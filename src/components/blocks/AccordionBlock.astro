@@ -1,0 +1,189 @@
+---
+/**
+ * AccordionBlock.astro
+ * EmDash Portable Text カスタムブロック：アコーディオン（開閉詳細・スペック・FAQ）
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		id?: string;
+		content?: string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+const title = node.id || "詳細情報を開く";
+const contentRaw = node.content || "";
+
+// テキストを行ごとに分解
+const lines = contentRaw
+	.split("\n")
+	.map((l: string) => l.trim())
+	.filter((l: string) => l.length > 0);
+
+// 「：」「:」「|」で区切られたキー・バリュー形式が含まれているかを判定
+const isTableFormat = lines.length > 0 && lines.every((l: string) => l.includes(":") || l.includes("：") || l.includes("|"));
+
+const tableRows = isTableFormat
+	? lines.map((l: string) => {
+			const sep = l.includes("：") ? "：" : (l.includes(":") ? ":" : "|");
+			const parts = l.split(sep);
+			return {
+				key: parts[0].trim(),
+				val: parts.slice(1).join(sep).trim()
+			};
+	  })
+	: [];
+---
+
+<details class="cms-accordion-block">
+	<summary class="cms-acc-summary">
+		<div class="summary-left">
+			<span class="acc-chevron-badge">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+			</span>
+			<span class="summary-title">{title}</span>
+		</div>
+		<span class="acc-status-tag">詳細を表示</span>
+	</summary>
+
+	<div class="cms-acc-body">
+		{isTableFormat && tableRows.length > 0 ? (
+			<table class="cms-acc-table">
+				<tbody>
+					{tableRows.map((row) => (
+						<tr>
+							<th>{row.key}</th>
+							<td>{row.val}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		) : (
+			<div class="cms-acc-text">
+				{lines.map((p: string) => (
+					<p>{p}</p>
+				))}
+			</div>
+		)}
+	</div>
+</details>
+
+<style>
+	.cms-accordion-block {
+		margin: 2rem 0;
+		background: #0f172a;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+	.cms-accordion-block:hover {
+		border-color: rgba(59, 130, 246, 0.4);
+	}
+	.cms-accordion-block[open] {
+		border-color: rgba(59, 130, 246, 0.6);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+	}
+	.cms-acc-summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem 1.5rem;
+		background: #1e293b;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background-color 0.2s;
+	}
+	.cms-acc-summary::-webkit-details-marker {
+		display: none;
+	}
+	.cms-acc-summary:hover {
+		background: #24334a;
+	}
+	.summary-left {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+	.acc-chevron-badge {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+		background: rgba(59, 130, 246, 0.15);
+		color: #3b82f6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s;
+	}
+	.acc-chevron-badge svg {
+		width: 16px;
+		height: 16px;
+	}
+	.cms-accordion-block[open] .acc-chevron-badge {
+		transform: rotate(180deg);
+		background: #3b82f6;
+		color: #ffffff;
+	}
+	.summary-title {
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+	}
+	.acc-status-tag {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		background: rgba(255, 255, 255, 0.05);
+		padding: 0.25rem 0.6rem;
+		border-radius: 4px;
+	}
+	.cms-accordion-block[open] .acc-status-tag {
+		content: "閉じる";
+		color: #38bdf8;
+	}
+	.cms-acc-body {
+		padding: 1.5rem;
+		background: #0f172a;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.cms-acc-table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 0;
+	}
+	.cms-acc-table tr {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+	.cms-acc-table tr:last-child {
+		border-bottom: none;
+	}
+	.cms-acc-table th {
+		width: 32%;
+		padding: 0.85rem 1rem 0.85rem 0;
+		text-align: left;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #94a3b8;
+		vertical-align: top;
+	}
+	.cms-acc-table td {
+		padding: 0.85rem 0;
+		font-size: 0.95rem;
+		color: #e2e8f0;
+		line-height: 1.6;
+	}
+	.cms-acc-text p {
+		margin: 0 0 1rem;
+		color: #cbd5e1;
+		line-height: 1.8;
+		font-size: 0.96rem;
+	}
+	.cms-acc-text p:last-child {
+		margin-bottom: 0;
+	}
+</style>

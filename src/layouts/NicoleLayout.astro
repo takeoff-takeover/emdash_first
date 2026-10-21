@@ -1,0 +1,183 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "HOME - ニコル・グループ",
+	description = "東京・神奈川エリアを中心に、世界のプレミアムブランドを通じて最高の喜びをお届けするカーディーラー・グループ。"
+} = Astro.props;
+
+import NicoleHeader from "../components/NicoleHeader.astro";
+import NicoleFooter from "../components/NicoleFooter.astro";
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>{title}</title>
+	<meta name="description" content={description} />
+	<link rel="icon" href="https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
+	<link rel="apple-touch-icon" href="https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
+
+	<!-- Google Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700,800,900|Roboto+Slab:100,200,300,400,500,600,700,800,900&display=swap" />
+
+	<!-- WordPress & Astra & Elementor Core Styles -->
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/themes/astra/assets/css/minified/main.min.css?ver=4.14.1" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-mega-menu.min.css?ver=4.3.2" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-loop-common.min.css?ver=4.3.2" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-loop-carousel.min.css?ver=4.3.2" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-loop-grid.min.css?ver=4.3.2" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/widget-spacer.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/css/widget-divider.min.css?ver=4.3.5" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-breadcrumbs.min.css?ver=4.3.2" />
+	<link rel="stylesheet" href="https://www.nicole.co.jp/wp/wp-content/plugins/elementor-pro/assets/css/widget-post-info.min.css?ver=4.3.2" />
+
+	<!-- Extracted Site Styles (Kit-8, Header 6801, Home 2030, Footer 12887, etc.) -->
+	<link rel="stylesheet" href="/css/nicole-core.css" />
+
+	<!-- Core scripts in head -->
+	<script is:inline src="https://www.nicole.co.jp/wp/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
+	<script is:inline src="https://www.nicole.co.jp/wp/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
+</head>
+
+<body class="home wp-singular page-template-default page page-id-2030 wp-custom-logo wp-embed-responsive wp-theme-astra eio-default nicole-brand nicole-brand-nicole nicole-brand-slug-nicole ast-desktop ast-page-builder-template ast-no-sidebar astra-4.14.1 group-blog ast-single-post ast-inherit-site-logo-transparent ast-hfb-header ast-full-width-primary-header ast-normal-title-enabled elementor-default elementor-kit-8 elementor-page elementor-page-2030 astra-addon-4.13.11">
+	<div class="hfeed site" id="page">
+		<NicoleHeader />
+
+		<div id="content" class="site-content">
+			<div class="ast-container">
+				<div id="primary" class="content-area primary">
+					<slot />
+				</div>
+			</div>
+		</div>
+
+		<NicoleFooter />
+	</div>
+
+	<!-- Interactive Behavior Scripts (Mega Menu, Lazyload, Swiper Init) -->
+	<script is:inline>
+		document.addEventListener('DOMContentLoaded', function() {
+			// 1. Lazyload backgrounds observer
+			const lazyloadRunObserver = () => {
+				const lazyloadBackgrounds = document.querySelectorAll('.e-con.e-parent');
+				lazyloadBackgrounds.forEach((bg) => {
+					bg.classList.add('e-lazyloaded');
+				});
+			};
+			lazyloadRunObserver();
+
+			// 2. Swiper Carousel Initialization
+			try {
+				if (typeof Swiper !== 'undefined') {
+					// Main Featured Magazine Carousel (elementor-element-a045b7c)
+					new Swiper('.elementor-element-a045b7c .elementor-loop-container', {
+						slidesPerView: 1,
+						loop: true,
+						speed: 600,
+						autoplay: {
+							delay: 4000,
+							disableOnInteraction: false,
+						},
+						pagination: {
+							el: '.elementor-element-a045b7c .swiper-pagination',
+							clickable: true,
+						},
+					});
+
+					// Secondary Magazine Grid Carousel (elementor-element-2a171cc)
+					new Swiper('.elementor-element-2a171cc .elementor-loop-container', {
+						slidesPerView: 1,
+						spaceBetween: 20,
+						loop: true,
+						speed: 500,
+						autoplay: {
+							delay: 3500,
+							disableOnInteraction: false,
+						},
+						pagination: {
+							el: '.elementor-element-2a171cc .swiper-pagination',
+							clickable: true,
+						},
+						breakpoints: {
+							768: {
+								slidesPerView: 2,
+								spaceBetween: 20,
+							},
+							1025: {
+								slidesPerView: 3,
+								spaceBetween: 20,
+							}
+						}
+					});
+				}
+			} catch (e) {
+				console.warn('Swiper init warning:', e);
+			}
+
+			// 3. Mega Menu Hover / Click Handling
+			const menuItems = document.querySelectorAll('.e-n-menu-item');
+			menuItems.forEach((item) => {
+				const title = item.querySelector('.e-n-menu-title');
+				const content = item.querySelector('.e-n-menu-content');
+				if (title && content) {
+					// Toggle open on click
+					title.addEventListener('click', (e) => {
+						const isOpen = item.classList.contains('e-active');
+						menuItems.forEach(mi => mi.classList.remove('e-active'));
+						if (!isOpen) {
+							item.classList.add('e-active');
+							content.style.display = 'block';
+						} else {
+							content.style.display = 'none';
+						}
+					});
+
+					// Also show on mouseenter for desktop
+					if (window.innerWidth > 1024) {
+						item.addEventListener('mouseenter', () => {
+							content.style.display = 'block';
+						});
+						item.addEventListener('mouseleave', () => {
+							content.style.display = 'none';
+						});
+					}
+				}
+			});
+
+			// Close mega menu when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!e.target.closest('.e-n-menu')) {
+					document.querySelectorAll('.e-n-menu-content').forEach(c => c.style.display = 'none');
+					menuItems.forEach(mi => mi.classList.remove('e-active'));
+				}
+			});
+
+			// Mobile Menu Toggle
+			const menuToggle = document.querySelector('.e-n-menu-toggle');
+			const menuWrapper = document.querySelector('.e-n-menu-wrapper');
+			if (menuToggle && menuWrapper) {
+				menuToggle.addEventListener('click', () => {
+					menuWrapper.classList.toggle('e-active');
+					const isExpanded = menuWrapper.classList.contains('e-active');
+					menuToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+					menuWrapper.style.display = isExpanded ? 'block' : 'none';
+				});
+			}
+		});
+	</script>
+</body>
+</html>

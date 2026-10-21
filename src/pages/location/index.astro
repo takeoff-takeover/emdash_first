@@ -1,0 +1,2076 @@
+---
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import locations from "../../data/locations.json";
+import mapPoints from "../../data/map-points.json";
+
+// ブランド一覧
+const brands = [
+	{ id: "all", name: "ALL BRANDS", label: "すべてのブランド" },
+	{ id: "BMW", name: "BMW", label: "BMW", color: "#0066b1" },
+	{ id: "MINI", name: "MINI", label: "MINI", color: "#222222" },
+	{ id: "Rolls-Royce", name: "ROLLS-ROYCE", label: "Rolls-Royce", color: "#4a3c5a" },
+	{ id: "Ferrari", name: "FERRARI", label: "Ferrari", color: "#d40000" },
+	{ id: "ALPINA", name: "ALPINA", label: "ALPINA", color: "#005522" },
+];
+
+// 施設タイプ一覧
+const facilityTypes = [
+	{ id: "all", label: "すべての施設タイプ" },
+	{ id: "ショールーム", label: "ショールーム（新車）" },
+	{ id: "認定中古車", label: "認定中古車ショールーム" },
+	{ id: "サービスセンター", label: "サービス / 点検・修理" },
+	{ id: "本社・オフィス", label: "本社・オフィス" },
+];
+
+// 代表的な人気エリア
+const quickAreas = [
+	{ name: "すべて", filter: "all" },
+	{ name: "東京・青山", filter: "東京" },
+	{ name: "東京・世田谷", filter: "東京" },
+	{ name: "東京・大田", filter: "東京" },
+	{ name: "川崎・幸区", filter: "神奈川" },
+	{ name: "川崎・宮前", filter: "神奈川" },
+	{ name: "新百合ヶ丘", filter: "神奈川" },
+	{ name: "横浜・港北", filter: "神奈川" },
+	{ name: "横浜・都筑", filter: "神奈川" },
+	{ name: "横浜・みなとみらい", filter: "神奈川" },
+];
+
+// エリアセレクト用
+const areas = [
+	{ id: "all", label: "すべてのエリア" },
+	{ id: "東京", label: "東京エリア（青山・世田谷・大田）" },
+	{ id: "神奈川", label: "神奈川エリア（川崎・横浜・港北・都筑・新百合ヶ丘）" },
+];
+---
+
+<NicoleLayout 
+	title="店舗・拠点を探す | SHOWROOMS & SERVICE LOCATIONS - ニコル・グループ"
+	description="東京・神奈川エリアを中心に展開するニコル・グループのショールーム・サービスセンター・認定中古車拠点一覧。BMW、MINI、ロールス・ロイス、フェラーリ、アルピナの正規拠点をご案内します。"
+>
+	<!-- Leaflet CSS & JS (CDN) -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+	<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+	<div class="location-hub">
+		<!-- ヒーローヘッダーセクション -->
+		<section class="location-hero">
+			<div class="location-hero__bg">
+				<div class="location-hero__glow"></div>
+			</div>
+			<div class="location-hero__inner">
+				<div class="location-hero__badge">
+					<span class="badge-dot"></span>
+					NICOLE GROUP AUTHORIZED DEALER NETWORK
+				</div>
+				<h1 class="location-hero__title">SHOWROOMS &amp; SERVICES</h1>
+				<p class="location-hero__sub">店舗・サービス拠点を探す</p>
+				<p class="location-hero__lead">
+					東京・神奈川エリアに広がる正規ディーラーネットワーク。<br />
+					最高峰のクラフトマンシップとおもてなしで、特別なカーライフ体験をお近くの拠点でお届けします。
+				</p>
+
+				<!-- 統計バッジ -->
+				<div class="location-hero__stats">
+					<div class="stat-item">
+						<span class="stat-number">{locations.length}</span>
+						<span class="stat-label">LOCATIONS</span>
+					</div>
+					<div class="stat-divider"></div>
+					<div class="stat-item">
+						<span class="stat-number">5</span>
+						<span class="stat-label">LUXURY BRANDS</span>
+					</div>
+					<div class="stat-divider"></div>
+					<div class="stat-item">
+						<span class="stat-number">2</span>
+						<span class="stat-label">METROPOLITAN AREAS</span>
+					</div>
+				</div>
+
+				<!-- エリアクイックセレクター（レーダーチップス） -->
+				<div class="area-radar">
+					<span class="area-radar__label">QUICK AREA:</span>
+					<div class="area-radar__chips">
+						{quickAreas.map((a, i) => (
+							<button 
+								type="button" 
+								class={`area-chip ${i === 0 ? 'active' : ''}`}
+								data-quick-area={a.name === 'すべて' ? 'all' : a.name}
+							>
+								{a.name}
+							</button>
+						))}
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ==============================================
+		     インタラクティブ ネットワークマップ セクション
+		============================================== -->
+		<section class="network-map-section" id="network-map-section">
+			<div class="map-header-bar">
+				<div class="map-header-left">
+					<div class="map-eyebrow">
+						<span class="map-indicator-dot"></span>
+						INTERACTIVE DEALER MAP
+					</div>
+					<h2 class="map-title">拠点ネットワークマップ</h2>
+					<p class="map-subtitle">
+						ピンをタップするとショールーム情報とGoogleマップ経路案内を表示します。
+					</p>
+				</div>
+				<div class="map-header-right">
+					<a 
+						href="https://www.google.com/maps/search/?api=1&query=Nicole+BMW+ショールーム" 
+						target="_blank" 
+						rel="noopener noreferrer" 
+						class="btn-open-gmaps-all"
+					>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="gmap-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+						Googleマップで全拠点を開く
+					</a>
+				</div>
+			</div>
+
+			<!-- マップラッパー -->
+			<div class="map-frame-box">
+				<div id="nicole-leaflet-map" class="nicole-leaflet-map"></div>
+
+				<!-- マップオーバーレイ操作パネル -->
+				<div class="map-controls-overlay">
+					<div class="map-brand-filter-pill">
+						<button type="button" class="map-filter-btn active" data-map-brand="all">ALL (15エリア)</button>
+						<button type="button" class="map-filter-btn" data-map-brand="BMW">
+							<span class="brand-dot brand-dot--bmw"></span>
+							BMW
+						</button>
+						<button type="button" class="map-filter-btn" data-map-brand="MINI">
+							<span class="brand-dot brand-dot--mini"></span>
+							MINI
+						</button>
+						<button type="button" class="map-filter-btn" data-map-brand="Rolls-Royce">
+							<span class="brand-dot brand-dot--rr"></span>
+							Rolls-Royce
+						</button>
+						<button type="button" class="map-filter-btn" data-map-brand="Ferrari">
+							<span class="brand-dot brand-dot--ferrari"></span>
+							Ferrari
+						</button>
+						<button type="button" class="map-filter-btn" data-map-brand="ALPINA">
+							<span class="brand-dot brand-dot--alpina"></span>
+							ALPINA
+						</button>
+					</div>
+
+					<button type="button" id="btn-reset-map-view" class="btn-map-fit" title="全体を表示">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+						全体表示
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- 検索・コントロールパネル (Sticky Hub) -->
+		<section class="filter-hub-wrapper">
+			<div class="filter-hub" id="filter-hub">
+				<!-- ブランドクイックセレクター -->
+				<div class="brand-selector" role="tablist" aria-label="ブランドで絞り込み">
+					{brands.map((b) => (
+						<button 
+							type="button" 
+							class={`brand-tab ${b.id === 'all' ? 'active' : ''}`}
+							data-filter-brand={b.id}
+							role="tab"
+						>
+							<span class="brand-tab__name">{b.name}</span>
+							<span class="brand-tab__indicator"></span>
+						</button>
+					))}
+				</div>
+
+				<!-- 詳細フィルター・検索バー -->
+				<div class="filter-controls">
+					<!-- 施設タイプ -->
+					<div class="control-group">
+						<label class="control-label" for="select-type">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="control-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+							施設タイプ
+						</label>
+						<select id="select-type" class="control-select">
+							{facilityTypes.map((t) => (
+								<option value={t.id}>{t.label}</option>
+							))}
+						</select>
+					</div>
+
+					<!-- エリア -->
+					<div class="control-group">
+						<label class="control-label" for="select-area">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="control-icon"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+							エリア
+						</label>
+						<select id="select-area" class="control-select">
+							{areas.map((a) => (
+								<option value={a.id}>{a.label}</option>
+							))}
+						</select>
+					</div>
+
+					<!-- フリーワード検索 -->
+					<div class="control-group control-group--search">
+						<label class="control-label" for="search-input">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="control-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+							キーワード検索
+						</label>
+						<div class="search-input-wrap">
+							<input 
+								type="text" 
+								id="search-input" 
+								class="control-input" 
+								placeholder="店舗名・住所・駅名などで検索..." 
+							/>
+							<button type="button" id="search-clear" class="search-clear" title="クリア">×</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 結果サマリーバー -->
+				<div class="filter-status-bar">
+					<div class="status-count">
+						該当店舗：<span id="filtered-count" class="count-highlight">{locations.length}</span> 件
+						<span class="status-total">/ 全 {locations.length} 拠点</span>
+					</div>
+					<div class="status-actions">
+						<button type="button" id="reset-filters" class="btn-reset">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+							すべての条件をリセット
+						</button>
+						<div class="view-toggles">
+							<button type="button" class="view-btn active" data-view="grid" title="グリッド表示">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+							</button>
+							<button type="button" class="view-btn" data-view="list" title="リスト表示">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 店舗カード一覧メイン -->
+		<section class="locations-main">
+			<div class="locations-container" id="locations-grid">
+				{locations.map((loc) => (
+					<article 
+						class="luxury-card"
+						data-brand={loc.brand}
+						data-facility={loc.facilityType}
+						data-area-group={loc.areaGroup}
+						data-specific-area={loc.specificArea}
+						data-point-number={loc.pointNumber || ''}
+						data-keywords={`${loc.name} ${loc.address} ${loc.brand} ${loc.facilityType} ${loc.specificArea} ${loc.services.join(' ')}`}
+						id={loc.id}
+					>
+						<!-- カード画像 -->
+						<div class="card-media">
+							<img 
+								src={loc.image} 
+								alt={loc.name} 
+								class="card-img" 
+								loading="lazy" 
+								decoding="async" 
+							/>
+							<div class="card-media__gradient"></div>
+							
+							<!-- ブランドバッジ -->
+							<div class={`brand-badge brand-badge--${loc.brand.toLowerCase()}`}>
+								{loc.brand}
+							</div>
+
+							<!-- 施設タイプタグ -->
+							<div class="facility-badge">
+								{loc.facilityType}
+							</div>
+						</div>
+
+						<!-- カード本文 -->
+						<div class="card-body">
+							<div class="card-area-tag">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tag-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+								{loc.areaGroup}エリア ｜ {loc.specificArea}
+							</div>
+
+							<h2 class="card-title">{loc.name}</h2>
+
+							<!-- 対応サービスピル -->
+							<div class="card-services">
+								{loc.services.map((s) => (
+									<span class="service-pill">{s}</span>
+								))}
+							</div>
+
+							<!-- 詳細情報リスト -->
+							<div class="card-details">
+								<div class="detail-row">
+									<div class="detail-icon" title="所在地">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+									</div>
+									<div class="detail-content">
+										<span class="postal">{loc.postal}</span>
+										<span class="address">{loc.address}</span>
+									</div>
+								</div>
+
+								<div class="detail-row">
+									<div class="detail-icon" title="お電話番号">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+									</div>
+									<div class="detail-content">
+										<a href={`tel:${loc.tel.replace(/-/g, '')}`} class="tel-link">
+											{loc.tel}
+										</a>
+									</div>
+								</div>
+
+								<div class="detail-row detail-row--hours">
+									<div class="detail-icon" title="営業時間・定休日">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+									</div>
+									<div class="detail-content">
+										<span class="hours">営業時間：{loc.hours}</span>
+										<span class="closed">定休日：{loc.closed}</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- アクションボタンフッター -->
+							<div class="card-actions">
+								<a 
+									href={`https://www.google.com/maps/search/?api=1&query=${loc.mapQuery}`} 
+									target="_blank" 
+									rel="noopener noreferrer" 
+									class="card-btn card-btn--map"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+									Googleマップ
+								</a>
+								<a 
+									href={`tel:${loc.tel.replace(/-/g, '')}`} 
+									class="card-btn card-btn--tel"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+									電話をかける
+								</a>
+								{loc.detailUrl ? (
+									<a 
+										href={loc.detailUrl} 
+										class="card-btn card-btn--detail card-btn--featured"
+									>
+										ショールーム詳細
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+									</a>
+								) : loc.url ? (
+									<a 
+										href={loc.url} 
+										target="_blank" 
+										rel="noopener noreferrer" 
+										class="card-btn card-btn--detail"
+									>
+										拠点情報を見る
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+									</a>
+								) : null}
+							</div>
+						</div>
+					</article>
+				))}
+			</div>
+
+			<!-- 該当なしのプレースホルダー -->
+			<div id="no-results" class="no-results" style="display: none;">
+				<div class="no-results__icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+				</div>
+				<h3 class="no-results__title">条件に該当する店舗が見つかりませんでした</h3>
+				<p class="no-results__desc">検索キーワードを変更するか、フィルター条件をリセットしてお試しください。</p>
+				<button type="button" id="btn-reset-empty" class="btn-nicole-reset">条件をすべてリセット</button>
+			</div>
+		</section>
+	</div>
+
+	<!-- マップ初期化および連動スクリプト -->
+	<script is:inline define:vars={{ mapPoints, locations }}>
+		document.addEventListener('DOMContentLoaded', function() {
+			// ==========================================
+			// 1. 各ブランドのSVGマーク定義
+			// ==========================================
+			// ★ユーザー様のご要望：「1とか2って数字をBMWマークにしたい」
+			// BMWマーク（高精細な青・白4分割サークルプロペラエンブレム）
+			const bmwMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg bmw-svg">
+					<circle cx="50" cy="50" r="48" fill="#000000" stroke="#ffffff" stroke-width="2.5"/>
+					<circle cx="50" cy="50" r="37" fill="#ffffff"/>
+					<path d="M50 13 A37 37 0 0 1 87 50 L50 50 Z" fill="#0066b1"/>
+					<path d="M50 50 L13 50 A37 37 0 0 1 50 13 Z" fill="#ffffff"/>
+					<path d="M50 50 L50 87 A37 37 0 0 1 13 50 Z" fill="#0066b1"/>
+					<path d="M50 50 L87 50 A37 37 0 0 1 50 87 Z" fill="#ffffff"/>
+					<circle cx="50" cy="50" r="37" fill="none" stroke="#000000" stroke-width="1.2"/>
+					<text x="50" y="21" font-family="'Inter', sans-serif" font-weight="900" font-size="9" fill="#ffffff" text-anchor="middle">B</text>
+					<text x="76" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="9" fill="#ffffff" text-anchor="middle">M</text>
+					<text x="24" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="9" fill="#ffffff" text-anchor="middle">W</text>
+				</svg>
+			`;
+
+			const miniMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg mini-svg">
+					<circle cx="50" cy="50" r="46" fill="#18181b" stroke="#ffffff" stroke-width="2"/>
+					<circle cx="50" cy="50" r="32" fill="#27272a"/>
+					<text x="50" y="56" font-family="'Inter', sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle" letter-spacing="1">MINI</text>
+				</svg>
+			`;
+
+			const rrMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg rr-svg">
+					<circle cx="50" cy="50" r="46" fill="#2d1c3a" stroke="#d4af37" stroke-width="2"/>
+					<text x="44" y="58" font-family="'Times New Roman', serif" font-weight="700" font-size="28" fill="#ffffff" text-anchor="middle">R</text>
+					<text x="56" y="66" font-family="'Times New Roman', serif" font-weight="700" font-size="28" fill="#d4af37" text-anchor="middle">R</text>
+				</svg>
+			`;
+
+			const ferrariMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg ferrari-svg">
+					<circle cx="50" cy="50" r="46" fill="#cc0000" stroke="#ffeb3b" stroke-width="2.5"/>
+					<path d="M50 20 L58 45 L50 42 L42 45 Z" fill="#ffffff" opacity="0.3"/>
+					<text x="50" y="60" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">FERRARI</text>
+				</svg>
+			`;
+
+			const alpinaMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg alpina-svg">
+					<circle cx="50" cy="50" r="46" fill="#00441b" stroke="#ffffff" stroke-width="2"/>
+					<circle cx="50" cy="50" r="36" fill="#003314"/>
+					<text x="50" y="56" font-family="'Inter', sans-serif" font-weight="900" font-size="11" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">ALPINA</text>
+				</svg>
+			`;
+
+			const nicoleMarkSvg = `
+				<svg viewBox="0 0 100 100" class="pin-brand-svg nicole-svg">
+					<circle cx="50" cy="50" r="46" fill="#18181b" stroke="#ffffff" stroke-width="2"/>
+					<text x="50" y="62" font-family="'Inter', sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">N</text>
+				</svg>
+			`;
+
+			function getBrandMark(brand) {
+				if (brand === 'BMW') return bmwMarkSvg;
+				if (brand === 'MINI') return miniMarkSvg;
+				if (brand === 'Rolls-Royce') return rrMarkSvg;
+				if (brand === 'Ferrari') return ferrariMarkSvg;
+				if (brand === 'ALPINA') return alpinaMarkSvg;
+				return nicoleMarkSvg;
+			}
+
+			// ==========================================
+			// 2. Leaflet 地図の初期化 (Dark Matter テーマ)
+			// ==========================================
+			const mapEl = document.getElementById('nicole-leaflet-map');
+			if (!mapEl || typeof L === 'undefined') return;
+
+			// 東京・神奈川エリアの中心（川崎〜横浜港北）
+			const defaultCenter = [35.56, 139.63];
+			const defaultZoom = 11;
+
+			const map = L.map('nicole-leaflet-map', {
+				center: defaultCenter,
+				zoom: defaultZoom,
+				zoomControl: false,
+				attributionControl: false
+			});
+
+			// 右上にズームコントロール
+			L.control.zoom({ position: 'topright' }).addTo(map);
+
+			// CartoDB Dark Matter タイル（漆黒・ダークラグジュアリー）
+			L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+				maxZoom: 19,
+				subdomains: 'abcd',
+			}).addTo(map);
+
+			// ==========================================
+			// 3. マーカーピンの配置（BMWマーク等）
+			// ==========================================
+			const markerLayerGroup = L.layerGroup().addTo(map);
+			const markers = [];
+
+			mapPoints.forEach(point => {
+				// 代表ブランドの判定
+				const brands = point.locations.map(l => l.brand);
+				let primaryBrand = 'Nicole Group';
+				if (brands.includes('BMW')) primaryBrand = 'BMW';
+				else if (brands.includes('MINI')) primaryBrand = 'MINI';
+				else if (brands.includes('Ferrari')) primaryBrand = 'Ferrari';
+				else if (brands.includes('Rolls-Royce')) primaryBrand = 'Rolls-Royce';
+				else if (brands.includes('ALPINA')) primaryBrand = 'ALPINA';
+
+				const brandSvg = getBrandMark(primaryBrand);
+
+				// カスタムHTMLアイコン（BMWマークやブランドエンブレムが浮かび上がるピン）
+				const customIcon = L.divIcon({
+					className: 'lux-marker-wrap',
+					html: `
+						<div class="lux-pin lux-pin--${primaryBrand.toLowerCase()}" data-brand="${primaryBrand}">
+							<div class="lux-pin__halo"></div>
+							<div class="lux-pin__head">
+								${brandSvg}
+							</div>
+							<div class="lux-pin__tip"></div>
+							<div class="lux-pin__badge-text">${point.title}</div>
+						</div>
+					`,
+					iconSize: [44, 44],
+					iconAnchor: [22, 44],
+					popupAnchor: [0, -44]
+				});
+
+				// ポップアップ用HTML構築
+				const mainLoc = point.locations[0] || {};
+				const isKawasaki = point.title.includes('川崎・幸区') || point.number === 4;
+				const detailUrl = isKawasaki ? '/location/nicole-bmw-kawasaki/' : mainLoc.url;
+
+				const gmapRouteUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mainLoc.title + ' ' + point.title)}`;
+
+				const popupContent = `
+					<div class="lux-popup">
+						<div class="lux-popup__top">
+							<span class="lux-popup__brand-tag lux-popup__brand-tag--${primaryBrand.toLowerCase()}">${primaryBrand}</span>
+							<span class="lux-popup__area">${point.title}</span>
+						</div>
+						<h4 class="lux-popup__name">${mainLoc.title || point.title}</h4>
+						<div class="lux-popup__sublist">
+							${point.locations.map(l => `<span class="sub-item">${l.types.join('/')}：${l.title}</span>`).join('')}
+						</div>
+						<div class="lux-popup__btns">
+							<a href="${gmapRouteUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn popup-btn--gmap">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+								Googleマップでルート案内
+							</a>
+							${detailUrl ? `
+								<a href="${detailUrl}" class="popup-btn popup-btn--detail">
+									店舗詳細を見る →
+								</a>
+							` : ''}
+						</div>
+					</div>
+				`;
+
+				const marker = L.marker([point.lat, point.lng], { icon: customIcon });
+				marker.bindPopup(popupContent, {
+					className: 'lux-custom-leaflet-popup',
+					maxWidth: 320,
+					closeButton: true
+				});
+
+				marker.pointData = point;
+				marker.primaryBrand = primaryBrand;
+				markerLayerGroup.addLayer(marker);
+				markers.push(marker);
+			});
+
+			// 全体表示ボタン
+			const fitBtn = document.getElementById('btn-reset-map-view');
+			if (fitBtn) {
+				fitBtn.addEventListener('click', () => {
+					map.setView(defaultCenter, defaultZoom, { animate: true });
+				});
+			}
+
+			// マップ上部ブランドフィルター
+			const mapFilterBtns = document.querySelectorAll('.map-filter-btn');
+			mapFilterBtns.forEach(btn => {
+				btn.addEventListener('click', () => {
+					mapFilterBtns.forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					const targetBrand = btn.dataset.mapBrand;
+
+					const activeLatLngs = [];
+
+					markers.forEach(m => {
+						const el = m.getElement();
+						if (!el) return;
+
+						if (targetBrand === 'all' || m.primaryBrand === targetBrand) {
+							el.style.opacity = '1';
+							el.style.pointerEvents = 'auto';
+							el.classList.remove('lux-pin--dimmed');
+							activeLatLngs.push(m.getLatLng());
+						} else {
+							el.style.opacity = '0.2';
+							el.style.pointerEvents = 'none';
+							el.classList.add('lux-pin--dimmed');
+						}
+					});
+
+					if (activeLatLngs.length > 0) {
+						const bounds = L.latLngBounds(activeLatLngs);
+						map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true });
+					}
+				});
+			});
+
+			// ==========================================
+			// 4. 下部カード一覧のフィルター機能
+			// ==========================================
+			let currentBrand = 'all';
+			let currentType = 'all';
+			let currentArea = 'all';
+			let currentSearch = '';
+
+			const cards = document.querySelectorAll('.luxury-card');
+			const countEl = document.getElementById('filtered-count');
+			const noResultsEl = document.getElementById('no-results');
+			const gridEl = document.getElementById('locations-grid');
+
+			const brandTabs = document.querySelectorAll('.brand-tab');
+			const areaChips = document.querySelectorAll('.area-chip');
+			const selectType = document.getElementById('select-type');
+			const selectArea = document.getElementById('select-area');
+			const searchInput = document.getElementById('search-input');
+			const searchClear = document.getElementById('search-clear');
+			const resetBtn = document.getElementById('reset-filters');
+			const resetEmptyBtn = document.getElementById('btn-reset-empty');
+			const viewBtns = document.querySelectorAll('.view-btn');
+
+			function filterCards() {
+				let visibleCount = 0;
+				const searchLower = currentSearch.toLowerCase().trim();
+
+				cards.forEach(card => {
+					const cardBrand = card.dataset.brand;
+					const cardFacility = card.dataset.facility;
+					const cardAreaGroup = card.dataset.areaGroup;
+					const cardKeywords = card.dataset.keywords.toLowerCase();
+
+					const matchBrand = (currentBrand === 'all') || (cardBrand === currentBrand);
+					const matchType = (currentType === 'all') || (cardFacility === currentType);
+					const matchArea = (currentArea === 'all') || (cardAreaGroup === currentArea) || (cardKeywords.includes(currentArea.toLowerCase()));
+					const matchSearch = (!searchLower) || (cardKeywords.includes(searchLower));
+
+					if (matchBrand && matchType && matchArea && matchSearch) {
+						card.style.display = '';
+						visibleCount++;
+					} else {
+						card.style.display = 'none';
+					}
+				});
+
+				if (countEl) countEl.textContent = visibleCount;
+				if (noResultsEl) noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+				if (gridEl) gridEl.style.display = visibleCount === 0 ? 'none' : 'grid';
+			}
+
+			// ブランドタブ切り替え
+			brandTabs.forEach(tab => {
+				tab.addEventListener('click', () => {
+					brandTabs.forEach(t => t.classList.remove('active'));
+					tab.classList.add('active');
+					currentBrand = tab.dataset.filterBrand;
+
+					// マップ側ボタンとも同期
+					mapFilterBtns.forEach(mb => {
+						if (mb.dataset.mapBrand === currentBrand) {
+							mb.click();
+						}
+					});
+
+					filterCards();
+				});
+			});
+
+			// エリアチップスクリック
+			areaChips.forEach(chip => {
+				chip.addEventListener('click', () => {
+					areaChips.forEach(c => c.classList.remove('active'));
+					chip.classList.add('active');
+					const areaVal = chip.dataset.quickArea;
+					if (areaVal === 'all') {
+						currentArea = 'all';
+						if (selectArea) selectArea.value = 'all';
+					} else {
+						currentArea = areaVal;
+					}
+					filterCards();
+
+					// マップも該当エリアへパン
+					if (areaVal !== 'all') {
+						const matchedPoint = mapPoints.find(p => p.title.includes(areaVal) || areaVal.includes(p.title));
+						if (matchedPoint) {
+							map.setView([matchedPoint.lat, matchedPoint.lng], 13, { animate: true });
+							const m = markers.find(mk => mk.pointData.id === matchedPoint.id);
+							if (m) m.openPopup();
+						}
+					}
+				});
+			});
+
+			// セレクトボックス変更
+			if (selectType) {
+				selectType.addEventListener('change', (e) => {
+					currentType = e.target.value;
+					filterCards();
+				});
+			}
+
+			if (selectArea) {
+				selectArea.addEventListener('change', (e) => {
+					currentArea = e.target.value;
+					filterCards();
+				});
+			}
+
+			// 検索入力
+			if (searchInput) {
+				searchInput.addEventListener('input', (e) => {
+					currentSearch = e.target.value;
+					if (searchClear) searchClear.style.display = currentSearch ? 'flex' : 'none';
+					filterCards();
+				});
+			}
+
+			if (searchClear) {
+				searchClear.addEventListener('click', () => {
+					searchInput.value = '';
+					currentSearch = '';
+					searchClear.style.display = 'none';
+					filterCards();
+				});
+			}
+
+			// リセット
+			function resetAll() {
+				currentBrand = 'all';
+				currentType = 'all';
+				currentArea = 'all';
+				currentSearch = '';
+
+				brandTabs.forEach((t, i) => t.classList.toggle('active', i === 0));
+				areaChips.forEach((c, i) => c.classList.toggle('active', i === 0));
+				if (selectType) selectType.value = 'all';
+				if (selectArea) selectArea.value = 'all';
+				if (searchInput) searchInput.value = '';
+				if (searchClear) searchClear.style.display = 'none';
+
+				mapFilterBtns.forEach((mb, i) => mb.classList.toggle('active', i === 0));
+				markers.forEach(m => {
+					const el = m.getElement();
+					if (el) {
+						el.style.opacity = '1';
+						el.style.pointerEvents = 'auto';
+					}
+				});
+				map.setView(defaultCenter, defaultZoom, { animate: true });
+
+				filterCards();
+			}
+
+			if (resetBtn) resetBtn.addEventListener('click', resetAll);
+			if (resetEmptyBtn) resetEmptyBtn.addEventListener('click', resetAll);
+
+			// 表示モード切り替え（グリッド / リスト）
+			viewBtns.forEach(btn => {
+				btn.addEventListener('click', () => {
+					viewBtns.forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					const viewMode = btn.dataset.view;
+					if (gridEl) {
+						if (viewMode === 'list') {
+							gridEl.classList.add('locations-container--list');
+						} else {
+							gridEl.classList.remove('locations-container--list');
+						}
+					}
+				});
+			});
+		});
+	</script>
+</NicoleLayout>
+
+<style>
+	:root {
+		--loc-bg-dark: #0a0a0c;
+		--loc-surface-card: #141418;
+		--loc-surface-hover: #1c1c22;
+		--loc-border: rgba(255, 255, 255, 0.08);
+		--loc-border-focus: rgba(255, 255, 255, 0.25);
+		--loc-text-main: #f4f4f5;
+		--loc-text-muted: #a1a1aa;
+		--loc-accent-red: #e10600;
+		--loc-brand-bmw: #0066b1;
+		--loc-brand-mini: #27272a;
+		--loc-brand-rr: #4a3c5a;
+		--loc-brand-ferrari: #d40000;
+		--loc-brand-alpina: #005522;
+	}
+
+	.location-hub {
+		background-color: var(--loc-bg-dark);
+		color: var(--loc-text-main);
+		min-height: 100vh;
+		padding-bottom: 100px;
+	}
+
+	/* --- ヒーローセクション --- */
+	.location-hero {
+		position: relative;
+		padding-top: 150px;
+		padding-bottom: 60px;
+		text-align: center;
+		overflow: hidden;
+		border-bottom: 1px solid var(--loc-border);
+	}
+
+	.location-hero__bg {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.location-hero__glow {
+		position: absolute;
+		top: -100px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 800px;
+		height: 400px;
+		background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.07) 0%, rgba(0, 0, 0, 0) 70%);
+	}
+
+	.location-hero__inner {
+		position: relative;
+		z-index: 1;
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 0 24px;
+	}
+
+	.location-hero__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #a1a1aa;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--loc-border);
+		padding: 6px 14px;
+		border-radius: 30px;
+		margin-bottom: 24px;
+	}
+
+	.badge-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--loc-accent-red);
+		box-shadow: 0 0 8px var(--loc-accent-red);
+	}
+
+	.location-hero__title {
+		font-size: clamp(32px, 5vw, 54px);
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		color: #ffffff;
+		margin: 0 0 10px 0;
+		line-height: 1.15;
+	}
+
+	.location-hero__sub {
+		font-size: 15px;
+		letter-spacing: 0.2em;
+		color: #71717a;
+		margin: 0 0 24px 0;
+	}
+
+	.location-hero__lead {
+		font-size: 15px;
+		line-height: 1.8;
+		color: var(--loc-text-muted);
+		max-width: 680px;
+		margin: 0 auto 36px auto;
+	}
+
+	/* 統計バッジ */
+	.location-hero__stats {
+		display: inline-flex;
+		align-items: center;
+		gap: 32px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid var(--loc-border);
+		backdrop-filter: blur(8px);
+		border-radius: 16px;
+		padding: 16px 36px;
+		margin-bottom: 36px;
+	}
+
+	.stat-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.stat-number {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 28px;
+		font-weight: 700;
+		color: #ffffff;
+		line-height: 1;
+	}
+
+	.stat-label {
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		color: #71717a;
+		margin-top: 6px;
+	}
+
+	.stat-divider {
+		width: 1px;
+		height: 32px;
+		background: var(--loc-border);
+	}
+
+	/* エリアレーダー */
+	.area-radar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 10px;
+	}
+
+	.area-radar__label {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 11px;
+		color: #71717a;
+		letter-spacing: 0.08em;
+	}
+
+	.area-radar__chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		justify-content: center;
+	}
+
+	.area-chip {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid var(--loc-border);
+		color: #d4d4d8;
+		font-size: 12px;
+		padding: 6px 14px;
+		border-radius: 20px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.area-chip:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.area-chip.active {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+		font-weight: 600;
+	}
+
+	/* ==============================================
+	   ネットワークマップ セクション
+	============================================== */
+	.network-map-section {
+		max-width: 1240px;
+		margin: 40px auto 0 auto;
+		padding: 0 24px;
+	}
+
+	.map-header-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 20px;
+		gap: 20px;
+	}
+
+	.map-eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		color: #38bdf8;
+		margin-bottom: 4px;
+	}
+
+	.map-indicator-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #38bdf8;
+		box-shadow: 0 0 8px #38bdf8;
+	}
+
+	.map-title {
+		font-size: 22px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 6px 0;
+	}
+
+	.map-subtitle {
+		font-size: 13px;
+		color: var(--loc-text-muted);
+		margin: 0;
+	}
+
+	.btn-open-gmaps-all {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 18px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		color: #ffffff;
+		font-size: 13px;
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: all 0.2s ease;
+	}
+
+	.btn-open-gmaps-all:hover {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: #ffffff;
+		transform: translateY(-1px);
+	}
+
+	.gmap-icon {
+		width: 16px;
+		height: 16px;
+		color: #38bdf8;
+	}
+
+	/* マップフレームボックス */
+	.map-frame-box {
+		position: relative;
+		border-radius: 16px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+		background: #090a0d;
+	}
+
+	.nicole-leaflet-map {
+		width: 100%;
+		height: 520px;
+		background: #090a0d;
+	}
+
+	/* マップオーバーレイコントロール */
+	.map-controls-overlay {
+		position: absolute;
+		top: 16px;
+		left: 16px;
+		right: 16px;
+		z-index: 1000;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+		pointer-events: none;
+	}
+
+	.map-brand-filter-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px;
+		background: rgba(13, 15, 18, 0.88);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 30px;
+		pointer-events: auto;
+		overflow-x: auto;
+		max-width: calc(100% - 120px);
+	}
+
+	.map-filter-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		background: transparent;
+		border: none;
+		color: #a1a1aa;
+		font-size: 12px;
+		font-weight: 500;
+		border-radius: 20px;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: all 0.2s ease;
+	}
+
+	.map-filter-btn:hover {
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.map-filter-btn.active {
+		background: #ffffff;
+		color: #000000;
+		font-weight: 700;
+	}
+
+	.brand-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+	}
+	.brand-dot--bmw { background: #0066b1; }
+	.brand-dot--mini { background: #71717a; }
+	.brand-dot--rr { background: #9d82b4; }
+	.brand-dot--ferrari { background: #d40000; }
+	.brand-dot--alpina { background: #00aa44; }
+
+	.btn-map-fit {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 14px;
+		background: rgba(13, 15, 18, 0.88);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 20px;
+		color: #ffffff;
+		font-size: 12px;
+		cursor: pointer;
+		pointer-events: auto;
+		transition: all 0.2s ease;
+	}
+
+	.btn-map-fit:hover {
+		background: rgba(255, 255, 255, 0.18);
+	}
+
+	.btn-map-fit svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* ==============================================
+	   カスタムピン (BMWマークなど)
+	============================================== */
+	:global(.lux-marker-wrap) {
+		background: transparent;
+		border: none;
+	}
+
+	:global(.lux-pin) {
+		position: relative;
+		width: 44px;
+		height: 44px;
+		cursor: pointer;
+		transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	:global(.lux-pin:hover) {
+		transform: scale(1.18) translateY(-4px);
+		z-index: 1000 !important;
+	}
+
+	:global(.lux-pin__head) {
+		width: 42px;
+		height: 42px;
+		border-radius: 50%;
+		background: #000000;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.4);
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		z-index: 2;
+	}
+
+	:global(.lux-pin--bmw .lux-pin__head) {
+		box-shadow: 0 4px 18px rgba(0, 102, 177, 0.6), 0 0 0 2.5px #0066b1;
+	}
+
+	:global(.lux-pin--ferrari .lux-pin__head) {
+		box-shadow: 0 4px 18px rgba(212, 0, 0, 0.6), 0 0 0 2.5px #d40000;
+	}
+
+	:global(.lux-pin--alpina .lux-pin__head) {
+		box-shadow: 0 4px 18px rgba(0, 85, 34, 0.6), 0 0 0 2.5px #005522;
+	}
+
+	:global(.lux-pin__tip) {
+		position: absolute;
+		bottom: -5px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 0;
+		border-left: 6px solid transparent;
+		border-right: 6px solid transparent;
+		border-top: 8px solid #ffffff;
+		z-index: 1;
+	}
+
+	:global(.lux-pin--bmw .lux-pin__tip) {
+		border-top-color: #0066b1;
+	}
+
+	:global(.lux-pin__halo) {
+		position: absolute;
+		inset: -6px;
+		border-radius: 50%;
+		background: rgba(0, 102, 177, 0.25);
+		opacity: 0;
+		animation: pin-pulse 2.2s infinite ease-out;
+		z-index: 0;
+	}
+
+	:global(.lux-pin--bmw .lux-pin__halo) {
+		opacity: 1;
+	}
+
+	@keyframes pin-pulse {
+		0% { transform: scale(0.8); opacity: 0.8; }
+		100% { transform: scale(1.6); opacity: 0; }
+	}
+
+	:global(.pin-brand-svg) {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	:global(.lux-pin__badge-text) {
+		position: absolute;
+		top: -24px;
+		left: 50%;
+		transform: translateX(-50%);
+		background: rgba(10, 10, 12, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		padding: 2px 8px;
+		border-radius: 4px;
+		font-size: 11px;
+		color: #ffffff;
+		white-space: nowrap;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease, transform 0.2s ease;
+	}
+
+	:global(.lux-pin:hover .lux-pin__badge-text) {
+		opacity: 1;
+		transform: translateX(-50%) translateY(-2px);
+	}
+
+	/* Leaflet ポップアップのダークカスタマイズ */
+	:global(.lux-custom-leaflet-popup .leaflet-popup-content-wrapper) {
+		background: rgba(18, 20, 24, 0.95) !important;
+		backdrop-filter: blur(14px) !important;
+		border: 1px solid rgba(255, 255, 255, 0.16) !important;
+		border-radius: 12px !important;
+		color: #ffffff !important;
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7) !important;
+		padding: 0 !important;
+	}
+
+	:global(.lux-custom-leaflet-popup .leaflet-popup-content) {
+		margin: 16px 18px !important;
+		line-height: 1.5 !important;
+	}
+
+	:global(.lux-custom-leaflet-popup .leaflet-popup-tip) {
+		background: rgba(18, 20, 24, 0.95) !important;
+		border: 1px solid rgba(255, 255, 255, 0.16) !important;
+	}
+
+	:global(.lux-popup__top) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 8px;
+	}
+
+	:global(.lux-popup__brand-tag) {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 10px;
+		font-weight: 700;
+		padding: 2px 8px;
+		border-radius: 4px;
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+	}
+
+	:global(.lux-popup__brand-tag--bmw) {
+		background: #0066b1;
+		color: #ffffff;
+	}
+
+	:global(.lux-popup__brand-tag--ferrari) {
+		background: #d40000;
+		color: #ffffff;
+	}
+
+	:global(.lux-popup__area) {
+		font-size: 11px;
+		color: #a1a1aa;
+	}
+
+	:global(.lux-popup__name) {
+		font-size: 15px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	:global(.lux-popup__sublist) {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+		font-size: 11px;
+		color: #d4d4d8;
+		margin-bottom: 14px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	:global(.lux-popup__btns) {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	:global(.popup-btn) {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 12px;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	:global(.popup-btn--gmap) {
+		background: #0066b1;
+		color: #ffffff;
+	}
+
+	:global(.popup-btn--gmap:hover) {
+		background: #0077cf;
+	}
+
+	:global(.popup-btn--gmap svg) {
+		width: 14px;
+		height: 14px;
+	}
+
+	:global(.popup-btn--detail) {
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	:global(.popup-btn--detail:hover) {
+		background: rgba(255, 255, 255, 0.18);
+	}
+
+	/* --- Sticky Control Hub --- */
+	.filter-hub-wrapper {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		background: rgba(10, 10, 12, 0.95);
+		backdrop-filter: blur(16px);
+		border-bottom: 1px solid var(--loc-border);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		margin-top: 40px;
+	}
+
+	.filter-hub {
+		max-width: 1240px;
+		margin: 0 auto;
+		padding: 16px 24px;
+	}
+
+	/* ブランドタブセレクター */
+	.brand-selector {
+		display: flex;
+		gap: 4px;
+		border-bottom: 1px solid var(--loc-border);
+		padding-bottom: 12px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.brand-selector::-webkit-scrollbar {
+		display: none;
+	}
+
+	.brand-tab {
+		position: relative;
+		background: transparent;
+		border: none;
+		color: #71717a;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		padding: 8px 16px;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: color 0.2s;
+	}
+
+	.brand-tab:hover {
+		color: #ffffff;
+	}
+
+	.brand-tab.active {
+		color: #ffffff;
+	}
+
+	.brand-tab__indicator {
+		position: absolute;
+		bottom: -13px;
+		left: 16px;
+		right: 16px;
+		height: 2px;
+		background: transparent;
+		transition: background 0.2s;
+	}
+
+	.brand-tab.active .brand-tab__indicator {
+		background: var(--loc-accent-red);
+	}
+
+	/* 詳細コントロール */
+	.filter-controls {
+		display: grid;
+		grid-template-columns: 220px 240px 1fr;
+		gap: 16px;
+		margin-top: 16px;
+	}
+
+	.control-group {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.control-label {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 600;
+		color: #a1a1aa;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.control-icon {
+		width: 13px;
+		height: 13px;
+		color: #71717a;
+	}
+
+	.control-select {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--loc-border);
+		color: #ffffff;
+		font-size: 13px;
+		padding: 9px 12px;
+		border-radius: 8px;
+		outline: none;
+		transition: border-color 0.2s;
+		cursor: pointer;
+	}
+
+	.control-select:focus {
+		border-color: var(--loc-border-focus);
+	}
+
+	.control-select option {
+		background: #1c1c22;
+		color: #ffffff;
+	}
+
+	.search-input-wrap {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+
+	.control-input {
+		width: 100%;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--loc-border);
+		color: #ffffff;
+		font-size: 13px;
+		padding: 9px 36px 9px 12px;
+		border-radius: 8px;
+		outline: none;
+		transition: border-color 0.2s, background 0.2s;
+	}
+
+	.control-input:focus {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: var(--loc-border-focus);
+	}
+
+	.control-input::placeholder {
+		color: #52525b;
+	}
+
+	.search-clear {
+		position: absolute;
+		right: 10px;
+		background: transparent;
+		border: none;
+		color: #71717a;
+		font-size: 16px;
+		cursor: pointer;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+	}
+
+	.search-clear:hover {
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	/* ステータスバー */
+	.filter-status-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 14px;
+		padding-top: 12px;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		font-size: 12px;
+	}
+
+	.status-count {
+		color: #a1a1aa;
+	}
+
+	.count-highlight {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 16px;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.status-total {
+		color: #52525b;
+		margin-left: 4px;
+	}
+
+	.status-actions {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.btn-reset {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		background: transparent;
+		border: none;
+		color: #a1a1aa;
+		font-size: 12px;
+		cursor: pointer;
+		transition: color 0.2s;
+	}
+
+	.btn-reset:hover {
+		color: #ffffff;
+	}
+
+	.btn-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	.view-toggles {
+		display: flex;
+		gap: 4px;
+		background: rgba(255, 255, 255, 0.05);
+		padding: 3px;
+		border-radius: 6px;
+	}
+
+	.view-btn {
+		background: transparent;
+		border: none;
+		color: #71717a;
+		padding: 5px;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+	}
+
+	.view-btn svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	.view-btn.active {
+		background: rgba(255, 255, 255, 0.15);
+		color: #ffffff;
+	}
+
+	/* --- 店舗カード一覧メイン --- */
+	.locations-main {
+		max-width: 1240px;
+		margin: 40px auto 0 auto;
+		padding: 0 24px;
+	}
+
+	.locations-container {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+		gap: 32px;
+		transition: opacity 0.2s;
+	}
+
+	/* ラグジュアリーカード */
+	.luxury-card {
+		background: var(--loc-surface-card);
+		border: 1px solid var(--loc-border);
+		border-radius: 14px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
+		position: relative;
+	}
+
+	.luxury-card:hover {
+		transform: translateY(-4px);
+		border-color: rgba(255, 255, 255, 0.2);
+		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+	}
+
+	.card-media {
+		position: relative;
+		height: 220px;
+		overflow: hidden;
+		background: #18181b;
+	}
+
+	.card-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.luxury-card:hover .card-img {
+		transform: scale(1.05);
+	}
+
+	.card-media__gradient {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(20, 20, 24, 0.8) 100%);
+	}
+
+	.brand-badge {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 4px 10px;
+		border-radius: 4px;
+		color: #ffffff;
+		backdrop-filter: blur(8px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	}
+
+	.brand-badge--bmw { background: rgba(0, 102, 177, 0.9); }
+	.brand-badge--mini { background: rgba(39, 39, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.2); }
+	.brand-badge--rolls-royce { background: rgba(74, 60, 90, 0.9); }
+	.brand-badge--ferrari { background: rgba(212, 0, 0, 0.9); }
+	.brand-badge--alpina { background: rgba(0, 85, 34, 0.9); }
+
+	.facility-badge {
+		position: absolute;
+		bottom: 14px;
+		left: 14px;
+		font-size: 11px;
+		font-weight: 500;
+		color: #ffffff;
+		background: rgba(0, 0, 0, 0.7);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		padding: 3px 8px;
+		border-radius: 4px;
+	}
+
+	.card-body {
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.card-area-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 600;
+		color: #a1a1aa;
+		letter-spacing: 0.05em;
+		margin-bottom: 8px;
+	}
+
+	.tag-pin {
+		width: 12px;
+		height: 12px;
+		color: var(--loc-accent-red);
+	}
+
+	.card-title {
+		font-size: 19px;
+		font-weight: 700;
+		color: #ffffff;
+		line-height: 1.35;
+		margin: 0 0 14px 0;
+	}
+
+	.card-services {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 20px;
+	}
+
+	.service-pill {
+		font-size: 11px;
+		color: #d4d4d8;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 3px 8px;
+		border-radius: 4px;
+	}
+
+	.card-details {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		font-size: 13px;
+		line-height: 1.5;
+		margin-bottom: 24px;
+		flex-grow: 1;
+	}
+
+	.detail-row {
+		display: flex;
+		gap: 12px;
+		align-items: flex-start;
+	}
+
+	.detail-icon {
+		width: 16px;
+		height: 16px;
+		color: #71717a;
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
+
+	.detail-icon svg {
+		width: 100%;
+		height: 100%;
+	}
+
+	.detail-content {
+		display: flex;
+		flex-direction: column;
+		color: #d4d4d8;
+	}
+
+	.postal {
+		font-size: 11px;
+		color: #71717a;
+	}
+
+	.address {
+		color: #e4e4e7;
+	}
+
+	.tel-link {
+		color: #ffffff;
+		text-decoration: none;
+		font-family: 'JetBrains Mono', monospace;
+		font-weight: 600;
+		transition: color 0.2s;
+	}
+
+	.tel-link:hover {
+		color: #38bdf8;
+	}
+
+	.hours, .closed {
+		font-size: 12px;
+		color: #a1a1aa;
+	}
+
+	.card-actions {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		margin-top: auto;
+		padding-top: 18px;
+		border-top: 1px solid var(--loc-border);
+	}
+
+	.card-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 10px 12px;
+		border-radius: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+		text-align: center;
+	}
+
+	.card-btn svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	.card-btn--map {
+		background: rgba(255, 255, 255, 0.05);
+		color: #ffffff;
+		border: 1px solid var(--loc-border);
+	}
+
+	.card-btn--map:hover {
+		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.card-btn--tel {
+		background: rgba(255, 255, 255, 0.05);
+		color: #ffffff;
+		border: 1px solid var(--loc-border);
+	}
+
+	.card-btn--tel:hover {
+		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.card-btn--detail {
+		grid-column: 1 / -1;
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.card-btn--detail:hover {
+		background: #ffffff;
+		color: #000000;
+	}
+
+	.card-btn--featured {
+		background: #0066b1;
+		border-color: #0066b1;
+		color: #ffffff;
+		box-shadow: 0 4px 12px rgba(0, 102, 177, 0.35);
+	}
+
+	.card-btn--featured:hover {
+		background: #0077cf;
+		border-color: #0077cf;
+		color: #ffffff;
+	}
+
+	/* リスト表示モード */
+	.locations-container--list {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.locations-container--list .luxury-card {
+		flex-direction: row;
+		height: auto;
+		min-height: 200px;
+	}
+
+	.locations-container--list .card-media {
+		width: 320px;
+		height: auto;
+		flex-shrink: 0;
+	}
+
+	.locations-container--list .card-actions {
+		grid-template-columns: auto auto auto;
+		justify-content: flex-start;
+		margin-top: 14px;
+	}
+
+	.locations-container--list .card-btn--detail {
+		grid-column: auto;
+	}
+
+	/* 該当なしプレースホルダー */
+	.no-results {
+		text-align: center;
+		padding: 80px 20px;
+		background: #141418;
+		border: 1px dashed var(--loc-border);
+		border-radius: 16px;
+		max-width: 600px;
+		margin: 40px auto;
+	}
+
+	.no-results__icon {
+		width: 60px;
+		height: 60px;
+		margin: 0 auto 16px auto;
+		color: #52525b;
+	}
+
+	.no-results__icon svg {
+		width: 100%;
+		height: 100%;
+	}
+
+	.no-results__title {
+		font-size: 18px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	.no-results__desc {
+		font-size: 14px;
+		color: var(--loc-text-muted);
+		margin: 0 0 24px 0;
+	}
+
+	.btn-nicole-reset {
+		background: var(--loc-accent-red);
+		color: #ffffff;
+		border: none;
+		border-radius: 30px;
+		padding: 12px 28px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.btn-nicole-reset:hover {
+		background: #c40010;
+	}
+
+	/* レスポンシブ */
+	@media (max-width: 1024px) {
+		.filter-controls {
+			grid-template-columns: 1fr 1fr;
+		}
+		.control-group--search {
+			grid-column: 1 / -1;
+		}
+		.locations-container--list .luxury-card {
+			flex-direction: column;
+		}
+		.locations-container--list .card-media {
+			width: 100%;
+			height: 220px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.location-hero {
+			padding-top: 130px;
+			padding-bottom: 50px;
+		}
+		.location-hero__stats {
+			padding: 12px 20px;
+			gap: 16px;
+		}
+		.stat-number {
+			font-size: 22px;
+		}
+		.map-header-bar {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.nicole-leaflet-map {
+			height: 420px;
+		}
+		.map-controls-overlay {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		.map-brand-filter-pill {
+			max-width: 100%;
+		}
+		.filter-controls {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+		.locations-container {
+			grid-template-columns: 1fr;
+			gap: 24px;
+		}
+		.card-body {
+			padding: 18px;
+		}
+		.card-title {
+			font-size: 17px;
+		}
+		.card-actions {
+			grid-template-columns: 1fr;
+		}
+		.locations-container--list .card-actions {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

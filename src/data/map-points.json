@@ -1,0 +1,377 @@
+[
+  {
+    "id": 14251,
+    "title": "東京・青山",
+    "lat": 35.674276,
+    "lng": 139.7270702,
+    "sort": 10,
+    "number": 1,
+    "locations": [
+      {
+        "id": 290,
+        "title": "ニコル青山ショールーム",
+        "url": "https://www.nicole.co.jp/location/nicole-automobiles-aoyama/",
+        "brand": "ALPINA",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14249,
+    "title": "東京・世田谷",
+    "lat": 35.6059207,
+    "lng": 139.6424354,
+    "sort": 20,
+    "number": 2,
+    "locations": [
+      {
+        "id": 5187,
+        "title": "ニコル世田谷ショールーム",
+        "url": "https://www.nicole.co.jp/location/nicole-automobiles-setagaya/",
+        "brand": "ALPINA",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14250,
+    "title": "東京・大田",
+    "lat": 35.5996615,
+    "lng": 139.7015461,
+    "sort": 30,
+    "number": 3,
+    "locations": [
+      {
+        "id": 4710,
+        "title": "Nicole BMW 大田支店",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-ota/",
+        "brand": "BMW",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14247,
+    "title": "川崎・幸区",
+    "lat": 35.5459772,
+    "lng": 139.6897264,
+    "sort": 40,
+    "number": 4,
+    "locations": [
+      {
+        "id": 7016,
+        "title": "Nicole BMW 本社",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-kawasaki-hq/",
+        "brand": "BMW",
+        "types": [
+          "ショールーム"
+        ]
+      },
+      {
+        "id": 4032,
+        "title": "Nicole BMW 本社 サービス",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-kawasaki-service/",
+        "brand": "BMW",
+        "types": [
+          "サービス"
+        ]
+      },
+      {
+        "id": 128,
+        "title": "川崎本社",
+        "url": "https://www.nicole.co.jp/location/nicole-racing-japan-kawasaki/",
+        "brand": "Nicole Group",
+        "types": [
+          "本社"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14246,
+    "title": "川崎・宮前",
+    "lat": 35.5774914,
+    "lng": 139.5820004,
+    "sort": 50,
+    "number": 5,
+    "locations": [
+      {
+        "id": 4689,
+        "title": "Nicole BMW 青葉宮前支店",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-aobamiyamae/",
+        "brand": "BMW",
+        "types": [
+          "ショールーム"
+        ]
+      },
+      {
+        "id": 4691,
+        "title": "Nicole BMW 青葉宮前支店 サービス",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-aobamiyamae-service/",
+        "brand": "BMW",
+        "types": [
+          "サービス"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14248,
+    "title": "川崎・新百合ヶ丘",
+    "lat": 35.5990492,
+    "lng": 139.50214,
+    "sort": 60,
+    "number": 6,
+    "locations": [
+      {
+        "id": 4753,
+        "title": "Nicole BMW 新百合ヶ丘支店",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-shin-yurigaoka/",
+        "brand": "BMW",
+        "types": [
+          "ショールーム"
+        ]
+      },
+      {
+        "id": 4802,
+        "title": "BMW Premium Selection 新百合ヶ丘（BMW 認定中古車）",
+        "url": "https://www.nicole.co.jp/location/bmw-premium-selection-shin-yurigaoka/",
+        "brand": "BMW",
+        "types": [
+          "認定中古車"
+        ]
+      },
+      {
+        "id": 5221,
+        "title": "MINI 新百合ヶ丘",
+        "url": "https://www.nicole.co.jp/location/mini-shin-yurigaoka/",
+        "brand": "MINI",
+        "types": [
+          "ショールーム"
+        ]
+      },
+      {
+        "id": 5256,
+        "title": "MINI NEXT 新百合ヶ丘（MINI 認定中古車）",
+        "url": "https://www.nicole.co.jp/location/mini-next-shin-yurigaoka/",
+        "brand": "MINI",
+        "types": [
+          "認定中古車"
+        ]
+      },
+      {
+        "id": 4776,
+        "title": "Nicole BMW 新百合ヶ丘支店 サービス",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-shin-yurigaoka-service/",
+        "brand": "BMW",
+        "types": [
+          "サービス"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14254,
+    "title": "横浜・みなとみらい本社",
+    "lat": 35.4602864,
+    "lng": 139.6246171,
+    "sort": 70,
+    "number": 7,
+    "locations": [
+      {
+        "id": 126,
+        "title": "横浜本社",
+        "url": "https://www.nicole.co.jp/location/nicole-racing-japan-yokohama/",
+        "brand": "Nicole Group",
+        "types": [
+          "本社"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14253,
+    "title": "横浜・みなとみらい｜Rolls-Royce",
+    "lat": 35.4581947,
+    "lng": 139.6241731,
+    "sort": 80,
+    "number": 8,
+    "locations": [
+      {
+        "id": 5261,
+        "title": "ロールス・ロイス・モーター・カーズ横浜",
+        "url": "https://www.nicole.co.jp/location/rolls-royce-motor-cars-yokohama/",
+        "brand": "Rolls-Royce",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14252,
+    "title": "横浜・みなとみらい｜Ferrari",
+    "lat": 35.4571693,
+    "lng": 139.6265161,
+    "sort": 90,
+    "number": 9,
+    "locations": [
+      {
+        "id": 5270,
+        "title": "Nicole Competizione ショールーム",
+        "url": "https://www.nicole.co.jp/location/nicole-competizione-ferrari/",
+        "brand": "Ferrari",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14257,
+    "title": "横浜・早渕",
+    "lat": 35.5483816,
+    "lng": 139.600158,
+    "sort": 100,
+    "number": 10,
+    "locations": [
+      {
+        "id": 4594,
+        "title": "Nicole BMW 横浜港北支店",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-yokohama-kohoku/",
+        "brand": "BMW",
+        "types": [
+          "ショールーム"
+        ]
+      },
+      {
+        "id": 4609,
+        "title": "Nicole BMW 横浜港北支店 サービス",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-yokohama-kohoku-service/",
+        "brand": "BMW",
+        "types": [
+          "サービス"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14258,
+    "title": "横浜・東方町",
+    "lat": 35.5189692,
+    "lng": 139.5795125,
+    "sort": 110,
+    "number": 11,
+    "locations": [
+      {
+        "id": 4788,
+        "title": "BMW Premium Selection 横浜港北（BMW認定中古車）",
+        "url": "https://www.nicole.co.jp/location/bmw-premium-selection-yokohama-kohoku/",
+        "brand": "BMW",
+        "types": [
+          "認定中古車"
+        ]
+      },
+      {
+        "id": 5229,
+        "title": "MINI NEXT 横浜港北（MINI 認定中古車）",
+        "url": "https://www.nicole.co.jp/location/mini-next-yokohama-kohoku/",
+        "brand": "MINI",
+        "types": [
+          "認定中古車"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14259,
+    "title": "横浜・荏田南",
+    "lat": 35.5391754,
+    "lng": 139.5625694,
+    "sort": 120,
+    "number": 12,
+    "locations": [
+      {
+        "id": 5200,
+        "title": "MINI 港北",
+        "url": "https://www.nicole.co.jp/location/mini-kohoku/",
+        "brand": "MINI",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14255,
+    "title": "横浜・北山田",
+    "lat": 35.5610629,
+    "lng": 139.5906572,
+    "sort": 130,
+    "number": 13,
+    "locations": [
+      {
+        "id": 5215,
+        "title": "MINI 都筑",
+        "url": "https://www.nicole.co.jp/location/mini-yokohama-tsuzuki/",
+        "brand": "MINI",
+        "types": [
+          "ショールーム"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14260,
+    "title": "横浜・葛が谷",
+    "lat": 35.5358639,
+    "lng": 139.5606146,
+    "sort": 140,
+    "number": 14,
+    "locations": [
+      {
+        "id": 5193,
+        "title": "Nicole BMW Service Centre",
+        "url": "https://www.nicole.co.jp/location/nicole-bmw-service-centre/",
+        "brand": "BMW",
+        "types": [
+          "サービスセンター"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14256,
+    "title": "横浜・川向町",
+    "lat": 35.5163459,
+    "lng": 139.5865335,
+    "sort": 150,
+    "number": 15,
+    "locations": [
+      {
+        "id": 5272,
+        "title": "Nicole Competizione プレオウンド ショールーム",
+        "url": "https://www.nicole.co.jp/location/nicole-ccompetizione-ferrari-preowned/",
+        "brand": "Ferrari",
+        "types": [
+          "認定中古車"
+        ]
+      },
+      {
+        "id": 7522,
+        "title": "Nicole Competizione サービスセンター",
+        "url": "https://www.nicole.co.jp/location/nicole-competizione-service-centre/",
+        "brand": "Ferrari",
+        "types": [
+          "サービス"
+        ]
+      }
+    ]
+  }
+]

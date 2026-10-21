@@ -41,6 +41,22 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "text"
+				},
+				{
+					"slug": "related_location",
+					"label": "関連拠点 (Related Showroom)",
+					"type": "select",
+					"options": [
+						{ "label": "なし（設定しない）", "value": "" },
+						{ "label": "Nicole BMW 本社ショールーム（川崎）", "value": "nicole-bmw-kawasaki" },
+						{ "label": "Nicole BMW 大田支店", "value": "nicole-bmw-ota" },
+						{ "label": "Nicole BMW 青葉宮前支店", "value": "nicole-bmw-aobamiyamae" },
+						{ "label": "Nicole BMW 横浜港北支店", "value": "nicole-bmw-yokohama-kohoku" },
+						{ "label": "Nicole BMW 新百合ヶ丘支店", "value": "nicole-bmw-shin-yurigaoka" },
+						{ "label": "ロールス・ロイス・モーター・カーズ横浜", "value": "rolls-royce-yokohama" },
+						{ "label": "Nicole Competizione 青山（Ferrari）", "value": "ferrari-aoyama" },
+						{ "label": "ニコル世田谷ショールーム（ALPINA）", "value": "alpina-setagaya" }
+					]
 				}
 			]
 		},

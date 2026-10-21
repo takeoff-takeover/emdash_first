@@ -1,0 +1,286 @@
+---
+/**
+ * SliderBlock.astro
+ * EmDash Portable Text カスタムブロック：写真スライダー（ギャラリー）
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		id?: string;
+		title?: string;
+		images?: string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+const mainImg = (node.id || "").trim();
+const title = node.title || "";
+const extraImgsRaw = node.images || "";
+
+// 番号付き画像スロット (image_2 〜 image_12, slide_2 〜 slide_12)
+const slotImages: string[] = [];
+for (let i = 2; i <= 12; i++) {
+	const val = (node[`image_${i}`] || node[`slide_${i}`] || "").trim();
+	if (val && (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("/"))) {
+		slotImages.push(val);
+	}
+}
+
+// 改行またはカンマでURLを分割（後方互換・一括指定）
+const extraImgs = extraImgsRaw
+	.split(/[\n,]/)
+	.map((url: string) => url.trim())
+	.filter((url: string) => url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/"));
+
+const allImages: Array<{ image: string; title: string }> = [];
+if (mainImg && (mainImg.startsWith("http://") || mainImg.startsWith("https://") || mainImg.startsWith("/"))) {
+	allImages.push({ image: mainImg, title: title || "ギャラリー写真 1" });
+}
+slotImages.forEach((url: string) => {
+	if (!allImages.some(img => img.image === url)) {
+		allImages.push({ image: url, title: title ? `${title} (${allImages.length + 1})` : `ギャラリー写真 ${allImages.length + 1}` });
+	}
+});
+extraImgs.forEach((url: string) => {
+	if (!allImages.some(img => img.image === url)) {
+		allImages.push({ image: url, title: title ? `${title} (${allImages.length + 1})` : `ギャラリー写真 ${allImages.length + 1}` });
+	}
+});
+
+const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
+---
+
+{allImages.length > 0 && (
+	<div class="cms-slider-block" id={blockId}>
+		<div class="cms-slider-header">
+			<div class="slider-header-left">
+				<div class="slider-badge">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="badge-icon">
+						<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+						<circle cx="9" cy="9" r="2"/>
+						<path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+					</svg>
+					PHOTO GALLERY
+				</div>
+				{title && <h4 class="slider-heading">{title}</h4>}
+			</div>
+			<div class="slider-counter">
+				<span class="counter-current">1</span> / <span class="counter-total">{allImages.length}</span>
+			</div>
+		</div>
+
+		<div class="cms-slider-container">
+			<div class="cms-slider-track" id={`${blockId}-track`}>
+				{allImages.map((item, idx) => (
+					<div class={`cms-slide-item ${idx === 0 ? 'active' : ''}`} data-index={idx}>
+						<div class="slide-media-wrap">
+							<img src={item.image} alt={item.title || "Gallery image"} loading="lazy" />
+						</div>
+						{item.title && <div class="slide-caption">{item.title}</div>}
+					</div>
+				))}
+			</div>
+
+			{allImages.length > 1 && (
+				<>
+					<button type="button" class="slider-nav slider-nav--prev" id={`${blockId}-prev`} aria-label="前へ">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+					</button>
+					<button type="button" class="slider-nav slider-nav--next" id={`${blockId}-next`} aria-label="次へ">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+					</button>
+
+					<div class="slider-dots" id={`${blockId}-dots`}>
+						{allImages.map((_, idx) => (
+							<button type="button" class={`dot-btn ${idx === 0 ? 'active' : ''}`} data-index={idx} aria-label={`写真 ${idx + 1}`}></button>
+						))}
+					</div>
+				</>
+			)}
+		</div>
+	</div>
+)}
+
+<style>
+	.cms-slider-block {
+		margin: 2.5rem 0;
+		background: #0d1117;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 1.5rem;
+		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+	}
+	.cms-slider-header {
+		margin-bottom: 1.25rem;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.slider-header-left {
+		flex: 1;
+	}
+	.slider-counter {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #94a3b8;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		padding: 0.25rem 0.65rem;
+		border-radius: 9999px;
+		letter-spacing: 0.05em;
+	}
+	.counter-current {
+		color: #38bdf8;
+	}
+	.slider-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.72rem;
+		letter-spacing: 0.12em;
+		color: #3b82f6;
+		background: rgba(59, 130, 246, 0.12);
+		padding: 0.25rem 0.65rem;
+		border-radius: 9999px;
+		font-weight: 600;
+	}
+	.badge-icon {
+		width: 14px;
+		height: 14px;
+	}
+	.slider-heading {
+		font-size: 1.2rem;
+		color: #ffffff;
+		margin: 0.5rem 0 0;
+		font-weight: 700;
+	}
+	.cms-slider-container {
+		position: relative;
+		overflow: hidden;
+		border-radius: 12px;
+		background: #000;
+	}
+	.cms-slider-track {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		min-height: 280px;
+	}
+	.cms-slide-item {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.4s ease, visibility 0.4s ease;
+		display: flex;
+		flex-direction: column;
+	}
+	.cms-slide-item.active {
+		opacity: 1;
+		visibility: visible;
+		z-index: 1;
+	}
+	.slide-media-wrap {
+		flex: 1;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.slide-media-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.slide-caption {
+		background: rgba(10, 15, 25, 0.85);
+		color: rgba(255, 255, 255, 0.9);
+		padding: 0.75rem 1rem;
+		font-size: 0.88rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.slider-nav {
+		position: absolute;
+		top: calc(50% - 20px);
+		z-index: 10;
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+		transition: all 0.2s;
+	}
+	.slider-nav:hover {
+		background: #0066b1;
+		border-color: #0066b1;
+	}
+	.slider-nav svg {
+		width: 20px;
+		height: 20px;
+	}
+	.slider-nav--prev {
+		left: 12px;
+	}
+	.slider-nav--next {
+		right: 12px;
+	}
+	.slider-dots {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.8rem;
+		background: #0d1117;
+	}
+	.dot-btn {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.2);
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.dot-btn.active {
+		background: #3b82f6;
+		transform: scale(1.3);
+	}
+</style>
+
+<script define:vars={{ blockId, count: allImages.length }}>
+	if (count > 1) {
+		let current = 0;
+		const container = document.getElementById(blockId);
+		if (container) {
+			const slides = container.querySelectorAll('.cms-slide-item');
+			const dots = container.querySelectorAll('.dot-btn');
+			const prevBtn = document.getElementById(`${blockId}-prev`);
+			const nextBtn = document.getElementById(`${blockId}-next`);
+
+			const counterCurrent = container.querySelector('.counter-current');
+
+			function goTo(idx) {
+				current = (idx + count) % count;
+				slides.forEach((s, i) => s.classList.toggle('active', i === current));
+				dots.forEach((d, i) => d.classList.toggle('active', i === current));
+				if (counterCurrent) counterCurrent.textContent = String(current + 1);
+			}
+
+			if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
+			if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
+			dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+		}
+	}
+</script>

@@ -6,7 +6,7 @@ import {
 	getSiteSettings,
 } from "emdash";
 import { PortableText } from "emdash/ui";
-import Base from "../../layouts/Base.astro";
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 import "../../styles/prose.css";
 
@@ -31,54 +31,98 @@ const seo = getSeoMeta(page, {
 });
 ---
 
-<Base
-	title={seo.title}
-	pageTitle={seo.ogTitle}
-	description={seo.description}
-	canonical={seo.canonical}
-	robots={seo.robots}
-	content={{ collection: "pages", id: page.data.id, slug }}
->
-	<article class="band page">
-		<div class="frame page__layout">
-			<header class="page__header">
-				<h1 class="page__title" {...page.edit.title}>{page.data.title}</h1>
-			</header>
+<NicoleLayout title={`${page.data.title} - ニコル・グループ`} description={seo.description}>
+	<div class="nicole-page-container">
+		<header class="nicole-page-header">
+			<div class="nicole-page-header__inner">
+				<span class="nicole-page-header__badge">CORPORATE</span>
+				<h1 class="nicole-page-title" {...page.edit.title}>{page.data.title}</h1>
+			</div>
+		</header>
 
-			<div class="prose page__body" {...page.edit.content}>
+		<div class="nicole-page-content">
+			<div class="prose nicole-page-prose" {...page.edit.content}>
 				<PortableText value={page.data.content} />
 			</div>
 		</div>
-	</article>
-</Base>
+	</div>
+</NicoleLayout>
 
 <style>
-	.page {
-		padding-block: clamp(3rem, 2rem + 4vw, 5.5rem) clamp(4rem, 3rem + 4vw, 7rem);
+	.nicole-page-container {
+		background: #000000;
+		color: #ffffff;
+		min-height: 80vh;
+		padding-top: 140px;
+		padding-bottom: 100px;
 	}
 
-	.page__layout {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--spacing-8);
+	.nicole-page-header {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+		padding-bottom: 40px;
+		margin-bottom: 60px;
 	}
 
-	.page__title {
-		font-size: var(--font-size-display);
-		line-height: 1.05;
-		max-width: 22ch;
+	.nicole-page-header__inner {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 0 40px;
 	}
 
-	@media (min-width: 960px) {
-		.page__layout {
-			grid-template-columns: minmax(14rem, 1fr) minmax(0, var(--content-width));
-			column-gap: clamp(2rem, 1rem + 4vw, 6rem);
-		}
+	.nicole-page-header__badge {
+		display: inline-block;
+		font-family: "Helvetica", sans-serif;
+		font-size: 13px;
+		font-weight: 500;
+		letter-spacing: 0.15em;
+		color: #e60012;
+		margin-bottom: 12px;
+	}
 
-		.page__header {
-			position: sticky;
-			top: calc(var(--nav-height) + var(--spacing-8));
-			align-self: start;
-		}
+	.nicole-page-title {
+		font-family: "Helvetica", sans-serif;
+		font-size: clamp(2rem, 1.5rem + 2.5vw, 3.2rem);
+		font-weight: 300;
+		line-height: 1.2;
+		color: #ffffff;
+		margin: 0;
+	}
+
+	.nicole-page-content {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 0 40px;
+	}
+
+	.nicole-page-prose {
+		color: #d1d5db;
+		font-size: 16px;
+		line-height: 1.9;
+	}
+
+	.nicole-page-prose :global(h2) {
+		color: #ffffff;
+		font-family: "Helvetica", sans-serif;
+		font-weight: 400;
+		font-size: 1.8rem;
+		border-left: 4px solid #e60012;
+		padding-left: 16px;
+		margin-top: 3rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.nicole-page-prose :global(h3) {
+		color: #ffffff;
+		font-size: 1.4rem;
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+	}
+
+	.nicole-page-prose :global(p) {
+		margin-bottom: 1.8rem;
+	}
+
+	.nicole-page-prose :global(strong) {
+		color: #ffffff;
 	}
 </style>
