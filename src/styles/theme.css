@@ -1,34 +1,37 @@
 /*
-  theme.css -- your theme overrides. This is the file to edit to
-  retheme the site.
-
-  Every design token lives in src/styles/tokens.css (colors, type
-  scale, spacing, layout, shadows) with its default value. Override any
-  of them here: declarations in this file are unlayered, so they always
-  beat the @layer base defaults in tokens.css.
-
-  Colors are defined with light-dark(). Overriding with a plain color
-  changes light and dark mode at once; use light-dark(<light>, <dark>)
-  to set different values per mode.
-
-  Set the three brand tokens together, as in the example below:
-  --color-on-brand defaults to near-black in dark mode.
-
-  Webfonts are loaded in astro.config.mjs (--font-body, --font-mono).
-  Swap the loaded font there; use overrides here for system fonts or a
-  separate heading face.
-
-  Example:
-
-  :root {
-    --color-brand: light-dark(#0f766e, #2dd4bf);
-    --color-brand-hover: light-dark(#115e59, #5eead4);
-    --color-on-brand: light-dark(#ffffff, #0a0a0a);
-    --font-heading: "Iowan Old Style", Georgia, serif;
-    --radius-lg: 18px;
-    --radius-xl: 24px;
-  }
+  theme.css -- Nicole Group Theme Overrides
 */
 
 :root {
+	color-scheme: dark;
+
+	/* Nicole Group Luxury Dark Palette */
+	--color-bg: #0a0a0c; /* Deep luxury black */
+	--color-surface: #141418; /* Surface cards */
+	--color-fill: #1e1e24; /* Button / tag fills */
+	--color-fill-strong: #2a2a32;
+	--color-text: #f4f4f6;
+	--color-text-secondary: #a0a0aa;
+	--color-muted: #71717a;
+	--color-border: #222228;
+	--color-border-subtle: #1a1a20;
+	--color-border-strong: #383842;
+	--color-ring: rgb(255 255 255 / 0.08);
+
+	/* Nicole Brand Accent: Elegant Platinum Silver */
+	--color-brand: #ffffff;
+	--color-brand-hover: #e4e4e7;
+	--color-on-brand: #09090b;
+	--color-brand-ring: rgb(255 255 255 / 0.2);
+
+	/* Premium subtle shadows */
+	--shadow-card: 0 0 0 1px var(--color-ring), 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+	--shadow-card-hover: 0 0 0 1px rgba(255, 255 255, 0.18), 0 12px 32px -4px rgba(0, 0, 0, 0.9);
+}
+
+/* Adjust brand logo image in header */
+.brand__logo {
+	height: 36px;
+	width: auto;
+	object-fit: contain;
 }

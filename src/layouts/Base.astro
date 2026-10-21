@@ -61,7 +61,20 @@ const titleIncludesSiteName =
 const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
 
 const menu = menuResult.data;
-const menuItems = menu?.items ?? [];
+interface CustomMenuItem {
+	label: string;
+	url: string;
+	target?: string | null;
+}
+const nicoleMenuItems: CustomMenuItem[] = [
+	{ label: "ホーム", url: "/", target: null },
+	{ label: "企業理念", url: "/pages/philosophy", target: null },
+	{ label: "会社概要", url: "/pages/corporate", target: null },
+	{ label: "ニュース", url: "/posts", target: null },
+];
+const menuItems: CustomMenuItem[] = menu?.items?.length && menu.items[0]?.label !== "Home" ? menu.items : nicoleMenuItems;
+
+
 
 // Build public page context for plugin contributions
 // SEO data is passed here and rendered securely by EmDashHead
