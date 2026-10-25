@@ -48,9 +48,11 @@ const areas = [
 	title="店舗・拠点を探す | SHOWROOMS & SERVICE LOCATIONS - ニコル・グループ"
 	description="東京・神奈川エリアを中心に展開するニコル・グループのショールーム・サービスセンター・認定中古車拠点一覧。BMW、MINI、ロールス・ロイス、フェラーリ、アルピナの正規拠点をご案内します。"
 >
-	<!-- Leaflet CSS & JS (CDN) -->
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-	<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+	<Fragment slot="head">
+		<!-- Leaflet CSS & JS (Cloudflare cdnjs: 高速・安定・CORS対応) -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+		<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+	</Fragment>
 
 	<div class="location-hub">
 		<!-- ヒーローヘッダーセクション -->
@@ -473,150 +475,187 @@ const areas = [
 			}
 
 			// ==========================================
-			// 2. Leaflet 地図の初期化 (Dark Matter テーマ)
+			// 2. Leaflet 地図の初期化 (耐障害性・非同期リトライ対応)
 			// ==========================================
-			const mapEl = document.getElementById('nicole-leaflet-map');
-			if (!mapEl || typeof L === 'undefined') return;
-
-			// 東京・神奈川エリアの中心（川崎〜横浜港北）
 			const defaultCenter = [35.56, 139.63];
 			const defaultZoom = 11;
-
-			const map = L.map('nicole-leaflet-map', {
-				center: defaultCenter,
-				zoom: defaultZoom,
-				zoomControl: false,
-				attributionControl: false
-			});
-
-			// 右上にズームコントロール
-			L.control.zoom({ position: 'topright' }).addTo(map);
-
-			// CartoDB Dark Matter タイル（漆黒・ダークラグジュアリー）
-			L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-				maxZoom: 19,
-				subdomains: 'abcd',
-			}).addTo(map);
-
-			// ==========================================
-			// 3. マーカーピンの配置（BMWマーク等）
-			// ==========================================
-			const markerLayerGroup = L.layerGroup().addTo(map);
-			const markers = [];
-
-			mapPoints.forEach(point => {
-				// 代表ブランドの判定
-				const brands = point.locations.map(l => l.brand);
-				let primaryBrand = 'Nicole Group';
-				if (brands.includes('BMW')) primaryBrand = 'BMW';
-				else if (brands.includes('MINI')) primaryBrand = 'MINI';
-				else if (brands.includes('Ferrari')) primaryBrand = 'Ferrari';
-				else if (brands.includes('Rolls-Royce')) primaryBrand = 'Rolls-Royce';
-				else if (brands.includes('ALPINA')) primaryBrand = 'ALPINA';
-
-				const brandSvg = getBrandMark(primaryBrand);
-
-				// カスタムHTMLアイコン（BMWマークやブランドエンブレムが浮かび上がるピン）
-				const customIcon = L.divIcon({
-					className: 'lux-marker-wrap',
-					html: `
-						<div class="lux-pin lux-pin--${primaryBrand.toLowerCase()}" data-brand="${primaryBrand}">
-							<div class="lux-pin__halo"></div>
-							<div class="lux-pin__head">
-								${brandSvg}
-							</div>
-							<div class="lux-pin__tip"></div>
-							<div class="lux-pin__badge-text">${point.title}</div>
-						</div>
-					`,
-					iconSize: [44, 44],
-					iconAnchor: [22, 44],
-					popupAnchor: [0, -44]
-				});
-
-				// ポップアップ用HTML構築
-				const mainLoc = point.locations[0] || {};
-				const isKawasaki = point.title.includes('川崎・幸区') || point.number === 4;
-				const detailUrl = isKawasaki ? '/location/nicole-bmw-kawasaki/' : mainLoc.url;
-
-				const gmapRouteUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mainLoc.title + ' ' + point.title)}`;
-
-				const popupContent = `
-					<div class="lux-popup">
-						<div class="lux-popup__top">
-							<span class="lux-popup__brand-tag lux-popup__brand-tag--${primaryBrand.toLowerCase()}">${primaryBrand}</span>
-							<span class="lux-popup__area">${point.title}</span>
-						</div>
-						<h4 class="lux-popup__name">${mainLoc.title || point.title}</h4>
-						<div class="lux-popup__sublist">
-							${point.locations.map(l => `<span class="sub-item">${l.types.join('/')}：${l.title}</span>`).join('')}
-						</div>
-						<div class="lux-popup__btns">
-							<a href="${gmapRouteUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn popup-btn--gmap">
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-								Googleマップでルート案内
-							</a>
-							${detailUrl ? `
-								<a href="${detailUrl}" class="popup-btn popup-btn--detail">
-									店舗詳細を見る →
-								</a>
-							` : ''}
-						</div>
-					</div>
-				`;
-
-				const marker = L.marker([point.lat, point.lng], { icon: customIcon });
-				marker.bindPopup(popupContent, {
-					className: 'lux-custom-leaflet-popup',
-					maxWidth: 320,
-					closeButton: true
-				});
-
-				marker.pointData = point;
-				marker.primaryBrand = primaryBrand;
-				markerLayerGroup.addLayer(marker);
-				markers.push(marker);
-			});
-
-			// 全体表示ボタン
-			const fitBtn = document.getElementById('btn-reset-map-view');
-			if (fitBtn) {
-				fitBtn.addEventListener('click', () => {
-					map.setView(defaultCenter, defaultZoom, { animate: true });
-				});
-			}
-
-			// マップ上部ブランドフィルター
+			let map = null;
+			let markers = [];
 			const mapFilterBtns = document.querySelectorAll('.map-filter-btn');
-			mapFilterBtns.forEach(btn => {
-				btn.addEventListener('click', () => {
-					mapFilterBtns.forEach(b => b.classList.remove('active'));
-					btn.classList.add('active');
-					const targetBrand = btn.dataset.mapBrand;
 
-					const activeLatLngs = [];
+			function initMap() {
+				const mapEl = document.getElementById('nicole-leaflet-map');
+				if (!mapEl) return;
+				if (mapEl._leaflet_id) return; // 既に初期化完了
 
-					markers.forEach(m => {
-						const el = m.getElement();
-						if (!el) return;
+				if (typeof L === 'undefined') {
+					setTimeout(initMap, 80);
+					return;
+				}
 
-						if (targetBrand === 'all' || m.primaryBrand === targetBrand) {
-							el.style.opacity = '1';
-							el.style.pointerEvents = 'auto';
-							el.classList.remove('lux-pin--dimmed');
-							activeLatLngs.push(m.getLatLng());
-						} else {
-							el.style.opacity = '0.2';
-							el.style.pointerEvents = 'none';
-							el.classList.add('lux-pin--dimmed');
-						}
+				try {
+					map = L.map('nicole-leaflet-map', {
+						center: defaultCenter,
+						zoom: defaultZoom,
+						zoomControl: false,
+						attributionControl: false
 					});
 
-					if (activeLatLngs.length > 0) {
-						const bounds = L.latLngBounds(activeLatLngs);
-						map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true });
+					// 右上にズームコントロール
+					L.control.zoom({ position: 'topright' }).addTo(map);
+
+					// CartoDB Dark Matter タイル（広告ブロッカー対策のOSM自動フォールバック付き）
+					const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+						maxZoom: 19,
+						subdomains: 'abcd',
+						attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+					});
+
+					let fallbackTriggered = false;
+					darkTile.on('tileerror', function() {
+						if (!fallbackTriggered) {
+							fallbackTriggered = true;
+							L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+								maxZoom: 19,
+								attribution: '&copy; OpenStreetMap contributors'
+							}).addTo(map);
+						}
+					});
+					darkTile.addTo(map);
+
+					// マーカーピンの配置
+					const markerLayerGroup = L.layerGroup().addTo(map);
+					markers = [];
+
+					mapPoints.forEach(point => {
+						const brands = point.locations.map(l => l.brand);
+						let primaryBrand = 'Nicole Group';
+						if (brands.includes('BMW')) primaryBrand = 'BMW';
+						else if (brands.includes('MINI')) primaryBrand = 'MINI';
+						else if (brands.includes('Ferrari')) primaryBrand = 'Ferrari';
+						else if (brands.includes('Rolls-Royce')) primaryBrand = 'Rolls-Royce';
+						else if (brands.includes('ALPINA')) primaryBrand = 'ALPINA';
+
+						const brandSvg = getBrandMark(primaryBrand);
+
+						const customIcon = L.divIcon({
+							className: 'lux-marker-wrap',
+							html: `
+								<div class="lux-pin lux-pin--${primaryBrand.toLowerCase()}" data-brand="${primaryBrand}">
+									<div class="lux-pin__halo"></div>
+									<div class="lux-pin__head">
+										${brandSvg}
+									</div>
+									<div class="lux-pin__tip"></div>
+									<div class="lux-pin__badge-text">${point.title}</div>
+								</div>
+							`,
+							iconSize: [44, 44],
+							iconAnchor: [22, 44],
+							popupAnchor: [0, -44]
+						});
+
+						const mainLoc = point.locations[0] || {};
+						const isKawasaki = point.title.includes('川崎・幸区') || point.number === 4;
+						const detailUrl = isKawasaki ? '/location/nicole-bmw-kawasaki/' : mainLoc.url;
+						const gmapRouteUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mainLoc.title + ' ' + point.title)}`;
+
+						const popupContent = `
+							<div class="lux-popup">
+								<div class="lux-popup__top">
+									<span class="lux-popup__brand-tag lux-popup__brand-tag--${primaryBrand.toLowerCase()}">${primaryBrand}</span>
+									<span class="lux-popup__area">${point.title}</span>
+								</div>
+								<h4 class="lux-popup__name">${mainLoc.title || point.title}</h4>
+								<div class="lux-popup__sublist">
+									${point.locations.map(l => `<span class="sub-item">${l.types.join('/')}：${l.title}</span>`).join('')}
+								</div>
+								<div class="lux-popup__btns">
+									<a href="${gmapRouteUrl}" target="_blank" rel="noopener noreferrer" class="popup-btn popup-btn--gmap">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+										Googleマップでルート案内
+									</a>
+									${detailUrl ? `
+										<a href="${detailUrl}" class="popup-btn popup-btn--detail">
+											店舗詳細を見る →
+										</a>
+									` : ''}
+								</div>
+							</div>
+						`;
+
+						const marker = L.marker([point.lat, point.lng], { icon: customIcon });
+						marker.bindPopup(popupContent, {
+							className: 'lux-custom-leaflet-popup',
+							maxWidth: 320,
+							closeButton: true
+						});
+
+						marker.pointData = point;
+						marker.primaryBrand = primaryBrand;
+						markerLayerGroup.addLayer(marker);
+						markers.push(marker);
+					});
+
+					// 全体表示ボタン
+					const fitBtn = document.getElementById('btn-reset-map-view');
+					if (fitBtn) {
+						fitBtn.addEventListener('click', () => {
+							map.setView(defaultCenter, defaultZoom, { animate: true });
+						});
 					}
-				});
+
+					// マップ上部ブランドフィルター
+					mapFilterBtns.forEach(btn => {
+						btn.addEventListener('click', () => {
+							mapFilterBtns.forEach(b => b.classList.remove('active'));
+							btn.classList.add('active');
+							const targetBrand = btn.dataset.mapBrand;
+
+							const activeLatLngs = [];
+
+							markers.forEach(m => {
+								const el = m.getElement();
+								if (!el) return;
+
+								if (targetBrand === 'all' || m.primaryBrand === targetBrand) {
+									el.style.opacity = '1';
+									el.style.pointerEvents = 'auto';
+									el.classList.remove('lux-pin--dimmed');
+									activeLatLngs.push(m.getLatLng());
+								} else {
+									el.style.opacity = '0.2';
+									el.style.pointerEvents = 'none';
+									el.classList.add('lux-pin--dimmed');
+								}
+							});
+
+							if (activeLatLngs.length > 0) {
+								const bounds = L.latLngBounds(activeLatLngs);
+								map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true });
+							}
+						});
+					});
+
+					// サイズ再計算（Leafletの初期表示欠けを防止）
+					map.invalidateSize();
+					setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+					setTimeout(() => { if (map) map.invalidateSize(); }, 600);
+					setTimeout(() => { if (map) map.invalidateSize(); }, 1200);
+
+				} catch (err) {
+					console.error('[Nicole Map] Initialization error:', err);
+				}
+			}
+
+			// 地図の初期化を実行
+			initMap();
+			window.addEventListener('load', () => {
+				if (map) map.invalidateSize();
+				else initMap();
+			});
+			window.addEventListener('resize', () => {
+				if (map) map.invalidateSize();
 			});
 
 			// ==========================================
@@ -1079,9 +1118,12 @@ const areas = [
 	}
 
 	.nicole-leaflet-map {
-		width: 100%;
-		height: 520px;
-		background: #090a0d;
+		width: 100% !important;
+		height: 520px !important;
+		min-height: 520px !important;
+		background: #090a0d !important;
+		position: relative;
+		z-index: 1;
 	}
 
 	/* マップオーバーレイコントロール */
