@@ -1,7 +1,7 @@
 ---
 // src/pages/posts/[slug].astro
 // 投稿記事詳細（Nicole Connect と完全統一された大迫力アイキャッチ・現代的エディトリアルレイアウト）
-import { getEmDashEntry, decodeSlug } from "emdash";
+import { getEmDashEntry, getEmDashCollection, decodeSlug } from "emdash";
 import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
@@ -176,8 +176,20 @@ const heroImageUrlSp = getImageUrl(featuredImageSp);
 const photoCredit = (featuredImage as any)?.alt || (isNeueKlasse ? "Photo: © BMW AG PressClub Global" : "Photo: © Nicole Group Editorial");
 const hasShowroom = Boolean((post.data as any).related_location) || isNeueKlasse;
 
-// 関連記事データ
-const relatedStories = [
+// サイドバー用関連記事の取得（CMSから最新記事を取得）
+let cmsRecentPosts: any[] = [];
+try {
+	const { entries: postEntries } = await getEmDashCollection("posts", {
+		limit: 8,
+		orderBy: { published_at: "desc" }
+	});
+	cmsRecentPosts = postEntries || [];
+} catch (e) {
+	console.error("Failed to fetch recent posts for sidebar:", e);
+}
+
+// 静的記事カタログのバックアップ
+const staticFallbackStories = [
 	{
 		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
@@ -188,10 +200,19 @@ const relatedStories = [
 		url: "/posts/2027_new_bmw_3series_neue_klasse/"
 	},
 	{
+		slug: "202608_bmw_kids_mechanic",
+		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
+		brand: "BMW",
+		topic: "Event Report",
+		date: "2026.08.20",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+		url: "/posts/202608_bmw_kids_mechanic/"
+	},
+	{
 		slug: "202610_mini_united-japan-2026",
 		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
 		brand: "MINI",
-		topic: "Feature",
+		topic: "Event",
 		date: "2026.10.15",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
@@ -205,7 +226,31 @@ const relatedStories = [
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
 		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
 	}
-].filter(s => s.slug !== slug);
+];
+
+// サイドバー表示用記事（現在の記事を除外して最大4件）
+const sidebarArticles = [
+	...cmsRecentPosts
+		.filter(p => p.id !== slug)
+		.map(p => {
+			const isBmw = p.id.includes("bmw") || p.id.includes("neue_klasse");
+			const imgUrl = getImageUrl(p.data.featured_image) || (isBmw 
+				? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" 
+				: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
+			return {
+				slug: p.id,
+				url: `/posts/${p.id}/`,
+				title: p.data.title,
+				image: imgUrl,
+				brand: isBmw ? "BMW" : (p.data.brand || "EDITORIAL"),
+				topic: isBmw ? "Feature" : (p.data.topic || "Article"),
+				date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25"
+			};
+		}),
+	...staticFallbackStories.filter(s => s.slug !== slug)
+].filter((item, index, self) => index === self.findIndex(t => t.slug === item.slug)).slice(0, 4);
+
+const relatedStories = sidebarArticles;
 ---
 
 <NicoleLayout 
@@ -273,95 +318,138 @@ const relatedStories = [
 		</header>
 
 		<!-- ============================================================== -->
-		<!-- 2. 本文エリア（現代的エディトリアルレイアウト） -->
+		<!-- 2. 本文 ＆ サイドバー エリア（現代的2カラムエディトリアルレイアウト） -->
 		<!-- ============================================================== -->
 		<div class="article-body-container">
-			<div class="article-prose-wrap">
-				<!-- 本文（Portable Text） -->
-				<div class="article-rich-text prose prose-invert">
-					<PortableText value={post.data.content} components={portableTextComponents} />
-				</div>
-
-				<!-- 関連拠点（ショールーム）カード（関連拠点がある場合のみ表示） -->
-				{hasShowroom && (
-				<section class="showroom-feature-block">
-					<div class="showroom-card-modern">
-						<div class="showroom-card-media">
-							<img src={relatedShowroom.image} alt={relatedShowroom.name} />
-							<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
+			<div class="article-layout-grid">
+				<!-- 左側：メイン記事コンテンツ -->
+				<main class="article-main-column">
+					<div class="article-prose-wrap">
+						<!-- 本文（Portable Text） -->
+						<div class="article-rich-text prose prose-invert">
+							<PortableText value={post.data.content} components={portableTextComponents} />
 						</div>
-						<div class="showroom-card-body">
-							<span class="showroom-kicker">CURATED SHOWROOM</span>
-							<h3 class="showroom-title">{relatedShowroom.name}</h3>
-							<p class="showroom-sub">{relatedShowroom.subName}</p>
-							
-							<div class="showroom-details">
-								<div class="detail-row">
-									<span class="detail-label">ADDRESS</span>
-									<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
+
+						<!-- 関連拠点（ショールーム）カード（関連拠点がある場合のみ表示） -->
+						{hasShowroom && (
+						<section class="showroom-feature-block">
+							<div class="showroom-card-modern">
+								<div class="showroom-card-media">
+									<img src={relatedShowroom.image} alt={relatedShowroom.name} />
+									<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
 								</div>
-								<div class="detail-row">
-									<span class="detail-label">OPEN HOURS</span>
-									<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
-								</div>
-								<div class="detail-row">
-									<span class="detail-label">PHONE</span>
-									<span class="detail-val">{relatedShowroom.tel}</span>
+								<div class="showroom-card-body">
+									<span class="showroom-kicker">CURATED SHOWROOM</span>
+									<h3 class="showroom-title">{relatedShowroom.name}</h3>
+									<p class="showroom-sub">{relatedShowroom.subName}</p>
+									
+									<div class="showroom-details">
+										<div class="detail-row">
+											<span class="detail-label">ADDRESS</span>
+											<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
+										</div>
+										<div class="detail-row">
+											<span class="detail-label">OPEN HOURS</span>
+											<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
+										</div>
+										<div class="detail-row">
+											<span class="detail-label">PHONE</span>
+											<span class="detail-val">{relatedShowroom.tel}</span>
+										</div>
+									</div>
+
+									<div class="showroom-actions">
+										<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
+											<span>ショールーム詳細を見る</span>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+										</a>
+										<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
+											<span>Google Mapsで開く ↗</span>
+										</a>
+									</div>
 								</div>
 							</div>
+						</section>
+						)}
 
-							<div class="showroom-actions">
-								<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
-									<span>ショールーム詳細を見る</span>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+						<!-- SNSシェアボタン -->
+						<div class="article-share-bar">
+							<span class="share-label">SHARE THIS STORY</span>
+							<div class="share-buttons">
+								<a 
+									href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
+									target="_blank"
+									rel="noopener"
+									class="share-btn"
+									aria-label="X（Twitter）でシェア"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+									<span>Xでポスト</span>
 								</a>
-								<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
-									<span>Google Mapsで開く ↗</span>
+								<a 
+									href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
+									target="_blank"
+									rel="noopener"
+									class="share-btn"
+									aria-label="Facebookでシェア"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+									<span>Facebook</span>
 								</a>
+								<button type="button" class="share-btn" id="btn-copy-url">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+									<span id="copy-text">URLをコピー</span>
+								</button>
 							</div>
 						</div>
-					</div>
-				</section>
-				)}
 
-				<!-- SNSシェアボタン -->
-				<div class="article-share-bar">
-					<span class="share-label">SHARE THIS STORY</span>
-					<div class="share-buttons">
-						<a 
-							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
-							target="_blank"
-							rel="noopener"
-							class="share-btn"
-							aria-label="X（Twitter）でシェア"
-						>
-							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-							<span>Xでポスト</span>
-						</a>
-						<a 
-							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
-							target="_blank"
-							rel="noopener"
-							class="share-btn"
-							aria-label="Facebookでシェア"
-						>
-							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-							<span>Facebook</span>
-						</a>
-						<button type="button" class="share-btn" id="btn-copy-url">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-							<span id="copy-text">URLをコピー</span>
-						</button>
+						<!-- バックリンク -->
+						<div class="article-back-nav">
+							<a href="/magazine/" class="btn-back-to-magazine">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+								<span>Nicole Connect 一覧へ戻る</span>
+							</a>
+						</div>
 					</div>
-				</div>
+				</main>
 
-				<!-- バックリンク -->
-				<div class="article-back-nav">
-					<a href="/magazine/" class="btn-back-to-magazine">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-						<span>Nicole Connect 一覧へ戻る</span>
-					</a>
-				</div>
+				<!-- 右側：サイドバー（スクロール追従・関連記事・ショールーム案内） -->
+				<aside class="article-sidebar-column">
+					<div class="sidebar-sticky-wrap">
+						<!-- 関連記事ウィジェット -->
+						<div class="sidebar-widget">
+							<div class="widget-header">
+								<span class="widget-kicker">RELATED STORIES</span>
+								<h3 class="widget-title">関連記事・最新特集</h3>
+							</div>
+							<div class="sidebar-post-list">
+								{sidebarArticles.map((story) => (
+									<a href={story.url} class="sidebar-post-card">
+										<div class="sidebar-post-thumb">
+											<img src={story.image} alt={story.title} loading="lazy" />
+											<span class="sidebar-brand-badge">{story.brand}</span>
+										</div>
+										<div class="sidebar-post-body">
+											<time class="sidebar-post-date">{story.date}</time>
+											<h4 class="sidebar-post-title">{story.title}</h4>
+										</div>
+									</a>
+								))}
+							</div>
+						</div>
+
+						<!-- Nicole ショールーム案内・コンシェルジュCTA -->
+						<div class="sidebar-widget sidebar-cta-widget">
+							<span class="cta-kicker">NICOLE CONCIERGE</span>
+							<h4 class="cta-title">Nicole 正規ショールーム</h4>
+							<p class="cta-desc">BMW、MINI、Ferrari、ALPINA、Rolls-Royce 各正規拠点で最新モデルの試乗・ご商談を承っております。</p>
+							<a href="/location/" class="btn-sidebar-cta">
+								<span>ショールーム一覧を見る</span>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+							</a>
+						</div>
+					</div>
+				</aside>
 			</div>
 		</div>
 
@@ -606,17 +694,234 @@ const relatedStories = [
 	}
 
 	/* ============================================================== */
-	/* 2. 現代的エディトリアル本文 */
+	/* 2. 現代的エディトリアル本文 ＆ 2カラムサイドバー */
 	/* ============================================================== */
 	.article-body-container {
 		width: 100%;
-		padding: 40px 20px 80px 20px;
+		max-width: 1240px;
+		margin: 0 auto;
+		padding: 50px 24px 90px 24px;
+	}
+
+	.article-layout-grid {
+		display: grid;
+		grid-template-columns: 1fr 340px;
+		gap: 52px;
+		align-items: start;
+	}
+
+	.article-main-column {
+		min-width: 0;
 	}
 
 	.article-prose-wrap {
 		width: 100%;
-		max-width: 820px;
-		margin: 0 auto;
+		max-width: 100%;
+	}
+
+	/* サイドバー・スクロール追従 */
+	.article-sidebar-column {
+		min-width: 0;
+	}
+
+	.sidebar-sticky-wrap {
+		position: sticky;
+		top: 100px;
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	/* サイドバーウィジェット共通 */
+	.sidebar-widget {
+		background: rgba(14, 16, 22, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 16px;
+		padding: 24px 22px;
+		backdrop-filter: blur(14px);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	}
+
+	.widget-header {
+		margin-bottom: 20px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.widget-kicker {
+		display: block;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.16em;
+		color: #dfba73;
+		margin-bottom: 4px;
+	}
+
+	.widget-title {
+		font-size: 17px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	/* 関連記事リスト */
+	.sidebar-post-list {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.sidebar-post-card {
+		display: flex;
+		gap: 14px;
+		align-items: center;
+		text-decoration: none;
+		color: inherit;
+		padding: 8px;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid transparent;
+		transition: all 0.25s ease;
+	}
+
+	.sidebar-post-card:hover {
+		background: rgba(255, 255, 255, 0.05);
+		border-color: rgba(223, 186, 115, 0.25);
+		transform: translateX(4px);
+	}
+
+	.sidebar-post-thumb {
+		position: relative;
+		width: 96px;
+		height: 68px;
+		border-radius: 8px;
+		overflow: hidden;
+		flex-shrink: 0;
+		background: #000;
+	}
+
+	.sidebar-post-thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.35s ease;
+	}
+
+	.sidebar-post-card:hover .sidebar-post-thumb img {
+		transform: scale(1.08);
+	}
+
+	.sidebar-brand-badge {
+		position: absolute;
+		top: 4px;
+		left: 4px;
+		font-size: 9px;
+		font-weight: 800;
+		padding: 2px 6px;
+		background: rgba(4, 5, 7, 0.9);
+		color: #dfba73;
+		border-radius: 4px;
+		letter-spacing: 0.06em;
+	}
+
+	.sidebar-post-body {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.sidebar-post-date {
+		display: block;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		margin-bottom: 4px;
+		letter-spacing: 0.04em;
+	}
+
+	.sidebar-post-title {
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.45;
+		color: rgba(255, 255, 255, 0.9);
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.2s ease;
+	}
+
+	.sidebar-post-card:hover .sidebar-post-title {
+		color: #dfba73;
+	}
+
+	/* Nicole コンシェルジュ・ショールーム案内CTA */
+	.sidebar-cta-widget {
+		background: linear-gradient(135deg, rgba(223, 186, 115, 0.1) 0%, rgba(14, 16, 22, 0.95) 100%);
+		border: 1px solid rgba(223, 186, 115, 0.25);
+	}
+
+	.cta-kicker {
+		font-size: 10px;
+		font-weight: 800;
+		color: #dfba73;
+		letter-spacing: 0.2em;
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.cta-title {
+		font-size: 16px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	.cta-desc {
+		font-size: 12px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 16px 0;
+	}
+
+	.btn-sidebar-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		width: 100%;
+		padding: 11px 16px;
+		background: #dfba73;
+		color: #040507;
+		font-size: 12px;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-decoration: none;
+		border-radius: 8px;
+		transition: all 0.2s ease;
+	}
+
+	.btn-sidebar-cta:hover {
+		background: #f0cb84;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(223, 186, 115, 0.3);
+	}
+
+	.btn-sidebar-cta svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* レスポンシブ切り替え（1024px以下は自然な1カラムレイアウトへ） */
+	@media (max-width: 1024px) {
+		.article-layout-grid {
+			grid-template-columns: 1fr;
+			gap: 48px;
+		}
+
+		.sidebar-sticky-wrap {
+			position: static;
+		}
 	}
 
 	.article-rich-text {
