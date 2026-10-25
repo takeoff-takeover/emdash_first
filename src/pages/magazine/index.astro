@@ -1,6 +1,6 @@
 ---
 // src/pages/magazine/index.astro
-// Nicole Connect - Web Magazine（本に特化したエディトリアル・装丁デザイン＆シネマティック3Dマガジン）
+// Nicole Connect - Web Magazine（Apple風の巨大写真ヒーロー＆エディトリアル・マガジンカバー）
 import { getEmDashCollection } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 
@@ -268,182 +268,155 @@ const allArticles = [
 // 一番目玉の記事（Cover Story）
 const coverArticle = allArticles.find(a => a.isFeatured) || allArticles[0];
 
-// 本の目次（Chapters）として掲載するハイライト記事
-const chaptersArticles = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 3);
+// 特集ハイライト記事（Chapters）
+const highlightStories = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 4);
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
 const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 ---
 
 <NicoleLayout 
-	title="Nicole Connect - The Editorial Volume ｜ ニコル・グループ公式マガジン" 
-	description="世界最高峰のモビリティと美学を編むWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新特集・インタビュー・購入ガイド。"
+	title="Nicole Connect - Web Magazine ｜ ニコル・グループ公式" 
+	description="Appleのような大迫力のビジュアルと洗練されたエディトリアルで綴るWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新モデル情報から特集記事まで。"
 >
-	<main class="magazine-book-main">
+	<main class="apple-magazine-main">
 		<!-- ============================================================== -->
-		<!-- 1. 栞（ブックマーク・リボン）：ページ上部から垂れ下がる布製リボン -->
+		<!-- 1. Apple風 特大マガジンカバー・HERO（画面全体に写真を大胆に使用） -->
 		<!-- ============================================================== -->
-		<a href="#magazine-archive" class="bookmark-ribbon" title="目次・全記事一覧へスクロール">
-			<span class="ribbon-text">INDEX ▾</span>
-			<span class="ribbon-end"></span>
-		</a>
+		<section class="apple-hero" id="hero-cover">
+			<!-- 巨大背景画像コンテナ（スクロール視差パララックス対応） -->
+			<div class="apple-hero__media" id="apple-hero-media">
+				<img 
+					src={coverArticle.image} 
+					alt={coverArticle.title} 
+					class="apple-hero__img" 
+					id="apple-hero-img"
+					loading="eager" 
+				/>
+				<!-- 映画的なダークビネットとグラデーション -->
+				<div class="apple-hero__gradient"></div>
+				<div class="apple-hero__side-vignette"></div>
+			</div>
+
+			<!-- 雑誌表紙のエディトリアル・フレーム（Hairline Border & Corner Badges） -->
+			<div class="apple-hero__frame">
+				<div class="frame-edge top-left"></div>
+				<div class="frame-edge top-right"></div>
+				<div class="frame-edge bottom-left"></div>
+				<div class="frame-edge bottom-right"></div>
+			</div>
+
+			<!-- 表紙コンテンツ（Apple風の大胆かつ洗練されたタイポグラフィ） -->
+			<div class="apple-hero__content">
+				<div class="mag-container apple-hero__container">
+					<!-- トップメタ：号数 ＆ 誌名マストヘッド -->
+					<div class="apple-hero__header">
+						<div class="apple-hero__issue-pill">
+							<span class="pulse-dot"></span>
+							<span>VOLUME 08 — AUTUMN / WINTER 2026-2027</span>
+						</div>
+						<div class="apple-hero__masthead">
+							<span class="masthead-name">NICOLE CONNECT</span>
+							<span class="masthead-edition">COLLECTOR'S EDITION</span>
+						</div>
+					</div>
+
+					<!-- センター：目玉記事の超巨大ヘッドライン ＆ コピー -->
+					<div class="apple-hero__center">
+						<div class="apple-hero__brand-kicker">
+							<span class="kicker-brand">{coverArticle.brand}</span>
+							<span class="kicker-sep">/</span>
+							<span class="kicker-topic">COVER STORY</span>
+						</div>
+
+						<h1 class="apple-hero__title">
+							THE NEW DAWN.
+						</h1>
+
+						<p class="apple-hero__lead">
+							【世界初公開】新型BMW 3シリーズ誕生。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く、新世代モビリティの夜明け。
+						</p>
+
+						<!-- Apple風の洗練されたアクションボタン群 -->
+						<div class="apple-hero__actions">
+							<a href={coverArticle.url} class="apple-cta-btn apple-cta-btn--primary">
+								<span>特集記事を開く</span>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+							</a>
+							<a href="#table-of-contents" class="apple-cta-btn apple-cta-btn--secondary">
+								<span>今号の目次を見る</span>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+							</a>
+						</div>
+					</div>
+
+					<!-- ボトム：本の表紙ならではのスペック＆クレジット情報 -->
+					<div class="apple-hero__footer">
+						<div class="footer-spec-col">
+							<span class="spec-label">ARCHITECTURE</span>
+							<span class="spec-value">Neue Klasse 800V EV</span>
+						</div>
+						<div class="footer-spec-divider"></div>
+						<div class="footer-spec-col">
+							<span class="spec-label">POWERTRAIN</span>
+							<span class="spec-value">Dual Motor AWD / 3.0L M TwinPower Turbo</span>
+						</div>
+						<div class="footer-spec-divider"></div>
+						<div class="footer-spec-col">
+							<span class="spec-label">EDITORIAL</span>
+							<span class="spec-value">Nicole Automobiles Magazine Issue</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- スクロール促進インジケーター -->
+			<a href="#table-of-contents" class="apple-hero__scroll-cue" aria-label="コンテンツへスクロール">
+				<span class="scroll-cue-text">SCROLL TO READ</span>
+				<div class="scroll-cue-line"></div>
+			</a>
+		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. 特大ブックカバー・ヒーローステージ（本に特化したエディトリアル装丁） -->
+		<!-- 2. 本の見開き目次（TABLE OF CONTENTS / FEATURED CHAPTERS） -->
 		<!-- ============================================================== -->
-		<section class="book-hero-stage">
-			<div class="book-ambient-glow"></div>
-
+		<section class="toc-section" id="table-of-contents">
 			<div class="mag-container">
-				<div class="book-hero-layout">
-					<!-- 左／中央：3D立体ブック（目玉記事がそのまま特大ハードカバー本の表紙に！） -->
-					<div class="book-showcase-col">
-						<div class="book-3d-perspective" id="book-perspective-wrapper">
-							<article class="editorial-book-object" id="interactive-book-cover">
-								<a href={coverArticle.url} class="book-cover-anchor" aria-label={`今号の巻頭特集：${coverArticle.title}`}>
-									<!-- 背表紙の折り目溝・陰影（ハードカバーの質感を再現） -->
-									<div class="book-spine-crease"></div>
-
-									<!-- ページ束の多層厚み（本の右端に覗く紙の重なり） -->
-									<div class="book-pages-stack"></div>
-
-									<!-- 表紙画像（目玉記事の写真） -->
-									<div class="book-cover-artwork">
-										<img 
-											src={coverArticle.image} 
-											alt={coverArticle.title} 
-											class="book-cover-image" 
-											loading="eager" 
-										/>
-										<div class="book-cover-vignette"></div>
-									</div>
-
-									<!-- 光沢シマー反射レイヤー（マウスの動きで光が走る） -->
-									<div class="book-glare-foil" id="book-glare-foil"></div>
-
-									<!-- 表紙グラフィック・タイポグラフィ装丁 -->
-									<div class="book-cover-header">
-										<div class="book-vol-tag">
-											<span class="vol-symbol">❖</span>
-											<span>VOL. 08 — AUTUMN / WINTER 2026-2027</span>
-										</div>
-										<h1 class="book-masthead">
-											<span class="masthead-main">NICOLE CONNECT</span>
-											<span class="masthead-sub">THE EDITORIAL CAR CULTURE & CRAFTSMANSHIP</span>
-										</h1>
-									</div>
-
-									<div class="book-cover-body">
-										<div class="book-feature-kicker">COVER STORY</div>
-										<h2 class="book-feature-headline">
-											THE NEW DAWN OF 3 SERIES.
-										</h2>
-										<p class="book-feature-subline">
-											次世代ノイエ・クラッセ初採用。時代が静かに、だが劇的に動き出す。
-										</p>
-									</div>
-
-									<!-- 本の帯（Book Obi）：限定特装版のリアルな帯 -->
-									<div class="book-obi">
-										<div class="book-obi__ribbon">SPECIAL EDITION</div>
-										<div class="book-obi__body">
-											<span class="book-obi__lead">【世界初公開】BMW i3 ＆ M350 xDrive</span>
-											<span class="book-obi__sub">歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン</span>
-										</div>
-										<div class="book-obi__open">
-											<span>READ</span>
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-										</div>
-									</div>
-
-									<!-- 奥付・ISBNバーコード（本のディテール） -->
-									<div class="book-colophon">
-										<div class="colophon-barcode">
-											<span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span>
-											<span class="bar b1"></span><span class="bar b4"></span><span class="bar b2"></span>
-											<span class="bar b3"></span><span class="bar b1"></span><span class="bar b2"></span>
-										</div>
-										<span class="colophon-isbn">ISBN 978-4-990000-08-9</span>
-										<span class="colophon-pub">NICOLE GROUP PUBLICATIONS</span>
-									</div>
-
-									<!-- 右下角の紙めくれ（ドッグイア / Page Curl） -->
-									<div class="book-page-curl" title="ページをめくる">
-										<span class="curl-text">OPEN</span>
-									</div>
-								</a>
-							</article>
-						</div>
-
-						<!-- 本の置き台シャドウ（床面に落ちる重厚なソフトシャドウ） -->
-						<div class="book-pedestal-shadow"></div>
-						<div class="book-interaction-hint">
-							<span class="hint-icon">✦</span>
-							<span>カーソルに合わせて本が立体的に傾きます。クリックして特集ページへ</span>
-						</div>
+				<div class="toc-header">
+					<div class="toc-badge">
+						<span class="badge-accent"></span>
+						<span>TABLE OF CONTENTS — VOL. 08</span>
 					</div>
+					<h2 class="toc-heading">今号の主な特集ストーリー</h2>
+					<p class="toc-sub">ページをめくるように、Nicoleが厳選した特別なストーリーをお楽しみください。</p>
+				</div>
 
-					<!-- 右：今号の目次・解説（Book Overview & Chapters） -->
-					<div class="book-contents-col">
-						<div class="volume-header">
-							<div class="volume-label">
-								<span class="volume-dot"></span>
-								<span>COLLECTOR'S VOLUME 08</span>
-							</div>
-							<h2 class="volume-title">本質を極めた、美しいモビリティの記録。</h2>
-							<p class="volume-desc">
-								自動車は単なる移動の手段を超え、人生を豊かに彩る芸術作品となる。本号では、新世代EVへと昇華した新型BMW 3シリーズを筆頭に、跳ね馬の血統を受け継ぐフェラーリ初のフル電動モデル、そしてクラフトマンシップが息づく熟練マイスターたちの手仕事まで、妥協なき情熱の結晶を1冊の特装本として綴ります。
-							</p>
-						</div>
-
-						<!-- 本の目次（Chapters / 今号のハイライト） -->
-						<div class="book-chapters-card">
-							<div class="chapters-card-head">
-								<span class="chapters-card-title">TABLE OF CONTENTS</span>
-								<span class="chapters-card-vol">VOL.08</span>
-							</div>
-
-							<div class="chapters-list">
-								<!-- Chapter 01: 巻頭特集 -->
-								<a href={coverArticle.url} class="chapter-item is-cover">
-									<div class="chapter-num">CHAP. 01</div>
-									<div class="chapter-content">
-										<div class="chapter-meta">
-											<span class="chapter-brand">{coverArticle.brand}</span>
-											<span class="chapter-tag">COVER STORY</span>
-										</div>
-										<div class="chapter-title">{coverArticle.title}</div>
+				<div class="toc-grid">
+					{highlightStories.map((story, index) => (
+						<article class="toc-card">
+							<a href={story.url} class="toc-card__link">
+								<div class="toc-card__media">
+									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" />
+									<div class="toc-card__overlay"></div>
+									<span class="toc-card__chapter">CHAP. 0{index + 2}</span>
+									<span class="toc-card__brand">{story.brand}</span>
+								</div>
+								<div class="toc-card__body">
+									<div class="toc-card__meta">
+										<span class="toc-meta-topic">{story.topic}</span>
+										<span class="toc-meta-sep">/</span>
+										<time class="toc-meta-date">{story.date}</time>
 									</div>
-									<div class="chapter-arrow">→</div>
-								</a>
-
-								<!-- Chapter 02, 03... -->
-								{chaptersArticles.map((chap, idx) => (
-									<a href={chap.url} class="chapter-item">
-										<div class="chapter-num">CHAP. {String(idx + 2).padStart(2, '0')}</div>
-										<div class="chapter-content">
-											<div class="chapter-meta">
-												<span class="chapter-brand">{chap.brand}</span>
-												<span class="chapter-tag">{chap.topic}</span>
-											</div>
-											<div class="chapter-title">{chap.title}</div>
-										</div>
-										<div class="chapter-arrow">→</div>
-									</a>
-								))}
-							</div>
-
-							<div class="chapters-card-footer">
-								<a href={coverArticle.url} class="btn-read-volume">
-									<span>今号の巻頭特集を読む</span>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-								</a>
-								<a href="#magazine-archive" class="btn-browse-archive">
-									<span>過去のアーカイブを検索 ↓</span>
-								</a>
-							</div>
-						</div>
-					</div>
+									<h3 class="toc-card__title">{story.title}</h3>
+									{story.lead && <p class="toc-card__lead">{story.lead}</p>}
+									<div class="toc-card__arrow">
+										<span>読む</span>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+									</div>
+								</div>
+							</a>
+						</article>
+					))}
 				</div>
 			</div>
 		</section>
@@ -560,61 +533,35 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	</main>
 </NicoleLayout>
 
-<!-- 3Dブックカバー傾き＆光沢シマー＆フィルター制御スクリプト -->
+<!-- Apple風スクロールパララックス＆フィルタリング制御スクリプト -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
 		// ==============================================================
-		// 1. 本の表紙 3Dジャイロ傾き＆金箔押しシマー効果
+		// 1. Apple風 スクロールパララックス＆ズーム効果
 		// ==============================================================
-		const bookWrapper = document.getElementById('book-perspective-wrapper');
-		const bookObject = document.getElementById('interactive-book-cover');
-		const glareFoil = document.getElementById('book-glare-foil');
+		const heroImg = document.getElementById('apple-hero-img');
+		const heroSection = document.getElementById('hero-cover');
 
-		if (bookWrapper && bookObject) {
-			let isHovered = false;
+		if (heroImg && heroSection) {
+			let ticking = false;
 
-			bookWrapper.addEventListener('mouseenter', () => {
-				isHovered = true;
-				bookObject.style.transition = 'transform 0.15s ease-out, box-shadow 0.15s ease-out';
-			});
+			window.addEventListener('scroll', () => {
+				if (!ticking) {
+					window.requestAnimationFrame(() => {
+						const scrollY = window.scrollY;
+						const heroHeight = heroSection.offsetHeight;
 
-			bookWrapper.addEventListener('mousemove', (e) => {
-				if (!isHovered) return;
-				const rect = bookWrapper.getBoundingClientRect();
-				const x = e.clientX - rect.left;
-				const y = e.clientY - rect.top;
-
-				const centerX = rect.width / 2;
-				const centerY = rect.height / 2;
-
-				// -1 to 1 の正規化オフセット
-				const offsetX = (x - centerX) / centerX;
-				const offsetY = (y - centerY) / centerY;
-
-				// 最大12度の立体チルト
-				const rotateY = offsetX * 14;
-				const rotateX = -offsetY * 12;
-
-				bookObject.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-
-				// 光沢シマー（グレア）の反射位置計算
-				if (glareFoil) {
-					const glareX = ((x / rect.width) * 100).toFixed(1);
-					const glareY = ((y / rect.height) * 100).toFixed(1);
-					glareFoil.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 230, 180, 0.45) 0%, rgba(212, 175, 55, 0.15) 35%, transparent 70%)`;
-					glareFoil.style.opacity = '1';
+						if (scrollY <= heroHeight) {
+							// スクロールに合わせて背景画像がわずかにゆっくり動き（パララックス）、奥へと引く
+							const translateY = scrollY * 0.35;
+							const scale = 1.05 - (scrollY / heroHeight) * 0.05;
+							heroImg.style.transform = `translate3d(0, ${translateY}px, 0) scale(${Math.max(scale, 1)})`;
+						}
+						ticking = false;
+					});
+					ticking = true;
 				}
-			});
-
-			bookWrapper.addEventListener('mouseleave', () => {
-				isHovered = false;
-				// スプリングのように元の角度へスムーズに復帰
-				bookObject.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-				bookObject.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-				if (glareFoil) {
-					glareFoil.style.opacity = '0';
-				}
-			});
+			}, { passive: true });
 		}
 
 		// ==============================================================
@@ -715,14 +662,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 <style>
 	/* ============================================================== */
-	/* Nicole Connect - 本特化エディトリアルマガジンスタイル */
+	/* Nicole Connect - Apple風大判写真エディトリアルマガジン */
 	/* ============================================================== */
-	.magazine-book-main {
-		background-color: #050608;
+	.apple-magazine-main {
+		background-color: #040507;
 		color: #ffffff;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
-		padding-top: 80px;
 		position: relative;
 		overflow-x: hidden;
 	}
@@ -735,186 +681,41 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	/* ============================================================== */
-	/* 1. 栞（Bookmark Ribbon）：上部から垂れ下がる布製リボン */
+	/* 1. Apple風 特大マガジンカバー・HERO */
 	/* ============================================================== */
-	.bookmark-ribbon {
-		position: fixed;
-		top: 70px;
-		right: 60px;
-		z-index: 600;
-		width: 38px;
-		height: 110px;
-		background: linear-gradient(135deg, #c5a059 0%, #dfba73 50%, #9e7d3b 100%);
-		box-shadow: -3px 6px 16px rgba(0, 0, 0, 0.6);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: flex-start;
-		padding-top: 18px;
-		text-decoration: none;
-		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
-		cursor: pointer;
-		filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
-	}
-
-	.bookmark-ribbon:hover {
-		transform: translateY(10px);
-		filter: drop-shadow(0 8px 18px rgba(197, 160, 89, 0.5));
-	}
-
-	.ribbon-text {
-		writing-mode: vertical-rl;
-		font-family: 'Inter', sans-serif;
-		font-size: 11px;
-		font-weight: 800;
-		letter-spacing: 0.25em;
-		color: #060709;
-		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-	}
-
-	.ribbon-end {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 0;
-		height: 0;
-		border-left: 19px solid transparent;
-		border-right: 19px solid transparent;
-		border-bottom: 16px solid #050608;
-	}
-
-	/* ============================================================== */
-	/* 2. 特大ブックカバー・ヒーローステージ */
-	/* ============================================================== */
-	.book-hero-stage {
+	.apple-hero {
 		position: relative;
-		padding: 70px 0 90px 0;
-		overflow: hidden;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.book-ambient-glow {
-		position: absolute;
-		top: -20%;
-		left: 10%;
-		width: 60%;
-		height: 120%;
-		background: radial-gradient(circle at 40% 40%, rgba(197, 160, 89, 0.12) 0%, transparent 60%);
-		pointer-events: none;
-	}
-
-	.book-hero-layout {
-		display: grid;
-		grid-template-columns: 500px 1fr;
-		gap: 60px;
-		align-items: center;
-	}
-
-	/* 3Dパースペクティブコンテナ */
-	.book-showcase-col {
+		min-height: 94vh;
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-	}
-
-	.book-3d-perspective {
-		perspective: 1400px;
-		width: 100%;
-		max-width: 480px;
-		display: flex;
 		justify-content: center;
-	}
-
-	/* 本の立体オブジェクト（ハードカバー装丁） */
-	.editorial-book-object {
-		position: relative;
-		width: 460px;
-		height: 650px;
-		border-radius: 4px 14px 14px 4px;
-		background: #090b0e;
-		transform-style: preserve-3d;
-		box-shadow: 
-			-12px 14px 30px rgba(0, 0, 0, 0.8),
-			-2px 0 6px rgba(0, 0, 0, 0.5),
-			inset -2px 0 6px rgba(0, 0, 0, 0.7);
-		cursor: pointer;
-		user-select: none;
-	}
-
-	.book-cover-anchor {
-		display: block;
-		width: 100%;
-		height: 100%;
-		position: relative;
-		border-radius: inherit;
 		overflow: hidden;
-		text-decoration: none;
-		color: inherit;
+		padding-top: 80px;
+		background: #000000;
 	}
 
-	/* 背表紙の折り目溝（ハードカバーの蝶番溝） */
-	.book-spine-crease {
+	/* 巨大背景画像コンテナ */
+	.apple-hero__media {
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: 32px;
+		width: 100%;
 		height: 100%;
-		background: linear-gradient(90deg, 
-			rgba(0, 0, 0, 0.95) 0%, 
-			rgba(255, 255, 255, 0.15) 15%, 
-			rgba(0, 0, 0, 0.8) 35%, 
-			rgba(0, 0, 0, 0.4) 70%, 
-			transparent 100%);
-		z-index: 10;
-		pointer-events: none;
-		box-shadow: inset 1px 0 2px rgba(255, 255, 255, 0.2);
-	}
-
-	/* ページ束の多層厚み（右側に覗く紙の重なり） */
-	.book-pages-stack {
-		position: absolute;
-		top: 6px;
-		right: -10px;
-		width: 10px;
-		height: calc(100% - 12px);
-		background: repeating-linear-gradient(
-			180deg,
-			#d0cbbe 0px,
-			#b5b0a3 1px,
-			#ede8dd 2px,
-			#ded9ce 3px
-		);
-		border-radius: 0 3px 3px 0;
-		box-shadow: 
-			inset 2px 0 4px rgba(0, 0, 0, 0.5),
-			4px 0 10px rgba(0, 0, 0, 0.7);
 		z-index: 1;
+		overflow: hidden;
 	}
 
-	/* 表紙画像 */
-	.book-cover-artwork {
-		position: absolute;
-		top: 0;
-		left: 0;
+	.apple-hero__img {
 		width: 100%;
-		height: 100%;
-		z-index: 2;
-	}
-
-	.book-cover-image {
-		width: 100%;
-		height: 100%;
+		height: 115%;
 		object-fit: cover;
+		object-position: center 38%;
+		transform: scale(1.05);
+		transition: transform 0.1s linear;
 		filter: brightness(0.85) contrast(1.08);
-		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
 	}
 
-	.editorial-book-object:hover .book-cover-image {
-		filter: brightness(0.95) contrast(1.12);
-		transform: scale(1.03);
-	}
-
-	.book-cover-vignette {
+	.apple-hero__gradient {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -922,319 +723,317 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		height: 100%;
 		background: linear-gradient(
 			180deg, 
-			rgba(5, 6, 8, 0.75) 0%, 
-			rgba(5, 6, 8, 0.2) 25%, 
-			rgba(5, 6, 8, 0.3) 55%, 
-			rgba(5, 6, 8, 0.95) 100%
+			rgba(4, 5, 7, 0.82) 0%, 
+			rgba(4, 5, 7, 0.15) 30%, 
+			rgba(4, 5, 7, 0.25) 55%, 
+			rgba(4, 5, 7, 0.95) 100%
 		);
 	}
 
-	/* 金箔光沢シマー */
-	.book-glare-foil {
+	.apple-hero__side-vignette {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 8;
-		pointer-events: none;
-		opacity: 0;
-		transition: opacity 0.3s ease;
-		mix-blend-mode: overlay;
+		background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(4, 5, 7, 0.6) 100%);
 	}
 
-	/* 表紙上部マストヘッド */
-	.book-cover-header {
+	/* 雑誌の表紙フレーム（四隅のエッジ） */
+	.apple-hero__frame {
 		position: absolute;
-		top: 28px;
-		left: 44px;
-		right: 32px;
-		z-index: 5;
+		top: 30px;
+		left: 30px;
+		right: 30px;
+		bottom: 30px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		pointer-events: none;
+		z-index: 3;
 	}
 
-	.book-vol-tag {
+	.frame-edge {
+		position: absolute;
+		width: 16px;
+		height: 16px;
+		border: 2px solid #dfba73;
+	}
+
+	.frame-edge.top-left { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+	.frame-edge.top-right { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+	.frame-edge.bottom-left { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+	.frame-edge.bottom-right { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+	/* 表紙コンテンツ */
+	.apple-hero__content {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+		padding: 40px 0 60px 0;
+	}
+
+	.apple-hero__container {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		min-height: 74vh;
+	}
+
+	/* トップヘッダー */
+	.apple-hero__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.apple-hero__issue-pill {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		font-family: 'Inter', sans-serif;
-		font-size: 10px;
+		gap: 8px;
+		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.22em;
 		color: #dfba73;
-		margin-bottom: 10px;
 		text-transform: uppercase;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+		background: rgba(0, 0, 0, 0.5);
+		padding: 6px 14px;
+		border-radius: 999px;
+		border: 1px solid rgba(223, 186, 115, 0.3);
+		backdrop-filter: blur(10px);
 	}
 
-	.vol-symbol {
-		font-size: 8px;
-		color: #dfba73;
+	.pulse-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #dfba73;
+		box-shadow: 0 0 10px #dfba73;
+		animation: pulseGlow 2s infinite ease-in-out;
 	}
 
-	.book-masthead {
-		margin: 0;
+	@keyframes pulseGlow {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.4; transform: scale(0.85); }
+	}
+
+	.apple-hero__masthead {
 		display: flex;
 		flex-direction: column;
+		align-items: flex-end;
+		text-align: right;
 	}
 
-	.masthead-main {
+	.masthead-name {
 		font-family: 'Times New Roman', 'Didot', 'Playfair Display', serif;
-		font-size: clamp(34px, 3.2vw, 42px);
+		font-size: clamp(20px, 2.2vw, 30px);
 		font-weight: 700;
-		letter-spacing: 0.08em;
-		background: linear-gradient(135deg, #ffffff 0%, #dfba73 50%, #ffffff 100%);
+		letter-spacing: 0.15em;
+		background: linear-gradient(135deg, #ffffff 0%, #dfba73 100%);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
-		line-height: 1;
-		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
 	}
 
-	.masthead-sub {
-		font-family: 'Inter', sans-serif;
-		font-size: 8.5px;
-		font-weight: 600;
-		letter-spacing: 0.3em;
-		color: rgba(255, 255, 255, 0.7);
-		margin-top: 6px;
-		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+	.masthead-edition {
+		font-size: 9px;
+		font-weight: 700;
+		letter-spacing: 0.25em;
+		color: rgba(255, 255, 255, 0.6);
 	}
 
-	/* 表紙中面タイトル */
-	.book-cover-body {
-		position: absolute;
-		bottom: 155px;
-		left: 44px;
-		right: 32px;
-		z-index: 5;
+	/* センタータイトル＆コピー */
+	.apple-hero__center {
+		max-width: 960px;
+		margin: 40px 0;
 	}
 
-	.book-feature-kicker {
-		font-family: 'Inter', sans-serif;
-		font-size: 10px;
+	.apple-hero__brand-kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
 		font-weight: 800;
 		letter-spacing: 0.25em;
 		color: #dfba73;
-		margin-bottom: 6px;
+		margin-bottom: 12px;
 		text-transform: uppercase;
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 	}
 
-	.book-feature-headline {
-		font-family: 'Inter', sans-serif;
-		font-size: clamp(22px, 2.2vw, 28px);
+	.kicker-sep {
+		opacity: 0.5;
+	}
+
+	.apple-hero__title {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(48px, 7vw, 96px);
 		font-weight: 800;
-		line-height: 1.15;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.025em;
+		line-height: 1.02;
 		color: #ffffff;
-		margin: 0 0 8px 0;
+		margin: 0 0 20px 0;
+		text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
+	}
+
+	.apple-hero__lead {
+		font-size: clamp(16px, 1.6vw, 21px);
+		line-height: 1.55;
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.9);
+		max-width: 780px;
+		margin: 0 0 36px 0;
 		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 	}
 
-	.book-feature-subline {
-		font-size: 12px;
-		line-height: 1.5;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0;
-		text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-	}
-
-	/* 本の帯（Book Obi） */
-	.book-obi {
-		position: absolute;
-		bottom: 38px;
-		left: 0;
-		width: 100%;
-		height: 94px;
-		background: rgba(14, 16, 20, 0.92);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border-top: 1px solid rgba(223, 186, 115, 0.4);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		z-index: 6;
+	/* Apple風のアクションボタン */
+	.apple-hero__actions {
 		display: flex;
 		align-items: center;
-		padding: 0 20px 0 44px;
-		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
-		transition: background 0.3s ease, border-color 0.3s ease;
+		gap: 18px;
+		flex-wrap: wrap;
 	}
 
-	.editorial-book-object:hover .book-obi {
-		background: rgba(20, 24, 30, 0.96);
-		border-top-color: #dfba73;
-	}
-
-	.book-obi__ribbon {
-		position: absolute;
-		top: -10px;
-		left: 44px;
-		padding: 2px 8px;
-		background: #c5a059;
-		color: #060709;
-		font-size: 9px;
-		font-weight: 800;
-		letter-spacing: 0.15em;
-		border-radius: 2px;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-	}
-
-	.book-obi__body {
-		flex-grow: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 3px;
-		padding-right: 14px;
-	}
-
-	.book-obi__lead {
-		font-size: 13px;
+	.apple-cta-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 14px 30px;
+		border-radius: 999px;
+		font-size: 14px;
 		font-weight: 700;
-		color: #ffffff;
-		line-height: 1.3;
+		letter-spacing: 0.06em;
+		text-decoration: none;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.book-obi__sub {
-		font-size: 10.5px;
-		color: rgba(255, 255, 255, 0.65);
-		line-height: 1.35;
-	}
-
-	.book-obi__open {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-family: 'Inter', sans-serif;
-		font-size: 10px;
-		font-weight: 800;
-		letter-spacing: 0.15em;
-		color: #dfba73;
-		padding: 6px 10px;
-		background: rgba(223, 186, 115, 0.12);
-		border: 1px solid rgba(223, 186, 115, 0.3);
-		border-radius: 4px;
-		flex-shrink: 0;
-		transition: all 0.3s ease;
-	}
-
-	.book-obi__open svg {
-		width: 12px;
-		height: 12px;
+	.apple-cta-btn svg {
+		width: 16px;
+		height: 16px;
 		transition: transform 0.3s ease;
 	}
 
-	.editorial-book-object:hover .book-obi__open {
+	.apple-cta-btn--primary {
 		background: #dfba73;
-		color: #060709;
+		color: #040507;
+		box-shadow: 0 4px 20px rgba(223, 186, 115, 0.4);
 	}
 
-	.editorial-book-object:hover .book-obi__open svg {
-		transform: translateX(3px);
+	.apple-cta-btn--primary:hover {
+		background: #f2ce89;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 30px rgba(223, 186, 115, 0.6);
 	}
 
-	/* 奥付・ISBNバーコード */
-	.book-colophon {
-		position: absolute;
-		bottom: 12px;
-		left: 44px;
-		right: 32px;
+	.apple-cta-btn--primary:hover svg {
+		transform: translateX(4px);
+	}
+
+	.apple-cta-btn--secondary {
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		backdrop-filter: blur(12px);
+	}
+
+	.apple-cta-btn--secondary:hover {
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(255, 255, 255, 0.5);
+		transform: translateY(-2px);
+	}
+
+	.apple-cta-btn--secondary:hover svg {
+		transform: translateY(3px);
+	}
+
+	/* ボトムバー：表紙スペック情報 */
+	.apple-hero__footer {
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		z-index: 5;
-		font-size: 8.5px;
-		font-family: 'Inter', monospace;
-		color: rgba(255, 255, 255, 0.4);
-		letter-spacing: 0.05em;
-	}
-
-	.colophon-barcode {
-		display: flex;
-		align-items: stretch;
-		height: 12px;
-		gap: 1.5px;
-	}
-
-	.colophon-barcode .bar {
-		background: rgba(255, 255, 255, 0.5);
-	}
-	.bar.b1 { width: 1px; }
-	.bar.b2 { width: 2px; }
-	.bar.b3 { width: 1.5px; }
-	.bar.b4 { width: 3px; }
-
-	.colophon-pub {
-		margin-left: auto;
-		letter-spacing: 0.12em;
-	}
-
-	/* 右下角の紙めくれ（ドッグイア / Page Curl） */
-	.book-page-curl {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		width: 44px;
-		height: 44px;
-		background: linear-gradient(135deg, transparent 50%, rgba(223, 186, 115, 0.4) 50%, #ffffff 100%);
-		box-shadow: -4px -4px 10px rgba(0, 0, 0, 0.6);
-		border-radius: 0 0 14px 0;
-		z-index: 12;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-		display: flex;
-		align-items: flex-end;
-		justify-content: flex-end;
-		padding: 4px;
-	}
-
-	.curl-text {
-		font-size: 8px;
-		font-weight: 800;
-		color: #060709;
-		letter-spacing: 0.05em;
-		transform: rotate(-45deg) translate(-2px, 2px);
-	}
-
-	.editorial-book-object:hover .book-page-curl {
-		transform: scale(1.25);
-		box-shadow: -8px -8px 16px rgba(0, 0, 0, 0.8);
-	}
-
-	/* 本の置き台シャドウ */
-	.book-pedestal-shadow {
-		width: 420px;
-		height: 24px;
-		background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.85) 0%, transparent 70%);
-		margin-top: 18px;
-		filter: blur(6px);
-	}
-
-	.book-interaction-hint {
-		margin-top: 10px;
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.45);
-		display: flex;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.hint-icon {
-		color: #dfba73;
-		font-size: 9px;
-	}
-
-	/* ============================================================== */
-	/* 今号の目次・解説（右カラム） */
-	/* ============================================================== */
-	.book-contents-col {
-		display: flex;
-		flex-direction: column;
 		gap: 32px;
+		padding-top: 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		flex-wrap: wrap;
 	}
 
-	.volume-header {
+	.footer-spec-col {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 3px;
 	}
 
-	.volume-label {
+	.spec-label {
+		font-size: 9.5px;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		color: #dfba73;
+	}
+
+	.spec-value {
+		font-size: 13px;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.footer-spec-divider {
+		width: 1px;
+		height: 24px;
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	/* スクロールキュー */
+	.apple-hero__scroll-cue {
+		position: absolute;
+		bottom: 24px;
+		right: 48px;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		text-decoration: none;
+		color: rgba(255, 255, 255, 0.5);
+		transition: color 0.3s ease;
+	}
+
+	.apple-hero__scroll-cue:hover {
+		color: #dfba73;
+	}
+
+	.scroll-cue-text {
+		font-size: 9px;
+		font-weight: 800;
+		letter-spacing: 0.25em;
+		writing-mode: vertical-rl;
+	}
+
+	.scroll-cue-line {
+		width: 1px;
+		height: 36px;
+		background: linear-gradient(180deg, #dfba73 0%, transparent 100%);
+		animation: scrollDrop 1.8s infinite ease-in-out;
+	}
+
+	@keyframes scrollDrop {
+		0% { transform: scaleY(0); transform-origin: top; }
+		50% { transform: scaleY(1); transform-origin: top; }
+		50.1% { transform: scaleY(1); transform-origin: bottom; }
+		100% { transform: scaleY(0); transform-origin: bottom; }
+	}
+
+	/* ============================================================== */
+	/* 2. 本の見開き目次（TABLE OF CONTENTS） */
+	/* ============================================================== */
+	.toc-section {
+		padding: 90px 0 70px 0;
+		background: #06070a;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.toc-header {
+		margin-bottom: 44px;
+	}
+
+	.toc-badge {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
@@ -1242,206 +1041,182 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-weight: 700;
 		letter-spacing: 0.2em;
 		color: #dfba73;
+		margin-bottom: 10px;
 	}
 
-	.volume-dot {
+	.badge-accent {
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
 		background: #dfba73;
-		box-shadow: 0 0 8px #dfba73;
 	}
 
-	.volume-title {
-		font-family: 'Times New Roman', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
-		font-size: clamp(26px, 2.5vw, 36px);
-		font-weight: 600;
-		line-height: 1.35;
-		color: #ffffff;
-		margin: 0;
-		letter-spacing: 0.02em;
-	}
-
-	.volume-desc {
-		font-size: 14.5px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0;
-	}
-
-	/* 目次カード（TABLE OF CONTENTS） */
-	.book-chapters-card {
-		background: #090b0f;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 28px;
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-	}
-
-	.chapters-card-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-bottom: 16px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		margin-bottom: 18px;
-	}
-
-	.chapters-card-title {
-		font-family: 'Inter', sans-serif;
-		font-size: 11.5px;
-		font-weight: 800;
-		letter-spacing: 0.22em;
-		color: #ffffff;
-	}
-
-	.chapters-card-vol {
-		font-family: 'Inter', sans-serif;
-		font-size: 10.5px;
+	.toc-heading {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(28px, 3vw, 42px);
 		font-weight: 700;
-		color: #dfba73;
-		letter-spacing: 0.15em;
+		letter-spacing: -0.01em;
+		color: #ffffff;
+		margin: 0 0 10px 0;
 	}
 
-	.chapters-list {
+	.toc-sub {
+		font-size: 15px;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0;
+	}
+
+	.toc-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 24px;
+	}
+
+	.toc-card {
+		background: #0a0d12;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 14px;
+		overflow: hidden;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+	}
+
+	.toc-card:hover {
+		transform: translateY(-6px);
+		border-color: rgba(223, 186, 115, 0.4);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+	}
+
+	.toc-card__link {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
-		margin-bottom: 24px;
-	}
-
-	.chapter-item {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		padding: 14px 16px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
+		height: 100%;
 		text-decoration: none;
 		color: inherit;
-		transition: all 0.3s ease;
 	}
 
-	.chapter-item:hover {
-		background: rgba(223, 186, 115, 0.08);
-		border-color: rgba(223, 186, 115, 0.3);
-		transform: translateX(4px);
+	.toc-card__media {
+		position: relative;
+		height: 190px;
+		overflow: hidden;
+		background: #000;
 	}
 
-	.chapter-item.is-cover {
-		border-left: 3px solid #dfba73;
-		background: rgba(223, 186, 115, 0.05);
+	.toc-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.chapter-num {
-		font-family: 'Inter', sans-serif;
+	.toc-card:hover .toc-card__img {
+		transform: scale(1.06);
+	}
+
+	.toc-card__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(180deg, transparent 40%, rgba(10, 13, 18, 0.8) 100%);
+	}
+
+	.toc-card__chapter {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		padding: 3px 8px;
+		background: #dfba73;
+		color: #040507;
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.15em;
-		color: #dfba73;
-		flex-shrink: 0;
+		letter-spacing: 0.12em;
+		border-radius: 4px;
 	}
 
-	.chapter-content {
-		flex-grow: 1;
+	.toc-card__brand {
+		position: absolute;
+		top: 14px;
+		right: 14px;
+		padding: 3px 10px;
+		background: rgba(0, 0, 0, 0.7);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		font-size: 10px;
+		font-weight: 700;
+		color: #ffffff;
+		backdrop-filter: blur(6px);
+	}
+
+	.toc-card__body {
+		padding: 22px;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		flex-grow: 1;
 	}
 
-	.chapter-meta {
+	.toc-card__meta {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.5);
+		margin-bottom: 8px;
 	}
 
-	.chapter-brand {
-		font-size: 9.5px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		color: #ffffff;
-	}
-
-	.chapter-tag {
-		font-size: 9.5px;
-		color: rgba(255, 255, 255, 0.45);
-	}
-
-	.chapter-title {
-		font-size: 13.5px;
+	.toc-meta-topic {
+		color: #dfba73;
 		font-weight: 600;
-		line-height: 1.4;
-		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.toc-card__title {
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.45;
+		color: #ffffff;
+		margin: 0 0 10px 0;
 		display: -webkit-box;
-		-webkit-line-clamp: 1;
+		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
+		transition: color 0.3s ease;
 	}
 
-	.chapter-item:hover .chapter-title {
+	.toc-card:hover .toc-card__title {
 		color: #dfba73;
 	}
 
-	.chapter-arrow {
-		color: rgba(255, 255, 255, 0.3);
-		font-size: 14px;
-		transition: transform 0.3s ease, color 0.3s ease;
+	.toc-card__lead {
+		font-size: 12.5px;
+		color: rgba(255, 255, 255, 0.65);
+		line-height: 1.5;
+		margin: 0 0 18px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		flex-grow: 1;
 	}
 
-	.chapter-item:hover .chapter-arrow {
-		transform: translateX(4px);
-		color: #dfba73;
-	}
-
-	.chapters-card-footer {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		flex-wrap: wrap;
-	}
-
-	.btn-read-volume {
+	.toc-card__arrow {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
-		padding: 12px 24px;
-		background: #dfba73;
-		color: #060709;
-		font-size: 12px;
-		font-weight: 800;
-		letter-spacing: 0.12em;
-		border-radius: 6px;
-		text-decoration: none;
-		transition: all 0.3s ease;
+		gap: 6px;
+		font-size: 11.5px;
+		font-weight: 700;
+		color: #dfba73;
+		margin-top: auto;
+		transition: transform 0.3s ease;
 	}
 
-	.btn-read-volume svg {
+	.toc-card__arrow svg {
 		width: 14px;
 		height: 14px;
 		transition: transform 0.3s ease;
 	}
 
-	.btn-read-volume:hover {
-		background: #f0cb85;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 20px rgba(223, 186, 115, 0.4);
-	}
-
-	.btn-read-volume:hover svg {
+	.toc-card:hover .toc-card__arrow svg {
 		transform: translateX(4px);
-	}
-
-	.btn-browse-archive {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.6);
-		text-decoration: none;
-		letter-spacing: 0.05em;
-		transition: color 0.3s ease;
-	}
-
-	.btn-browse-archive:hover {
-		color: #dfba73;
 	}
 
 	/* ============================================================== */
@@ -1451,7 +1226,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		position: sticky;
 		top: 70px;
 		z-index: 500;
-		background: rgba(7, 8, 10, 0.94);
+		background: rgba(6, 7, 10, 0.94);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -1474,7 +1249,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.filter-group__label {
-		font-family: 'Inter', sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.18em;
@@ -1510,7 +1285,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	.filter-pill.is-active {
 		background: #dfba73;
 		border-color: #dfba73;
-		color: #060709;
+		color: #040507;
 		font-weight: 700;
 		box-shadow: 0 2px 10px rgba(223, 186, 115, 0.35);
 	}
@@ -1597,7 +1372,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.section-num {
-		font-family: 'Inter', sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 		font-size: 11px;
 		font-weight: 700;
 		color: #dfba73;
@@ -1607,7 +1382,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.section-heading {
-		font-family: 'Inter', sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: 26px;
 		font-weight: 700;
 		color: #ffffff;
@@ -1802,7 +1577,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.btn-reset-filters {
 		background: #dfba73;
-		color: #060709;
+		color: #040507;
 		border: none;
 		padding: 10px 24px;
 		border-radius: 6px;
@@ -1821,45 +1596,12 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	/* レスポンシブ対応（モバイル・タブレット） */
 	/* ============================================================== */
 	@media (max-width: 1200px) {
-		.book-hero-layout {
-			grid-template-columns: 440px 1fr;
-			gap: 40px;
-		}
-
-		.editorial-book-object {
-			width: 420px;
-			height: 600px;
-		}
-
-		.book-pedestal-shadow {
-			width: 380px;
+		.toc-grid {
+			grid-template-columns: repeat(2, 1fr);
 		}
 
 		.articles-grid {
 			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 992px) {
-		.book-hero-layout {
-			grid-template-columns: 1fr;
-			justify-items: center;
-			gap: 50px;
-		}
-
-		.bookmark-ribbon {
-			right: 20px;
-			top: 65px;
-			width: 32px;
-			height: 90px;
-		}
-
-		.ribbon-text {
-			font-size: 9.5px;
-		}
-
-		.editorial-book-object {
-			max-width: 90vw;
 		}
 	}
 
@@ -1868,64 +1610,56 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			padding: 0 20px;
 		}
 
-		.editorial-book-object {
-			width: 320px;
-			height: 480px;
+		.apple-hero {
+			min-height: 85vh;
+			padding-top: 60px;
 		}
 
-		.book-spine-crease {
-			width: 24px;
+		.apple-hero__frame {
+			top: 15px;
+			left: 15px;
+			right: 15px;
+			bottom: 15px;
 		}
 
-		.book-cover-header {
-			top: 18px;
-			left: 32px;
-			right: 20px;
+		.apple-hero__header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 12px;
 		}
 
-		.masthead-main {
-			font-size: 26px;
+		.apple-hero__masthead {
+			align-items: flex-start;
+			text-align: left;
 		}
 
-		.book-cover-body {
-			bottom: 110px;
-			left: 32px;
-			right: 20px;
+		.apple-hero__title {
+			font-size: 42px;
 		}
 
-		.book-feature-headline {
-			font-size: 18px;
+		.apple-hero__lead {
+			font-size: 15px;
 		}
 
-		.book-feature-subline {
+		.apple-hero__actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.apple-cta-btn {
+			justify-content: center;
+		}
+
+		.apple-hero__footer {
 			display: none;
 		}
 
-		.book-obi {
-			height: 72px;
-			padding: 0 14px 0 32px;
-			bottom: 28px;
-		}
-
-		.book-obi__ribbon {
-			left: 32px;
-			font-size: 8px;
-		}
-
-		.book-obi__lead {
-			font-size: 11px;
-		}
-
-		.book-obi__sub {
+		.apple-hero__scroll-cue {
 			display: none;
 		}
 
-		.book-colophon {
-			display: none;
-		}
-
-		.book-pedestal-shadow {
-			width: 280px;
+		.toc-grid {
+			grid-template-columns: 1fr;
 		}
 
 		.filter-wrap {
