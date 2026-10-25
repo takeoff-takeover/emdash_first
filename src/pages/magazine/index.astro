@@ -1,6 +1,6 @@
 ---
 // src/pages/magazine/index.astro
-// Nicole Connect - Web Magazine（シネマティック＆ミニマル・エディトリアル一覧）
+// Nicole Connect - Web Magazine（本に特化したエディトリアル・装丁デザイン＆シネマティック3Dマガジン）
 import { getEmDashCollection } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 
@@ -151,48 +151,35 @@ const staticArticles = [
 		brand: "BMW",
 		topic: "People",
 		date: "2026.04.18",
-		views: "1,450",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
-		lead: "精密機械としてのBMWをミリ単位で調律する。マイスター称号保持者が語るクラフトマンシップの真髄。",
+		views: "2,450",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/04/DSC3210.jpg",
+		lead: "ミリ単位の精度を追求するクラフトマンシップ。お客様の信頼に応え続けるメカニックの哲学。",
 		url: "https://www.nicole.co.jp/magazine/202604_bmw_meister_interview/",
 		isFeatured: false
 	},
 	{
-		id: "guide-bmw-7series-2026",
-		slug: "guide-bmw-7series-2026",
-		title: "【2026最新】新型BMW 7シリーズ徹底解説！比較と失敗しない選び方",
+		id: "guide-bmw-used-cars-select",
+		slug: "guide-bmw-used-cars-select",
+		title: "失敗しない認定中古車の選び方｜BMW Premium Selection 完全ガイド",
 		brand: "BMW",
 		topic: "Guide",
-		date: "2026.06.28",
-		views: "3,400",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg",
-		lead: "ガソリン・PHEV・完全電動『i7』のラインアップ比較と、シアタースクリーンを擁するリアシートの真価。",
+		date: "2026.07.10",
+		views: "3,210",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657685/P90657685-the-new-bmw-3-series-interior-2250px.jpg",
+		lead: "100項目点検、走行無制限保証、充実のアフターケア。ディーラー認定中古車ならではの安心と賢い購入術。",
 		url: "#",
 		isFeatured: false
 	},
 	{
-		id: "guide-certified-preowned",
-		slug: "guide-certified-preowned",
-		title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・選び方",
-		brand: "Rolls-Royce",
+		id: "guide-paint-protection-film",
+		slug: "guide-paint-protection-film",
+		title: "愛車の輝きを10年守るプロテクションフィルム（PPF）のすべて｜施工価格・耐久性・メリット",
+		brand: "Ferrari",
 		topic: "Guide",
-		date: "2026.06.12",
-		views: "2,980",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole-BMW-本社.jpg",
-		lead: "最大100項目におよぶ厳格な納車前点検と正規保証。安心と信頼のプレミアム認定中古車選びを完全網羅。",
-		url: "#",
-		isFeatured: false
-	},
-	{
-		id: "guide-mini-models-2026",
-		slug: "guide-mini-models-2026",
-		title: "2026年版 MINI全モデルの選び方｜3ドア・5ドア・エースマン・カントリーマンの違い",
-		brand: "MINI",
-		topic: "Guide",
-		date: "2026.06.05",
-		views: "2,150",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/06/mini_lineup_2026.jpg",
-		lead: "進化した新世代MINIファミリー。サイズ、パワートレイン、実用性からあなたにぴったりの1台を診断。",
+		date: "2026.06.25",
+		views: "2,780",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "飛び石や紫外線から塗装を守る最新XPELフィルム。スーパーカーオーナーが選ぶボディ保護の最適解。",
 		url: "#",
 		isFeatured: false
 	},
@@ -278,50 +265,183 @@ const allArticles = [
 	...staticArticles
 ];
 
+// 一番目玉の記事（Cover Story）
+const coverArticle = allArticles.find(a => a.isFeatured) || allArticles[0];
+
+// 本の目次（Chapters）として掲載するハイライト記事
+const chaptersArticles = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 3);
+
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
 const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 ---
 
 <NicoleLayout 
-	title="Nicole Connect - Web Magazine ｜ ニコル・グループ" 
-	description="ニコル・グループが発信するWebマガジン「Nicole Connect」。BMW、MINI、ロールス・ロイス、フェラーリ、アルピナの最新情報から、コラム、購入ガイドまで上質なカーライフを彩る記事をお届けします。"
+	title="Nicole Connect - The Editorial Volume ｜ ニコル・グループ公式マガジン" 
+	description="世界最高峰のモビリティと美学を編むWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新特集・インタビュー・購入ガイド。"
 >
-	<main class="magazine-archive-main">
+	<main class="magazine-book-main">
 		<!-- ============================================================== -->
-		<!-- 1. マガジン・ヒーローヘッダー（静謐なエディトリアル装丁） -->
+		<!-- 1. 栞（ブックマーク・リボン）：ページ上部から垂れ下がる布製リボン -->
 		<!-- ============================================================== -->
-		<section class="mag-hero">
-			<div class="mag-hero__bg"></div>
+		<a href="#magazine-archive" class="bookmark-ribbon" title="目次・全記事一覧へスクロール">
+			<span class="ribbon-text">INDEX ▾</span>
+			<span class="ribbon-end"></span>
+		</a>
+
+		<!-- ============================================================== -->
+		<!-- 2. 特大ブックカバー・ヒーローステージ（本に特化したエディトリアル装丁） -->
+		<!-- ============================================================== -->
+		<section class="book-hero-stage">
+			<div class="book-ambient-glow"></div>
+
 			<div class="mag-container">
-				<div class="mag-hero__inner">
-					<div class="mag-hero__badge">
-						<span class="badge-dot"></span>
-						<span>NICOLE CONNECT — OFFICIAL WEB MAGAZINE</span>
+				<div class="book-hero-layout">
+					<!-- 左／中央：3D立体ブック（目玉記事がそのまま特大ハードカバー本の表紙に！） -->
+					<div class="book-showcase-col">
+						<div class="book-3d-perspective" id="book-perspective-wrapper">
+							<article class="editorial-book-object" id="interactive-book-cover">
+								<a href={coverArticle.url} class="book-cover-anchor" aria-label={`今号の巻頭特集：${coverArticle.title}`}>
+									<!-- 背表紙の折り目溝・陰影（ハードカバーの質感を再現） -->
+									<div class="book-spine-crease"></div>
+
+									<!-- ページ束の多層厚み（本の右端に覗く紙の重なり） -->
+									<div class="book-pages-stack"></div>
+
+									<!-- 表紙画像（目玉記事の写真） -->
+									<div class="book-cover-artwork">
+										<img 
+											src={coverArticle.image} 
+											alt={coverArticle.title} 
+											class="book-cover-image" 
+											loading="eager" 
+										/>
+										<div class="book-cover-vignette"></div>
+									</div>
+
+									<!-- 光沢シマー反射レイヤー（マウスの動きで光が走る） -->
+									<div class="book-glare-foil" id="book-glare-foil"></div>
+
+									<!-- 表紙グラフィック・タイポグラフィ装丁 -->
+									<div class="book-cover-header">
+										<div class="book-vol-tag">
+											<span class="vol-symbol">❖</span>
+											<span>VOL. 08 — AUTUMN / WINTER 2026-2027</span>
+										</div>
+										<h1 class="book-masthead">
+											<span class="masthead-main">NICOLE CONNECT</span>
+											<span class="masthead-sub">THE EDITORIAL CAR CULTURE & CRAFTSMANSHIP</span>
+										</h1>
+									</div>
+
+									<div class="book-cover-body">
+										<div class="book-feature-kicker">COVER STORY</div>
+										<h2 class="book-feature-headline">
+											THE NEW DAWN OF 3 SERIES.
+										</h2>
+										<p class="book-feature-subline">
+											次世代ノイエ・クラッセ初採用。時代が静かに、だが劇的に動き出す。
+										</p>
+									</div>
+
+									<!-- 本の帯（Book Obi）：限定特装版のリアルな帯 -->
+									<div class="book-obi">
+										<div class="book-obi__ribbon">SPECIAL EDITION</div>
+										<div class="book-obi__body">
+											<span class="book-obi__lead">【世界初公開】BMW i3 ＆ M350 xDrive</span>
+											<span class="book-obi__sub">歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン</span>
+										</div>
+										<div class="book-obi__open">
+											<span>READ</span>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+										</div>
+									</div>
+
+									<!-- 奥付・ISBNバーコード（本のディテール） -->
+									<div class="book-colophon">
+										<div class="colophon-barcode">
+											<span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span>
+											<span class="bar b1"></span><span class="bar b4"></span><span class="bar b2"></span>
+											<span class="bar b3"></span><span class="bar b1"></span><span class="bar b2"></span>
+										</div>
+										<span class="colophon-isbn">ISBN 978-4-990000-08-9</span>
+										<span class="colophon-pub">NICOLE GROUP PUBLICATIONS</span>
+									</div>
+
+									<!-- 右下角の紙めくれ（ドッグイア / Page Curl） -->
+									<div class="book-page-curl" title="ページをめくる">
+										<span class="curl-text">OPEN</span>
+									</div>
+								</a>
+							</article>
+						</div>
+
+						<!-- 本の置き台シャドウ（床面に落ちる重厚なソフトシャドウ） -->
+						<div class="book-pedestal-shadow"></div>
+						<div class="book-interaction-hint">
+							<span class="hint-icon">✦</span>
+							<span>カーソルに合わせて本が立体的に傾きます。クリックして特集ページへ</span>
+						</div>
 					</div>
 
-					<h1 class="mag-hero__title">
-						<span class="mag-hero__title-sub">Nicole Connect</span>
-						<span class="mag-hero__title-main">A Web Magazine Curating the World of Nicole Group</span>
-					</h1>
-
-					<p class="mag-hero__desc">
-						東京・神奈川エリアを中心に展開するニコル・グループが発信するWebマガジン。世界最高峰のプレミアムブランド（BMW、MINI、ロールス・ロイス、フェラーリ、アルピナ）の最新モデル情報から、熟練マイスターの舞台裏、購入・維持ガイド、地域社会との対話まで、上質なカーライフを彩る物語をお届けします。
-					</p>
-
-					<div class="mag-hero__stat-bar">
-						<div class="stat-item">
-							<span class="stat-num">{allArticles.length}</span>
-							<span class="stat-label">ARTICLES</span>
+					<!-- 右：今号の目次・解説（Book Overview & Chapters） -->
+					<div class="book-contents-col">
+						<div class="volume-header">
+							<div class="volume-label">
+								<span class="volume-dot"></span>
+								<span>COLLECTOR'S VOLUME 08</span>
+							</div>
+							<h2 class="volume-title">本質を極めた、美しいモビリティの記録。</h2>
+							<p class="volume-desc">
+								自動車は単なる移動の手段を超え、人生を豊かに彩る芸術作品となる。本号では、新世代EVへと昇華した新型BMW 3シリーズを筆頭に、跳ね馬の血統を受け継ぐフェラーリ初のフル電動モデル、そしてクラフトマンシップが息づく熟練マイスターたちの手仕事まで、妥協なき情熱の結晶を1冊の特装本として綴ります。
+							</p>
 						</div>
-						<div class="stat-divider"></div>
-						<div class="stat-item">
-							<span class="stat-num">5</span>
-							<span class="stat-label">BRANDS</span>
-						</div>
-						<div class="stat-divider"></div>
-						<div class="stat-item">
-							<span class="stat-num">1977</span>
-							<span class="stat-label">SINCE</span>
+
+						<!-- 本の目次（Chapters / 今号のハイライト） -->
+						<div class="book-chapters-card">
+							<div class="chapters-card-head">
+								<span class="chapters-card-title">TABLE OF CONTENTS</span>
+								<span class="chapters-card-vol">VOL.08</span>
+							</div>
+
+							<div class="chapters-list">
+								<!-- Chapter 01: 巻頭特集 -->
+								<a href={coverArticle.url} class="chapter-item is-cover">
+									<div class="chapter-num">CHAP. 01</div>
+									<div class="chapter-content">
+										<div class="chapter-meta">
+											<span class="chapter-brand">{coverArticle.brand}</span>
+											<span class="chapter-tag">COVER STORY</span>
+										</div>
+										<div class="chapter-title">{coverArticle.title}</div>
+									</div>
+									<div class="chapter-arrow">→</div>
+								</a>
+
+								<!-- Chapter 02, 03... -->
+								{chaptersArticles.map((chap, idx) => (
+									<a href={chap.url} class="chapter-item">
+										<div class="chapter-num">CHAP. {String(idx + 2).padStart(2, '0')}</div>
+										<div class="chapter-content">
+											<div class="chapter-meta">
+												<span class="chapter-brand">{chap.brand}</span>
+												<span class="chapter-tag">{chap.topic}</span>
+											</div>
+											<div class="chapter-title">{chap.title}</div>
+										</div>
+										<div class="chapter-arrow">→</div>
+									</a>
+								))}
+							</div>
+
+							<div class="chapters-card-footer">
+								<a href={coverArticle.url} class="btn-read-volume">
+									<span>今号の巻頭特集を読む</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								</a>
+								<a href="#magazine-archive" class="btn-browse-archive">
+									<span>過去のアーカイブを検索 ↓</span>
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -329,9 +449,9 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
+		<!-- 3. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
 		<!-- ============================================================== -->
-		<section class="filter-sticky-bar" id="filter-bar">
+		<section class="filter-sticky-bar" id="magazine-archive">
 			<div class="mag-container">
 				<div class="filter-wrap">
 					<!-- ブランドフィルター（メインタブ） -->
@@ -378,61 +498,17 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 3. ピックアップ・フィーチャー記事（注目の大判スライダー風グリッド） -->
-		<!-- ============================================================== -->
-		<section class="featured-showcase" id="featured-showcase">
-			<div class="mag-container">
-				<div class="section-title-bar">
-					<div>
-						<span class="section-num">01</span>
-						<h2 class="section-heading">FEATURED STORIES</h2>
-					</div>
-					<span class="section-sub">注目の特集ストーリー</span>
-				</div>
-
-				<div class="featured-grid">
-					{allArticles.slice(0, 3).map((art, idx) => (
-						<article class={`featured-card ${idx === 0 ? 'featured-card--main' : 'featured-card--sub'}`} data-brand={art.brand} data-topic={art.topic}>
-							<a href={art.url} class="featured-card__link">
-								<div class="featured-card__media">
-									<img src={art.image} alt={art.title} loading="eager" class="featured-card__img" />
-									<div class="featured-card__gradient"></div>
-									<span class="brand-tag">{art.brand}</span>
-								</div>
-								<div class="featured-card__content">
-									<div class="featured-card__meta">
-										<time class="meta-date">{art.date}</time>
-										<span class="meta-divider">/</span>
-										<span class="meta-topic">{art.topic}</span>
-										<span class="meta-divider">/</span>
-										<span class="meta-views">👁 {art.views}</span>
-									</div>
-									<h3 class="featured-card__title">{art.title}</h3>
-									{art.lead && <p class="featured-card__lead">{art.lead}</p>}
-									<span class="read-more-btn">
-										<span>READ FULL STORY</span>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-									</span>
-								</div>
-							</a>
-						</article>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- 4. 全記事エディトリアルグリッド（フィルタリング対応） -->
+		<!-- 4. 全記事エディトリアルグリッド（LIBRARY / ARCHIVE） -->
 		<!-- ============================================================== -->
 		<section class="all-articles-section">
 			<div class="mag-container">
 				<div class="section-title-bar">
 					<div>
-						<span class="section-num">02</span>
-						<h2 class="section-heading">ALL ARTICLES</h2>
+						<span class="section-num">ARCHIVE LIBRARY</span>
+						<h2 class="section-heading">ALL STORIES & ESSAYS</h2>
 					</div>
 					<div class="count-display">
-						該当記事：<span id="current-article-count">{allArticles.length}</span>件
+						収録記事：<span id="current-article-count">{allArticles.length}</span>篇
 					</div>
 				</div>
 
@@ -461,7 +537,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 									<h3 class="article-item__title">{art.title}</h3>
 									{art.lead && <p class="article-item__lead">{art.lead}</p>}
 									<div class="article-item__footer">
-										<span class="article-item__more">記事を読む →</span>
+										<span class="article-item__more">記事を開く →</span>
 										<span class="article-item__views">👁 {art.views}</span>
 									</div>
 								</div>
@@ -484,9 +560,66 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	</main>
 </NicoleLayout>
 
-<!-- インタラクティブ・フィルタリング制御スクリプト -->
+<!-- 3Dブックカバー傾き＆光沢シマー＆フィルター制御スクリプト -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
+		// ==============================================================
+		// 1. 本の表紙 3Dジャイロ傾き＆金箔押しシマー効果
+		// ==============================================================
+		const bookWrapper = document.getElementById('book-perspective-wrapper');
+		const bookObject = document.getElementById('interactive-book-cover');
+		const glareFoil = document.getElementById('book-glare-foil');
+
+		if (bookWrapper && bookObject) {
+			let isHovered = false;
+
+			bookWrapper.addEventListener('mouseenter', () => {
+				isHovered = true;
+				bookObject.style.transition = 'transform 0.15s ease-out, box-shadow 0.15s ease-out';
+			});
+
+			bookWrapper.addEventListener('mousemove', (e) => {
+				if (!isHovered) return;
+				const rect = bookWrapper.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+
+				const centerX = rect.width / 2;
+				const centerY = rect.height / 2;
+
+				// -1 to 1 の正規化オフセット
+				const offsetX = (x - centerX) / centerX;
+				const offsetY = (y - centerY) / centerY;
+
+				// 最大12度の立体チルト
+				const rotateY = offsetX * 14;
+				const rotateX = -offsetY * 12;
+
+				bookObject.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+				// 光沢シマー（グレア）の反射位置計算
+				if (glareFoil) {
+					const glareX = ((x / rect.width) * 100).toFixed(1);
+					const glareY = ((y / rect.height) * 100).toFixed(1);
+					glareFoil.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 230, 180, 0.45) 0%, rgba(212, 175, 55, 0.15) 35%, transparent 70%)`;
+					glareFoil.style.opacity = '1';
+				}
+			});
+
+			bookWrapper.addEventListener('mouseleave', () => {
+				isHovered = false;
+				// スプリングのように元の角度へスムーズに復帰
+				bookObject.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+				bookObject.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+				if (glareFoil) {
+					glareFoil.style.opacity = '0';
+				}
+			});
+		}
+
+		// ==============================================================
+		// 2. インタラクティブ・フィルタリング制御
+		// ==============================================================
 		let currentBrand = 'ALL';
 		let currentTopic = 'ALL';
 		let searchQuery = '';
@@ -498,7 +631,6 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		const countDisplay = document.getElementById('current-article-count');
 		const noArticles = document.getElementById('no-articles');
 		const resetBtn = document.getElementById('btn-reset-filters');
-		const showcase = document.getElementById('featured-showcase');
 
 		function applyFilters() {
 			let visibleCount = 0;
@@ -509,11 +641,11 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				const title = article.getAttribute('data-title') || '';
 				const lead = article.getAttribute('data-lead') || '';
 
-				const matchesBrand = currentBrand === 'ALL' || brand === currentBrand || brand === 'ALL';
-				const matchesTopic = currentTopic === 'ALL' || topic === currentTopic;
-				const matchesSearch = !searchQuery || title.includes(searchQuery) || lead.includes(searchQuery);
+				const matchBrand = (currentBrand === 'ALL') || (brand === currentBrand);
+				const matchTopic = (currentTopic === 'ALL') || (topic === currentTopic);
+				const matchSearch = (!searchQuery) || (title.includes(searchQuery) || lead.includes(searchQuery) || brand.toLowerCase().includes(searchQuery));
 
-				if (matchesBrand && matchesTopic && matchesSearch) {
+				if (matchBrand && matchTopic && matchSearch) {
 					article.style.display = '';
 					visibleCount++;
 				} else {
@@ -521,29 +653,22 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				}
 			});
 
-			// カウント更新
 			if (countDisplay) {
-				countDisplay.textContent = String(visibleCount);
+				countDisplay.textContent = visibleCount.toString();
 			}
 
-			// 該当なし表示
 			if (noArticles) {
-				noArticles.style.display = visibleCount === 0 ? 'block' : 'none';
-			}
-
-			// ブランドや検索がアクティブな場合、フィーチャーショーケースを隠して一覧に集中
-			if (showcase) {
-				if (currentBrand !== 'ALL' || currentTopic !== 'ALL' || searchQuery.length > 0) {
-					showcase.style.display = 'none';
+				if (visibleCount === 0) {
+					noArticles.style.display = 'block';
 				} else {
-					showcase.style.display = '';
+					noArticles.style.display = 'none';
 				}
 			}
 		}
 
-		// 1. ブランドタブ切り替え
+		// ブランドピルクリック切り替え
 		brandPills.forEach(pill => {
-			pill.addEventListener('click', () => {
+			pill.addEventListener('click', (e) => {
 				brandPills.forEach(p => p.classList.remove('is-active'));
 				pill.classList.add('is-active');
 				currentBrand = pill.getAttribute('data-value') || 'ALL';
@@ -551,7 +676,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			});
 		});
 
-		// 2. カテゴリーセレクト切り替え
+		// カテゴリーセレクト切り替え
 		if (topicSelect) {
 			topicSelect.addEventListener('change', (e) => {
 				currentTopic = e.target.value;
@@ -559,7 +684,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			});
 		}
 
-		// 3. インクリメンタルキーワード検索
+		// インクリメンタルキーワード検索
 		if (searchInput) {
 			searchInput.addEventListener('input', (e) => {
 				searchQuery = e.target.value.toLowerCase().trim();
@@ -567,7 +692,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			});
 		}
 
-		// 4. リセットボタン
+		// リセットボタン
 		if (resetBtn) {
 			resetBtn.addEventListener('click', () => {
 				currentBrand = 'ALL';
@@ -590,14 +715,16 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 <style>
 	/* ============================================================== */
-	/* Nicole Connect マガジンアーカイブ専用スタイル */
+	/* Nicole Connect - 本特化エディトリアルマガジンスタイル */
 	/* ============================================================== */
-	.magazine-archive-main {
-		background-color: #060709;
+	.magazine-book-main {
+		background-color: #050608;
 		color: #ffffff;
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
 		padding-top: 80px;
+		position: relative;
+		overflow-x: hidden;
 	}
 
 	.mag-container {
@@ -608,125 +735,717 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	/* ============================================================== */
-	/* 1. マガジン・ヒーローヘッダー */
+	/* 1. 栞（Bookmark Ribbon）：上部から垂れ下がる布製リボン */
 	/* ============================================================== */
-	.mag-hero {
-		position: relative;
-		padding: 80px 0 60px 0;
-		overflow: hidden;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	.bookmark-ribbon {
+		position: fixed;
+		top: 70px;
+		right: 60px;
+		z-index: 600;
+		width: 38px;
+		height: 110px;
+		background: linear-gradient(135deg, #c5a059 0%, #dfba73 50%, #9e7d3b 100%);
+		box-shadow: -3px 6px 16px rgba(0, 0, 0, 0.6);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		padding-top: 18px;
+		text-decoration: none;
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+		cursor: pointer;
+		filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
 	}
 
-	.mag-hero__bg {
+	.bookmark-ribbon:hover {
+		transform: translateY(10px);
+		filter: drop-shadow(0 8px 18px rgba(197, 160, 89, 0.5));
+	}
+
+	.ribbon-text {
+		writing-mode: vertical-rl;
+		font-family: 'Inter', sans-serif;
+		font-size: 11px;
+		font-weight: 800;
+		letter-spacing: 0.25em;
+		color: #060709;
+		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+	}
+
+	.ribbon-end {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 0;
+		height: 0;
+		border-left: 19px solid transparent;
+		border-right: 19px solid transparent;
+		border-bottom: 16px solid #050608;
+	}
+
+	/* ============================================================== */
+	/* 2. 特大ブックカバー・ヒーローステージ */
+	/* ============================================================== */
+	.book-hero-stage {
+		position: relative;
+		padding: 70px 0 90px 0;
+		overflow: hidden;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.book-ambient-glow {
+		position: absolute;
+		top: -20%;
+		left: 10%;
+		width: 60%;
+		height: 120%;
+		background: radial-gradient(circle at 40% 40%, rgba(197, 160, 89, 0.12) 0%, transparent 60%);
+		pointer-events: none;
+	}
+
+	.book-hero-layout {
+		display: grid;
+		grid-template-columns: 500px 1fr;
+		gap: 60px;
+		align-items: center;
+	}
+
+	/* 3Dパースペクティブコンテナ */
+	.book-showcase-col {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.book-3d-perspective {
+		perspective: 1400px;
+		width: 100%;
+		max-width: 480px;
+		display: flex;
+		justify-content: center;
+	}
+
+	/* 本の立体オブジェクト（ハードカバー装丁） */
+	.editorial-book-object {
+		position: relative;
+		width: 460px;
+		height: 650px;
+		border-radius: 4px 14px 14px 4px;
+		background: #090b0e;
+		transform-style: preserve-3d;
+		box-shadow: 
+			-12px 14px 30px rgba(0, 0, 0, 0.8),
+			-2px 0 6px rgba(0, 0, 0, 0.5),
+			inset -2px 0 6px rgba(0, 0, 0, 0.7);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.book-cover-anchor {
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		border-radius: inherit;
+		overflow: hidden;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	/* 背表紙の折り目溝（ハードカバーの蝶番溝） */
+	.book-spine-crease {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 32px;
+		height: 100%;
+		background: linear-gradient(90deg, 
+			rgba(0, 0, 0, 0.95) 0%, 
+			rgba(255, 255, 255, 0.15) 15%, 
+			rgba(0, 0, 0, 0.8) 35%, 
+			rgba(0, 0, 0, 0.4) 70%, 
+			transparent 100%);
+		z-index: 10;
+		pointer-events: none;
+		box-shadow: inset 1px 0 2px rgba(255, 255, 255, 0.2);
+	}
+
+	/* ページ束の多層厚み（右側に覗く紙の重なり） */
+	.book-pages-stack {
+		position: absolute;
+		top: 6px;
+		right: -10px;
+		width: 10px;
+		height: calc(100% - 12px);
+		background: repeating-linear-gradient(
+			180deg,
+			#d0cbbe 0px,
+			#b5b0a3 1px,
+			#ede8dd 2px,
+			#ded9ce 3px
+		);
+		border-radius: 0 3px 3px 0;
+		box-shadow: 
+			inset 2px 0 4px rgba(0, 0, 0, 0.5),
+			4px 0 10px rgba(0, 0, 0, 0.7);
+		z-index: 1;
+	}
+
+	/* 表紙画像 */
+	.book-cover-artwork {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.12) 0%, transparent 60%);
-		pointer-events: none;
-	}
-
-	.mag-hero__inner {
-		position: relative;
 		z-index: 2;
-		max-width: 920px;
 	}
 
-	.mag-hero__badge {
+	.book-cover-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: brightness(0.85) contrast(1.08);
+		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+	}
+
+	.editorial-book-object:hover .book-cover-image {
+		filter: brightness(0.95) contrast(1.12);
+		transform: scale(1.03);
+	}
+
+	.book-cover-vignette {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			180deg, 
+			rgba(5, 6, 8, 0.75) 0%, 
+			rgba(5, 6, 8, 0.2) 25%, 
+			rgba(5, 6, 8, 0.3) 55%, 
+			rgba(5, 6, 8, 0.95) 100%
+		);
+	}
+
+	/* 金箔光沢シマー */
+	.book-glare-foil {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 8;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		mix-blend-mode: overlay;
+	}
+
+	/* 表紙上部マストヘッド */
+	.book-cover-header {
+		position: absolute;
+		top: 28px;
+		left: 44px;
+		right: 32px;
+		z-index: 5;
+	}
+
+	.book-vol-tag {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
-		padding: 5px 14px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
-		font-size: 11px;
+		gap: 6px;
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
 		font-weight: 700;
-		letter-spacing: 0.16em;
-		color: #c5a059;
-		margin-bottom: 24px;
+		letter-spacing: 0.22em;
+		color: #dfba73;
+		margin-bottom: 10px;
+		text-transform: uppercase;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 	}
 
-	.badge-dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		background: #c5a059;
-		box-shadow: 0 0 8px #c5a059;
+	.vol-symbol {
+		font-size: 8px;
+		color: #dfba73;
 	}
 
-	.mag-hero__title {
-		margin: 0 0 24px 0;
+	.book-masthead {
+		margin: 0;
 		display: flex;
 		flex-direction: column;
-		line-height: 1.15;
 	}
 
-	.mag-hero__title-sub {
+	.masthead-main {
+		font-family: 'Times New Roman', 'Didot', 'Playfair Display', serif;
+		font-size: clamp(34px, 3.2vw, 42px);
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		background: linear-gradient(135deg, #ffffff 0%, #dfba73 50%, #ffffff 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		line-height: 1;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+	}
+
+	.masthead-sub {
 		font-family: 'Inter', sans-serif;
-		font-size: clamp(36px, 5vw, 64px);
+		font-size: 8.5px;
+		font-weight: 600;
+		letter-spacing: 0.3em;
+		color: rgba(255, 255, 255, 0.7);
+		margin-top: 6px;
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+	}
+
+	/* 表紙中面タイトル */
+	.book-cover-body {
+		position: absolute;
+		bottom: 155px;
+		left: 44px;
+		right: 32px;
+		z-index: 5;
+	}
+
+	.book-feature-kicker {
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: -0.02em;
-		color: #ffffff;
+		letter-spacing: 0.25em;
+		color: #dfba73;
+		margin-bottom: 6px;
 		text-transform: uppercase;
 	}
 
-	.mag-hero__title-main {
+	.book-feature-headline {
 		font-family: 'Inter', sans-serif;
-		font-size: clamp(20px, 2.5vw, 32px);
-		font-weight: 300;
-		color: rgba(255, 255, 255, 0.7);
-		margin-top: 6px;
-		letter-spacing: 0.02em;
+		font-size: clamp(22px, 2.2vw, 28px);
+		font-weight: 800;
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 	}
 
-	.mag-hero__desc {
-		font-size: 15px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.75);
-		margin: 0 0 40px 0;
+	.book-feature-subline {
+		font-size: 12px;
+		line-height: 1.5;
+		color: rgba(255, 255, 255, 0.85);
+		margin: 0;
+		text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 	}
 
-	.mag-hero__stat-bar {
+	/* 本の帯（Book Obi） */
+	.book-obi {
+		position: absolute;
+		bottom: 38px;
+		left: 0;
+		width: 100%;
+		height: 94px;
+		background: rgba(14, 16, 20, 0.92);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border-top: 1px solid rgba(223, 186, 115, 0.4);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		z-index: 6;
 		display: flex;
 		align-items: center;
-		gap: 32px;
-		padding: 18px 28px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 12px;
-		width: fit-content;
+		padding: 0 20px 0 44px;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+		transition: background 0.3s ease, border-color 0.3s ease;
 	}
 
-	.stat-item {
-		display: flex;
-		align-items: baseline;
-		gap: 10px;
+	.editorial-book-object:hover .book-obi {
+		background: rgba(20, 24, 30, 0.96);
+		border-top-color: #dfba73;
 	}
 
-	.stat-num {
-		font-family: 'Inter', sans-serif;
-		font-size: 24px;
-		font-weight: 700;
-		color: #c5a059;
-	}
-
-	.stat-label {
-		font-size: 11px;
-		font-weight: 600;
+	.book-obi__ribbon {
+		position: absolute;
+		top: -10px;
+		left: 44px;
+		padding: 2px 8px;
+		background: #c5a059;
+		color: #060709;
+		font-size: 9px;
+		font-weight: 800;
 		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.5);
+		border-radius: 2px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 	}
 
-	.stat-divider {
-		width: 1px;
-		height: 20px;
-		background: rgba(255, 255, 255, 0.15);
+	.book-obi__body {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+		padding-right: 14px;
+	}
+
+	.book-obi__lead {
+		font-size: 13px;
+		font-weight: 700;
+		color: #ffffff;
+		line-height: 1.3;
+	}
+
+	.book-obi__sub {
+		font-size: 10.5px;
+		color: rgba(255, 255, 255, 0.65);
+		line-height: 1.35;
+	}
+
+	.book-obi__open {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.15em;
+		color: #dfba73;
+		padding: 6px 10px;
+		background: rgba(223, 186, 115, 0.12);
+		border: 1px solid rgba(223, 186, 115, 0.3);
+		border-radius: 4px;
+		flex-shrink: 0;
+		transition: all 0.3s ease;
+	}
+
+	.book-obi__open svg {
+		width: 12px;
+		height: 12px;
+		transition: transform 0.3s ease;
+	}
+
+	.editorial-book-object:hover .book-obi__open {
+		background: #dfba73;
+		color: #060709;
+	}
+
+	.editorial-book-object:hover .book-obi__open svg {
+		transform: translateX(3px);
+	}
+
+	/* 奥付・ISBNバーコード */
+	.book-colophon {
+		position: absolute;
+		bottom: 12px;
+		left: 44px;
+		right: 32px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		z-index: 5;
+		font-size: 8.5px;
+		font-family: 'Inter', monospace;
+		color: rgba(255, 255, 255, 0.4);
+		letter-spacing: 0.05em;
+	}
+
+	.colophon-barcode {
+		display: flex;
+		align-items: stretch;
+		height: 12px;
+		gap: 1.5px;
+	}
+
+	.colophon-barcode .bar {
+		background: rgba(255, 255, 255, 0.5);
+	}
+	.bar.b1 { width: 1px; }
+	.bar.b2 { width: 2px; }
+	.bar.b3 { width: 1.5px; }
+	.bar.b4 { width: 3px; }
+
+	.colophon-pub {
+		margin-left: auto;
+		letter-spacing: 0.12em;
+	}
+
+	/* 右下角の紙めくれ（ドッグイア / Page Curl） */
+	.book-page-curl {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 44px;
+		height: 44px;
+		background: linear-gradient(135deg, transparent 50%, rgba(223, 186, 115, 0.4) 50%, #ffffff 100%);
+		box-shadow: -4px -4px 10px rgba(0, 0, 0, 0.6);
+		border-radius: 0 0 14px 0;
+		z-index: 12;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+		display: flex;
+		align-items: flex-end;
+		justify-content: flex-end;
+		padding: 4px;
+	}
+
+	.curl-text {
+		font-size: 8px;
+		font-weight: 800;
+		color: #060709;
+		letter-spacing: 0.05em;
+		transform: rotate(-45deg) translate(-2px, 2px);
+	}
+
+	.editorial-book-object:hover .book-page-curl {
+		transform: scale(1.25);
+		box-shadow: -8px -8px 16px rgba(0, 0, 0, 0.8);
+	}
+
+	/* 本の置き台シャドウ */
+	.book-pedestal-shadow {
+		width: 420px;
+		height: 24px;
+		background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.85) 0%, transparent 70%);
+		margin-top: 18px;
+		filter: blur(6px);
+	}
+
+	.book-interaction-hint {
+		margin-top: 10px;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.hint-icon {
+		color: #dfba73;
+		font-size: 9px;
 	}
 
 	/* ============================================================== */
-	/* 2. インタラクティブ・フィルターバー */
+	/* 今号の目次・解説（右カラム） */
+	/* ============================================================== */
+	.book-contents-col {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.volume-header {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.volume-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		color: #dfba73;
+	}
+
+	.volume-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #dfba73;
+		box-shadow: 0 0 8px #dfba73;
+	}
+
+	.volume-title {
+		font-family: 'Times New Roman', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+		font-size: clamp(26px, 2.5vw, 36px);
+		font-weight: 600;
+		line-height: 1.35;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: 0.02em;
+	}
+
+	.volume-desc {
+		font-size: 14.5px;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0;
+	}
+
+	/* 目次カード（TABLE OF CONTENTS） */
+	.book-chapters-card {
+		background: #090b0f;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 28px;
+		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+	}
+
+	.chapters-card-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 16px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: 18px;
+	}
+
+	.chapters-card-title {
+		font-family: 'Inter', sans-serif;
+		font-size: 11.5px;
+		font-weight: 800;
+		letter-spacing: 0.22em;
+		color: #ffffff;
+	}
+
+	.chapters-card-vol {
+		font-family: 'Inter', sans-serif;
+		font-size: 10.5px;
+		font-weight: 700;
+		color: #dfba73;
+		letter-spacing: 0.15em;
+	}
+
+	.chapters-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 24px;
+	}
+
+	.chapter-item {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 14px 16px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 8px;
+		text-decoration: none;
+		color: inherit;
+		transition: all 0.3s ease;
+	}
+
+	.chapter-item:hover {
+		background: rgba(223, 186, 115, 0.08);
+		border-color: rgba(223, 186, 115, 0.3);
+		transform: translateX(4px);
+	}
+
+	.chapter-item.is-cover {
+		border-left: 3px solid #dfba73;
+		background: rgba(223, 186, 115, 0.05);
+	}
+
+	.chapter-num {
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.15em;
+		color: #dfba73;
+		flex-shrink: 0;
+	}
+
+	.chapter-content {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.chapter-meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.chapter-brand {
+		font-size: 9.5px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #ffffff;
+	}
+
+	.chapter-tag {
+		font-size: 9.5px;
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.chapter-title {
+		font-size: 13.5px;
+		font-weight: 600;
+		line-height: 1.4;
+		color: rgba(255, 255, 255, 0.9);
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.chapter-item:hover .chapter-title {
+		color: #dfba73;
+	}
+
+	.chapter-arrow {
+		color: rgba(255, 255, 255, 0.3);
+		font-size: 14px;
+		transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.chapter-item:hover .chapter-arrow {
+		transform: translateX(4px);
+		color: #dfba73;
+	}
+
+	.chapters-card-footer {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+
+	.btn-read-volume {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 24px;
+		background: #dfba73;
+		color: #060709;
+		font-size: 12px;
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		border-radius: 6px;
+		text-decoration: none;
+		transition: all 0.3s ease;
+	}
+
+	.btn-read-volume svg {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.3s ease;
+	}
+
+	.btn-read-volume:hover {
+		background: #f0cb85;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(223, 186, 115, 0.4);
+	}
+
+	.btn-read-volume:hover svg {
+		transform: translateX(4px);
+	}
+
+	.btn-browse-archive {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.6);
+		text-decoration: none;
+		letter-spacing: 0.05em;
+		transition: color 0.3s ease;
+	}
+
+	.btn-browse-archive:hover {
+		color: #dfba73;
+	}
+
+	/* ============================================================== */
+	/* 3. インタラクティブ・フィルターバー */
 	/* ============================================================== */
 	.filter-sticky-bar {
 		position: sticky;
@@ -758,41 +1477,42 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-family: 'Inter', sans-serif;
 		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.4);
+		letter-spacing: 0.18em;
+		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.filter-pills {
 		display: flex;
+		align-items: center;
 		gap: 8px;
 		flex-wrap: wrap;
 	}
 
 	.filter-pill {
-		padding: 7px 16px;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.8);
+		padding: 6px 16px;
 		border-radius: 999px;
-		font-family: 'Inter', sans-serif;
 		font-size: 12px;
 		font-weight: 600;
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.8);
+		letter-spacing: 0.08em;
 		cursor: pointer;
 		transition: all 0.25s ease;
 	}
 
 	.filter-pill:hover {
-		background: rgba(255, 255, 255, 0.12);
+		background: rgba(255, 255, 255, 0.14);
 		color: #ffffff;
-		border-color: rgba(255, 255, 255, 0.25);
+		border-color: rgba(255, 255, 255, 0.35);
 	}
 
 	.filter-pill.is-active {
-		background: #c5a059;
-		border-color: #c5a059;
-		color: #000000;
-		box-shadow: 0 4px 14px rgba(197, 160, 89, 0.35);
+		background: #dfba73;
+		border-color: #dfba73;
+		color: #060709;
+		font-weight: 700;
+		box-shadow: 0 2px 10px rgba(223, 186, 115, 0.35);
 	}
 
 	.filter-controls-right {
@@ -802,35 +1522,41 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.topic-dropdown {
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 8px;
-		padding: 8px 14px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.18);
 		color: #ffffff;
+		padding: 7px 14px;
+		border-radius: 8px;
 		font-size: 12.5px;
-		font-family: inherit;
-		cursor: pointer;
 		outline: none;
+		cursor: pointer;
+		transition: border-color 0.25s ease;
 	}
 
 	.topic-dropdown:focus {
-		border-color: #c5a059;
+		border-color: #dfba73;
+	}
+
+	.topic-dropdown option {
+		background: #111419;
+		color: #ffffff;
 	}
 
 	.filter-search-box {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.15);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 8px;
 		padding: 6px 14px;
-		width: 240px;
-		transition: border-color 0.25s ease, width 0.25s ease;
+		width: 220px;
+		transition: border-color 0.25s ease, width 0.3s ease;
 	}
 
 	.filter-search-box:focus-within {
-		border-color: #c5a059;
+		border-color: #dfba73;
 		width: 280px;
 	}
 
@@ -855,8 +1581,12 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	/* ============================================================== */
-	/* 共通セクションヘッダー */
+	/* 4. 全記事エディトリアルグリッド（LIBRARY） */
 	/* ============================================================== */
+	.all-articles-section {
+		padding: 60px 0 120px 0;
+	}
+
 	.section-title-bar {
 		display: flex;
 		justify-content: space-between;
@@ -870,7 +1600,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-family: 'Inter', sans-serif;
 		font-size: 11px;
 		font-weight: 700;
-		color: #c5a059;
+		color: #dfba73;
 		letter-spacing: 0.2em;
 		display: block;
 		margin-bottom: 4px;
@@ -885,182 +1615,14 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		letter-spacing: -0.01em;
 	}
 
-	.section-sub,
 	.count-display {
 		font-size: 13px;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.count-display span {
-		color: #c5a059;
+		color: #dfba73;
 		font-weight: 700;
-	}
-
-	/* ============================================================== */
-	/* 3. フィーチャー・ショーケース */
-	/* ============================================================== */
-	.featured-showcase {
-		padding: 60px 0 40px 0;
-	}
-
-	.featured-grid {
-		display: grid;
-		grid-template-columns: 7fr 5fr;
-		gap: 24px;
-	}
-
-	.featured-card {
-		background: #0e1014;
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 12px;
-		overflow: hidden;
-		transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-	}
-
-	.featured-card:hover {
-		transform: translateY(-5px);
-		border-color: rgba(255, 255, 255, 0.3);
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-	}
-
-	.featured-card--main {
-		grid-row: span 2;
-	}
-
-	.featured-card__link {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.featured-card--main .featured-card__media {
-		height: 420px;
-	}
-
-	.featured-card--sub .featured-card__media {
-		height: 200px;
-	}
-
-	.featured-card__media {
-		position: relative;
-		overflow: hidden;
-		background: #000;
-	}
-
-	.featured-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.featured-card:hover .featured-card__img {
-		transform: scale(1.05);
-	}
-
-	.featured-card__gradient {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(180deg, transparent 40%, rgba(14, 16, 20, 0.85) 100%);
-	}
-
-	.brand-tag {
-		position: absolute;
-		top: 16px;
-		left: 16px;
-		padding: 4px 12px;
-		background: rgba(7, 8, 10, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		border-radius: 999px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		color: #ffffff;
-		backdrop-filter: blur(8px);
-	}
-
-	.featured-card__content {
-		padding: 24px 28px;
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-	}
-
-	.featured-card__meta {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 11.5px;
-		color: rgba(255, 255, 255, 0.5);
-		margin-bottom: 10px;
-	}
-
-	.meta-divider {
-		opacity: 0.4;
-	}
-
-	.meta-topic {
-		color: #c5a059;
-		font-weight: 600;
-	}
-
-	.featured-card__title {
-		font-size: clamp(16px, 1.6vw, 22px);
-		font-weight: 600;
-		line-height: 1.45;
-		color: #ffffff;
-		margin: 0 0 12px 0;
-		transition: color 0.3s ease;
-	}
-
-	.featured-card:hover .featured-card__title {
-		color: #c5a059;
-	}
-
-	.featured-card__lead {
-		font-size: 13.5px;
-		color: rgba(255, 255, 255, 0.7);
-		line-height: 1.6;
-		margin: 0 0 20px 0;
-		flex-grow: 1;
-	}
-
-	.read-more-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.6);
-		margin-top: auto;
-		transition: all 0.3s ease;
-	}
-
-	.read-more-btn svg {
-		width: 14px;
-		height: 14px;
-		transition: transform 0.3s ease;
-	}
-
-	.featured-card:hover .read-more-btn {
-		color: #ffffff;
-	}
-
-	.featured-card:hover .read-more-btn svg {
-		transform: translateX(4px);
-	}
-
-	/* ============================================================== */
-	/* 4. 全記事エディトリアルグリッド */
-	/* ============================================================== */
-	.all-articles-section {
-		padding: 40px 0 120px 0;
 	}
 
 	.articles-grid {
@@ -1070,7 +1632,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.article-item {
-		background: #0e1014;
+		background: #090b0e;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 		overflow: hidden;
@@ -1079,7 +1641,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.article-item:hover {
 		transform: translateY(-5px);
-		border-color: rgba(255, 255, 255, 0.28);
+		border-color: rgba(223, 186, 115, 0.4);
 		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 	}
 
@@ -1115,7 +1677,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(180deg, transparent 50%, rgba(14, 16, 20, 0.7) 100%);
+		background: linear-gradient(180deg, transparent 50%, rgba(9, 11, 14, 0.8) 100%);
 	}
 
 	.article-brand-pill {
@@ -1149,32 +1711,33 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		margin-bottom: 8px;
 	}
 
+	.meta-divider {
+		opacity: 0.4;
+	}
+
+	.meta-topic {
+		color: #dfba73;
+		font-weight: 600;
+	}
+
 	.article-item__title {
 		font-size: 16px;
 		font-weight: 600;
-		line-height: 1.5;
+		line-height: 1.45;
 		color: #ffffff;
 		margin: 0 0 10px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		transition: color 0.25s ease;
+		transition: color 0.3s ease;
 	}
 
 	.article-item:hover .article-item__title {
-		color: #c5a059;
+		color: #dfba73;
 	}
 
 	.article-item__lead {
-		font-size: 12.5px;
+		font-size: 13px;
 		color: rgba(255, 255, 255, 0.65);
-		line-height: 1.6;
+		line-height: 1.55;
 		margin: 0 0 18px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
 		flex-grow: 1;
 	}
 
@@ -1182,88 +1745,121 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		font-size: 11.5px;
 		padding-top: 14px;
 		border-top: 1px solid rgba(255, 255, 255, 0.08);
-		font-size: 12px;
+		margin-top: auto;
 	}
 
 	.article-item__more {
 		color: rgba(255, 255, 255, 0.7);
 		font-weight: 600;
-		transition: color 0.25s ease, transform 0.25s ease;
+		transition: color 0.25s ease;
 	}
 
 	.article-item:hover .article-item__more {
-		color: #c5a059;
-		transform: translateX(3px);
+		color: #dfba73;
 	}
 
 	.article-item__views {
 		color: rgba(255, 255, 255, 0.4);
-		font-size: 11px;
 	}
 
-	/* 該当なし */
+	/* 検索該当なし状態 */
 	.no-articles-state {
 		text-align: center;
 		padding: 80px 20px;
-		background: #0d0f14;
+		background: #090b0e;
+		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 16px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		max-width: 600px;
-		margin: 40px auto;
+		margin-top: 20px;
+	}
+
+	.no-articles-icon {
+		width: 56px;
+		height: 56px;
+		margin: 0 auto 20px auto;
+		color: rgba(255, 255, 255, 0.3);
 	}
 
 	.no-articles-icon svg {
-		width: 48px;
-		height: 48px;
-		stroke: rgba(255, 255, 255, 0.3);
-		margin-bottom: 16px;
+		width: 100%;
+		height: 100%;
 	}
 
 	.no-articles-title {
 		font-size: 18px;
 		font-weight: 600;
-		color: #ffffff;
 		margin: 0 0 8px 0;
+		color: #ffffff;
 	}
 
 	.no-articles-desc {
-		font-size: 13.5px;
-		color: rgba(255, 255, 255, 0.55);
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.5);
 		margin: 0 0 24px 0;
 	}
 
 	.btn-reset-filters {
+		background: #dfba73;
+		color: #060709;
+		border: none;
 		padding: 10px 24px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
-		color: #ffffff;
+		border-radius: 6px;
 		font-size: 13px;
-		font-weight: 600;
+		font-weight: 700;
 		cursor: pointer;
-		transition: all 0.25s ease;
+		transition: background 0.25s ease, transform 0.25s ease;
 	}
 
 	.btn-reset-filters:hover {
-		background: #c5a059;
-		border-color: #c5a059;
-		color: #000000;
+		background: #f0cb85;
+		transform: translateY(-2px);
 	}
 
 	/* ============================================================== */
-	/* レスポンシブ対応 */
+	/* レスポンシブ対応（モバイル・タブレット） */
 	/* ============================================================== */
-	@media (max-width: 1100px) {
-		.featured-grid {
-			grid-template-columns: 1fr;
+	@media (max-width: 1200px) {
+		.book-hero-layout {
+			grid-template-columns: 440px 1fr;
+			gap: 40px;
 		}
-		.featured-card--main {
-			grid-row: auto;
+
+		.editorial-book-object {
+			width: 420px;
+			height: 600px;
 		}
+
+		.book-pedestal-shadow {
+			width: 380px;
+		}
+
 		.articles-grid {
 			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 992px) {
+		.book-hero-layout {
+			grid-template-columns: 1fr;
+			justify-items: center;
+			gap: 50px;
+		}
+
+		.bookmark-ribbon {
+			right: 20px;
+			top: 65px;
+			width: 32px;
+			height: 90px;
+		}
+
+		.ribbon-text {
+			font-size: 9.5px;
+		}
+
+		.editorial-book-object {
+			max-width: 90vw;
 		}
 	}
 
@@ -1272,43 +1868,86 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			padding: 0 20px;
 		}
 
-		.mag-hero {
-			padding: 40px 0;
+		.editorial-book-object {
+			width: 320px;
+			height: 480px;
 		}
 
-		.mag-hero__stat-bar {
-			width: 100%;
-			justify-content: space-around;
+		.book-spine-crease {
+			width: 24px;
 		}
 
-		.filter-sticky-bar {
-			top: 60px;
-			padding: 12px 0;
+		.book-cover-header {
+			top: 18px;
+			left: 32px;
+			right: 20px;
+		}
+
+		.masthead-main {
+			font-size: 26px;
+		}
+
+		.book-cover-body {
+			bottom: 110px;
+			left: 32px;
+			right: 20px;
+		}
+
+		.book-feature-headline {
+			font-size: 18px;
+		}
+
+		.book-feature-subline {
+			display: none;
+		}
+
+		.book-obi {
+			height: 72px;
+			padding: 0 14px 0 32px;
+			bottom: 28px;
+		}
+
+		.book-obi__ribbon {
+			left: 32px;
+			font-size: 8px;
+		}
+
+		.book-obi__lead {
+			font-size: 11px;
+		}
+
+		.book-obi__sub {
+			display: none;
+		}
+
+		.book-colophon {
+			display: none;
+		}
+
+		.book-pedestal-shadow {
+			width: 280px;
 		}
 
 		.filter-wrap {
 			flex-direction: column;
 			align-items: stretch;
-			gap: 12px;
 		}
 
 		.filter-controls-right {
 			flex-direction: column;
-			align-items: stretch;
+			width: 100%;
 		}
 
 		.filter-search-box {
-			width: 100% !important;
+			width: 100%;
+		}
+
+		.filter-search-box:focus-within {
+			width: 100%;
 		}
 
 		.articles-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.section-title-bar {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 8px;
 		}
 	}
 </style>
