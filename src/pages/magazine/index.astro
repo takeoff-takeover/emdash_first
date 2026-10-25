@@ -1,0 +1,1314 @@
+---
+// src/pages/magazine/index.astro
+// Nicole Connect - Web Magazine（シネマティック＆ミニマル・エディトリアル一覧）
+import { getEmDashCollection } from "emdash";
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
+
+// CMS（postsコレクション）から記事を取得
+const { entries: cmsPosts, cacheHint } = await getEmDashCollection("posts", {
+	orderBy: { published_at: "desc" },
+	limit: 50,
+});
+
+if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
+
+// 静的アーカイブ記事データ（Nicole Connect公式マガジン記事マスタ）
+const staticArticles = [
+	{
+		id: "2027_new_bmw_3series_neue_klasse",
+		slug: "2027_new_bmw_3series_neue_klasse",
+		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
+		brand: "BMW",
+		topic: "Feature",
+		date: "2026.10.22",
+		views: "8,150",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
+		lead: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。",
+		url: "/magazine/2027_new_bmw_3series_neue_klasse/",
+		isFeatured: true
+	},
+	{
+		id: "202610_mini_united-japan-2026",
+		slug: "202610_mini_united-japan-2026",
+		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
+		brand: "MINI",
+		topic: "Feature",
+		date: "2026.10.15",
+		views: "1,240",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
+		lead: "全国のMINIオーナーが集い、笑顔と情熱を分かち合った特別なファンミーティングの模様をレポート。",
+		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/",
+		isFeatured: true
+	},
+	{
+		id: "202608_ferrari_luce",
+		slug: "202608_ferrari_luce",
+		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
+		brand: "Ferrari",
+		topic: "Feature",
+		date: "2026.08.17",
+		views: "1,505",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
+		lead: "跳ね馬の血統を受け継ぐエレクトリック・スーパーカー。マラネッロの情熱が宿る未踏のパフォーマンス。",
+		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/",
+		isFeatured: true
+	},
+	{
+		id: "202608_bmw_kids_mechanic",
+		slug: "202608_bmw_kids_mechanic",
+		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
+		brand: "BMW",
+		topic: "People",
+		date: "2026.08.20",
+		views: "960",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+		lead: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。",
+		url: "/magazine/202608_bmw_kids_mechanic/",
+		isFeatured: false
+	},
+	{
+		id: "20260714_mini_jcw_track_style_edition",
+		slug: "20260714_mini_jcw_track_style_edition",
+		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
+		brand: "MINI",
+		topic: "Feature",
+		date: "2026.07.14",
+		views: "483",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		lead: "ゴーカート・フィーリングの極致。モータースポーツのDNAを濃縮した特別な限定車を全国独占デリバリー。",
+		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/",
+		isFeatured: false
+	},
+	{
+		id: "20260707_ferrari_challenge_invitation",
+		slug: "20260707_ferrari_challenge_invitation",
+		title: "跳ね馬の本能を呼び覚ます。フェラーリ・チャレンジへの招待",
+		brand: "Ferrari",
+		topic: "Feature",
+		date: "2026.07.07",
+		views: "890",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "サーキットを疾走する純粋な興奮。オーナー限定ワンメイクレースシリーズの世界へ。",
+		url: "https://www.nicole.co.jp/magazine/20260707_ferrari_challenge_invitation/",
+		isFeatured: false
+	},
+	{
+		id: "202607_new_bmw_x5",
+		slug: "202607_new_bmw_x5",
+		title: "新たなデザイン言語と5つの動力。第5世代、New BMW X5 誕生",
+		brand: "BMW",
+		topic: "Feature",
+		date: "2026.07.01",
+		views: "1,120",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC6630.jpg",
+		lead: "プレミアムSUVのパイオニアが劇的な進化。新世代オペレーティングシステムと極上の快適性。",
+		url: "https://www.nicole.co.jp/magazine/202607_new_bmw_x5/",
+		isFeatured: false
+	},
+	{
+		id: "202608_ferrari_marketing",
+		slug: "202608_ferrari_marketing",
+		title: "フェラーリスタの心を揺さぶる体験。その世界観を支えるマーケターの視点",
+		brand: "Ferrari",
+		topic: "People",
+		date: "2026.08.10",
+		views: "640",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
+		lead: "最高峰のクラブライフをプロデュースする、Nicole Competizioneマーケターが語る美学と情熱。",
+		url: "https://www.nicole.co.jp/magazine/202608_ferrari_marketing/",
+		isFeatured: false
+	},
+	{
+		id: "202607_mini_evlife",
+		slug: "202607_mini_evlife",
+		title: "MINIの電気自動車で叶える、愛犬との特別なドライブ",
+		brand: "MINI",
+		topic: "People",
+		date: "2026.07.25",
+		views: "720",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		lead: "静粛性とスムースな加速がもたらす、ペットにも優しい新時代のドッグフレンドリー・カーライフ。",
+		url: "https://www.nicole.co.jp/magazine/202607_mini_evlife/",
+		isFeatured: false
+	},
+	{
+		id: "202605_mini_ev_no1_sales",
+		slug: "202605_mini_ev_no1_sales",
+		title: "燃料代は5分の1に。MINI EV販売全国1位のセールスが明かす、不安を「納得」へと変えるメソッド",
+		brand: "MINI",
+		topic: "People",
+		date: "2026.05.20",
+		views: "1,830",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/06/mini_lineup_2026.jpg",
+		lead: "航続距離や充電インフラへの疑問を解消し、お客様のライフスタイルに最適なEVを提案するプロの眼差し。",
+		url: "https://www.nicole.co.jp/magazine/202605_mini_ev_no1_sales/",
+		isFeatured: false
+	},
+	{
+		id: "202604_bmw_meister_interview",
+		slug: "202604_bmw_meister_interview",
+		title: "BMW一筋20年。熟練マイスターのプライドと素顔",
+		brand: "BMW",
+		topic: "People",
+		date: "2026.04.18",
+		views: "1,450",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+		lead: "精密機械としてのBMWをミリ単位で調律する。マイスター称号保持者が語るクラフトマンシップの真髄。",
+		url: "https://www.nicole.co.jp/magazine/202604_bmw_meister_interview/",
+		isFeatured: false
+	},
+	{
+		id: "guide-bmw-7series-2026",
+		slug: "guide-bmw-7series-2026",
+		title: "【2026最新】新型BMW 7シリーズ徹底解説！比較と失敗しない選び方",
+		brand: "BMW",
+		topic: "Guide",
+		date: "2026.06.28",
+		views: "3,400",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg",
+		lead: "ガソリン・PHEV・完全電動『i7』のラインアップ比較と、シアタースクリーンを擁するリアシートの真価。",
+		url: "#",
+		isFeatured: false
+	},
+	{
+		id: "guide-certified-preowned",
+		slug: "guide-certified-preowned",
+		title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・選び方",
+		brand: "Rolls-Royce",
+		topic: "Guide",
+		date: "2026.06.12",
+		views: "2,980",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole-BMW-本社.jpg",
+		lead: "最大100項目におよぶ厳格な納車前点検と正規保証。安心と信頼のプレミアム認定中古車選びを完全網羅。",
+		url: "#",
+		isFeatured: false
+	},
+	{
+		id: "guide-mini-models-2026",
+		slug: "guide-mini-models-2026",
+		title: "2026年版 MINI全モデルの選び方｜3ドア・5ドア・エースマン・カントリーマンの違い",
+		brand: "MINI",
+		topic: "Guide",
+		date: "2026.06.05",
+		views: "2,150",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/06/mini_lineup_2026.jpg",
+		lead: "進化した新世代MINIファミリー。サイズ、パワートレイン、実用性からあなたにぴったりの1台を診断。",
+		url: "#",
+		isFeatured: false
+	},
+	{
+		id: "guide-ev-subsidy-2026",
+		slug: "guide-ev-subsidy-2026",
+		title: "2026年版 EV補助金・充電インフラ完全ガイド｜CEV補助金・自宅充電・V2Hまで整理",
+		brand: "BMW",
+		topic: "Guide",
+		date: "2026.05.30",
+		views: "4,120",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657728/P90657728-the-new-bmw-320-exterior-09-26-2250px.jpg",
+		lead: "国や自治体からの最新補助金制度と、戸建て・集合住宅における充電器設置ステップを分かりやすく解説。",
+		url: "#",
+		isFeatured: false
+	},
+	{
+		id: "alpina-heritage-story",
+		slug: "alpina-heritage-story",
+		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
+		brand: "ALPINA",
+		topic: "Feature",
+		date: "2026.05.15",
+		views: "3,890",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "1965年から2025年まで、日本総輸入元としてアルピナの魅力を伝え続けてきた歴史と、未来へ受け継ぐメンテナンス体制。",
+		url: "https://nicole-automobiles.com/",
+		isFeatured: false
+	},
+	{
+		id: "rolls-royce-bespoke-world",
+		slug: "rolls-royce-bespoke-world",
+		title: "唯一無二を仕立てる。ロールス・ロイス・ビスポークの世界と横浜ショールームの誇り",
+		brand: "Rolls-Royce",
+		topic: "Feature",
+		date: "2026.04.28",
+		views: "1,940",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
+		lead: "4万4000色以上のパレットと無限の素材。オーナーの夢を形にするロールス・ロイスの最高峰クラフト。",
+		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
+		isFeatured: false
+	},
+	{
+		id: "esg-sdgs-activities",
+		slug: "esg-sdgs-activities",
+		title: "地域とともに走る。多摩川美化活動と災害時帰宅支援ステーション協定の歩み",
+		brand: "ALL",
+		topic: "ESG / SDGs",
+		date: "2026.04.10",
+		views: "520",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+		lead: "地域社会への貢献とサステナビリティ。ニコル・グループが取り組むSDGsアクションレポート。",
+		url: "https://www.nicole.co.jp/corporate/esg_sdgs/",
+		isFeatured: false
+	}
+];
+
+// CMS記事がある場合は統合
+const cmsArticles = (cmsPosts || []).map((p: any) => {
+	const featImg = p.data.featured_image;
+	const imgUrl = typeof featImg === "object" && featImg !== null && "src" in featImg
+		? featImg.src
+		: (typeof featImg === "string" ? featImg : "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg");
+
+	return {
+		id: p.id || p.data.id,
+		slug: p.id,
+		title: p.data.title,
+		brand: p.data.related_location ? "BMW" : "ALL",
+		topic: "Feature",
+		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25",
+		views: "NEW",
+		image: imgUrl,
+		lead: p.data.excerpt || "",
+		url: `/magazine/${p.id}/`,
+		isFeatured: false
+	};
+});
+
+// 全記事リスト（重複排除）
+const allArticles = [
+	...cmsArticles.filter(ca => !staticArticles.some(sa => sa.slug === ca.slug)),
+	...staticArticles
+];
+
+const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
+const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
+---
+
+<NicoleLayout 
+	title="Nicole Connect - Web Magazine ｜ ニコル・グループ" 
+	description="ニコル・グループが発信するWebマガジン「Nicole Connect」。BMW、MINI、ロールス・ロイス、フェラーリ、アルピナの最新情報から、コラム、購入ガイドまで上質なカーライフを彩る記事をお届けします。"
+>
+	<main class="magazine-archive-main">
+		<!-- ============================================================== -->
+		<!-- 1. マガジン・ヒーローヘッダー（静謐なエディトリアル装丁） -->
+		<!-- ============================================================== -->
+		<section class="mag-hero">
+			<div class="mag-hero__bg"></div>
+			<div class="mag-container">
+				<div class="mag-hero__inner">
+					<div class="mag-hero__badge">
+						<span class="badge-dot"></span>
+						<span>NICOLE CONNECT — OFFICIAL WEB MAGAZINE</span>
+					</div>
+
+					<h1 class="mag-hero__title">
+						<span class="mag-hero__title-sub">Nicole Connect</span>
+						<span class="mag-hero__title-main">A Web Magazine Curating the World of Nicole Group</span>
+					</h1>
+
+					<p class="mag-hero__desc">
+						東京・神奈川エリアを中心に展開するニコル・グループが発信するWebマガジン。世界最高峰のプレミアムブランド（BMW、MINI、ロールス・ロイス、フェラーリ、アルピナ）の最新モデル情報から、熟練マイスターの舞台裏、購入・維持ガイド、地域社会との対話まで、上質なカーライフを彩る物語をお届けします。
+					</p>
+
+					<div class="mag-hero__stat-bar">
+						<div class="stat-item">
+							<span class="stat-num">{allArticles.length}</span>
+							<span class="stat-label">ARTICLES</span>
+						</div>
+						<div class="stat-divider"></div>
+						<div class="stat-item">
+							<span class="stat-num">5</span>
+							<span class="stat-label">BRANDS</span>
+						</div>
+						<div class="stat-divider"></div>
+						<div class="stat-item">
+							<span class="stat-num">1977</span>
+							<span class="stat-label">SINCE</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 2. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
+		<!-- ============================================================== -->
+		<section class="filter-sticky-bar" id="filter-bar">
+			<div class="mag-container">
+				<div class="filter-wrap">
+					<!-- ブランドフィルター（メインタブ） -->
+					<div class="filter-group filter-group--brand">
+						<span class="filter-group__label">BRAND:</span>
+						<div class="filter-pills" id="brand-filters">
+							{brandsList.map((b) => (
+								<button 
+									type="button" 
+									class={`filter-pill ${b === 'ALL' ? 'is-active' : ''}`} 
+									data-filter-type="brand" 
+									data-value={b}
+								>
+									{b}
+								</button>
+							))}
+						</div>
+					</div>
+
+					<!-- トピックフィルター ＆ 検索バー -->
+					<div class="filter-controls-right">
+						<div class="filter-group filter-group--topic">
+							<span class="filter-group__label">CATEGORY:</span>
+							<select id="topic-select" class="topic-dropdown" aria-label="カテゴリーを選択">
+								{topicsList.map((t) => (
+									<option value={t}>{t === 'ALL' ? 'すべてのカテゴリー' : t}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- キーワード検索 -->
+						<div class="filter-search-box">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+							<input 
+								type="text" 
+								id="article-search-input" 
+								placeholder="記事をキーワード検索..." 
+								aria-label="記事をキーワード検索"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 3. ピックアップ・フィーチャー記事（注目の大判スライダー風グリッド） -->
+		<!-- ============================================================== -->
+		<section class="featured-showcase" id="featured-showcase">
+			<div class="mag-container">
+				<div class="section-title-bar">
+					<div>
+						<span class="section-num">01</span>
+						<h2 class="section-heading">FEATURED STORIES</h2>
+					</div>
+					<span class="section-sub">注目の特集ストーリー</span>
+				</div>
+
+				<div class="featured-grid">
+					{allArticles.slice(0, 3).map((art, idx) => (
+						<article class={`featured-card ${idx === 0 ? 'featured-card--main' : 'featured-card--sub'}`} data-brand={art.brand} data-topic={art.topic}>
+							<a href={art.url} class="featured-card__link">
+								<div class="featured-card__media">
+									<img src={art.image} alt={art.title} loading="eager" class="featured-card__img" />
+									<div class="featured-card__gradient"></div>
+									<span class="brand-tag">{art.brand}</span>
+								</div>
+								<div class="featured-card__content">
+									<div class="featured-card__meta">
+										<time class="meta-date">{art.date}</time>
+										<span class="meta-divider">/</span>
+										<span class="meta-topic">{art.topic}</span>
+										<span class="meta-divider">/</span>
+										<span class="meta-views">👁 {art.views}</span>
+									</div>
+									<h3 class="featured-card__title">{art.title}</h3>
+									{art.lead && <p class="featured-card__lead">{art.lead}</p>}
+									<span class="read-more-btn">
+										<span>READ FULL STORY</span>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+									</span>
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 4. 全記事エディトリアルグリッド（フィルタリング対応） -->
+		<!-- ============================================================== -->
+		<section class="all-articles-section">
+			<div class="mag-container">
+				<div class="section-title-bar">
+					<div>
+						<span class="section-num">02</span>
+						<h2 class="section-heading">ALL ARTICLES</h2>
+					</div>
+					<div class="count-display">
+						該当記事：<span id="current-article-count">{allArticles.length}</span>件
+					</div>
+				</div>
+
+				<!-- 記事グリッド（JSフィルタリング対象） -->
+				<div class="articles-grid" id="articles-grid">
+					{allArticles.map((art) => (
+						<article 
+							class="article-item" 
+							data-brand={art.brand} 
+							data-topic={art.topic}
+							data-title={art.title.toLowerCase()}
+							data-lead={art.lead ? art.lead.toLowerCase() : ''}
+						>
+							<a href={art.url} class="article-item__link">
+								<div class="article-item__media">
+									<img src={art.image} alt={art.title} loading="lazy" class="article-item__img" />
+									<div class="article-item__overlay"></div>
+									<span class="article-brand-pill">{art.brand}</span>
+								</div>
+								<div class="article-item__body">
+									<div class="article-item__meta">
+										<time class="meta-date">{art.date}</time>
+										<span class="meta-divider">/</span>
+										<span class="meta-topic">{art.topic}</span>
+									</div>
+									<h3 class="article-item__title">{art.title}</h3>
+									{art.lead && <p class="article-item__lead">{art.lead}</p>}
+									<div class="article-item__footer">
+										<span class="article-item__more">記事を読む →</span>
+										<span class="article-item__views">👁 {art.views}</span>
+									</div>
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+
+				<!-- 検索該当なしプレースホルダー -->
+				<div id="no-articles" class="no-articles-state" style="display: none;">
+					<div class="no-articles-icon">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+					</div>
+					<h3 class="no-articles-title">該当する記事が見つかりませんでした</h3>
+					<p class="no-articles-desc">選択中のブランドまたは検索キーワードを変更してお試しください。</p>
+					<button type="button" id="btn-reset-filters" class="btn-reset-filters">すべてのフィルターを解除</button>
+				</div>
+			</div>
+		</section>
+	</main>
+</NicoleLayout>
+
+<!-- インタラクティブ・フィルタリング制御スクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		let currentBrand = 'ALL';
+		let currentTopic = 'ALL';
+		let searchQuery = '';
+
+		const brandPills = document.querySelectorAll('#brand-filters .filter-pill');
+		const topicSelect = document.getElementById('topic-select');
+		const searchInput = document.getElementById('article-search-input');
+		const articles = document.querySelectorAll('.article-item');
+		const countDisplay = document.getElementById('current-article-count');
+		const noArticles = document.getElementById('no-articles');
+		const resetBtn = document.getElementById('btn-reset-filters');
+		const showcase = document.getElementById('featured-showcase');
+
+		function applyFilters() {
+			let visibleCount = 0;
+
+			articles.forEach(article => {
+				const brand = article.getAttribute('data-brand') || '';
+				const topic = article.getAttribute('data-topic') || '';
+				const title = article.getAttribute('data-title') || '';
+				const lead = article.getAttribute('data-lead') || '';
+
+				const matchesBrand = currentBrand === 'ALL' || brand === currentBrand || brand === 'ALL';
+				const matchesTopic = currentTopic === 'ALL' || topic === currentTopic;
+				const matchesSearch = !searchQuery || title.includes(searchQuery) || lead.includes(searchQuery);
+
+				if (matchesBrand && matchesTopic && matchesSearch) {
+					article.style.display = '';
+					visibleCount++;
+				} else {
+					article.style.display = 'none';
+				}
+			});
+
+			// カウント更新
+			if (countDisplay) {
+				countDisplay.textContent = String(visibleCount);
+			}
+
+			// 該当なし表示
+			if (noArticles) {
+				noArticles.style.display = visibleCount === 0 ? 'block' : 'none';
+			}
+
+			// ブランドや検索がアクティブな場合、フィーチャーショーケースを隠して一覧に集中
+			if (showcase) {
+				if (currentBrand !== 'ALL' || currentTopic !== 'ALL' || searchQuery.length > 0) {
+					showcase.style.display = 'none';
+				} else {
+					showcase.style.display = '';
+				}
+			}
+		}
+
+		// 1. ブランドタブ切り替え
+		brandPills.forEach(pill => {
+			pill.addEventListener('click', () => {
+				brandPills.forEach(p => p.classList.remove('is-active'));
+				pill.classList.add('is-active');
+				currentBrand = pill.getAttribute('data-value') || 'ALL';
+				applyFilters();
+			});
+		});
+
+		// 2. カテゴリーセレクト切り替え
+		if (topicSelect) {
+			topicSelect.addEventListener('change', (e) => {
+				currentTopic = e.target.value;
+				applyFilters();
+			});
+		}
+
+		// 3. インクリメンタルキーワード検索
+		if (searchInput) {
+			searchInput.addEventListener('input', (e) => {
+				searchQuery = e.target.value.toLowerCase().trim();
+				applyFilters();
+			});
+		}
+
+		// 4. リセットボタン
+		if (resetBtn) {
+			resetBtn.addEventListener('click', () => {
+				currentBrand = 'ALL';
+				currentTopic = 'ALL';
+				searchQuery = '';
+
+				brandPills.forEach(p => {
+					if (p.getAttribute('data-value') === 'ALL') p.classList.add('is-active');
+					else p.classList.remove('is-active');
+				});
+
+				if (topicSelect) topicSelect.value = 'ALL';
+				if (searchInput) searchInput.value = '';
+
+				applyFilters();
+			});
+		}
+	});
+</script>
+
+<style>
+	/* ============================================================== */
+	/* Nicole Connect マガジンアーカイブ専用スタイル */
+	/* ============================================================== */
+	.magazine-archive-main {
+		background-color: #060709;
+		color: #ffffff;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		min-height: 100vh;
+		padding-top: 80px;
+	}
+
+	.mag-container {
+		width: 100%;
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 0 40px;
+	}
+
+	/* ============================================================== */
+	/* 1. マガジン・ヒーローヘッダー */
+	/* ============================================================== */
+	.mag-hero {
+		position: relative;
+		padding: 80px 0 60px 0;
+		overflow: hidden;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.mag-hero__bg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.12) 0%, transparent 60%);
+		pointer-events: none;
+	}
+
+	.mag-hero__inner {
+		position: relative;
+		z-index: 2;
+		max-width: 920px;
+	}
+
+	.mag-hero__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 5px 14px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		color: #c5a059;
+		margin-bottom: 24px;
+	}
+
+	.badge-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #c5a059;
+		box-shadow: 0 0 8px #c5a059;
+	}
+
+	.mag-hero__title {
+		margin: 0 0 24px 0;
+		display: flex;
+		flex-direction: column;
+		line-height: 1.15;
+	}
+
+	.mag-hero__title-sub {
+		font-family: 'Inter', sans-serif;
+		font-size: clamp(36px, 5vw, 64px);
+		font-weight: 800;
+		letter-spacing: -0.02em;
+		color: #ffffff;
+		text-transform: uppercase;
+	}
+
+	.mag-hero__title-main {
+		font-family: 'Inter', sans-serif;
+		font-size: clamp(20px, 2.5vw, 32px);
+		font-weight: 300;
+		color: rgba(255, 255, 255, 0.7);
+		margin-top: 6px;
+		letter-spacing: 0.02em;
+	}
+
+	.mag-hero__desc {
+		font-size: 15px;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.75);
+		margin: 0 0 40px 0;
+	}
+
+	.mag-hero__stat-bar {
+		display: flex;
+		align-items: center;
+		gap: 32px;
+		padding: 18px 28px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 12px;
+		width: fit-content;
+	}
+
+	.stat-item {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
+	}
+
+	.stat-num {
+		font-family: 'Inter', sans-serif;
+		font-size: 24px;
+		font-weight: 700;
+		color: #c5a059;
+	}
+
+	.stat-label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.stat-divider {
+		width: 1px;
+		height: 20px;
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	/* ============================================================== */
+	/* 2. インタラクティブ・フィルターバー */
+	/* ============================================================== */
+	.filter-sticky-bar {
+		position: sticky;
+		top: 70px;
+		z-index: 500;
+		background: rgba(7, 8, 10, 0.94);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		padding: 16px 0;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+
+	.filter-wrap {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 24px;
+		flex-wrap: wrap;
+	}
+
+	.filter-group {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.filter-group__label {
+		font-family: 'Inter', sans-serif;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.filter-pills {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.filter-pill {
+		padding: 7px 16px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		font-family: 'Inter', sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		color: rgba(255, 255, 255, 0.8);
+		cursor: pointer;
+		transition: all 0.25s ease;
+	}
+
+	.filter-pill:hover {
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+
+	.filter-pill.is-active {
+		background: #c5a059;
+		border-color: #c5a059;
+		color: #000000;
+		box-shadow: 0 4px 14px rgba(197, 160, 89, 0.35);
+	}
+
+	.filter-controls-right {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.topic-dropdown {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 8px;
+		padding: 8px 14px;
+		color: #ffffff;
+		font-size: 12.5px;
+		font-family: inherit;
+		cursor: pointer;
+		outline: none;
+	}
+
+	.topic-dropdown:focus {
+		border-color: #c5a059;
+	}
+
+	.filter-search-box {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 8px;
+		padding: 6px 14px;
+		width: 240px;
+		transition: border-color 0.25s ease, width 0.25s ease;
+	}
+
+	.filter-search-box:focus-within {
+		border-color: #c5a059;
+		width: 280px;
+	}
+
+	.search-icon {
+		width: 14px;
+		height: 14px;
+		stroke: rgba(255, 255, 255, 0.4);
+		flex-shrink: 0;
+	}
+
+	.filter-search-box input {
+		background: none;
+		border: none;
+		color: #ffffff;
+		font-size: 12.5px;
+		width: 100%;
+		outline: none;
+	}
+
+	.filter-search-box input::placeholder {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	/* ============================================================== */
+	/* 共通セクションヘッダー */
+	/* ============================================================== */
+	.section-title-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 36px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.section-num {
+		font-family: 'Inter', sans-serif;
+		font-size: 11px;
+		font-weight: 700;
+		color: #c5a059;
+		letter-spacing: 0.2em;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.section-heading {
+		font-family: 'Inter', sans-serif;
+		font-size: 26px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.section-sub,
+	.count-display {
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.count-display span {
+		color: #c5a059;
+		font-weight: 700;
+	}
+
+	/* ============================================================== */
+	/* 3. フィーチャー・ショーケース */
+	/* ============================================================== */
+	.featured-showcase {
+		padding: 60px 0 40px 0;
+	}
+
+	.featured-grid {
+		display: grid;
+		grid-template-columns: 7fr 5fr;
+		gap: 24px;
+	}
+
+	.featured-card {
+		background: #0e1014;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+	}
+
+	.featured-card:hover {
+		transform: translateY(-5px);
+		border-color: rgba(255, 255, 255, 0.3);
+		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+	}
+
+	.featured-card--main {
+		grid-row: span 2;
+	}
+
+	.featured-card__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.featured-card--main .featured-card__media {
+		height: 420px;
+	}
+
+	.featured-card--sub .featured-card__media {
+		height: 200px;
+	}
+
+	.featured-card__media {
+		position: relative;
+		overflow: hidden;
+		background: #000;
+	}
+
+	.featured-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.featured-card:hover .featured-card__img {
+		transform: scale(1.05);
+	}
+
+	.featured-card__gradient {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(180deg, transparent 40%, rgba(14, 16, 20, 0.85) 100%);
+	}
+
+	.brand-tag {
+		position: absolute;
+		top: 16px;
+		left: 16px;
+		padding: 4px 12px;
+		background: rgba(7, 8, 10, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #ffffff;
+		backdrop-filter: blur(8px);
+	}
+
+	.featured-card__content {
+		padding: 24px 28px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.featured-card__meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 11.5px;
+		color: rgba(255, 255, 255, 0.5);
+		margin-bottom: 10px;
+	}
+
+	.meta-divider {
+		opacity: 0.4;
+	}
+
+	.meta-topic {
+		color: #c5a059;
+		font-weight: 600;
+	}
+
+	.featured-card__title {
+		font-size: clamp(16px, 1.6vw, 22px);
+		font-weight: 600;
+		line-height: 1.45;
+		color: #ffffff;
+		margin: 0 0 12px 0;
+		transition: color 0.3s ease;
+	}
+
+	.featured-card:hover .featured-card__title {
+		color: #c5a059;
+	}
+
+	.featured-card__lead {
+		font-size: 13.5px;
+		color: rgba(255, 255, 255, 0.7);
+		line-height: 1.6;
+		margin: 0 0 20px 0;
+		flex-grow: 1;
+	}
+
+	.read-more-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.6);
+		margin-top: auto;
+		transition: all 0.3s ease;
+	}
+
+	.read-more-btn svg {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.3s ease;
+	}
+
+	.featured-card:hover .read-more-btn {
+		color: #ffffff;
+	}
+
+	.featured-card:hover .read-more-btn svg {
+		transform: translateX(4px);
+	}
+
+	/* ============================================================== */
+	/* 4. 全記事エディトリアルグリッド */
+	/* ============================================================== */
+	.all-articles-section {
+		padding: 40px 0 120px 0;
+	}
+
+	.articles-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 28px;
+	}
+
+	.article-item {
+		background: #0e1014;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+	}
+
+	.article-item:hover {
+		transform: translateY(-5px);
+		border-color: rgba(255, 255, 255, 0.28);
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+	}
+
+	.article-item__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.article-item__media {
+		position: relative;
+		height: 220px;
+		overflow: hidden;
+		background: #000;
+	}
+
+	.article-item__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.article-item:hover .article-item__img {
+		transform: scale(1.05);
+	}
+
+	.article-item__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(180deg, transparent 50%, rgba(14, 16, 20, 0.7) 100%);
+	}
+
+	.article-brand-pill {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		padding: 3px 10px;
+		background: rgba(7, 8, 10, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 999px;
+		font-size: 10.5px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #ffffff;
+		backdrop-filter: blur(8px);
+	}
+
+	.article-item__body {
+		padding: 22px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.article-item__meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 11.5px;
+		color: rgba(255, 255, 255, 0.45);
+		margin-bottom: 8px;
+	}
+
+	.article-item__title {
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 1.5;
+		color: #ffffff;
+		margin: 0 0 10px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.25s ease;
+	}
+
+	.article-item:hover .article-item__title {
+		color: #c5a059;
+	}
+
+	.article-item__lead {
+		font-size: 12.5px;
+		color: rgba(255, 255, 255, 0.65);
+		line-height: 1.6;
+		margin: 0 0 18px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		flex-grow: 1;
+	}
+
+	.article-item__footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-top: 14px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		font-size: 12px;
+	}
+
+	.article-item__more {
+		color: rgba(255, 255, 255, 0.7);
+		font-weight: 600;
+		transition: color 0.25s ease, transform 0.25s ease;
+	}
+
+	.article-item:hover .article-item__more {
+		color: #c5a059;
+		transform: translateX(3px);
+	}
+
+	.article-item__views {
+		color: rgba(255, 255, 255, 0.4);
+		font-size: 11px;
+	}
+
+	/* 該当なし */
+	.no-articles-state {
+		text-align: center;
+		padding: 80px 20px;
+		background: #0d0f14;
+		border-radius: 16px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		max-width: 600px;
+		margin: 40px auto;
+	}
+
+	.no-articles-icon svg {
+		width: 48px;
+		height: 48px;
+		stroke: rgba(255, 255, 255, 0.3);
+		margin-bottom: 16px;
+	}
+
+	.no-articles-title {
+		font-size: 18px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	.no-articles-desc {
+		font-size: 13.5px;
+		color: rgba(255, 255, 255, 0.55);
+		margin: 0 0 24px 0;
+	}
+
+	.btn-reset-filters {
+		padding: 10px 24px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		color: #ffffff;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.25s ease;
+	}
+
+	.btn-reset-filters:hover {
+		background: #c5a059;
+		border-color: #c5a059;
+		color: #000000;
+	}
+
+	/* ============================================================== */
+	/* レスポンシブ対応 */
+	/* ============================================================== */
+	@media (max-width: 1100px) {
+		.featured-grid {
+			grid-template-columns: 1fr;
+		}
+		.featured-card--main {
+			grid-row: auto;
+		}
+		.articles-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 768px) {
+		.mag-container {
+			padding: 0 20px;
+		}
+
+		.mag-hero {
+			padding: 40px 0;
+		}
+
+		.mag-hero__stat-bar {
+			width: 100%;
+			justify-content: space-around;
+		}
+
+		.filter-sticky-bar {
+			top: 60px;
+			padding: 12px 0;
+		}
+
+		.filter-wrap {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 12px;
+		}
+
+		.filter-controls-right {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.filter-search-box {
+			width: 100% !important;
+		}
+
+		.articles-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.section-title-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+	}
+</style>
