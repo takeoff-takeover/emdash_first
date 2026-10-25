@@ -577,9 +577,9 @@ const relatedStories = sidebarArticles;
 		position: relative;
 		z-index: 5;
 		width: 100%;
-		max-width: 1100px;
+		max-width: 1440px;
 		margin: 0 auto;
-		padding: 40px 30px 50px 30px;
+		padding: 40px 40px 50px 40px;
 	}
 
 	/* パンくず */
@@ -698,15 +698,15 @@ const relatedStories = sidebarArticles;
 	/* ============================================================== */
 	.article-body-container {
 		width: 100%;
-		max-width: 1240px;
+		max-width: 1440px;
 		margin: 0 auto;
-		padding: 50px 24px 90px 24px;
+		padding: 50px 40px 90px 40px;
 	}
 
 	.article-layout-grid {
 		display: grid;
-		grid-template-columns: 1fr 340px;
-		gap: 52px;
+		grid-template-columns: 1fr 360px;
+		gap: 56px;
 		align-items: start;
 	}
 
@@ -1235,9 +1235,9 @@ const relatedStories = sidebarArticles;
 
 	.recommended-container {
 		width: 100%;
-		max-width: 1200px;
+		max-width: 1440px;
 		margin: 0 auto;
-		padding: 0 30px;
+		padding: 0 40px;
 	}
 
 	.recommended-header {
@@ -1376,9 +1376,21 @@ const relatedStories = sidebarArticles;
 	}
 
 	/* ============================================================== */
-	/* レスポンシブ対応 */
+	/* レスポンシブ対応（ヘッダーと左右を完全一致） */
 	/* ============================================================== */
-	@media (max-width: 992px) {
+	@media (max-width: 1024px) {
+		.article-hero-container {
+			padding: 30px 24px 44px 24px;
+		}
+
+		.article-body-container {
+			padding: 40px 24px 70px 24px;
+		}
+
+		.recommended-container {
+			padding: 0 24px;
+		}
+
 		.showroom-card-modern {
 			grid-template-columns: 1fr;
 		}
@@ -1399,7 +1411,15 @@ const relatedStories = sidebarArticles;
 		}
 
 		.article-hero-container {
-			padding: 20px 16px 36px 16px;
+			padding: 20px 20px 36px 20px;
+		}
+
+		.article-body-container {
+			padding: 30px 20px 60px 20px;
+		}
+
+		.recommended-container {
+			padding: 0 20px;
 		}
 
 		.article-main-title {
