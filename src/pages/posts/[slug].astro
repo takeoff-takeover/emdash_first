@@ -149,13 +149,28 @@ const showroomCatalog: Record<string, any> = {
 
 const relatedShowroom = showroomCatalog[relatedLocationKey] || showroomCatalog["nicole-bmw-kawasaki"];
 
-// アイキャッチ画像のURL取得
-const featuredImage = post.data.featured_image;
-const heroImageUrl = typeof featuredImage === "object" && featuredImage !== null && "src" in featuredImage
-	? (featuredImage as { src: string }).src
-	: (typeof featuredImage === "string" ? featuredImage : "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg");
+// アイキャッチ画像のURL取得（EmDash R2ストレージ key および 外部URLの両方に対応）
+function getImageUrl(img: unknown): string {
+	if (!img) return "";
+	if (typeof img === "string") return img;
+	if (typeof img === "object" && img !== null) {
+		const image = img as Record<string, any>;
+		if (typeof image.src === "string" && image.src) {
+			return image.src;
+		}
+		const storageKey = image.meta?.storageKey || image.id;
+		if (storageKey) {
+			return `/_emdash/api/media/file/${storageKey}`;
+		}
+	}
+	return "";
+}
 
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
+const featuredImage = post.data.featured_image;
+const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
+const photoCredit = (featuredImage as any)?.alt || (isNeueKlasse ? "Photo: © BMW AG PressClub Global" : "Photo: © Nicole Group Editorial");
+const hasShowroom = Boolean((post.data as any).related_location) || isNeueKlasse;
 
 // 関連記事データ
 const relatedStories = [
@@ -224,10 +239,10 @@ const relatedStories = [
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
-						{isNeueKlasse ? "BMW" : "EDITORIAL"}
+						{isNeueKlasse ? "BMW" : (post.data.brand || "EDITORIAL")}
 					</span>
 					<span class="meta-category-pill">
-						{isNeueKlasse ? "FEATURE STORY" : "ARTICLE"}
+						{isNeueKlasse ? "FEATURE STORY" : (post.data.topic || "ARTICLE")}
 					</span>
 					<time class="meta-date">
 						{post.data.published_at ? new Date(post.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25"}
@@ -245,7 +260,7 @@ const relatedStories = [
 
 				<!-- 写真クレジット -->
 				<div class="article-photo-credit">
-					<span>Photo: © Nicole Group Editorial</span>
+					<span>{photoCredit}</span>
 				</div>
 			</div>
 		</header>
@@ -260,7 +275,8 @@ const relatedStories = [
 					<PortableText value={post.data.content} components={portableTextComponents} />
 				</div>
 
-				<!-- 関連拠点（ショールーム）カード -->
+				<!-- 関連拠点（ショールーム）カード（関連拠点がある場合のみ表示） -->
+				{hasShowroom && (
 				<section class="showroom-feature-block">
 					<div class="showroom-card-modern">
 						<div class="showroom-card-media">
@@ -299,6 +315,7 @@ const relatedStories = [
 						</div>
 					</div>
 				</section>
+				)}
 
 				<!-- SNSシェアボタン -->
 				<div class="article-share-bar">
