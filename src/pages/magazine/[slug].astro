@@ -1,4 +1,6 @@
 ---
+// src/pages/magazine/[slug].astro
+// Nicole Connect - マガジン記事詳細（上部に大迫力アイキャッチ写真・現代的エディトリアルレイアウト）
 import { getEmDashEntry, decodeSlug } from "emdash";
 import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
@@ -19,13 +21,97 @@ if (!slug) {
 	return Astro.rewrite("/404");
 }
 
-const { entry: post, cacheHint } = await getEmDashEntry("posts", slug);
+const { entry: cmsPost, cacheHint } = await getEmDashEntry("posts", slug);
+
+if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
+
+// 静的記事カタログ（CMSにまだ入っていない場合のフォールバック）
+const staticArticlesCatalog: Record<string, any> = {
+	"2027_new_bmw_3series_neue_klasse": {
+		data: {
+			title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
+			excerpt: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。",
+			featured_image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
+			published_at: "2026-10-22T10:00:00.000Z",
+			related_location: "nicole-bmw-kawasaki",
+			content: [
+				{
+					_type: "block",
+					style: "normal",
+					children: [
+						{ _type: "span", text: "BMWの歴史において、もっともアイコニックであり中核を担い続けてきた『3シリーズ』。その歴史に、かつてない劇的な革新がもたらされました。次世代EV専用アーキテクチャ『ノイエ・クラッセ（Neue Klasse）』を全面採用した初の市販セダンとして、完全電動モデル『BMW i3』、そして伝統の直列6気筒Mツインターボを極限まで研ぎ澄ました『BMW M350 xDrive』がベールを脱ぎました。" }
+					]
+				},
+				{
+					_type: "block",
+					style: "h2",
+					children: [
+						{ _type: "span", text: "1. デザイン言語の刷新：キドニーグリルとヘッドライトのデジタル融合" }
+					]
+				},
+				{
+					_type: "block",
+					style: "normal",
+					children: [
+						{ _type: "span", text: "フロントマスクは、歴代のツイン・サーキュラー・ヘッドライトとキドニーグリルをシームレスなデジタルサーフェスへと再定義。昼夜を問わず圧倒的な存在感を放つ発光シグネチャーが、走る悦びの新時代を告げます。サイドはロングホイールベースとショートオーバーハングの完璧な黄金比を継承し、自動格納式フラッシュドアハンドルによって極めて優れたエアロダイナミクスを実現しています。" }
+					]
+				},
+				{
+					_type: "block",
+					style: "h2",
+					children: [
+						{ _type: "span", text: "2. 800Vシステムと第6世代BMW eDrive：10分で300kmの航続回復" }
+					]
+				},
+				{
+					_type: "block",
+					style: "normal",
+					children: [
+						{ _type: "span", text: "完全電動モデル『i3』には、エネルギー密度を20%高めた新開発の円筒形バッテリーセルと、800V高電圧急速充電システムを搭載。最大300kW以上の超急速充電に対応し、長距離グランドツーリングにおいてもガソリン車の給油と変わらないストレスフリーな移動を可能にしました。" }
+					]
+				},
+				{
+					_type: "block",
+					style: "h2",
+					children: [
+						{ _type: "span", text: "3. ドライビング・ダイナミクス：『ハート・オブ・ジョイ』による統合制御" }
+					]
+				},
+				{
+					_type: "block",
+					style: "normal",
+					children: [
+						{ _type: "span", text: "新開発の中央統合演算ユニット『Heart of Joy』が、パワートレインとブレーキ、サスペンションを従来の10倍の速度で連動制御。後輪駆動をベースとした俊敏な回頭性と、ドライバーの意図をミリ秒単位で先読みする異次元のオン・ザ・レール感覚をもたらします。" }
+					]
+				}
+			]
+		}
+	},
+	"202608_bmw_kids_mechanic": {
+		data: {
+			title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
+			excerpt: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。",
+			featured_image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+			published_at: "2026-08-20T10:00:00.000Z",
+			related_location: "nicole-bmw-kawasaki",
+			content: [
+				{
+					_type: "block",
+					style: "normal",
+					children: [
+						{ _type: "span", text: "夏休み、Nicole BMW 本社ショールームのサービスファクトリーにて、小学生を対象とした『キッズメカニック体験プログラム』が開催されました。本物のつなぎを着て、熟練BMWマイスターの指導のもと、工具の使い方やタイヤの点検、安全整備の真髄を学ぶ特別な1日の様子をレポートします。" }
+					]
+				}
+			]
+		}
+	}
+};
+
+const post = cmsPost || staticArticlesCatalog[slug];
 
 if (!post) {
 	return Astro.rewrite("/404");
 }
-
-if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 
 // 関連拠点データの判定（CMSの related_location フィールドに基づく動的連携）
 const relatedLocationKey = (post.data as any).related_location || "nicole-bmw-kawasaki";
@@ -40,7 +126,6 @@ const showroomCatalog: Record<string, any> = {
 		address: "神奈川県川崎市幸区戸手2-5-7",
 		postal: "〒212-0005",
 		tel: "044-511-2000",
-		telDirect: "044-543-5400",
 		hours: "10:00～18:00",
 		closed: "水曜日（祝日を除く）",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole-BMW-本社.jpg",
@@ -56,11 +141,10 @@ const showroomCatalog: Record<string, any> = {
 		address: "東京都大田区北馬込1-16-11 1階",
 		postal: "〒143-0021",
 		tel: "03-5743-2000",
-		telDirect: "03-5743-2000",
 		hours: "10:00～18:00",
 		closed: "水曜日（祝日を除く）",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
-		detailUrl: "/location/#loc-2",
+		detailUrl: "/location/nicole-bmw-ota/",
 		googleMapsUrl: "https://maps.google.com/?q=Nicole+BMW+大田支店",
 		features: ["都内正規拠点", "新車ショールーム", "サービス工場併設"]
 	}
@@ -68,7 +152,7 @@ const showroomCatalog: Record<string, any> = {
 
 const relatedShowroom = showroomCatalog[relatedLocationKey] || showroomCatalog["nicole-bmw-kawasaki"];
 
-// アイキャッチ画像のURL取得（BMW Group PressClub公式写真）
+// アイキャッチ画像のURL取得
 const featuredImage = post.data.featured_image;
 const heroImageUrl = typeof featuredImage === "object" && featuredImage !== null && "src" in featuredImage
 	? (featuredImage as { src: string }).src
@@ -76,7 +160,7 @@ const heroImageUrl = typeof featuredImage === "object" && featuredImage !== null
 
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
 
-// ★スライドギャラリー写真データ（BMW Group PressClub 公式高解像度写真 T0460993EN）
+// スライドギャラリー写真データ（BMW Group PressClub 公式高解像度写真）
 const neueKlasseGallery = [
 	{
 		title: "新型BMW 3シリーズ エクステリア（フロント）",
@@ -90,7 +174,7 @@ const neueKlasseGallery = [
 	},
 	{
 		title: "BMW M350 xDrive（Mパフォーマンス・フラッグシップ）",
-		caption: "3.0L 直6 TwinPower Turbo＋48Vマイルドハイブリッド（326kW/443hp）。新機能『Drift Moment』と専用アダプティブMサスペンションを標準装備。",
+		caption: "3.0L 直6 TwinPower Turbo＋48Vマイルドハイブリッド（326kW/443hp）。専用アダプティブMサスペンションを標準装備。",
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg"
 	},
 	{
@@ -131,1818 +215,1315 @@ const hasSliderBlock = contentArray.some((b: any) => b && b._type === "slider");
 const hasAccordionBlock = contentArray.some((b: any) => b && b._type === "accordion");
 
 // 関連記事データ
-const relatedArticles = [
+const relatedStories = [
 	{
-		slug: "2027_new_bmw_3series_neue_klasse",
-		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
-		brand: "BMW",
-		category: "FUTURE & TECH",
-		date: "2026.10.22",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		views: "8,150"
+		slug: "202610_mini_united-japan-2026",
+		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
+		brand: "MINI",
+		topic: "Feature",
+		date: "2026.10.15",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
+		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
+	},
+	{
+		slug: "202608_ferrari_luce",
+		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
+		brand: "Ferrari",
+		topic: "Feature",
+		date: "2026.08.17",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
+		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
 	},
 	{
 		slug: "202608_bmw_kids_mechanic",
 		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 		brand: "BMW",
-		category: "CAR LIFE",
+		topic: "People",
 		date: "2026.08.20",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
-		views: "6,720"
-	},
-	{
-		slug: "202610_bmw_7series_review",
-		title: "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃",
-		brand: "BMW",
-		category: "MODELS",
-		date: "2026.10.19",
-		image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80",
-		views: "4,590"
+		url: "/magazine/202608_bmw_kids_mechanic/"
 	}
-].filter(a => a.slug !== slug);
-
-// 人気ランキング
-const popularArticles = [
-	{
-		rank: 1,
-		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
-		brand: "MINI",
-		brandClass: "mini",
-		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/",
-		views: "12,854",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg"
-	},
-	{
-		rank: 2,
-		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
-		brand: "FERRARI",
-		brandClass: "ferrari",
-		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/",
-		views: "9,420",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg"
-	},
-	{
-		rank: 3,
-		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
-		brand: "BMW",
-		brandClass: "bmw",
-		url: "/magazine/2027_new_bmw_3series_neue_klasse/",
-		views: "8,150",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
-	},
-	{
-		rank: 4,
-		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
-		brand: "BMW",
-		brandClass: "bmw",
-		url: "/magazine/202608_bmw_kids_mechanic/",
-		views: "6,720",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg"
-	}
-];
+].filter(s => s.slug !== slug);
 ---
 
 <NicoleLayout 
-	title={`${post.data.title} | MAGAZINE - ニコル・グループ`}
-	description={post.data.excerpt || "ニコル・グループがお届けするオフィシャル・マガジン。"}
+	title={`${post.data.title} ｜ Nicole Connect`}
+	description={post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Connect公式記事。"}
 >
-	<article class="magazine-article">
-		<!-- パンくずバー -->
-		<nav class="article-breadcrumb" aria-label="Breadcrumb">
-			<div class="bc-inner">
-				<a href="/" class="bc-link">ホーム</a>
-				<span class="bc-sep">/</span>
-				<a href="/magazine/" class="bc-link">マガジン</a>
-				<span class="bc-sep">/</span>
-				<span class="bc-current">{post.data.title}</span>
+	<article class="modern-article-page">
+		<!-- ============================================================== -->
+		<!-- 1. 上部：大迫力フルワイド・ヒーロー写真 ＆ 表題 -->
+		<!-- ============================================================== -->
+		<header class="article-hero-wrap">
+			<!-- 巨大アイキャッチ画像 -->
+			<div class="article-hero-bg">
+				<img 
+					src={heroImageUrl} 
+					alt={post.data.title} 
+					class="article-hero-img" 
+					loading="eager" 
+				/>
+				<div class="article-hero-gradient"></div>
 			</div>
-		</nav>
 
-		<!-- 記事ヘッダー -->
-		<header class="article-header">
-			<div class="header-inner">
-				<div class="header-meta-row">
-					<span class="brand-chip brand-chip--bmw">
-						<svg class="bmw-tiny-svg" viewBox="0 0 100 100" width="16" height="16">
-							<circle cx="50" cy="50" r="48" fill="#111111" stroke="#ffffff" stroke-width="3"/>
-							<circle cx="50" cy="50" r="37" fill="#ffffff"/>
-							<path d="M50 13 A37 37 0 0 1 87 50 L50 50 Z" fill="#0066b1"/>
-							<path d="M50 50 L13 50 A37 37 0 0 1 50 13 Z" fill="#ffffff"/>
-							<path d="M50 50 L50 87 A37 37 0 0 1 13 50 Z" fill="#0066b1"/>
-							<path d="M50 50 L87 50 A37 37 0 0 1 50 87 Z" fill="#ffffff"/>
-						</svg>
-						BMW
+			<!-- ヒーロー内コンテンツ -->
+			<div class="article-hero-container">
+				<!-- パンくずナビゲーション -->
+				<nav class="article-breadcrumb" aria-label="Breadcrumb">
+					<a href="/" class="bc-link">HOME</a>
+					<span class="bc-sep">/</span>
+					<a href="/magazine/" class="bc-link">MAGAZINE</a>
+					<span class="bc-sep">/</span>
+					<span class="bc-current">{post.data.title}</span>
+				</nav>
+
+				<!-- メタ情報バッジ群 -->
+				<div class="article-meta-row">
+					<span class="meta-brand-pill">
+						<span class="brand-dot"></span>
+						{isNeueKlasse ? "BMW" : "ALL BRANDS"}
 					</span>
-					<span class="category-chip">
-						{isNeueKlasse ? "FUTURE & SCOOP" : "COLUMN / CAR LIFE"}
+					<span class="meta-category-pill">
+						{isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE"}
 					</span>
-					<time class="post-date">
+					<time class="meta-date">
 						{isNeueKlasse ? "2026.10.22" : "2026.08.20"}
 					</time>
-					<span class="read-count">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="meta-icon"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-						{isNeueKlasse ? "8,150 views" : "6,720 views"}
-					</span>
-					{isNeueKlasse && (
-						<span class="official-press-badge">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="badge-check-icon"><polyline points="20 6 9 17 4 12"/></svg>
-							BMW Group PressClub 公式フォト採用
-						</span>
-					)}
+					<span class="meta-reading-time">READING TIME: 4 MIN</span>
 				</div>
 
-				<h1 class="article-title">{post.data.title}</h1>
+				<!-- 記事タイトル（大迫力＆美しいタイポグラフィ） -->
+				<h1 class="article-main-title">{post.data.title}</h1>
 
+				<!-- リード文（抜粋） -->
 				{post.data.excerpt && (
-					<p class="article-lead">{post.data.excerpt}</p>
+					<p class="article-lead-text">{post.data.excerpt}</p>
 				)}
-			</div>
 
-			<!-- ヒーローアイキャッチ画像（BMW Group PressClub公式写真） -->
-			<div class="article-hero-media">
-				<img src={heroImageUrl} alt={post.data.title} class="article-hero-img" />
-				<div class="press-photo-credit">Photo: © BMW AG (BMW Group PressClub Global)</div>
+				<!-- 写真クレジット -->
+				<div class="article-photo-credit">
+					<span>Photo: © BMW AG PressClub Global / Nicole Group Editorial</span>
+				</div>
 			</div>
 		</header>
 
-		<!-- 記事本文エリア -->
-		<div class="article-content-wrapper">
-			<div class="article-main-body prose prose-invert">
-				<PortableText value={post.data.content} components={portableTextComponents} />
-			</div>
-
-			<!-- ========================================================
-			     ★ご要望ツール①：スライドできる写真ギャラリー（Carousel）
-			     ※本文内にカスタムブロックが存在しない場合のみフォールバック表示
-			======================================================== -->
-			{!hasSliderBlock && (
-			<section class="slider-gallery-section" id="slider-gallery">
-				<div class="gallery-section-header">
-					<div class="gallery-tag">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tag-icon"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-						INTERACTIVE PHOTO SLIDER
-					</div>
-					<h3 class="gallery-heading">
-						{isNeueKlasse ? "BMW Vision Neue Klasse 公式フォトスライダー" : "キッズメカニック体験 イベントフォトスライダー"}
-					</h3>
-					<p class="gallery-sub">左右の矢印ボタンまたはスワイプ操作でスライド切り替えが可能です。（全 {currentGallery.length} 枚）</p>
+		<!-- ============================================================== -->
+		<!-- 2. 本文エリア（現代的エディトリアルレイアウト） -->
+		<!-- ============================================================== -->
+		<div class="article-body-container">
+			<div class="article-prose-wrap">
+				<!-- 本文（Portable Text） -->
+				<div class="article-rich-text prose prose-invert">
+					<PortableText value={post.data.content} components={portableTextComponents} />
 				</div>
 
-				<div class="custom-carousel" id="customCarousel">
-					<!-- スライダーメインビューポート -->
-					<div class="carousel-viewport">
-						<div class="carousel-track" id="carouselTrack">
-							{currentGallery.map((item, index) => (
-								<div class={`carousel-slide ${index === 0 ? 'active' : ''}`} data-index={index}>
-									<div class="slide-image-wrap">
-										<img src={item.image} alt={item.title} class="slide-img" loading={index === 0 ? "eager" : "lazy"} />
-										<span class="slide-counter-badge">{index + 1} / {currentGallery.length}</span>
-										{isNeueKlasse && <span class="slide-source-tag">© BMW AG PressClub</span>}
-									</div>
-									<div class="slide-caption-bar">
-										<h4 class="slide-title">{item.title}</h4>
-										<p class="slide-desc">{item.caption}</p>
-									</div>
-								</div>
-							))}
+				<!-- インタラクティブ・スライダー（本文内にない場合のフォールバック） -->
+				{!hasSliderBlock && (
+					<section class="gallery-slider-block">
+						<div class="block-header">
+							<span class="block-kicker">PHOTO GALLERY</span>
+							<h3 class="block-title">
+								{isNeueKlasse ? "BMW Vision Neue Klasse フォトギャラリー" : "キッズメカニック体験 フォトギャラリー"}
+							</h3>
+							<p class="block-sub">左右の矢印またはスワイプ操作でご覧いただけます。（全 {currentGallery.length} 点）</p>
 						</div>
 
-						<!-- ナビゲーション矢印 -->
-						<button type="button" class="carousel-arrow carousel-arrow--prev" id="carouselPrev" aria-label="前の写真">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-						</button>
-						<button type="button" class="carousel-arrow carousel-arrow--next" id="carouselNext" aria-label="次の写真">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-						</button>
-					</div>
-
-					<!-- サムネイルナビゲーション -->
-					<div class="carousel-thumbnails" id="carouselThumbs">
-						{currentGallery.map((item, index) => (
-							<button type="button" class={`thumb-btn ${index === 0 ? 'active' : ''}`} data-thumb-index={index} aria-label={`写真 ${index + 1} へジャンプ`}>
-								<img src={item.image} alt="" />
-							</button>
-						))}
-					</div>
-				</div>
-			</section>
-			)}
-
-			<!-- ========================================================
-			     ★ご要望ツール②：アコーディオン形式ツール（開閉詳細・FAQ）
-			     ※本文内にカスタムブロックが存在しない場合のみフォールバック表示
-			======================================================== -->
-			{!hasAccordionBlock && (
-			<section class="accordion-section" id="accordion-section">
-				<div class="accordion-section-header">
-					<div class="accordion-tag">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tag-icon"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-						COLLAPSIBLE DETAILS &amp; FAQ
-					</div>
-					<h3 class="accordion-heading">
-						{isNeueKlasse ? "次世代3シリーズ 詳細技術スペック ＆ FAQ（アコーディオン）" : "イベント詳細・よくあるご質問（アコーディオン）"}
-					</h3>
-					<p class="accordion-sub">項目をクリック（タップ）すると詳細情報が開閉します。</p>
-				</div>
-
-				<div class="accordion-container">
-					{isNeueKlasse ? (
-						<>
-							<!-- アコーディオン 1: 主要スペック予測 -->
-							<details class="acc-item" open>
-								<summary class="acc-trigger">
-									<div class="acc-trigger-left">
-										<span class="acc-icon-wrap">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-										</span>
-										<span class="acc-title">1. 【主要諸元・技術スペック予測】第6世代eDrive &amp; 800Vシステム</span>
-									</div>
-									<span class="acc-toggle-indicator"></span>
-								</summary>
-								<div class="acc-content">
-									<div class="spec-table-wrap">
-										<table class="spec-table">
-											<tbody>
-												<tr>
-													<th>プラットフォーム &amp; 駆動</th>
-													<td>BMW Neue Klasse Gen6 eDrive BEVアーキテクチャ ＆ 進化型高効率ICEアーキテクチャ</td>
-												</tr>
-												<tr>
-													<th>統合制御ECU</th>
-													<td><strong>Heart of Joy（ハート・オブ・ジョイ）</strong>：従来比10倍の処理速度を誇る次世代統合ドライビングスタック</td>
-												</tr>
-												<tr>
-													<th>バッテリー技術 &amp; 電圧</th>
-													<td>新開発 大径円筒形リチウムイオンセル ＆ <strong>800V 高電圧システム</strong>（最大400kW DC急速充電）</td>
-												</tr>
-												<tr>
-													<th>急速充電性能</th>
-													<td><strong>わずか10分間の充電で最大 423km分</strong>（WLTP）の航続距離を急速チャージ可能</td>
-												</tr>
-												<tr>
-													<th>一充電航続距離</th>
-													<td><strong>最大 912km</strong>（WLTP欧州モード値 / BMW i3 50 xDrive）</td>
-												</tr>
-												<tr>
-													<th>コックピット &amp; OS</th>
-													<td>BMW Panoramic iDrive（フロントガラス下端全幅投影「BMW Panoramic Vision」＋ 17.9インチ センターディスプレイ ＋ BMW OS X）</td>
-												</tr>
-												<tr>
-													<th>運転支援 &amp; AI</th>
-													<td>SAE Level 2、Motorway Assistant（時速130km/hまでのハンズオフ走行対応・日本等21カ国展開）、Amazon Alexa+ AI対話</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</details>
-
-							<!-- アコーディオン 2: グレード・ラインナップ展開 -->
-							<details class="acc-item">
-								<summary class="acc-trigger">
-									<div class="acc-trigger-left">
-										<span class="acc-icon-wrap">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-										</span>
-										<span class="acc-title">2. 【ラインナップ構成】完全電動（i3）から直6ガソリン（M350 xDrive）まで</span>
-									</div>
-									<span class="acc-toggle-indicator"></span>
-								</summary>
-								<div class="acc-content">
-									<div class="lineup-list">
-										<div class="lineup-card">
-											<span class="lineup-badge">完全電動 BEV フラッグシップ</span>
-											<h5>BMW i3 50 xDrive（AWD・長距離モデル）</h5>
-											<p>システム最高出力 345 kW（469 hp）、最大トルク 645 Nm。0-100km/h加速 4.7秒。108.7 kWhバッテリー搭載、航続距離は驚異の最大912 km（WLTP）。</p>
-										</div>
-										<div class="lineup-card">
-											<span class="lineup-badge">完全電動 BEV コアモデル</span>
-											<h5>BMW i3 40 xDrive（AWD・高効率モデル）</h5>
-											<p>システム最高出力 275 kW（374 hp）。82.8 kWh大容量バッテリーを搭載し、WLTP最大航続距離 710 kmを達成。</p>
-										</div>
-										<div class="lineup-card">
-											<span class="lineup-badge lineup-badge--m">M パフォーマンス ICE フラッグシップ</span>
-											<h5>BMW M350 xDrive（3.0L 直6 ターボ ＋ 48V）</h5>
-											<p>最高出力 326 kW（443 hp）、0-100km/h 4.1秒。後輪駆動のみにパワーを送る新機能「Drift Moment」とアダプティブMサスペンションを標準装備。</p>
-										</div>
-										<div class="lineup-card">
-											<span class="lineup-badge lineup-badge--ice">高効率 ガソリン ICE</span>
-											<h5>BMW 320（2.0L 直4 ターボ ＋ 48V）</h5>
-											<p>最新世代BMW TwinPower Turboと48Vマイルドハイブリッドを融合。俊敏なハンドリングと高い日常実用性を兼縮。</p>
-										</div>
-										<div class="lineup-card">
-											<span class="lineup-badge lineup-badge--mhigh">次世代 M BEV（2027年登場予定）</span>
-											<h5>BMW i3 M60 xDrive（超高性能フラッグシップ）</h5>
-											<p>M GmbHが手がけるノイエ・クラッセ初の超高性能Mモデル。圧倒的な出力と超高速コーナリングを実現するプロトタイプ。</p>
-										</div>
-									</div>
-								</div>
-							</details>
-
-							<!-- アコーディオン 3: FAQ -->
-							<details class="acc-item">
-								<summary class="acc-trigger">
-									<div class="acc-trigger-left">
-										<span class="acc-icon-wrap">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-										</span>
-										<span class="acc-title">3. 【よくあるご質問（FAQ）】生産拠点・新機能Drift Moment・急速充電について</span>
-									</div>
-									<span class="acc-toggle-indicator"></span>
-								</summary>
-								<div class="acc-content">
-									<div class="faq-list">
-										<div class="faq-item">
-											<span class="q-mark">Q</span>
-											<div class="q-body">
-												<strong>新型3シリーズはどこで生産されますか？</strong>
-												<p>完全電動モデルのBMW i3は、1975年に初代3シリーズが生まれたBMWグループ本拠地「ミュンヘン工場」で生産されます。高効率ガソリンエンジン搭載モデル（BMW 320、M350 xDrive）は、欧州最大の拠点である「ディンゴルフィング工場」で生産されます。</p>
+						<div class="modern-slider-wrap" id="modernSlider">
+							<div class="slider-viewport">
+								<div class="slider-track" id="sliderTrack">
+									{currentGallery.map((item, index) => (
+										<div class={`slider-slide ${index === 0 ? 'is-active' : ''}`} data-index={index}>
+											<div class="slide-media">
+												<img src={item.image} alt={item.title} loading={index === 0 ? "eager" : "lazy"} />
+												<span class="slide-badge">{index + 1} / {currentGallery.length}</span>
+											</div>
+											<div class="slide-info">
+												<h4 class="slide-heading">{item.title}</h4>
+												<p class="slide-caption">{item.caption}</p>
 											</div>
 										</div>
-										<div class="faq-item">
-											<span class="q-mark">Q</span>
-											<div class="q-body">
-												<strong>M350 xDriveに搭載された新機能「Drift Moment」とは何ですか？</strong>
-												<p>センターディスプレイの操作で起動できる新機能で、一時的に駆動力を後輪（FR）のみに集中配分します。これにより、従来のBMW MハイパフォーマンスモデルのようなエモーショナルなFRスライドコントロールの醍醐味を味わうことができます。</p>
-											</div>
-										</div>
-										<div class="faq-item">
-											<span class="q-mark">Q</span>
-											<div class="q-body">
-												<strong>充電スピードや国内の充電スタンドとの互換性は？</strong>
-												<p>BMW i3は最大400kWの高出力DC充電に対応しており、わずか10分間で最大423km分を充電可能です。国内ではNicole BMW 本社（川崎）の150kW超急速充電器をはじめ、全国のCHAdeMO規格急速充電ネットワークに幅広く対応します。</p>
-											</div>
-										</div>
-										<div class="faq-item">
-											<span class="q-mark">Q</span>
-											<div class="q-body">
-												<strong>ガソリンエンジン搭載の3シリーズはなくなってしまうのでしょうか？</strong>
-												<p>いいえ。BMWは「パワー・オブ・チョイス（選択の自由）」戦略を継続しており、完全電動のNeue Klasseと並行して、最新の排ガス基準に適合した直4および直6ガソリンエンジンモデルも設定される予定です。</p>
-											</div>
-										</div>
-									</div>
+									))}
 								</div>
-							</details>
-						</>
-					) : (
-						<>
-							<!-- キッズメカニック向けアコーディオン -->
-							<details class="acc-item" open>
-								<summary class="acc-trigger">
-									<div class="acc-trigger-left">
-										<span class="acc-icon-wrap">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-										</span>
-										<span class="acc-title">1. 【当日のプログラム・タイムスケジュール】</span>
-									</div>
-									<span class="acc-toggle-indicator"></span>
-								</summary>
-								<div class="acc-content">
-									<ul class="program-steps">
-										<li><strong>10:00〜10:30：</strong> 受付・専用メカニックつなぎへの着替え・オリエンテーション</li>
-										<li><strong>10:30〜11:30：</strong> 実車を使った点検作業（タイヤ空気圧・クラクション点検・エンジンルーム観察）</li>
-										<li><strong>11:30〜12:00：</strong> 給与授与式（修了証書・ニコル・ユーロ受領）</li>
-										<li><strong>12:00〜12:30：</strong> ニコル・ユーロを使ったショッピングタイム ＆ 記念撮影</li>
-										<li><strong>12:30〜13:00：</strong> 保護者様向け「Nicole BMW 本社サービス工場」特別見学ツアー</li>
-									</ul>
-								</div>
-							</details>
 
-							<details class="acc-item">
-								<summary class="acc-trigger">
-									<div class="acc-trigger-left">
-										<span class="acc-icon-wrap">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-										</span>
-										<span class="acc-title">2. 【次回の開催予定・参加要件について】</span>
-									</div>
-									<span class="acc-toggle-indicator"></span>
-								</summary>
-								<div class="acc-content">
-									<p>Nicole BMWでは、春休み・夏休みシーズンにお子様向けファミリーイベントを定期開催しております。対象年齢は小学校1年生〜6年生（保護者同伴必須）となります。次回の開催告知はNicole BMW公式LINEまたはメルマガにてご案内いたします。</p>
-								</div>
-							</details>
-						</>
-					)}
-				</div>
-			</section>
-			)}
-
-			<!-- ========================================================
-			     ★CMS連携：関連拠点セクション（川崎ショールームカード）
-			======================================================== -->
-			{relatedShowroom && (
-				<section class="related-location-card-box">
-					<div class="box-tag">
-						<span class="tag-live-dot"></span>
-						RELATED SHOWROOM &amp; SERVICE
-					</div>
-					<h3 class="box-heading">この記事の取材・取扱正規拠点</h3>
-					<p class="box-sub">
-						{isNeueKlasse
-							? "次世代BMWモデルに関する最新先行情報のご相談・現行モデルの試乗はこちらの拠点へお越しください。"
-							: "今回のキッズメカニック体験が開催された、ニコル・グループの中核フラッグシップ拠点です。"}
-					</p>
-
-					<div class="showroom-banner-card">
-						<div class="showroom-banner-media">
-							<img src={relatedShowroom.image} alt={relatedShowroom.name} class="showroom-banner-img" />
-							<div class="showroom-banner-pill">
-								<svg class="bmw-tiny-svg" viewBox="0 0 100 100" width="16" height="16">
-									<circle cx="50" cy="50" r="48" fill="#111111" stroke="#ffffff" stroke-width="3"/>
-									<circle cx="50" cy="50" r="37" fill="#ffffff"/>
-									<path d="M50 13 A37 37 0 0 1 87 50 L50 50 Z" fill="#0066b1"/>
-									<path d="M50 50 L13 50 A37 37 0 0 1 50 13 Z" fill="#ffffff"/>
-									<path d="M50 50 L50 87 A37 37 0 0 1 13 50 Z" fill="#0066b1"/>
-									<path d="M50 50 L87 50 A37 37 0 0 1 50 87 Z" fill="#ffffff"/>
-								</svg>
-								BMW AUTHORIZED DEALER
-							</div>
-						</div>
-
-						<div class="showroom-banner-body">
-							<span class="location-area-badge">神奈川・川崎エリア ｜ 国道1号線（第二京浜）沿い</span>
-							<h4 class="showroom-banner-title">{relatedShowroom.name}</h4>
-							<p class="showroom-banner-desc">
-								最新BMW全モデルの新車展示・試乗車常備。BMWマイスターが在籍する最新鋭サービス工場と、雨天でも安心の屋根付き大型パーキングを完備しています。
-							</p>
-
-							<div class="showroom-banner-meta">
-								<div class="meta-item">
-									<span class="meta-label">所在地：</span>
-									<span class="meta-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
-								</div>
-								<div class="meta-item">
-									<span class="meta-label">営業時間：</span>
-									<span class="meta-val">{relatedShowroom.hours}（定休日：{relatedShowroom.closed}）</span>
-								</div>
-								<div class="meta-item">
-									<span class="meta-label">お電話：</span>
-									<span class="meta-val"><a href={`tel:${relatedShowroom.telDirect}`} class="tel-text">{relatedShowroom.telDirect}</a></span>
-								</div>
+								<!-- ナビゲーション矢印 -->
+								<button type="button" class="slider-btn slider-btn--prev" id="sliderPrev" aria-label="前の写真">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+								</button>
+								<button type="button" class="slider-btn slider-btn--next" id="sliderNext" aria-label="次の写真">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+								</button>
 							</div>
 
-							<div class="showroom-banner-features">
-								{relatedShowroom.features.map((f: string) => (
-									<span class="feat-tag">✓ {f}</span>
+							<!-- サムネイルナビ -->
+							<div class="slider-thumbnails">
+								{currentGallery.map((item, index) => (
+									<button type="button" class={`slider-thumb-btn ${index === 0 ? 'is-active' : ''}`} data-thumb-index={index} aria-label={`写真 ${index + 1}`}>
+										<img src={item.image} alt="" />
+									</button>
 								))}
 							</div>
+						</div>
+					</section>
+				)}
 
-							<!-- アクションボタン群：川崎ショールーム詳細へ直接遷移！ -->
-							<div class="showroom-banner-actions">
-								<a href={relatedShowroom.detailUrl} class="btn-goto-showroom">
-									川崎ショールームの拠点情報を見る
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+				<!-- アコーディオン（本文内にない場合のフォールバック） -->
+				{!hasAccordionBlock && (
+					<section class="accordion-details-block">
+						<div class="block-header">
+							<span class="block-kicker">TECHNICAL SPECIFICATIONS</span>
+							<h3 class="block-title">
+								{isNeueKlasse ? "新型3シリーズ 主要諸元 ＆ よくあるご質問" : "イベント概要・詳細情報"}
+							</h3>
+						</div>
+
+						<div class="modern-accordion-list">
+							<details class="accordion-item" open>
+								<summary class="accordion-summary">
+									<span>1. Neue Klasse（ノイエ・クラッセ）アーキテクチャの革新性</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>第6世代BMW eDriveテクノロジーを搭載し、エネルギー密度が20%向上した新開発の円筒型リチウムイオンバッテリーセルを採用。800Vシステムによる超急速充電に対応し、わずか10分の充電で最大300kmの航続距離を回復します。</p>
+								</div>
+							</details>
+
+							<details class="accordion-item">
+								<summary class="accordion-summary">
+									<span>2. 『BMW パノラミック・ビジョン』と新世代デジタル・キャビン</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>フロントガラスの全幅にわたって運転関連情報を投影する「BMWパノラミック・ビジョン」を初採用。ドライバーと助手席乗員の視線移動を最小限に抑え、直感的なステアリング操作と音声コマンドにより、次世代のコックピット体験を提供します。</p>
+								</div>
+							</details>
+
+							<details class="accordion-item">
+								<summary class="accordion-summary">
+									<span>3. 日本市場における導入スケジュールと展示ショールーム</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>日本国内でのデリバリーは2026年後半以降を予定しております。Nicole BMW 本社ショールーム（川崎）および各支店にて、実車展示・プレオーダーステージが順次開設される予定です。最新情報は公式Webマガジンおよび各ショールームにてご案内いたします。</p>
+								</div>
+							</details>
+						</div>
+					</section>
+				)}
+
+				<!-- 関連拠点（ショールーム）カード -->
+				<section class="showroom-feature-block">
+					<div class="showroom-card-modern">
+						<div class="showroom-card-media">
+							<img src={relatedShowroom.image} alt={relatedShowroom.name} />
+							<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
+						</div>
+						<div class="showroom-card-body">
+							<span class="showroom-kicker">CURATED SHOWROOM</span>
+							<h3 class="showroom-title">{relatedShowroom.name}</h3>
+							<p class="showroom-sub">{relatedShowroom.subName}</p>
+							
+							<div class="showroom-details">
+								<div class="detail-row">
+									<span class="detail-label">ADDRESS</span>
+									<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
+								</div>
+								<div class="detail-row">
+									<span class="detail-label">OPEN HOURS</span>
+									<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
+								</div>
+								<div class="detail-row">
+									<span class="detail-label">PHONE</span>
+									<span class="detail-val">{relatedShowroom.tel}</span>
+								</div>
+							</div>
+
+							<div class="showroom-actions">
+								<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
+									<span>ショールーム詳細を見る</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 								</a>
-								<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-goto-gmaps">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-svg"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-									Googleマップでルート案内
+								<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
+									<span>Google Mapsで開く ↗</span>
 								</a>
 							</div>
 						</div>
 					</div>
 				</section>
-			)}
 
-			<!-- ========================================================
-			     ★関連記事セクション（Related Articles）
-			======================================================== -->
-			<section class="section-related-posts">
-				<div class="section-badge-label">RECOMMENDED ARTICLES</div>
-				<h3 class="section-posts-title">こちらの記事も読まれています</h3>
-
-				<div class="related-posts-grid">
-					{relatedArticles.map((art) => (
-						<a href={`/magazine/${art.slug}/`} class="related-post-card">
-							<div class="rel-media">
-								<img src={art.image} alt={art.title} loading="lazy" />
-								<span class="rel-brand-chip">{art.brand}</span>
-							</div>
-							<div class="rel-body">
-								<div class="rel-meta">
-									<span class="rel-cat">{art.category}</span>
-									<time>{art.date}</time>
-								</div>
-								<h4 class="rel-title">{art.title}</h4>
-								<span class="rel-views">{art.views} views</span>
-							</div>
+				<!-- SNSシェアボタン -->
+				<div class="article-share-bar">
+					<span class="share-label">SHARE THIS STORY</span>
+					<div class="share-buttons">
+						<a 
+							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn"
+							aria-label="X（Twitter）でシェア"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+							<span>Xでポスト</span>
 						</a>
-					))}
-				</div>
-			</section>
-
-			<!-- ========================================================
-			     ★人気記事ランキング（Popular Ranking）
-			======================================================== -->
-			<section class="section-popular-posts">
-				<div class="section-badge-label">POPULAR RANKING</div>
-				<h3 class="section-posts-title">アクセスランキング（人気記事）</h3>
-
-				<div class="popular-ranking-list">
-					{popularArticles.map((pop) => (
-						<a href={pop.url} class="popular-rank-item">
-							<div class={`rank-badge rank-badge--${pop.rank}`}>
-								{pop.rank}
-							</div>
-							<div class="pop-media">
-								<img src={pop.image} alt={pop.title} loading="lazy" />
-							</div>
-							<div class="pop-info">
-								<span class={`pop-brand-tag pop-brand-tag--${pop.brandClass}`}>{pop.brand}</span>
-								<h4 class="pop-title">{pop.title}</h4>
-								<div class="pop-meta">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pop-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-									<span>{pop.views} views</span>
-								</div>
-							</div>
+						<a 
+							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn"
+							aria-label="Facebookでシェア"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+							<span>Facebook</span>
 						</a>
-					))}
+						<button type="button" class="share-btn" id="btn-copy-url">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+							<span id="copy-text">URLをコピー</span>
+						</button>
+					</div>
 				</div>
-			</section>
 
-			<!-- 記事フッターナビ -->
-			<div class="article-footer-nav">
-				<a href="/#magazine" class="btn-back-magazine">
-					← マガジン一覧に戻る
-				</a>
-				<a href="/location/" class="btn-all-locations">
-					すべての店舗・拠点（25拠点）を探す →
-				</a>
+				<!-- バックリンク -->
+				<div class="article-back-nav">
+					<a href="/magazine/" class="btn-back-to-magazine">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+						<span>Nicole Connect 一覧へ戻る</span>
+					</a>
+				</div>
 			</div>
 		</div>
+
+		<!-- ============================================================== -->
+		<!-- 3. 下部：おすすめ記事（RECOMMENDED STORIES） -->
+		<!-- ============================================================== -->
+		<section class="recommended-stories-section">
+			<div class="recommended-container">
+				<div class="recommended-header">
+					<div>
+						<span class="rec-kicker">DISCOVER MORE</span>
+						<h2 class="rec-title">おすすめの特集ストーリー</h2>
+					</div>
+					<a href="/magazine/" class="rec-all-link">すべての記事を見る →</a>
+				</div>
+
+				<div class="recommended-grid">
+					{relatedStories.map((story) => (
+						<article class="rec-card">
+							<a href={story.url} class="rec-card-link">
+								<div class="rec-card-media">
+									<img src={story.image} alt={story.title} loading="lazy" />
+									<span class="rec-card-brand">{story.brand}</span>
+								</div>
+								<div class="rec-card-body">
+									<div class="rec-card-meta">
+										<span>{story.topic}</span>
+										<span class="rec-meta-sep">/</span>
+										<time>{story.date}</time>
+									</div>
+									<h3 class="rec-card-title">{story.title}</h3>
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
 	</article>
-
-	<!-- スライダー制御スクリプト -->
-	<script is:inline>
-		document.addEventListener('DOMContentLoaded', function() {
-			const track = document.getElementById('carouselTrack');
-			const prevBtn = document.getElementById('carouselPrev');
-			const nextBtn = document.getElementById('carouselNext');
-			const thumbs = document.querySelectorAll('.thumb-btn');
-			const slides = document.querySelectorAll('.carousel-slide');
-
-			if (!track || slides.length === 0) return;
-
-			let currentIndex = 0;
-			const totalSlides = slides.length;
-
-			function updateSlide(index) {
-				if (index < 0) index = totalSlides - 1;
-				if (index >= totalSlides) index = 0;
-				currentIndex = index;
-
-				// トラックの移動
-				track.style.transform = `translateX(-${currentIndex * 100}%)`;
-
-				// サムネイルのアクティブクラス更新
-				thumbs.forEach((th, i) => {
-					th.classList.toggle('active', i === currentIndex);
-				});
-
-				// スライドのアクティブクラス
-				slides.forEach((sl, i) => {
-					sl.classList.toggle('active', i === currentIndex);
-				});
-			}
-
-			if (prevBtn) {
-				prevBtn.addEventListener('click', () => updateSlide(currentIndex - 1));
-			}
-
-			if (nextBtn) {
-				nextBtn.addEventListener('click', () => updateSlide(currentIndex + 1));
-			}
-
-			thumbs.forEach((th) => {
-				th.addEventListener('click', () => {
-					const idx = parseInt(th.dataset.thumbIndex, 10);
-					updateSlide(idx);
-				});
-			});
-
-			// キーボード操作（左右矢印キー）
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'ArrowLeft') updateSlide(currentIndex - 1);
-				if (e.key === 'ArrowRight') updateSlide(currentIndex + 1);
-			});
-
-			// タッチスワイプ
-			let startX = 0;
-			let endX = 0;
-			track.addEventListener('touchstart', (e) => {
-				startX = e.touches[0].clientX;
-			}, { passive: true });
-
-			track.addEventListener('touchend', (e) => {
-				endX = e.changedTouches[0].clientX;
-				const diff = startX - endX;
-				if (Math.abs(diff) > 40) {
-					if (diff > 0) updateSlide(currentIndex + 1);
-					else updateSlide(currentIndex - 1);
-				}
-			}, { passive: true });
-		});
-	</script>
 </NicoleLayout>
 
+<!-- カルーセル ＆ コピー制御スクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		// 1. スライダー制御
+		const track = document.getElementById('sliderTrack');
+		const prevBtn = document.getElementById('sliderPrev');
+		const nextBtn = document.getElementById('sliderNext');
+		const thumbs = document.querySelectorAll('.slider-thumb-btn');
+		const slides = document.querySelectorAll('.slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) t.classList.add('is-active');
+					else t.classList.remove('is-active');
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
+		}
+
+		// 2. URLコピーボタン
+		const copyBtn = document.getElementById('btn-copy-url');
+		const copyText = document.getElementById('copy-text');
+		if (copyBtn && copyText) {
+			copyBtn.addEventListener('click', () => {
+				navigator.clipboard.writeText(window.location.href).then(() => {
+					copyText.textContent = 'コピーしました！';
+					setTimeout(() => {
+						copyText.textContent = 'URLをコピー';
+					}, 2000);
+				}).catch(() => {
+					copyText.textContent = 'コピー失敗';
+				});
+			});
+		}
+	});
+</script>
+
 <style>
-	.magazine-article {
-		background: #08090a;
-		color: #e5e5e5;
+	/* ============================================================== */
+	/* 現代的エディトリアル・マガジン記事詳細スタイル */
+	/* ============================================================== */
+	.modern-article-page {
+		background-color: #06070a;
+		color: #ffffff;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", sans-serif;
 		min-height: 100vh;
-		padding-bottom: 100px;
+	}
+
+	/* ============================================================== */
+	/* 1. ヒーローヘッダー（上部に特大写真を配置） */
+	/* ============================================================== */
+	.article-hero-wrap {
+		position: relative;
+		min-height: 80vh;
+		display: flex;
+		align-items: flex-end;
+		overflow: hidden;
+		padding-top: 100px;
+		background: #000;
+	}
+
+	.article-hero-bg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
+
+	.article-hero-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 36%;
+		filter: brightness(0.8) contrast(1.08);
+	}
+
+	.article-hero-gradient {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			180deg, 
+			rgba(6, 7, 10, 0.7) 0%, 
+			rgba(6, 7, 10, 0.2) 30%, 
+			rgba(6, 7, 10, 0.75) 75%, 
+			#06070a 100%
+		);
+	}
+
+	.article-hero-container {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 40px 30px 50px 30px;
 	}
 
 	/* パンくず */
 	.article-breadcrumb {
-		background: #0d0f12;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		padding: 14px 24px;
-		font-size: 0.8125rem;
-	}
-
-	.bc-inner {
-		max-width: 1000px;
-		margin: 0 auto;
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		color: #888888;
-		white-space: nowrap;
-		overflow-x: auto;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 24px;
 	}
 
 	.bc-link {
-		color: #aaaaaa;
+		color: rgba(255, 255, 255, 0.6);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
 
 	.bc-link:hover {
-		color: #ffffff;
+		color: #dfba73;
 	}
 
 	.bc-sep {
-		color: #555555;
+		opacity: 0.3;
 	}
 
 	.bc-current {
-		color: #ffffff;
-		font-weight: 500;
+		color: #dfba73;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 400px;
 	}
 
-	/* ヘッダー */
-	.article-header {
-		padding: 60px 24px 0;
-	}
-
-	.header-inner {
-		max-width: 900px;
-		margin: 0 auto 40px;
-	}
-
-	.header-meta-row {
+	/* メタ情報行 */
+	.article-meta-row {
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
 		gap: 12px;
+		flex-wrap: wrap;
 		margin-bottom: 20px;
-		font-size: 0.8125rem;
 	}
 
-	.brand-chip {
+	.meta-brand-pill {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
 		padding: 4px 12px;
-		border-radius: 4px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.brand-chip--bmw {
-		background: rgba(0, 102, 177, 0.8);
-		border: 1px solid rgba(0, 102, 177, 0.5);
-	}
-
-	.category-chip {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		color: #888888;
-		background: rgba(255, 255, 255, 0.06);
-		padding: 4px 10px;
-		border-radius: 4px;
-	}
-
-	.post-date {
-		font-family: 'JetBrains Mono', monospace;
-		color: #888888;
-	}
-
-	.read-count {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		color: #71717a;
-		font-size: 0.75rem;
-	}
-
-	.official-press-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 3px 10px;
-		background: rgba(34, 197, 94, 0.15);
-		border: 1px solid rgba(34, 197, 94, 0.4);
-		border-radius: 4px;
-		color: #4ade80;
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.badge-check-icon {
-		width: 14px;
-		height: 14px;
-	}
-
-	.meta-icon {
-		width: 14px;
-		height: 14px;
-	}
-
-	.article-title {
-		font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+		background: #dfba73;
+		color: #040507;
+		font-size: 11px;
 		font-weight: 800;
-		color: #ffffff;
-		line-height: 1.3;
-		letter-spacing: -0.02em;
-		margin: 0 0 20px;
-	}
-
-	.article-lead {
-		font-size: 1.125rem;
-		line-height: 1.8;
-		color: #b0b4ba;
-		border-left: 3px solid #0066b1;
-		padding-left: 18px;
-		margin: 0;
-	}
-
-	.article-hero-media {
-		position: relative;
-		max-width: 1040px;
-		margin: 0 auto;
-		border-radius: 14px;
-		overflow: hidden;
-		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	.article-hero-img {
-		width: 100%;
-		max-height: 580px;
-		object-fit: cover;
-		display: block;
-	}
-
-	.press-photo-credit {
-		position: absolute;
-		bottom: 12px;
-		right: 14px;
-		background: rgba(0, 0, 0, 0.75);
-		backdrop-filter: blur(6px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 3px 8px;
-		border-radius: 4px;
-		font-size: 0.6875rem;
-		color: #e4e4e7;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	/* 本文エリア */
-	.article-content-wrapper {
-		max-width: 860px;
-		margin: 0 auto;
-		padding: 56px 24px 0;
-	}
-
-	.article-main-body {
-		font-size: 1.0625rem;
-		line-height: 1.95;
-		color: #d1d5db;
-	}
-
-	.article-main-body :global(h2) {
-		font-size: 1.625rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 56px 0 24px;
-		padding-bottom: 12px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-	}
-
-	.article-main-body :global(p) {
-		margin-bottom: 24px;
-	}
-
-	/* ========================================================
-	   ★スライドギャラリー（Carousel）スタイル
-	======================================================== */
-	.slider-gallery-section {
-		margin: 64px 0;
-		padding: 32px 0 0;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	.gallery-section-header {
-		margin-bottom: 24px;
-	}
-
-	.gallery-tag, .accordion-tag {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: #38bdf8;
 		letter-spacing: 0.12em;
-		margin-bottom: 8px;
+		border-radius: 999px;
 	}
 
-	.tag-icon {
-		width: 14px;
-		height: 14px;
+	.brand-dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: #040507;
 	}
 
-	.gallery-heading, .accordion-heading {
-		font-size: 1.5rem;
+	.meta-category-pill {
+		padding: 4px 12px;
+		background: rgba(255, 255, 255, 0.12);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: #ffffff;
+		backdrop-filter: blur(8px);
+	}
+
+	.meta-date,
+	.meta-reading-time {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.65);
+		letter-spacing: 0.08em;
+	}
+
+	/* タイトル */
+	.article-main-title {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(32px, 3.8vw, 52px);
+		font-weight: 800;
+		line-height: 1.2;
+		letter-spacing: -0.015em;
+		color: #ffffff;
+		margin: 0 0 20px 0;
+		text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+	}
+
+	/* リード文 */
+	.article-lead-text {
+		font-size: clamp(16px, 1.5vw, 19px);
+		line-height: 1.7;
+		color: rgba(255, 255, 255, 0.9);
+		margin: 0 0 24px 0;
+		padding-left: 18px;
+		border-left: 3px solid #dfba73;
+		text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+	}
+
+	.article-photo-credit {
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		letter-spacing: 0.05em;
+	}
+
+	/* ============================================================== */
+	/* 2. 現代的エディトリアル本文 */
+	/* ============================================================== */
+	.article-body-container {
+		width: 100%;
+		padding: 40px 20px 80px 20px;
+	}
+
+	.article-prose-wrap {
+		width: 100%;
+		max-width: 820px;
+		margin: 0 auto;
+	}
+
+	.article-rich-text {
+		font-size: 17px;
+		line-height: 1.95;
+		color: #e4e6eb;
+		letter-spacing: 0.02em;
+	}
+
+	.article-rich-text :global(h2) {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(24px, 2.4vw, 30px);
 		font-weight: 700;
 		color: #ffffff;
-		margin: 0 0 8px;
+		margin: 64px 0 24px 0;
+		padding: 8px 0 8px 18px;
+		border-left: 3px solid #dfba73;
+		background: linear-gradient(90deg, rgba(223, 186, 115, 0.08) 0%, transparent 100%);
+		line-height: 1.35;
 	}
 
-	.gallery-sub, .accordion-sub {
-		font-size: 0.875rem;
-		color: #999999;
+	.article-rich-text :global(h3) {
+		font-size: 20px;
+		font-weight: 700;
+		color: #dfba73;
+		margin: 44px 0 18px 0;
+		line-height: 1.4;
+	}
+
+	.article-rich-text :global(p) {
+		margin-bottom: 28px;
+	}
+
+	.article-rich-text :global(img) {
+		width: 100%;
+		border-radius: 12px;
+		margin: 36px 0;
+		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+	}
+
+	.article-rich-text :global(blockquote) {
+		margin: 36px 0;
+		padding: 20px 24px;
+		background: rgba(223, 186, 115, 0.05);
+		border-left: 3px solid #dfba73;
+		border-radius: 0 8px 8px 0;
+		font-style: italic;
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.article-rich-text :global(a) {
+		color: #dfba73;
+		text-decoration: underline;
+		text-underline-offset: 4px;
+		transition: color 0.2s ease;
+	}
+
+	.article-rich-text :global(a:hover) {
+		color: #f0cb85;
+	}
+
+	/* ============================================================== */
+	/* スライダーギャラリーブロック */
+	/* ============================================================== */
+	.gallery-slider-block {
+		margin: 70px 0;
+		padding: 36px;
+		background: #0a0d12;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 16px;
+	}
+
+	.block-header {
+		margin-bottom: 24px;
+	}
+
+	.block-kicker {
+		font-size: 10.5px;
+		font-weight: 800;
+		letter-spacing: 0.2em;
+		color: #dfba73;
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.block-title {
+		font-size: 22px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	.block-sub {
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.55);
 		margin: 0;
 	}
 
-	.custom-carousel {
-		position: relative;
-		border-radius: 14px;
-		overflow: hidden;
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-	}
-
-	.carousel-viewport {
+	.slider-viewport {
 		position: relative;
 		overflow: hidden;
-		width: 100%;
-		height: 480px;
-		background: #000000;
+		border-radius: 10px;
+		background: #000;
 	}
 
-	.carousel-track {
+	.slider-track {
 		display: flex;
-		height: 100%;
-		transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-		will-change: transform;
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+		width: 100%;
 	}
 
-	.carousel-slide {
+	.slider-slide {
 		min-width: 100%;
-		height: 100%;
 		display: flex;
 		flex-direction: column;
-		position: relative;
 	}
 
-	.slide-image-wrap {
+	.slide-media {
 		position: relative;
-		width: 100%;
-		height: 400px;
-		background: #000000;
-		overflow: hidden;
+		height: 420px;
+		background: #000;
 	}
 
-	.slide-img {
+	.slide-media img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		display: block;
 	}
 
-	.slide-counter-badge {
+	.slide-badge {
 		position: absolute;
 		top: 14px;
 		right: 14px;
-		padding: 4px 10px;
-		background: rgba(0, 0, 0, 0.8);
-		backdrop-filter: blur(6px);
+		padding: 3px 10px;
+		background: rgba(0, 0, 0, 0.75);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 20px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
+		border-radius: 999px;
+		font-size: 11px;
 		font-weight: 700;
 		color: #ffffff;
+		backdrop-filter: blur(6px);
 	}
 
-	.slide-source-tag {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		padding: 4px 10px;
-		background: rgba(0, 102, 177, 0.85);
-		border-radius: 4px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
+	.slide-info {
+		padding: 20px;
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.slide-heading {
+		font-size: 16px;
 		font-weight: 700;
-		color: #ffffff;
+		color: #dfba73;
+		margin: 0 0 6px 0;
 	}
 
-	.slide-caption-bar {
-		padding: 16px 24px;
-		background: #111317;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.slide-title {
-		font-size: 1.0625rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 4px;
-	}
-
-	.slide-desc {
-		font-size: 0.8125rem;
-		color: #a0a0a0;
-		line-height: 1.5;
+	.slide-caption {
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.75);
+		line-height: 1.6;
 		margin: 0;
 	}
 
-	/* 矢印ボタン */
-	.carousel-arrow {
+	.slider-btn {
 		position: absolute;
-		top: 200px;
+		top: 40%;
 		transform: translateY(-50%);
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
-		background: rgba(13, 15, 18, 0.85);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.25);
+		background: rgba(0, 0, 0, 0.65);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		color: #ffffff;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
+		backdrop-filter: blur(8px);
+		transition: all 0.25s ease;
 		z-index: 10;
-		transition: all 0.2s ease;
 	}
 
-	.carousel-arrow:hover {
-		background: #0066b1;
-		border-color: #0066b1;
-		transform: translateY(-50%) scale(1.1);
+	.slider-btn svg {
+		width: 20px;
+		height: 20px;
 	}
 
-	.carousel-arrow svg {
-		width: 22px;
-		height: 22px;
+	.slider-btn:hover {
+		background: #dfba73;
+		color: #040507;
 	}
 
-	.carousel-arrow--prev {
-		left: 16px;
-	}
+	.slider-btn--prev { left: 16px; }
+	.slider-btn--next { right: 16px; }
 
-	.carousel-arrow--next {
-		right: 16px;
-	}
-
-	/* サムネイル一覧バー */
-	.carousel-thumbnails {
+	.slider-thumbnails {
 		display: flex;
-		gap: 8px;
-		padding: 12px 16px;
-		background: #0d0f12;
+		gap: 10px;
+		margin-top: 14px;
 		overflow-x: auto;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		padding-bottom: 6px;
 	}
 
-	.thumb-btn {
-		position: relative;
-		width: 72px;
-		height: 48px;
-		flex-shrink: 0;
+	.slider-thumb-btn {
+		width: 80px;
+		height: 52px;
 		border-radius: 6px;
 		overflow: hidden;
 		border: 2px solid transparent;
 		background: #000;
 		padding: 0;
 		cursor: pointer;
+		flex-shrink: 0;
 		opacity: 0.5;
-		transition: all 0.2s ease;
+		transition: opacity 0.25s ease, border-color 0.25s ease;
 	}
 
-	.thumb-btn img {
+	.slider-thumb-btn.is-active {
+		border-color: #dfba73;
+		opacity: 1;
+	}
+
+	.slider-thumb-btn img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		display: block;
 	}
 
-	.thumb-btn:hover {
-		opacity: 0.9;
+	/* ============================================================== */
+	/* アコーディオンブロック */
+	/* ============================================================== */
+	.accordion-details-block {
+		margin: 70px 0;
+		padding: 36px;
+		background: #0a0d12;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 16px;
 	}
 
-	.thumb-btn.active {
-		opacity: 1;
-		border-color: #0066b1;
-		transform: scale(1.05);
-	}
-
-	/* ========================================================
-	   ★アコーディオンツール スタイル
-	======================================================== */
-	.accordion-section {
-		margin: 64px 0;
-		padding: 40px 0 0;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	.accordion-section-header {
-		margin-bottom: 24px;
-	}
-
-	.accordion-container {
+	.modern-accordion-list {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 12px;
 	}
 
-	.acc-item {
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 10px;
+	.accordion-item {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 8px;
 		overflow: hidden;
-		transition: border-color 0.2s ease, background 0.2s ease;
+		transition: border-color 0.25s ease;
 	}
 
-	.acc-item[open] {
-		border-color: rgba(0, 102, 177, 0.6);
-		background: #14171d;
+	.accordion-item[open] {
+		border-color: rgba(223, 186, 115, 0.4);
+		background: rgba(223, 186, 115, 0.04);
 	}
 
-	.acc-trigger {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 20px 24px;
+	.accordion-summary {
+		padding: 16px 20px;
+		font-size: 15px;
+		font-weight: 700;
+		color: #ffffff;
 		cursor: pointer;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		user-select: none;
 		list-style: none;
 	}
 
-	.acc-trigger::-webkit-details-marker {
+	.accordion-summary::-webkit-details-marker {
 		display: none;
 	}
 
-	.acc-trigger-left {
-		display: flex;
-		align-items: center;
-		gap: 14px;
+	.accordion-icon {
+		font-size: 18px;
+		font-weight: 400;
+		color: #dfba73;
+		transition: transform 0.3s ease;
 	}
 
-	.acc-icon-wrap {
-		width: 34px;
-		height: 34px;
-		border-radius: 8px;
-		background: rgba(0, 102, 177, 0.2);
-		border: 1px solid rgba(0, 102, 177, 0.4);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #38bdf8;
-		flex-shrink: 0;
+	.accordion-item[open] .accordion-icon {
+		transform: rotate(45deg);
 	}
 
-	.acc-icon-wrap svg {
-		width: 18px;
-		height: 18px;
-	}
-
-	.acc-title {
-		font-size: 1.0625rem;
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.acc-toggle-indicator {
-		position: relative;
-		width: 18px;
-		height: 18px;
-		flex-shrink: 0;
-	}
-
-	.acc-toggle-indicator::before, .acc-toggle-indicator::after {
-		content: '';
-		position: absolute;
-		background: #a1a1aa;
-		transition: transform 0.25s ease;
-	}
-
-	/* 水平バー */
-	.acc-toggle-indicator::before {
-		top: 8px;
-		left: 1px;
-		width: 16px;
-		height: 2px;
-	}
-
-	/* 垂直バー */
-	.acc-toggle-indicator::after {
-		top: 1px;
-		left: 8px;
-		width: 2px;
-		height: 16px;
-	}
-
-	.acc-item[open] .acc-toggle-indicator::after {
-		transform: rotate(90deg);
-		opacity: 0;
-	}
-
-	.acc-item[open] .acc-toggle-indicator::before {
-		background: #38bdf8;
-	}
-
-	.acc-content {
-		padding: 0 24px 24px;
-		color: #d1d5db;
-		font-size: 0.9375rem;
+	.accordion-content {
+		padding: 0 20px 20px 20px;
+		font-size: 14px;
 		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.75);
 	}
 
-	/* スペック表 */
-	.spec-table-wrap {
-		overflow-x: auto;
+	.accordion-content p {
+		margin: 0;
 	}
 
-	.spec-table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 0.875rem;
+	/* ============================================================== */
+	/* 関連ショールームカード */
+	/* ============================================================== */
+	.showroom-feature-block {
+		margin: 70px 0;
 	}
 
-	.spec-table th, .spec-table td {
-		padding: 12px 16px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		text-align: left;
-	}
-
-	.spec-table th {
-		width: 200px;
-		color: #a1a1aa;
-		font-weight: 600;
-		background: rgba(255, 255, 255, 0.02);
-	}
-
-	.spec-table td {
-		color: #ffffff;
-	}
-
-	.spec-table td strong {
-		color: #38bdf8;
-	}
-
-	/* ラインナップカード */
-	.lineup-list {
+	.showroom-card-modern {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 16px;
-		margin-top: 8px;
-	}
-
-	.lineup-card {
-		padding: 18px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
-	}
-
-	.lineup-badge {
-		display: inline-block;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		color: #38bdf8;
-		background: rgba(0, 102, 177, 0.2);
-		padding: 2px 8px;
-		border-radius: 4px;
-		margin-bottom: 6px;
-	}
-
-	.lineup-badge--m { color: #facc15; background: rgba(234, 179, 8, 0.15); }
-	.lineup-badge--ice { color: #4ade80; background: rgba(34, 197, 94, 0.15); }
-	.lineup-badge--mhigh { color: #f87171; background: rgba(239, 68, 68, 0.2); }
-
-	.lineup-card h5 {
-		font-size: 0.9375rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 6px;
-	}
-
-	.lineup-card p {
-		font-size: 0.8125rem;
-		color: #999999;
-		margin: 0;
-		line-height: 1.5;
-	}
-
-	/* FAQ */
-	.faq-list {
-		display: flex;
-		flex-direction: column;
-		gap: 18px;
-	}
-
-	.faq-item {
-		display: flex;
-		gap: 14px;
-		padding: 14px 16px;
-		background: rgba(255, 255, 255, 0.02);
-		border-radius: 8px;
-	}
-
-	.q-mark {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 1.125rem;
-		font-weight: 800;
-		color: #0066b1;
-		flex-shrink: 0;
-	}
-
-	.q-body strong {
-		display: block;
-		font-size: 0.9375rem;
-		color: #ffffff;
-		margin-bottom: 6px;
-	}
-
-	.q-body p {
-		font-size: 0.875rem;
-		color: #a0a0a0;
-		margin: 0;
-		line-height: 1.6;
-	}
-
-	.program-steps {
-		padding-left: 20px;
-		margin: 0;
-	}
-
-	.program-steps li {
-		margin-bottom: 8px;
-		font-size: 0.875rem;
-	}
-
-	/* ========================================================
-	   ★関連拠点セクション（川崎ショールームカード）
-	======================================================== */
-	.related-location-card-box {
-		margin: 72px 0 56px;
-		padding: 36px;
-		background: linear-gradient(180deg, #101318 0%, #0d0f13 100%);
-		border: 1px solid rgba(0, 102, 177, 0.4);
+		grid-template-columns: 320px 1fr;
+		background: #090b0e;
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 16px;
-		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 102, 177, 0.15);
-	}
-
-	.box-tag {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: #38bdf8;
-		letter-spacing: 0.12em;
-		margin-bottom: 8px;
-	}
-
-	.tag-live-dot {
-		width: 7px;
-		height: 7px;
-		border-radius: 50%;
-		background: #38bdf8;
-		box-shadow: 0 0 8px #38bdf8;
-	}
-
-	.box-heading {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 8px;
-	}
-
-	.box-sub {
-		font-size: 0.9375rem;
-		color: #a0a0a0;
-		margin: 0 0 28px;
-	}
-
-	.showroom-banner-card {
-		display: grid;
-		grid-template-columns: 340px 1fr;
-		gap: 28px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
 		overflow: hidden;
-		transition: border-color 0.2s ease;
+		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 	}
 
-	.showroom-banner-card:hover {
-		border-color: rgba(0, 102, 177, 0.6);
-	}
-
-	.showroom-banner-media {
+	.showroom-card-media {
 		position: relative;
-		height: 100%;
-		min-height: 240px;
-		background: #000000;
-	}
-
-	.showroom-banner-img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-	}
-
-	.showroom-banner-pill {
-		position: absolute;
-		top: 12px;
-		left: 12px;
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 4px 10px;
-		background: rgba(0, 0, 0, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.showroom-banner-body {
-		padding: 24px 24px 24px 0;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.location-area-badge {
-		font-size: 0.75rem;
-		color: #38bdf8;
-		font-weight: 600;
-		margin-bottom: 6px;
-	}
-
-	.showroom-banner-title {
-		font-size: 1.375rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 10px;
-	}
-
-	.showroom-banner-desc {
-		font-size: 0.875rem;
-		line-height: 1.6;
-		color: #b0b4ba;
-		margin: 0 0 16px;
-	}
-
-	.showroom-banner-meta {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		font-size: 0.8125rem;
-		margin-bottom: 16px;
-		padding-bottom: 14px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.meta-label {
-		color: #71717a;
-	}
-
-	.meta-val {
-		color: #e4e4e7;
-	}
-
-	.tel-text {
-		color: #38bdf8;
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 700;
-		text-decoration: none;
-	}
-
-	.showroom-banner-features {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		margin-bottom: 24px;
-	}
-
-	.feat-tag {
-		font-size: 0.75rem;
-		color: #93c5fd;
-		background: rgba(0, 102, 177, 0.15);
-		border: 1px solid rgba(0, 102, 177, 0.3);
-		padding: 2px 8px;
-		border-radius: 4px;
-	}
-
-	.showroom-banner-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		margin-top: auto;
-	}
-
-	.btn-goto-showroom {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 22px;
-		background: #0066b1;
-		color: #ffffff;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 700;
-		text-decoration: none;
-		box-shadow: 0 4px 16px rgba(0, 102, 177, 0.4);
-		transition: all 0.2s ease;
-	}
-
-	.btn-goto-showroom:hover {
-		background: #0077cf;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 20px rgba(0, 102, 177, 0.55);
-	}
-
-	.btn-arrow {
-		width: 16px;
-		height: 16px;
-		transition: transform 0.2s ease;
-	}
-
-	.btn-goto-showroom:hover .btn-arrow {
-		transform: translateX(3px);
-	}
-
-	.btn-goto-gmaps {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 12px 18px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 6px;
-		color: #ffffff;
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s ease;
-	}
-
-	.btn-goto-gmaps:hover {
-		background: rgba(255, 255, 255, 0.16);
-		border-color: #ffffff;
-	}
-
-	.btn-svg {
-		width: 15px;
-		height: 15px;
-	}
-
-	/* ========================================================
-	   ★関連記事セクション（Related Articles）
-	======================================================== */
-	.section-related-posts, .section-popular-posts {
-		margin: 64px 0 0;
-		padding-top: 48px;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	.section-badge-label {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		color: #0066b1;
-		letter-spacing: 0.14em;
-		margin-bottom: 6px;
-	}
-
-	.section-posts-title {
-		font-size: 1.375rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 24px;
-	}
-
-	.related-posts-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-		gap: 20px;
-	}
-
-	.related-post-card {
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
-		overflow: hidden;
-		text-decoration: none;
-		display: flex;
-		flex-direction: column;
-		transition: transform 0.2s ease, border-color 0.2s ease;
-	}
-
-	.related-post-card:hover {
-		transform: translateY(-3px);
-		border-color: rgba(0, 102, 177, 0.5);
-	}
-
-	.rel-media {
-		position: relative;
-		height: 150px;
 		background: #000;
 	}
 
-	.rel-media img {
+	.showroom-card-media img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 	}
 
-	.rel-brand-chip {
+	.showroom-brand-tag {
 		position: absolute;
-		top: 10px;
-		left: 10px;
-		padding: 2px 8px;
-		background: rgba(0, 102, 177, 0.9);
-		border-radius: 3px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
+		top: 14px;
+		left: 14px;
+		padding: 3px 10px;
+		background: rgba(4, 5, 7, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		font-size: 10.5px;
 		font-weight: 700;
 		color: #ffffff;
+		backdrop-filter: blur(6px);
 	}
 
-	.rel-body {
+	.showroom-card-body {
+		padding: 32px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.showroom-kicker {
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.2em;
+		color: #dfba73;
+		margin-bottom: 6px;
+	}
+
+	.showroom-title {
+		font-size: 20px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 4px 0;
+	}
+
+	.showroom-sub {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.5);
+		margin: 0 0 20px 0;
+	}
+
+	.showroom-details {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-bottom: 24px;
 		padding: 16px;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+	}
+
+	.detail-row {
+		display: flex;
+		align-items: baseline;
+		gap: 14px;
+		font-size: 12.5px;
+	}
+
+	.detail-label {
+		font-size: 9.5px;
+		font-weight: 800;
+		letter-spacing: 0.15em;
+		color: #dfba73;
+		width: 90px;
+		flex-shrink: 0;
+	}
+
+	.detail-val {
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.showroom-actions {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-top: auto;
+		flex-wrap: wrap;
+	}
+
+	.btn-showroom-detail {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 11px 22px;
+		background: #dfba73;
+		color: #040507;
+		font-size: 12px;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		border-radius: 6px;
+		text-decoration: none;
+		transition: all 0.25s ease;
+	}
+
+	.btn-showroom-detail svg {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.25s ease;
+	}
+
+	.btn-showroom-detail:hover {
+		background: #f0cb85;
+		transform: translateY(-2px);
+	}
+
+	.btn-showroom-detail:hover svg {
+		transform: translateX(3px);
+	}
+
+	.btn-showroom-map {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.6);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.btn-showroom-map:hover {
+		color: #dfba73;
+	}
+
+	/* ============================================================== */
+	/* シェアバー ＆ バックリンク */
+	/* ============================================================== */
+	.article-share-bar {
+		margin: 60px 0 40px 0;
+		padding: 24px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.share-label {
+		font-size: 11px;
+		font-weight: 800;
+		letter-spacing: 0.2em;
+		color: #dfba73;
+	}
+
+	.share-buttons {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.share-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 16px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 999px;
+		font-size: 12px;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.85);
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.25s ease;
+	}
+
+	.share-btn svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	.share-btn:hover {
+		background: rgba(255, 255, 255, 0.15);
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.35);
+	}
+
+	.article-back-nav {
+		text-align: center;
+		margin-top: 50px;
+	}
+
+	.btn-back-to-magazine {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 13px 28px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(223, 186, 115, 0.4);
+		color: #dfba73;
+		border-radius: 999px;
+		font-size: 13px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		transition: all 0.3s ease;
+	}
+
+	.btn-back-to-magazine svg {
+		width: 16px;
+		height: 16px;
+		transition: transform 0.3s ease;
+	}
+
+	.btn-back-to-magazine:hover {
+		background: #dfba73;
+		color: #040507;
+	}
+
+	.btn-back-to-magazine:hover svg {
+		transform: translateX(-4px);
+	}
+
+	/* ============================================================== */
+	/* 3. おすすめ記事セクション */
+	/* ============================================================== */
+	.recommended-stories-section {
+		padding: 80px 0 100px 0;
+		background: #040507;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.recommended-container {
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 30px;
+	}
+
+	.recommended-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 36px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.rec-kicker {
+		font-size: 10.5px;
+		font-weight: 800;
+		letter-spacing: 0.22em;
+		color: #dfba73;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.rec-title {
+		font-size: 24px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+	}
+
+	.rec-all-link {
+		font-size: 12.5px;
+		color: rgba(255, 255, 255, 0.6);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.rec-all-link:hover {
+		color: #dfba73;
+	}
+
+	.recommended-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 24px;
+	}
+
+	.rec-card {
+		background: #090b0e;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+	}
+
+	.rec-card:hover {
+		transform: translateY(-5px);
+		border-color: rgba(223, 186, 115, 0.4);
+		box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+	}
+
+	.rec-card-link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.rec-card-media {
+		position: relative;
+		height: 190px;
+		background: #000;
+		overflow: hidden;
+	}
+
+	.rec-card-media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.rec-card:hover .rec-card-media img {
+		transform: scale(1.05);
+	}
+
+	.rec-card-brand {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		padding: 3px 9px;
+		background: rgba(4, 5, 7, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		font-size: 10px;
+		font-weight: 700;
+		color: #ffffff;
+		backdrop-filter: blur(6px);
+	}
+
+	.rec-card-body {
+		padding: 20px;
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
 	}
 
-	.rel-meta {
+	.rec-card-meta {
 		display: flex;
-		justify-content: space-between;
-		font-size: 0.6875rem;
-		color: #71717a;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		color: #dfba73;
+		font-weight: 600;
 		margin-bottom: 8px;
 	}
 
-	.rel-title {
-		font-size: 0.9375rem;
-		font-weight: 700;
-		color: #ffffff;
-		line-height: 1.45;
-		margin: 0 0 12px;
+	.rec-meta-sep {
+		opacity: 0.4;
+		color: rgba(255, 255, 255, 0.4);
 	}
 
-	.rel-views {
-		font-size: 0.6875rem;
-		color: #38bdf8;
-		margin-top: auto;
-	}
-
-	/* ========================================================
-	   ★人気ランキング（Popular Ranking）
-	======================================================== */
-	.popular-ranking-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-
-	.popular-rank-item {
-		display: grid;
-		grid-template-columns: 36px 100px 1fr;
-		gap: 16px;
-		align-items: center;
-		padding: 12px;
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
-		text-decoration: none;
-		transition: all 0.2s ease;
-	}
-
-	.popular-rank-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.18);
-		transform: translateX(4px);
-	}
-
-	.rank-badge {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 1.125rem;
-		font-weight: 800;
-		color: #71717a;
-		text-align: center;
-	}
-
-	.rank-badge--1 {
-		color: #facc15;
-	}
-
-	.rank-badge--2 {
-		color: #cbd5e1;
-	}
-
-	.rank-badge--3 {
-		color: #f97316;
-	}
-
-	.pop-media {
-		width: 100px;
-		height: 64px;
-		border-radius: 6px;
-		overflow: hidden;
-		background: #000;
-	}
-
-	.pop-media img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.pop-info {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.pop-brand-tag {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.625rem;
-		font-weight: 700;
-		padding: 1px 6px;
-		border-radius: 3px;
-		width: fit-content;
-	}
-
-	.pop-brand-tag--bmw { background: rgba(0, 102, 177, 0.25); color: #38bdf8; border: 1px solid rgba(0, 102, 177, 0.4); }
-	.pop-brand-tag--mini { background: rgba(255, 255, 255, 0.1); color: #ffffff; }
-	.pop-brand-tag--ferrari { background: rgba(212, 0, 0, 0.25); color: #f87171; border: 1px solid rgba(212, 0, 0, 0.4); }
-
-	.pop-title {
-		font-size: 0.875rem;
+	.rec-card-title {
+		font-size: 14.5px;
 		font-weight: 600;
-		color: #e4e4e7;
-		line-height: 1.4;
-		margin: 0;
-	}
-
-	.pop-meta {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 0.6875rem;
-		color: #71717a;
-	}
-
-	.pop-eye {
-		width: 12px;
-		height: 12px;
-	}
-
-	/* フッターナビ */
-	.article-footer-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-top: 36px;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-		gap: 16px;
-		flex-wrap: wrap;
-		margin-top: 48px;
-	}
-
-	.btn-back-magazine, .btn-all-locations {
-		color: #a1a1aa;
-		text-decoration: none;
-		font-size: 0.875rem;
-		font-weight: 500;
-		transition: color 0.2s ease;
-	}
-
-	.btn-back-magazine:hover, .btn-all-locations:hover {
+		line-height: 1.45;
 		color: #ffffff;
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.25s ease;
 	}
 
-	/* レスポンシブ */
-	@media (max-width: 900px) {
-		.showroom-banner-card {
+	.rec-card:hover .rec-card-title {
+		color: #dfba73;
+	}
+
+	/* ============================================================== */
+	/* レスポンシブ対応 */
+	/* ============================================================== */
+	@media (max-width: 992px) {
+		.showroom-card-modern {
 			grid-template-columns: 1fr;
 		}
 
-		.showroom-banner-media {
+		.showroom-card-media {
 			height: 220px;
 		}
 
-		.showroom-banner-body {
-			padding: 24px;
-		}
-
-		.lineup-list {
+		.recommended-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.carousel-viewport {
-			height: 420px;
-		}
-
-		.slide-image-wrap {
-			height: 330px;
 		}
 	}
 
-	@media (max-width: 640px) {
-		.article-header {
-			padding: 40px 16px 0;
+	@media (max-width: 768px) {
+		.article-hero-wrap {
+			min-height: 70vh;
+			padding-top: 80px;
 		}
 
-		.article-content-wrapper {
-			padding: 36px 16px 0;
+		.article-hero-container {
+			padding: 20px 16px 36px 16px;
 		}
 
-		.related-location-card-box {
-			padding: 24px 16px;
+		.article-main-title {
+			font-size: 28px;
 		}
 
-		.showroom-banner-actions {
+		.article-lead-text {
+			font-size: 15px;
+		}
+
+		.slide-media {
+			height: 260px;
+		}
+
+		.gallery-slider-block,
+		.accordion-details-block {
+			padding: 20px;
+		}
+
+		.showroom-card-body {
+			padding: 20px;
+		}
+
+		.article-share-bar {
 			flex-direction: column;
+			align-items: stretch;
 		}
 
-		.btn-goto-showroom, .btn-goto-gmaps {
+		.share-buttons {
+			width: 100%;
+			justify-content: stretch;
+		}
+
+		.share-btn {
+			flex-grow: 1;
 			justify-content: center;
-		}
-
-		.popular-rank-item {
-			grid-template-columns: 24px 70px 1fr;
-			gap: 10px;
-		}
-
-		.pop-media {
-			width: 70px;
-			height: 50px;
-		}
-
-		.pop-title {
-			font-size: 0.8125rem;
-		}
-
-		.carousel-viewport {
-			height: 360px;
-		}
-
-		.slide-image-wrap {
-			height: 270px;
-		}
-
-		.carousel-arrow {
-			width: 36px;
-			height: 36px;
-			top: 135px;
-		}
-
-		.acc-trigger {
-			padding: 16px;
-		}
-
-		.acc-title {
-			font-size: 0.9375rem;
 		}
 	}
 </style>
