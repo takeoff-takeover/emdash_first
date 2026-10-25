@@ -28,7 +28,12 @@
 				},
 				{
 					"slug": "featured_image",
-					"label": "Featured Image",
+					"label": "Featured Image (PC用)",
+					"type": "image"
+				},
+				{
+					"slug": "featured_image_sp",
+					"label": "Featured Image (スマホ用)",
 					"type": "image"
 				},
 				{

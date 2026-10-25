@@ -172,7 +172,10 @@ function getImageUrl(img: unknown): string {
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
 const isDemoArticle = isNeueKlasse || slug === "202608_bmw_kids_mechanic";
 const featuredImage = post.data.featured_image;
+const featuredImageSp = (post.data as any).featured_image_sp;
+
 const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
+const heroImageUrlSp = getImageUrl(featuredImageSp);
 const hasShowroom = Boolean((post.data as any).related_location) || isDemoArticle;
 
 // スライドギャラリー写真データ（BMW Group PressClub 公式高解像度写真）
@@ -270,14 +273,19 @@ const relatedStories = [
 		<!-- 1. 上部：大迫力フルワイド・ヒーロー写真 ＆ 表題 -->
 		<!-- ============================================================== -->
 		<header class="article-hero-wrap">
-			<!-- 巨大アイキャッチ画像 -->
+			<!-- 巨大アイキャッチ画像（PC/スマホ別登録・切り替え対応） -->
 			<div class="article-hero-bg">
-				<img 
-					src={heroImageUrl} 
-					alt={post.data.title} 
-					class="article-hero-img" 
-					loading="eager" 
-				/>
+				<picture>
+					{heroImageUrlSp && (
+						<source media="(max-width: 768px)" srcset={heroImageUrlSp} />
+					)}
+					<img 
+						src={heroImageUrl} 
+						alt={post.data.title} 
+						class="article-hero-img" 
+						loading="eager" 
+					/>
+				</picture>
 				<div class="article-hero-gradient"></div>
 			</div>
 
@@ -635,6 +643,12 @@ const relatedStories = [
 		width: 100%;
 		height: 100%;
 		z-index: 1;
+	}
+
+	.article-hero-bg picture {
+		width: 100%;
+		height: 100%;
+		display: block;
 	}
 
 	.article-hero-img {
