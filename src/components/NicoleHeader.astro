@@ -4,39 +4,39 @@
 
 const brands = [
 	{ 
+		name: "ALPINA", 
+		corp: "Nicole Automobiles", 
+		logo: "/brands/alpina.png", 
+		url: "https://nicole-automobiles.com/",
+		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学"
+	},
+	{ 
 		name: "BMW", 
 		corp: "Nicole Cars", 
-		badge: "正規ディーラー", 
+		logo: "/brands/bmw.svg", 
 		url: "https://www.nicole.co.jp/bmw/",
 		desc: "駆けぬける歓びの真価を東京・神奈川からお届けする正規ディーラー"
 	},
 	{ 
 		name: "MINI", 
 		corp: "Nicole Cars", 
-		badge: "正規ディーラー", 
+		logo: "/brands/mini.svg", 
 		url: "https://www.nicole.co.jp/mini/",
 		desc: "時代を切り拓くアイコニックデザインとゴーカート・フィーリング"
 	},
 	{ 
 		name: "Rolls-Royce", 
 		corp: "Nicole MotorCars", 
-		badge: "正規ディーラー", 
+		logo: "/brands/rolls-royce.svg", 
 		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
 		desc: "静寂と至高の美。ビスポークが紡ぎ出す世界唯一のラグジュアリー"
 	},
 	{ 
 		name: "Ferrari", 
 		corp: "Nicole Competizione", 
-		badge: "正規ディーラー", 
+		logo: "/brands/ferrari.svg", 
 		url: "https://yokohama.ferraridealers.com/ja-JP",
 		desc: "跳ね馬の情熱とレーシングスピリットを横浜から体現"
-	},
-	{ 
-		name: "ALPINA", 
-		corp: "Nicole Automobiles", 
-		badge: "1965-2025", 
-		url: "https://nicole-automobiles.com/",
-		desc: "半世紀にわたる総輸入元としての誇りと継承される哲学"
 	}
 ];
 
@@ -83,8 +83,10 @@ const corporateLinks = [
 								{brands.map((b) => (
 									<a href={b.url} class="brand-dropdown-card" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
 										<div class="brand-dropdown-card__top">
-											<span class="brand-dropdown-card__name">{b.name}</span>
-											<span class="brand-dropdown-card__badge">{b.badge}</span>
+											<div class="brand-dropdown-card__head">
+												<img src={b.logo} alt="" class="brand-dropdown-card__logo" loading="lazy" />
+												<span class="brand-dropdown-card__name">{b.name}</span>
+											</div>
 										</div>
 										<p class="brand-dropdown-card__corp">{b.corp}</p>
 										<p class="brand-dropdown-card__desc">{b.desc}</p>
@@ -314,33 +316,87 @@ const corporateLinks = [
 			});
 		});
 
-		// 4. メガメニューのPCクリック/ホバー挙動改善
-		const dropdownButtons = document.querySelectorAll('.nav-item--has-dropdown .nav-link--btn');
-		dropdownButtons.forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				e.preventDefault();
-				const parent = btn.closest('.nav-item--has-dropdown');
-				const isCurrentExpanded = btn.getAttribute('aria-expanded') === 'true';
+		// 4. グローバルメニューのホバー/ポインター連動（指/マウスを置いたらドロップダウン、移動したら隠れる）
+		const dropdownItems = document.querySelectorAll('.nav-item--has-dropdown');
+		let activeTimeout = null;
 
-				// 他を閉じる
-				dropdownButtons.forEach(otherBtn => {
-					otherBtn.setAttribute('aria-expanded', 'false');
-					otherBtn.closest('.nav-item--has-dropdown')?.classList.remove('is-active');
-				});
+		dropdownItems.forEach(item => {
+			const btn = item.querySelector('.nav-link--btn');
 
-				if (!isCurrentExpanded) {
-					btn.setAttribute('aria-expanded', 'true');
-					parent?.classList.add('is-active');
+			const openDropdown = () => {
+				if (activeTimeout) {
+					clearTimeout(activeTimeout);
+					activeTimeout = null;
 				}
+				dropdownItems.forEach(otherItem => {
+					if (otherItem !== item) {
+						otherItem.classList.remove('is-active');
+						otherItem.querySelector('.nav-link--btn')?.setAttribute('aria-expanded', 'false');
+					}
+				});
+				item.classList.add('is-active');
+				btn?.setAttribute('aria-expanded', 'true');
+			};
+
+			const closeDropdown = () => {
+				if (activeTimeout) {
+					clearTimeout(activeTimeout);
+				}
+				activeTimeout = setTimeout(() => {
+					item.classList.remove('is-active');
+					btn?.setAttribute('aria-expanded', 'false');
+					activeTimeout = null;
+				}, 150);
+			};
+
+			// 指やマウスを置いたら即座にウィンドウダウン
+			item.addEventListener('mouseenter', openDropdown);
+			item.addEventListener('pointerenter', (e) => {
+				if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+					openDropdown();
+				}
+			});
+
+			// 他の場所へ移動したらスムーズに隠れる
+			item.addEventListener('mouseleave', closeDropdown);
+			item.addEventListener('pointerleave', (e) => {
+				if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+					closeDropdown();
+				}
+			});
+
+			// クリック/タップ（タッチ端末対応）
+			if (btn) {
+				btn.addEventListener('click', (e) => {
+					e.preventDefault();
+					const isCurrentlyActive = item.classList.contains('is-active');
+					if (isCurrentlyActive) {
+						item.classList.remove('is-active');
+						btn.setAttribute('aria-expanded', 'false');
+					} else {
+						openDropdown();
+					}
+				});
+			}
+		});
+
+		// ドロップダウンを持たない他のメニュー項目に移動したら即座に閉じる
+		const directLinks = document.querySelectorAll('.desktop-nav .nav-link:not(.nav-link--btn), .nav-cta-btn');
+		directLinks.forEach(link => {
+			link.addEventListener('mouseenter', () => {
+				dropdownItems.forEach(item => {
+					item.classList.remove('is-active');
+					item.querySelector('.nav-link--btn')?.setAttribute('aria-expanded', 'false');
+				});
 			});
 		});
 
 		// 外側クリックでメガメニューを閉じる
 		document.addEventListener('click', (e) => {
 			if (!e.target.closest('.nav-item--has-dropdown')) {
-				dropdownButtons.forEach(btn => {
-					btn.setAttribute('aria-expanded', 'false');
-					btn.closest('.nav-item--has-dropdown')?.classList.remove('is-active');
+				dropdownItems.forEach(item => {
+					item.classList.remove('is-active');
+					item.querySelector('.nav-link--btn')?.setAttribute('aria-expanded', 'false');
 				});
 			}
 		});
@@ -513,13 +569,19 @@ const corporateLinks = [
 	}
 
 	/* ============================================================== */
+	/* ドロップダウン付きナビアイテムのホバー領域拡張 */
+	.nav-item--has-dropdown {
+		position: relative;
+		padding-bottom: 12px;
+		margin-bottom: -12px;
+	}
+
 	/* ドロップダウン・メガメニュー（エディトリアル展開） */
-	/* ============================================================== */
 	.dropdown-menu {
 		position: absolute;
 		top: 100%;
 		left: 50%;
-		transform: translateX(-50%) translateY(16px);
+		transform: translateX(-50%) translateY(10px);
 		background: rgba(11, 13, 17, 0.96);
 		backdrop-filter: blur(24px);
 		-webkit-backdrop-filter: blur(24px);
@@ -530,16 +592,27 @@ const corporateLinks = [
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
-		transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+		transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
 	}
 
-	/* ホバーまたはアクティブで展開 */
-	.nav-item:hover .dropdown-menu,
-	.nav-item.is-active .dropdown-menu {
+	/* メニュー間の移動中に切れないようにするホバーブリッジ */
+	.dropdown-menu::before {
+		content: '';
+		position: absolute;
+		top: -20px;
+		left: 0;
+		width: 100%;
+		height: 20px;
+		background: transparent;
+	}
+
+	/* 指/マウスを置いたらウインドウダウン、移動したら隠れる */
+	.nav-item--has-dropdown:hover .dropdown-menu,
+	.nav-item--has-dropdown.is-active .dropdown-menu {
 		opacity: 1;
 		visibility: visible;
 		pointer-events: auto;
-		transform: translateX(-50%) translateY(8px);
+		transform: translateX(-50%) translateY(0);
 	}
 
 	.dropdown-menu--brands {
@@ -601,7 +674,25 @@ const corporateLinks = [
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 4px;
+		margin-bottom: 6px;
+	}
+
+	.brand-dropdown-card__head {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.brand-dropdown-card__logo {
+		width: 22px;
+		height: 22px;
+		object-fit: contain;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+		transition: transform 0.3s ease;
+	}
+
+	.brand-dropdown-card:hover .brand-dropdown-card__logo {
+		transform: scale(1.15);
 	}
 
 	.brand-dropdown-card__name {
@@ -609,13 +700,6 @@ const corporateLinks = [
 		font-size: 16px;
 		font-weight: 700;
 		color: #ffffff;
-	}
-
-	.brand-dropdown-card__badge {
-		font-size: 9px;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		color: #c5a059;
 	}
 
 	.brand-dropdown-card__corp {
