@@ -2,80 +2,157 @@
 // src/components/NicoleHomeMain.astro
 // ニコル・グループ公式 トップページ（シネマティック＆ミニマル・エディトリアル新デザイン）
 
-// 特集マガジンデータ（メイン・大型スライダー／グリッド）
-const featuredMagazines = [
+import { getEmDashCollection } from "emdash";
+
+// CMS（postsコレクション）から最新記事を取得（エラー時は安全にフォールバック）
+let cmsPosts: any[] = [];
+try {
+	const result = await getEmDashCollection("posts", {
+		orderBy: { published_at: "desc" },
+		limit: 12,
+	});
+	cmsPosts = result?.entries || [];
+} catch (e) {
+	console.warn("Could not fetch CMS posts for home page:", e);
+}
+
+// 静的アーカイブ記事データ（フォールバックおよびベース記事カタログ）
+const fallbackInsights = [
 	{
-		id: "bmw-3series",
+		id: "2027_new_bmw_3series_neue_klasse",
+		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
 		category: "BMW",
 		date: "2026.10.22",
-		views: "8,150",
+		readTime: "6 MIN READ",
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		url: "/magazine/2027_new_bmw_3series_neue_klasse/",
-		lead: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。"
+		lead: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。",
+		url: "/magazine/2027_new_bmw_3series_neue_klasse/"
 	},
 	{
-		id: "ferrari-luce",
+		id: "202610_mini_united-japan-2026",
+		slug: "202610_mini_united-japan-2026",
+		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
+		category: "MINI",
+		date: "2026.10.15",
+		readTime: "4 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
+		lead: "全国のMINIオーナーが集い、笑顔と情熱を分かち合った特別なファンミーティングの模様をレポート。",
+		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
+	},
+	{
+		id: "202608_ferrari_luce",
+		slug: "202608_ferrari_luce",
 		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
 		category: "Ferrari",
 		date: "2026.08.17",
-		views: "1,505",
+		readTime: "5 MIN READ",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
-		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/",
-		lead: "跳ね馬の血統を受け継ぐエレクトリック・スーパーカー。マラネッロの情熱が宿る未踏のパフォーマンス。"
+		lead: "跳ね馬の血統を受け継ぐエレクトリック・スーパーカー。マラネッロの情熱が宿る未踏のパフォーマンス。",
+		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
 	},
 	{
-		id: "mini-jcw",
-		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
-		category: "MINI",
-		date: "2026.07.14",
-		views: "483",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
-		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/",
-		lead: "ゴーカート・フィーリングの極致。モータースポーツのDNAを濃縮した特別な限定車を全国独占デリバリー。"
-	},
-	{
-		id: "kids-mechanic",
+		id: "202608_bmw_kids_mechanic",
+		slug: "202608_bmw_kids_mechanic",
 		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 		category: "BMW",
 		date: "2026.08.20",
-		views: "96",
+		readTime: "4 MIN READ",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
-		url: "/magazine/202608_bmw_kids_mechanic/",
-		lead: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。"
-	}
-];
-
-// サブ特集記事リスト
-const subMagazines = [
+		lead: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。",
+		url: "/magazine/202608_bmw_kids_mechanic/"
+	},
 	{
+		id: "20260714_mini_jcw_track_style_edition",
+		slug: "20260714_mini_jcw_track_style_edition",
+		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
+		category: "MINI",
+		date: "2026.07.14",
+		readTime: "5 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		lead: "ゴーカート・フィーリングの極致。モータースポーツのDNAを濃縮した特別な限定車を全国独占デリバリー。",
+		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/"
+	},
+	{
+		id: "20260707_ferrari_challenge_invitation",
+		slug: "20260707_ferrari_challenge_invitation",
 		title: "跳ね馬の本能を呼び覚ます。フェラーリ・チャレンジへの招待",
 		category: "Ferrari",
 		date: "2026.07.07",
+		readTime: "4 MIN READ",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "サーキットを疾走する純粋な興奮。オーナー限定ワンメイクレースシリーズの世界へ。",
 		url: "https://www.nicole.co.jp/magazine/20260707_ferrari_challenge_invitation/"
 	},
 	{
+		id: "202607_new_bmw_x5",
+		slug: "202607_new_bmw_x5",
 		title: "新たなデザイン言語と5つの動力。第5世代、New BMW X5 誕生",
 		category: "BMW",
 		date: "2026.07.01",
+		readTime: "5 MIN READ",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC6630.jpg",
+		lead: "プレミアムSUVのパイオニアが劇的な進化。新世代オペレーティングシステムと極上の快適性。",
 		url: "https://www.nicole.co.jp/magazine/202607_new_bmw_x5/"
 	},
 	{
-		title: "愛車の輝きを10年守る。プロテクションフィルムの選び方とメーカー直結施工の真価",
-		category: "Service",
-		date: "2026.06.18",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/06/ppf_main.jpg",
-		url: "/magazine/"
+		id: "alpina-heritage-story",
+		slug: "alpina-heritage-story",
+		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
+		category: "ALPINA",
+		date: "2026.05.15",
+		readTime: "7 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "1965年から2025年まで、日本総輸入元としてアルピナの魅力を伝え続けてきた歴史と、未来へ受け継ぐメンテナンス体制。",
+		url: "https://nicole-automobiles.com/"
 	},
 	{
-		title: "2026年版 MINI全モデルの選び方｜3ドア・5ドア・エースマン・カントリーマンの違い",
-		category: "MINI",
-		date: "2026.06.10",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/06/mini_lineup_2026.jpg",
-		url: "/magazine/"
+		id: "rolls-royce-bespoke-world",
+		slug: "rolls-royce-bespoke-world",
+		title: "唯一無二を仕立てる。ロールス・ロイス・ビスポークの世界と横浜ショールームの誇り",
+		category: "Rolls-Royce",
+		date: "2026.04.28",
+		readTime: "6 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
+		lead: "4万4000色以上のパレットと無限の素材。オーナーの夢を形にするロールス・ロイスの最高峰クラフト。",
+		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/"
 	}
+];
+
+// CMS記事をBMW Group Insights形式に整形
+const formattedCmsArticles = (cmsPosts || []).map((p: any) => {
+	const featImg = p.data?.featured_image;
+	const imgUrl = typeof featImg === "object" && featImg !== null && "src" in featImg
+		? featImg.src
+		: (typeof featImg === "string" && featImg ? featImg : "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg");
+
+	const contentStr = typeof p.data?.content === "string" ? p.data.content : JSON.stringify(p.data?.content || "");
+	const readMinutes = Math.max(3, Math.min(12, Math.ceil(contentStr.length / 350)));
+	const readTime = `${readMinutes} MIN READ`;
+
+	const pubDate = p.data?.published_at 
+		? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.')
+		: "2026.10.25";
+
+	const brand = p.data?.related_location ? "BMW" : (p.data?.category || "INSIGHTS");
+
+	return {
+		id: p.id || p.data?.id,
+		slug: p.id,
+		title: p.data?.title || "Nicole Group Insights",
+		category: brand,
+		date: pubDate,
+		readTime,
+		image: imgUrl,
+		lead: p.data?.excerpt || "",
+		url: `/magazine/${p.id}/`
+	};
+});
+
+// CMS記事を最優先し、フォールバック記事とマージ（重複除外）
+const allInsights = [
+	...formattedCmsArticles,
+	...fallbackInsights.filter(fb => !formattedCmsArticles.some(c => c.id === fb.id || c.slug === fb.slug))
 ];
 
 // スタッフストーリー・コラム
@@ -258,85 +335,84 @@ const newsList = [
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 3. 特集マガジン（エディトリアル・大判カード＆グリッド） -->
+	<!-- 3. 特集マガジン：The latest Nicole Group Insights.（BMW Group Insights スタイル） -->
 	<!-- ============================================================== -->
-	<section class="editorial-magazine" id="magazine-section">
+	<section class="bmw-insights-section" id="magazine-section" aria-label="The latest Nicole Group Insights">
 		<div class="editorial-container">
-			<!-- セクションヘッダー -->
-			<div class="editorial-header">
-				<div class="editorial-header__left editorial-reveal">
-					<span class="editorial-num">02</span>
-					<span class="editorial-eyebrow">FEATURED STORIES</span>
-					<h2 class="editorial-title">MAGAZINE</h2>
-				</div>
-				<div class="editorial-header__right editorial-reveal" data-delay="200">
-					<p class="editorial-header__desc">
-						最新モデルのインプレッションから、オーナー様との対話、メカニックの舞台裏まで。ニコルならではの視点で綴るエディトリアル。
+			<!-- セクションヘッダー：BMW Group Insightsレイアウト -->
+			<div class="bmw-insights-header">
+				<div class="bmw-insights-header__title-group editorial-reveal">
+					<div class="bmw-insights-header__meta">
+						<span class="editorial-num">02</span>
+						<span class="bmw-insights-eyebrow">NICOLE CONNECT • WEB MAGAZINE</span>
+					</div>
+					<h2 class="bmw-insights-title">The latest Nicole Group Insights.</h2>
+					<p class="bmw-insights-subtitle">
+						最新モデルの試乗レポートから、オーナー様との対話、熟練メカニックのクラフトマンシップまで。
 					</p>
-					<a href="/magazine/" class="editorial-link-btn">
-						すべての記事を見る
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</div>
+				<div class="bmw-insights-header__actions editorial-reveal" data-delay="150">
+					<a href="/magazine/" class="bmw-insights-cta">
+						<span>Discover all insights</span>
+						<span class="bmw-insights-cta__icon">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-svg">
+								<path d="M5 12h14M12 5l7 7-7 7"/>
+							</svg>
+						</span>
 					</a>
+					<div class="bmw-insights-nav">
+						<button type="button" class="insights-nav-btn insights-nav-btn--prev" id="insights-prev-btn" aria-label="Previous article" disabled>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+						</button>
+						<button type="button" class="insights-nav-btn insights-nav-btn--next" id="insights-next-btn" aria-label="Next article">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+						</button>
+					</div>
 				</div>
 			</div>
 
-			<!-- メイン特集（大判フィーチャーグリッド） -->
-			<div class="magazine-lead-grid">
-				{featuredMagazines.map((item, idx) => (
-					<article class={`mag-card mag-card--${idx === 0 ? 'lead' : 'item'} editorial-reveal`} data-delay={idx * 150}>
-						<a href={item.url} class="mag-card__link">
-							<div class="mag-card__media">
-								<img 
-									src={item.image} 
-									alt={item.title} 
-									loading={idx === 0 ? "eager" : "lazy"} 
-									class="mag-card__img img-slow-zoom" 
-								/>
-								<div class="mag-card__gradient"></div>
-								<span class="mag-card__category">{item.category}</span>
-							</div>
-							<div class="mag-card__content">
-								<div class="mag-card__meta">
-									<time class="mag-card__date">{item.date}</time>
-									<span class="mag-card__meta-divider">/</span>
-									<span class="mag-card__views">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-										{item.views}
-									</span>
+			<!-- カルーセル / スライダーコンテナ -->
+			<div class="bmw-insights-slider-wrapper">
+				<div class="bmw-insights-slider" id="insights-slider" tabindex="0" role="region" aria-label="Insights Carousel">
+					{allInsights.map((item, idx) => (
+						<article class="bmw-insight-card editorial-reveal" data-delay={(idx % 6) * 80}>
+							<a href={item.url} class="bmw-insight-card__link">
+								<!-- メディアエリア：16:10 アスペクト比 ＆ 右下丸型アクションボタン -->
+								<div class="bmw-insight-card__media">
+									<img 
+										src={item.image} 
+										alt={item.title} 
+										loading={idx < 3 ? "eager" : "lazy"} 
+										class="bmw-insight-card__img" 
+									/>
+									<div class="bmw-insight-card__overlay"></div>
+									<div class="bmw-insight-card__badge" aria-hidden="true">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="card-arrow-svg">
+											<path d="M5 12h14M12 5l7 7-7 7"/>
+										</svg>
+									</div>
 								</div>
-								<h3 class="mag-card__title">{item.title}</h3>
-								{item.lead && (
-									<p class="mag-card__lead">{item.lead}</p>
-								)}
-								<div class="mag-card__readmore">
-									<span>READ ARTICLE</span>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-								</div>
-							</div>
-						</a>
-					</article>
-				))}
-			</div>
 
-			<!-- サブ特集のミニマルリストグリッド -->
-			<div class="sub-magazine-grid">
-				{subMagazines.map((sub, idx) => (
-					<article class="sub-mag-card editorial-reveal" data-delay={idx * 100}>
-						<a href={sub.url} class="sub-mag-card__link">
-							<div class="sub-mag-card__media">
-								<img src={sub.image} alt={sub.title} loading="lazy" class="sub-mag-card__img img-slow-zoom" />
-							</div>
-							<div class="sub-mag-card__body">
-								<div class="sub-mag-card__meta">
-									<span class="sub-mag-card__tag">{sub.category}</span>
-									<time class="sub-mag-card__date">{sub.date}</time>
+								<!-- メタオーバーライン：[CATEGORY] • [DATE] • [READING TIME] -->
+								<div class="bmw-insight-card__overline">
+									<span class="insight-overline__cat">{item.category}</span>
+									<span class="insight-overline__dot">•</span>
+									<time class="insight-overline__date">{item.date}</time>
+									<span class="insight-overline__dot">•</span>
+									<span class="insight-overline__read">{item.readTime}</span>
 								</div>
-								<h4 class="sub-mag-card__title">{sub.title}</h4>
-								<span class="sub-mag-card__arrow">→</span>
-							</div>
-						</a>
-					</article>
-				))}
+
+								<!-- ヘッドライン（タイトル） -->
+								<h3 class="bmw-insight-card__title">{item.title}</h3>
+
+								<!-- リード文（抜粋） -->
+								{item.lead && (
+									<p class="bmw-insight-card__lead">{item.lead}</p>
+								)}
+							</a>
+						</article>
+					))}
+				</div>
 			</div>
 		</div>
 	</section>
@@ -551,6 +627,39 @@ const newsList = [
 					ticking = true;
 				}
 			}, { passive: true });
+		}
+
+		// 4. The latest Nicole Group Insights スライダー（BMW Group TeaserSlider操作）
+		const slider = document.getElementById('insights-slider');
+		const prevBtn = document.getElementById('insights-prev-btn');
+		const nextBtn = document.getElementById('insights-next-btn');
+
+		if (slider && prevBtn && nextBtn) {
+			const updateSliderNav = () => {
+				const maxScroll = slider.scrollWidth - slider.clientWidth - 8;
+				prevBtn.disabled = slider.scrollLeft <= 5;
+				nextBtn.disabled = slider.scrollLeft >= maxScroll;
+			};
+
+			const getCardStep = () => {
+				const firstCard = slider.querySelector('.bmw-insight-card');
+				if (firstCard) {
+					return firstCard.offsetWidth + 28; // card width + gap
+				}
+				return slider.clientWidth * 0.75;
+			};
+
+			prevBtn.addEventListener('click', () => {
+				slider.scrollBy({ left: -getCardStep(), behavior: 'smooth' });
+			});
+
+			nextBtn.addEventListener('click', () => {
+				slider.scrollBy({ left: getCardStep(), behavior: 'smooth' });
+			});
+
+			slider.addEventListener('scroll', updateSliderNav, { passive: true });
+			window.addEventListener('resize', updateSliderNav, { passive: true });
+			updateSliderNav();
 		}
 	});
 </script>
@@ -915,193 +1024,186 @@ const newsList = [
 	}
 
 	/* ============================================================== */
-	/* 3. 特集マガジン（エディトリアル・カード） */
+	/* 3. 特集マガジン：The latest Nicole Group Insights.（BMW Group Insights スタイル） */
 	/* ============================================================== */
-	.editorial-magazine {
-		padding: 80px 0;
-	}
-
-	.magazine-lead-grid {
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-		gap: 28px;
-		margin-bottom: 40px;
-	}
-
-	/* 最初の記事は大判（8カラム） */
-	.mag-card--lead {
-		grid-column: span 8;
-	}
-
-	/* 2番目の記事は縦型（4カラム） */
-	.mag-card--item:nth-child(2) {
-		grid-column: span 4;
-	}
-
-	/* 3番目・4番目は半々（6カラムずつ） */
-	.mag-card--item:nth-child(3),
-	.mag-card--item:nth-child(4) {
-		grid-column: span 6;
-	}
-
-	.mag-card {
-		background: var(--bg-card);
-		border-radius: 12px;
-		overflow: hidden;
-		border: 1px solid var(--border-subtle);
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
-	}
-
-	.mag-card:hover {
-		transform: translateY(-6px);
-		border-color: rgba(255, 255, 255, 0.25);
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-	}
-
-	.mag-card__link {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.mag-card__media {
+	.bmw-insights-section {
+		padding: 96px 0 90px 0;
+		background: #08090b;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 		position: relative;
-		width: 100%;
-		height: 380px;
-		overflow: hidden;
-		background: #000;
 	}
 
-	.mag-card--lead .mag-card__media {
-		height: 480px;
-	}
-
-	.mag-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
-	}
-
-	.mag-card:hover .mag-card__img {
-		transform: scale(1.04);
-		filter: brightness(1.05);
-	}
-
-	.mag-card__gradient {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(180deg, transparent 40%, rgba(14, 16, 20, 0.8) 100%);
-		pointer-events: none;
-	}
-
-	.mag-card__category {
-		position: absolute;
-		top: 20px;
-		left: 20px;
-		padding: 4px 12px;
-		background: rgba(7, 8, 10, 0.85);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		color: #ffffff;
-		z-index: 2;
-	}
-
-	.mag-card__content {
-		padding: 28px 32px 32px 32px;
+	.bmw-insights-header {
 		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 32px;
+		margin-bottom: 44px;
 	}
 
-	.mag-card__meta {
+	.bmw-insights-header__title-group {
+		max-width: 720px;
+	}
+
+	.bmw-insights-header__meta {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		font-size: 12px;
-		color: var(--text-muted);
+		gap: 12px;
 		margin-bottom: 12px;
 	}
 
-	.mag-card__views {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
+	.bmw-insights-eyebrow {
+		display: inline-block;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--color-gold, #e6ca65);
 	}
 
-	.eye-icon {
+	.bmw-insights-title {
+		font-size: clamp(28px, 3.4vw, 44px);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		line-height: 1.16;
+		color: #ffffff;
+		margin: 0 0 10px 0;
+		font-family: var(--font-heading, "Outfit", sans-serif);
+	}
+
+	.bmw-insights-subtitle {
+		font-size: 14.5px;
+		color: #9aa0a6;
+		margin: 0;
+		line-height: 1.6;
+	}
+
+	.bmw-insights-header__actions {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		flex-shrink: 0;
+	}
+
+	/* 「すべての記事を見る」ボタン（BMW Group "Discover all insights" 風） */
+	.bmw-insights-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		padding: 10px 20px 10px 24px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		color: #ffffff;
+		text-decoration: none;
+		font-size: 13.5px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.bmw-insights-cta:hover {
+		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.5);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+	}
+
+	.bmw-insights-cta__icon {
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: #ffffff;
+		color: #08090b;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+	}
+
+	.bmw-insights-cta:hover .bmw-insights-cta__icon {
+		transform: scale(1.1) translateX(2px);
+		background: var(--color-gold, #e6ca65);
+	}
+
+	.cta-arrow-svg {
 		width: 14px;
 		height: 14px;
 	}
 
-	.mag-card__title {
-		font-size: clamp(17px, 1.8vw, 22px);
-		font-weight: 600;
-		line-height: 1.45;
+	/* スライダー左右ナビゲーションボタン */
+	.bmw-insights-nav {
+		display: flex;
+		gap: 8px;
+	}
+
+	.insights-nav-btn {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		background: rgba(20, 22, 28, 0.7);
+		backdrop-filter: blur(12px);
 		color: #ffffff;
-		margin: 0 0 12px 0;
-		transition: color 0.3s ease;
-	}
-
-	.mag-card:hover .mag-card__title {
-		color: var(--color-gold);
-	}
-
-	.mag-card__lead {
-		font-size: 13.5px;
-		color: var(--text-secondary);
-		line-height: 1.6;
-		margin: 0 0 20px 0;
-		flex-grow: 1;
-	}
-
-	.mag-card__readmore {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
-		gap: 6px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.7);
-		margin-top: auto;
-		transition: gap 0.3s ease, color 0.3s ease;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		padding: 0;
 	}
 
-	.mag-card:hover .mag-card__readmore {
-		color: #ffffff;
-		gap: 10px;
+	.insights-nav-btn svg {
+		width: 18px;
+		height: 18px;
+		stroke-width: 2.2;
 	}
 
-	/* サブマガジングリッド（4列） */
-	.sub-magazine-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
+	.insights-nav-btn:hover:not(:disabled) {
+		background: #ffffff;
+		color: #08090b;
+		border-color: #ffffff;
+		transform: scale(1.08);
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 	}
 
-	.sub-mag-card {
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: 8px;
-		overflow: hidden;
-		transition: all 0.3s ease;
+	.insights-nav-btn:disabled {
+		opacity: 0.25;
+		cursor: not-allowed;
+		pointer-events: none;
 	}
 
-	.sub-mag-card:hover {
-		border-color: rgba(255, 255, 255, 0.25);
-		transform: translateY(-4px);
+	/* スライダーコンテナ */
+	.bmw-insights-slider-wrapper {
+		position: relative;
+		width: 100%;
 	}
 
-	.sub-mag-card__link {
+	.bmw-insights-slider {
+		display: flex;
+		gap: 28px;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		-webkit-overflow-scrolling: touch;
+		padding: 8px 4px 28px 4px;
+		scrollbar-width: none;
+	}
+
+	.bmw-insights-slider::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* 記事カード（BMW Group TeaserNews仕様） */
+	.bmw-insight-card {
+		flex: 0 0 calc((100% - 56px) / 3.15);
+		scroll-snap-align: start;
+		min-width: 320px;
+		position: relative;
+	}
+
+	.bmw-insight-card__link {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -1109,67 +1211,137 @@ const newsList = [
 		color: inherit;
 	}
 
-	.sub-mag-card__media {
-		height: 160px;
+	/* カードメディア：16:10 アスペクト比＆角丸 */
+	.bmw-insight-card__media {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		border-radius: 12px;
 		overflow: hidden;
-		background: #000;
+		background: #12141a;
+		box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
 	}
 
-	.sub-mag-card__img {
+	.bmw-insight-card__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.6s ease;
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
 	}
 
-	.sub-mag-card:hover .sub-mag-card__img {
+	.bmw-insight-card__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+		pointer-events: none;
+	}
+
+	/* 右下フローティング丸型アクションボタン */
+	.bmw-insight-card__badge {
+		position: absolute;
+		bottom: 16px;
+		right: 16px;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(14, 16, 20, 0.75);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.28);
+		color: #ffffff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+		z-index: 2;
+	}
+
+	.card-arrow-svg {
+		width: 18px;
+		height: 18px;
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	/* ホバーアクション */
+	.bmw-insight-card:hover .bmw-insight-card__img {
 		transform: scale(1.06);
+		filter: brightness(1.04);
 	}
 
-	.sub-mag-card__body {
-		padding: 18px;
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-		position: relative;
+	.bmw-insight-card:hover .bmw-insight-card__badge {
+		background: var(--color-gold, #e6ca65);
+		color: #08090b;
+		border-color: var(--color-gold, #e6ca65);
+		transform: scale(1.1);
+		box-shadow: 0 6px 20px rgba(230, 202, 101, 0.4);
 	}
 
-	.sub-mag-card__meta {
+	.bmw-insight-card:hover .card-arrow-svg {
+		transform: translateX(3px);
+	}
+
+	/* メタオーバーライン：CATEGORY • DATE • READ TIME */
+	.bmw-insight-card__overline {
+		margin-top: 18px;
+		margin-bottom: 10px;
 		display: flex;
-		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
 		font-size: 11px;
-		color: var(--text-muted);
-		margin-bottom: 8px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #8e95a0;
 	}
 
-	.sub-mag-card__tag {
-		color: var(--color-gold);
-		font-weight: 600;
+	.insight-overline__cat {
+		color: #ffffff;
+		letter-spacing: 0.14em;
 	}
 
-	.sub-mag-card__title {
-		font-size: 13.5px;
-		font-weight: 500;
-		line-height: 1.5;
-		color: rgba(255, 255, 255, 0.9);
-		margin: 0;
+	.insight-overline__dot {
+		color: rgba(255, 255, 255, 0.25);
+		font-size: 10px;
+	}
+
+	.insight-overline__date {
+		color: #8e95a0;
+	}
+
+	.insight-overline__read {
+		color: #8e95a0;
+	}
+
+	/* 記事タイトル */
+	.bmw-insight-card__title {
+		font-size: 19px;
+		font-weight: 700;
+		line-height: 1.45;
+		color: #f5f6f8;
+		margin: 0 0 10px 0;
 		display: -webkit-box;
-		-webkit-line-clamp: 3;
+		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
+		transition: color 0.3s ease;
+		font-family: var(--font-heading, "Outfit", sans-serif);
 	}
 
-	.sub-mag-card__arrow {
-		margin-top: 12px;
-		font-size: 14px;
-		color: var(--text-muted);
-		align-self: flex-end;
-		transition: transform 0.3s ease, color 0.3s ease;
+	.bmw-insight-card:hover .bmw-insight-card__title {
+		color: var(--color-gold, #e6ca65);
 	}
 
-	.sub-mag-card:hover .sub-mag-card__arrow {
-		color: #ffffff;
-		transform: translateX(4px);
+	/* リード文 */
+	.bmw-insight-card__lead {
+		font-size: 13.5px;
+		line-height: 1.6;
+		color: #9aa0a6;
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 
 	/* ============================================================== */
@@ -1594,8 +1766,9 @@ const newsList = [
 		.brands-grid {
 			grid-template-columns: repeat(3, 1fr);
 		}
-		.sub-magazine-grid {
-			grid-template-columns: repeat(2, 1fr);
+		.bmw-insight-card {
+			flex: 0 0 calc((100% - 28px) / 2.2);
+			min-width: 280px;
 		}
 	}
 
@@ -1624,29 +1797,33 @@ const newsList = [
 			margin-bottom: 36px;
 		}
 
-		.magazine-lead-grid {
-			grid-template-columns: 1fr;
+		.bmw-insights-section {
+			padding: 64px 0 60px 0;
+		}
+
+		.bmw-insights-header {
+			flex-direction: column;
+			align-items: flex-start;
 			gap: 20px;
+			margin-bottom: 28px;
 		}
 
-		.mag-card--lead,
-		.mag-card--item:nth-child(2),
-		.mag-card--item:nth-child(3),
-		.mag-card--item:nth-child(4) {
-			grid-column: span 1;
+		.bmw-insights-title {
+			font-size: 26px;
 		}
 
-		.mag-card--lead .mag-card__media,
-		.mag-card__media {
-			height: 240px;
+		.bmw-insights-header__actions {
+			width: 100%;
+			justify-content: space-between;
 		}
 
-		.mag-card__content {
-			padding: 20px;
+		.bmw-insight-card {
+			flex: 0 0 85%;
+			min-width: 260px;
 		}
 
-		.sub-magazine-grid {
-			grid-template-columns: 1fr;
+		.bmw-insight-card__title {
+			font-size: 17px;
 		}
 
 		.stories-grid {
