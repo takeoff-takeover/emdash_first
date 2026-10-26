@@ -1,7 +1,7 @@
 ---
 // src/pages/posts/[slug].astro
-// 投稿記事詳細（Nicole Connect と完全統一された大迫力アイキャッチ・現代的エディトリアルレイアウト）
-import { getEmDashEntry, getEmDashCollection, decodeSlug } from "emdash";
+// Nicole Connect - マガジン記事詳細（上部に大迫力アイキャッチ写真・現代的エディトリアルレイアウト）
+import { getEmDashEntry, decodeSlug } from "emdash";
 import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
@@ -25,7 +25,7 @@ const { entry: cmsPost, cacheHint } = await getEmDashEntry("posts", slug);
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 
-// 静的記事カタログ（フォールバック）
+// 静的記事カタログ（CMSにまだ入っていない場合のフォールバック）
 const staticArticlesCatalog: Record<string, any> = {
 	"2027_new_bmw_3series_neue_klasse": {
 		data: {
@@ -113,9 +113,10 @@ if (!post) {
 	return Astro.rewrite("/404");
 }
 
-// 関連拠点データの判定
+// 関連拠点データの判定（CMSの related_location フィールドに基づく動的連携）
 const relatedLocationKey = (post.data as any).related_location || "nicole-bmw-kawasaki";
 
+// 拠点マスタ定義
 const showroomCatalog: Record<string, any> = {
 	"nicole-bmw-kawasaki": {
 		id: "nicole-bmw-kawasaki",
@@ -129,7 +130,8 @@ const showroomCatalog: Record<string, any> = {
 		closed: "水曜日（祝日を除く）",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole-BMW-本社.jpg",
 		detailUrl: "/location/nicole-bmw-kawasaki/",
-		googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7"
+		googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7",
+		features: ["新車ショールーム", "BMWマイスター在籍ファクトリー併設", "納車ハンドオーバースペース", "150kW急速充電"]
 	},
 	"nicole-bmw-ota": {
 		id: "nicole-bmw-ota",
@@ -143,7 +145,8 @@ const showroomCatalog: Record<string, any> = {
 		closed: "水曜日（祝日を除く）",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
 		detailUrl: "/location/nicole-bmw-ota/",
-		googleMapsUrl: "https://maps.google.com/?q=Nicole+BMW+大田支店"
+		googleMapsUrl: "https://maps.google.com/?q=Nicole+BMW+大田支店",
+		features: ["都内正規拠点", "新車ショールーム", "サービス工場併設"]
 	}
 };
 
@@ -167,52 +170,90 @@ function getImageUrl(img: unknown): string {
 }
 
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
+const isDemoArticle = isNeueKlasse || slug === "202608_bmw_kids_mechanic";
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
 
 const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
 const heroImageUrlSp = getImageUrl(featuredImageSp);
+const hasShowroom = Boolean((post.data as any).related_location) || isDemoArticle;
 
-const photoCredit = (featuredImage as any)?.alt || (isNeueKlasse ? "Photo: © BMW AG PressClub Global" : "Photo: © Nicole Group Editorial");
-const hasShowroom = Boolean((post.data as any).related_location) || isNeueKlasse;
+// スライドギャラリー写真データ（BMW Group PressClub 公式高解像度写真）
+const neueKlasseGallery = [
+	{
+		title: "新型BMW 3シリーズ エクステリア（フロント）",
+		caption: "Neue Klasseデザイン言語を採用した先進のフロントマスク。キドニーグリルとツインヘッドライトが一体化し、新たな光のシグネチャーを創出。",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
+	},
+	{
+		title: "サイドプロファイル ＆ 2.5ボックスシルエット",
+		caption: "ロングホイールベースとショートオーバーハングによる伝統のスポーツプロポーション。自動格納式フラッシュドアハンドルと低重心なキャラクターライン。",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657631/P90657631-the-new-bmw-3-series-exterior-2250px.jpg"
+	},
+	{
+		title: "BMW M350 xDrive（Mパフォーマンス・フラッグシップ）",
+		caption: "3.0L 直6 TwinPower Turbo＋48Vマイルドハイブリッド（326kW/443hp）。専用アダプティブMサスペンションを標準装備。",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg"
+	},
+	{
+		title: "BMW 320（高効率4気筒ガソリンモデル）",
+		caption: "最新世代BMW TwinPower Turboと48Vマイルドハイブリッドを搭載し、優れた環境性能と洗練された俊敏なハンドリングを高次元で両立。",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657728/P90657728-the-new-bmw-320-exterior-09-26-2250px.jpg"
+	}
+];
 
-// サイドバー用関連記事の取得（CMSから最新記事を取得）
-let cmsRecentPosts: any[] = [];
-try {
-	const { entries: postEntries } = await getEmDashCollection("posts", {
-		limit: 8,
-		orderBy: { published_at: "desc" }
-	});
-	cmsRecentPosts = postEntries || [];
-} catch (e) {
-	console.error("Failed to fetch recent posts for sidebar:", e);
-}
+const kidsGallery = [
+	{
+		title: "メカニックウエアへの着替え",
+		caption: "BMWマイスターと同じつなぎに身を包み、少し緊張しながらも誇らしげな笑顔",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5139.jpg"
+	},
+	{
+		title: "実車を使ったタイヤ空気圧・点検作業",
+		caption: "プロのBMWマイスターの手ほどきを受けながら、エアゲージを使って適正空気圧をチェック",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5162.jpg"
+	},
+	{
+		title: "「ニコル・ユーロ」給与明細の授与",
+		caption: "すべての点検ミッションを終え、自らの労働の対価として給与明細とお給料を受け取る",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5188.jpg"
+	},
+	{
+		title: "特別ファクトリー見学ツアー",
+		caption: "普段は立ち入ることのできないNicole BMW 本社サービス工場を保護者様と共に見学",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5206.jpg"
+	}
+];
 
-// 静的記事カタログのバックアップ
-const staticFallbackStories = [
+const currentGallery = isNeueKlasse ? neueKlasseGallery : kidsGallery;
+
+// 本文内に既にスライダー／アコーディオンブロックが存在するか判定
+const contentArray = Array.isArray(post.data.content) ? post.data.content : [];
+const hasSliderBlock = contentArray.some((b: any) => b && b._type === "slider");
+const hasAccordionBlock = contentArray.some((b: any) => b && b._type === "accordion");
+
+// 関連記事データ（サイドバー用）
+const relatedStories = [
 	{
 		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
 		brand: "BMW",
-		topic: "Feature",
 		date: "2026.10.22",
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		url: "/posts/2027_new_bmw_3series_neue_klasse/"
+		url: "/magazine/2027_new_bmw_3series_neue_klasse/"
 	},
 	{
 		slug: "202608_bmw_kids_mechanic",
 		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 		brand: "BMW",
-		topic: "Event Report",
 		date: "2026.08.20",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
-		url: "/posts/202608_bmw_kids_mechanic/"
+		url: "/magazine/202608_bmw_kids_mechanic/"
 	},
 	{
 		slug: "202610_mini_united-japan-2026",
 		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
 		brand: "MINI",
-		topic: "Event",
 		date: "2026.10.15",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
@@ -221,284 +262,414 @@ const staticFallbackStories = [
 		slug: "202608_ferrari_luce",
 		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
 		brand: "Ferrari",
-		topic: "Feature",
 		date: "2026.08.17",
 		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
 		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
+	},
+	{
+		slug: "20260714_mini_jcw_track_style_edition",
+		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
+		brand: "MINI",
+		date: "2026.07.14",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/"
+	},
+	{
+		slug: "alpina-heritage-story",
+		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
+		brand: "ALPINA",
+		date: "2026.05.15",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		url: "https://nicole-automobiles.com/"
 	}
-];
+].filter(s => s.slug !== slug);
 
-// サイドバー表示用記事（現在の記事を除外して最大4件）
-const sidebarArticles = [
-	...cmsRecentPosts
-		.filter(p => p.id !== slug)
-		.map(p => {
-			const isBmw = p.id.includes("bmw") || p.id.includes("neue_klasse");
-			const imgUrl = getImageUrl(p.data.featured_image) || (isBmw 
-				? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" 
-				: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
-			return {
-				slug: p.id,
-				url: `/posts/${p.id}/`,
-				title: p.data.title,
-				image: imgUrl,
-				brand: isBmw ? "BMW" : (p.data.brand || "EDITORIAL"),
-				topic: isBmw ? "Feature" : (p.data.topic || "Article"),
-				date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25"
-			};
-		}),
-	...staticFallbackStories.filter(s => s.slug !== slug)
-].filter((item, index, self) => index === self.findIndex(t => t.slug === item.slug)).slice(0, 4);
+// タイトルを自然な文節で改行・表示するためのセグメント分割
+function getTitleSegments(rawTitle: string) {
+	if (rawTitle.includes("新型BMW 3シリーズ") || (rawTitle.includes("3シリーズ") && rawTitle.includes("直6"))) {
+		return [
+			{ text: "【公式発表】新型BMW 3シリーズ登場。", class: "title-phrase" },
+			{ text: "完全電動『BMW i3』と", class: "title-phrase" },
+			{ text: "直6搭載『M350 xDrive』が切り拓く新時代", class: "title-phrase" }
+		];
+	}
+	if (rawTitle.includes("ノイエ・クラッセ")) {
+		return [
+			{ text: "【最新スクープ】2027年登場の", class: "title-phrase" },
+			{ text: "次世代BMW 3シリーズ（ノイエ・クラッセ）は", class: "title-phrase" },
+			{ text: "BEVと直6エンジンが共存へ", class: "title-phrase" }
+		];
+	}
+	if (rawTitle.includes("。")) {
+		const parts = rawTitle.split("。");
+		return parts.map((p, idx) => ({
+			text: idx < parts.length - 1 ? `${p}。` : p,
+			class: "title-phrase"
+		})).filter(p => p.text.length > 0);
+	}
+	return [{ text: rawTitle, class: "" }];
+}
 
-const relatedStories = sidebarArticles;
+const titleSegments = getTitleSegments(post.data.title);
+
+// 記事編集ページURL（EmDash Admin）
+const postDbId = (post?.data as any)?.id;
+const editUrl = postDbId 
+	? `/_emdash/admin/content/posts/${postDbId}` 
+	: "/_emdash/admin/content/posts";
 ---
 
 <NicoleLayout 
-	title={`${post.data.title} ｜ Nicole Group`}
-	description={post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Group公式記事。"}
+	title={`${post.data.title} ｜ Nicole Connect`}
+	description={post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Connect公式記事。"}
 >
 	<article class="modern-article-page">
 		<!-- ============================================================== -->
-		<!-- 1. 記事ヘッダー：表題・パンくず・メタデータ（HERO写真の上に文字を重ねない） -->
+		<!-- 1. 最上部：左右いっぱいに広がるアイキャッチ写真（フルブリード・シネマティック） -->
 		<!-- ============================================================== -->
+		<div class="article-hero-media-wrap">
+			<div class="article-hero-top-scrim" aria-hidden="true"></div>
+			<picture>
+				{heroImageUrlSp && (
+					<source media="(max-width: 768px)" srcset={heroImageUrlSp} />
+				)}
+				<img 
+					src={heroImageUrl} 
+					alt={post.data.title} 
+					class="article-hero-img" 
+					loading="eager" 
+				/>
+			</picture>
+			<div class="article-photo-credit-overlay">
+				<span>Photo: © BMW AG PressClub Global / Nicole Group Editorial</span>
+			</div>
+		</div>
+
 		<header class="article-header-section">
 			<div class="article-header-container">
-				<!-- パンくずナビゲーション -->
-				<nav class="article-breadcrumb" aria-label="Breadcrumb">
-					<a href="/" class="bc-link">HOME</a>
-					<span class="bc-sep">/</span>
-					<a href="/magazine/" class="bc-link">MAGAZINE</a>
-					<span class="bc-sep">/</span>
-					<span class="bc-current">{post.data.title}</span>
-				</nav>
+				<!-- パンくずナビゲーション & 編集リンク -->
+				<div class="article-breadcrumb-row">
+					<nav class="article-breadcrumb" aria-label="Breadcrumb">
+						<a href="/" class="bc-link">HOME</a>
+						<span class="bc-sep">/</span>
+						<a href="/magazine/" class="bc-link">MAGAZINE</a>
+						<span class="bc-sep">/</span>
+						<span class="bc-current">{post.data.title}</span>
+					</nav>
 
-				<!-- メタ情報バッジ群 -->
-				<div class="article-meta-row">
-					<span class="meta-brand-pill">
-						<span class="brand-dot"></span>
-						{isNeueKlasse ? "BMW" : (post.data.brand || "EDITORIAL")}
-					</span>
-					<span class="meta-category-pill">
-						{isNeueKlasse ? "FEATURE STORY" : (post.data.topic || "ARTICLE")}
-					</span>
-					<time class="meta-date">
-						{post.data.published_at ? new Date(post.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25"}
-					</time>
-					<span class="meta-reading-time">READING TIME: 3 MIN</span>
+					<!-- CMS管理画面（編集ページ）へのダイレクトリンク -->
+					<a href={editUrl} class="article-edit-btn" title="CMS管理画面でこの記事を編集">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="edit-icon">
+							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+						</svg>
+						<span>記事を編集</span>
+					</a>
 				</div>
 
-				<!-- 記事タイトル -->
-				<h1 class="article-main-title">{post.data.title}</h1>
+				<!-- 記事タイトル（自然な文節で改行） -->
+				<h1 class="article-main-title">
+					{titleSegments.map(segment => (
+						segment.class ? (
+							<span class={segment.class}>{segment.text}</span>
+						) : (
+							segment.text
+						)
+					))}
+				</h1>
 
-				<!-- リード文（抜粋） -->
+				<!-- リード文（サブタイトル・抜粋） -->
 				{post.data.excerpt && (
 					<p class="article-lead-text">{post.data.excerpt}</p>
 				)}
+
+				<!-- メタ情報バッジ群（サブタイトルの下に配置） -->
+				<div class="article-meta-row">
+					<span class="meta-brand-pill">
+						<span class="brand-dot"></span>
+						{isNeueKlasse ? "BMW" : "ALL BRANDS"}
+					</span>
+					<span class="meta-category-pill">
+						{isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE"}
+					</span>
+					<time class="meta-date">
+						{isNeueKlasse ? "2026.10.22" : "2026.08.20"}
+					</time>
+					<span class="meta-reading-time">READING TIME: 4 MIN</span>
+
+					<!-- メタ行内のクイック編集リンク -->
+					<a href={editUrl} class="meta-edit-pill" title="この記事の編集画面を開く">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+						</svg>
+						<span>編集</span>
+					</a>
+				</div>
 			</div>
 		</header>
 
 		<!-- ============================================================== -->
-		<!-- 2. HERO写真エリア（テキストは一切置かず、写真本来の美しさを全面に見せる） -->
+		<!-- 2. 本文エリア（現代的エディトリアルレイアウト） -->
 		<!-- ============================================================== -->
-		<div class="article-hero-media-wrap">
-			<div class="article-hero-media-container">
-				<div class="article-hero-frame">
-					<picture>
-						{heroImageUrlSp && (
-							<source media="(max-width: 768px)" srcset={heroImageUrlSp} />
-						)}
-						<img 
-							src={heroImageUrl} 
-							alt={post.data.title} 
-							class="article-hero-img" 
-							loading="eager" 
-						/>
-					</picture>
+		<div class="article-content-wrapper">
+			<div class="article-two-col-layout">
+				<!-- 左メインカラム：記事本文 -->
+				<div class="article-main-col">
+					<!-- 本文（Portable Text） -->
+				<div class="article-rich-text prose prose-invert">
+					<PortableText value={post.data.content} components={portableTextComponents} />
 				</div>
-				<!-- 写真クレジット -->
-				<div class="article-photo-credit">
-					<span>{photoCredit}</span>
-				</div>
-			</div>
-		</div>
 
-		<!-- ============================================================== -->
-		<!-- 2. 本文 ＆ サイドバー エリア（現代的2カラムエディトリアルレイアウト） -->
-		<!-- ============================================================== -->
-		<div class="article-body-container">
-			<div class="article-layout-grid">
-				<!-- 左側：メイン記事コンテンツ -->
-				<main class="article-main-column">
-					<div class="article-prose-wrap">
-						<!-- 本文（Portable Text） -->
-						<div class="article-rich-text prose prose-invert">
-							<PortableText value={post.data.content} components={portableTextComponents} />
-						</div>
+				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->
+				{!hasSliderBlock && isDemoArticle && (
+					<section class="gallery-slider-block">
+						
 
-						<!-- 関連拠点（ショールーム）カード（関連拠点がある場合のみ表示） -->
-						{hasShowroom && (
-						<section class="showroom-feature-block">
-							<div class="showroom-card-modern">
-								<div class="showroom-card-media">
-									<img src={relatedShowroom.image} alt={relatedShowroom.name} />
-									<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
+						<div class="modern-slider-wrap" id="modernSlider">
+							<div class="slider-viewport">
+								<div class="slider-track" id="sliderTrack">
+									{currentGallery.map((item, index) => (
+										<div class={`slider-slide ${index === 0 ? 'is-active' : ''}`} data-index={index}>
+											<div class="slide-media">
+												<img src={item.image} alt={item.title} loading={index === 0 ? "eager" : "lazy"} />
+												<span class="slide-badge">{index + 1} / {currentGallery.length}</span>
+											</div>
+											<div class="slide-info">
+												<h4 class="slide-heading">{item.title}</h4>
+												<p class="slide-caption">{item.caption}</p>
+											</div>
+										</div>
+									))}
 								</div>
-								<div class="showroom-card-body">
-									<span class="showroom-kicker">CURATED SHOWROOM</span>
-									<h3 class="showroom-title">{relatedShowroom.name}</h3>
-									<p class="showroom-sub">{relatedShowroom.subName}</p>
-									
-									<div class="showroom-details">
-										<div class="detail-row">
-											<span class="detail-label">ADDRESS</span>
-											<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
-										</div>
-										<div class="detail-row">
-											<span class="detail-label">OPEN HOURS</span>
-											<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
-										</div>
-										<div class="detail-row">
-											<span class="detail-label">PHONE</span>
-											<span class="detail-val">{relatedShowroom.tel}</span>
-										</div>
-									</div>
 
-									<div class="showroom-actions">
-										<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
-											<span>ショールーム詳細を見る</span>
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-										</a>
-										<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
-											<span>Google Mapsで開く ↗</span>
-										</a>
-									</div>
-								</div>
-							</div>
-						</section>
-						)}
-
-						<!-- SNSシェアボタン -->
-						<div class="article-share-bar">
-							<span class="share-label">SHARE THIS STORY</span>
-							<div class="share-buttons">
-								<a 
-									href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
-									target="_blank"
-									rel="noopener"
-									class="share-btn"
-									aria-label="X（Twitter）でシェア"
-								>
-									<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-									<span>Xでポスト</span>
-								</a>
-								<a 
-									href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/posts/${slug}/`)}`}
-									target="_blank"
-									rel="noopener"
-									class="share-btn"
-									aria-label="Facebookでシェア"
-								>
-									<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-									<span>Facebook</span>
-								</a>
-								<button type="button" class="share-btn" id="btn-copy-url">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-									<span id="copy-text">URLをコピー</span>
+								<!-- ナビゲーション矢印 -->
+								<button type="button" class="slider-btn slider-btn--prev" id="sliderPrev" aria-label="前の写真">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+								</button>
+								<button type="button" class="slider-btn slider-btn--next" id="sliderNext" aria-label="次の写真">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
 								</button>
 							</div>
-						</div>
 
-						<!-- バックリンク -->
-						<div class="article-back-nav">
-							<a href="/magazine/" class="btn-back-to-magazine">
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-								<span>Nicole Connect 一覧へ戻る</span>
-							</a>
-						</div>
-					</div>
-				</main>
-
-				<!-- 右側：サイドバー（スクロール追従・関連記事・ショールーム案内） -->
-				<aside class="article-sidebar-column">
-					<div class="sidebar-sticky-wrap">
-						<!-- 関連記事ウィジェット -->
-						<div class="sidebar-widget">
-							<div class="widget-header">
-								<span class="widget-kicker">RELATED STORIES</span>
-								<h3 class="widget-title">関連記事・最新特集</h3>
-							</div>
-							<div class="sidebar-post-list">
-								{sidebarArticles.map((story) => (
-									<a href={story.url} class="sidebar-post-card">
-										<div class="sidebar-post-thumb">
-											<img src={story.image} alt={story.title} loading="lazy" />
-											<span class="sidebar-brand-badge">{story.brand}</span>
-										</div>
-										<div class="sidebar-post-body">
-											<time class="sidebar-post-date">{story.date}</time>
-											<h4 class="sidebar-post-title">{story.title}</h4>
-										</div>
-									</a>
+							<!-- サムネイルナビ -->
+							<div class="slider-thumbnails">
+								{currentGallery.map((item, index) => (
+									<button type="button" class={`slider-thumb-btn ${index === 0 ? 'is-active' : ''}`} data-thumb-index={index} aria-label={`写真 ${index + 1}`}>
+										<img src={item.image} alt="" />
+									</button>
 								))}
 							</div>
 						</div>
+					</section>
+				)}
 
-						<!-- Nicole ショールーム案内・コンシェルジュCTA -->
-						<div class="sidebar-widget sidebar-cta-widget">
-							<span class="cta-kicker">NICOLE CONCIERGE</span>
-							<h4 class="cta-title">Nicole 正規ショールーム</h4>
-							<p class="cta-desc">BMW、MINI、Ferrari、ALPINA、Rolls-Royce 各正規拠点で最新モデルの試乗・ご商談を承っております。</p>
-							<a href="/location/" class="btn-sidebar-cta">
-								<span>ショールーム一覧を見る</span>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-							</a>
+				<!-- アコーディオン（デモ記事のみフォールバック表示） -->
+				{!hasAccordionBlock && isDemoArticle && (
+					<section class="accordion-details-block">
+						<div class="block-header">
+							
+							<h3 class="block-title">
+								{isNeueKlasse ? "新型3シリーズ 主要諸元 ＆ よくあるご質問" : "イベント概要・詳細情報"}
+							</h3>
+						</div>
+
+						<div class="modern-accordion-list">
+							<details class="accordion-item" open>
+								<summary class="accordion-summary">
+									<span>1. Neue Klasse（ノイエ・クラッセ）アーキテクチャの革新性</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>第6世代BMW eDriveテクノロジーを搭載し、エネルギー密度が20%向上した新開発の円筒型リチウムイオンバッテリーセルを採用。800Vシステムによる超急速充電に対応し、わずか10分の充電で最大300kmの航続距離を回復します。</p>
+								</div>
+							</details>
+
+							<details class="accordion-item">
+								<summary class="accordion-summary">
+									<span>2. 『BMW パノラミック・ビジョン』と新世代デジタル・キャビン</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>フロントガラスの全幅にわたって運転関連情報を投影する「BMWパノラミック・ビジョン」を初採用。ドライバーと助手席乗員の視線移動を最小限に抑え、直感的なステアリング操作と音声コマンドにより、次世代のコックピット体験を提供します。</p>
+								</div>
+							</details>
+
+							<details class="accordion-item">
+								<summary class="accordion-summary">
+									<span>3. 日本市場における導入スケジュールと展示ショールーム</span>
+									<span class="accordion-icon">+</span>
+								</summary>
+								<div class="accordion-content">
+									<p>日本国内でのデリバリーは2026年後半以降を予定しております。Nicole BMW 本社ショールーム（川崎）および各支店にて、実車展示・プレオーダーステージが順次開設される予定です。最新情報は公式Webマガジンおよび各ショールームにてご案内いたします。</p>
+								</div>
+							</details>
+						</div>
+					</section>
+				)}
+
+				<!-- 関連拠点（ショールーム）カード（拠点情報がある場合のみ表示） -->
+				{hasShowroom && (
+				<section class="showroom-feature-block">
+					<div class="showroom-card-modern">
+						<div class="showroom-card-media">
+							<img src={relatedShowroom.image} alt={relatedShowroom.name} />
+							<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
+						</div>
+						<div class="showroom-card-body">
+							
+							<h3 class="showroom-title">{relatedShowroom.name}</h3>
+							<p class="showroom-sub">{relatedShowroom.subName}</p>
+							
+							<div class="showroom-details">
+								<div class="detail-row">
+									<span class="detail-label">ADDRESS</span>
+									<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
+								</div>
+								<div class="detail-row">
+									<span class="detail-label">OPEN HOURS</span>
+									<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
+								</div>
+								<div class="detail-row">
+									<span class="detail-label">PHONE</span>
+									<span class="detail-val">{relatedShowroom.tel}</span>
+								</div>
+							</div>
+
+							<div class="showroom-actions">
+								<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
+									<span>ショールーム詳細を見る</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								</a>
+								<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
+									<span>Google Mapsで開く ↗</span>
+								</a>
+							</div>
 						</div>
 					</div>
-				</aside>
-			</div>
-		</div>
+				</section>
+				)}
 
-		<!-- ============================================================== -->
-		<!-- 3. 下部：おすすめ記事（RECOMMENDED STORIES） -->
-		<!-- ============================================================== -->
-		<section class="recommended-stories-section">
-			<div class="recommended-container">
-				<div class="recommended-header">
-					<div>
-						<span class="rec-kicker">DISCOVER MORE</span>
-						<h2 class="rec-title">おすすめの特集ストーリー</h2>
+				<!-- SNSシェアボタン -->
+				<div class="article-share-bar">
+					<span class="share-label">記事をシェアする</span>
+					<div class="share-buttons">
+						<a 
+							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn"
+							aria-label="X（Twitter）でシェア"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+							<span>Xでポスト</span>
+						</a>
+						<a 
+							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn"
+							aria-label="Facebookでシェア"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+							<span>Facebook</span>
+						</a>
+						<button type="button" class="share-btn" id="btn-copy-url">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+							<span id="copy-text">URLをコピー</span>
+						</button>
 					</div>
-					<a href="/magazine/" class="rec-all-link">すべての記事を見る →</a>
 				</div>
 
-				<div class="recommended-grid">
-					{relatedStories.map((story) => (
-						<article class="rec-card">
-							<a href={story.url} class="rec-card-link">
-								<div class="rec-card-media">
-									<img src={story.image} alt={story.title} loading="lazy" />
-									<span class="rec-card-brand">{story.brand}</span>
-								</div>
-								<div class="rec-card-body">
-									<div class="rec-card-meta">
-										<span>{story.topic}</span>
-										<span class="rec-meta-sep">/</span>
-										<time>{story.date}</time>
-									</div>
-									<h3 class="rec-card-title">{story.title}</h3>
-								</div>
-							</a>
-						</article>
-					))}
+				<!-- バックリンク & 編集リンク -->
+				<div class="article-back-nav">
+					<a href="/magazine/" class="btn-back-to-magazine">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+						<span>Nicole Connect 一覧へ戻る</span>
+					</a>
+					<a href={editUrl} class="btn-edit-article-admin" title="CMS管理画面でこの記事を編集">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+						</svg>
+						<span>記事を編集する（CMS）</span>
+					</a>
 				</div>
 			</div>
-		</section>
+
+			<!-- 右サイドバーカラム：関連記事（シンプル・読みやすさ重視・スティッキー） -->
+			<aside class="article-sidebar-col">
+				<div class="sidebar-sticky-panel">
+					<div class="sidebar-block">
+						<h3 class="sidebar-heading">関連記事</h3>
+						<div class="sidebar-story-list">
+							{relatedStories.map((story) => (
+								<article class="sidebar-story-card">
+									<a href={story.url} class="sidebar-story-link">
+										<div class="sidebar-story-media">
+											<img src={story.image} alt={story.title} loading="lazy" />
+											<span class="sidebar-story-brand">{story.brand}</span>
+										</div>
+										<div class="sidebar-story-body">
+											<time class="sidebar-story-date">{story.date}</time>
+											<h4 class="sidebar-story-title">{story.title}</h4>
+										</div>
+									</a>
+								</article>
+							))}
+						</div>
+						<div class="sidebar-footer-link">
+							<a href="/magazine/" class="sidebar-all-link">すべての記事を見る →</a>
+						</div>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
 	</article>
 </NicoleLayout>
 
-<!-- コピー制御スクリプト -->
+<!-- カルーセル ＆ コピー制御スクリプト -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
+		// 1. スライダー制御
+		const track = document.getElementById('sliderTrack');
+		const prevBtn = document.getElementById('sliderPrev');
+		const nextBtn = document.getElementById('sliderNext');
+		const thumbs = document.querySelectorAll('.slider-thumb-btn');
+		const slides = document.querySelectorAll('.slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) t.classList.add('is-active');
+					else t.classList.remove('is-active');
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
+		}
+
+		// 2. URLコピーボタン
 		const copyBtn = document.getElementById('btn-copy-url');
 		const copyText = document.getElementById('copy-text');
 		if (copyBtn && copyText) {
@@ -532,20 +703,33 @@ const relatedStories = sidebarArticles;
 	/* ============================================================== */
 	.article-header-section {
 		width: 100%;
-		padding-top: 130px;
-		padding-bottom: 24px;
+		padding-top: 48px;
+		padding-bottom: 0;
 		background: #06070a;
 	}
 
 	.article-header-container {
 		width: 100%;
-		max-width: 1440px;
+		max-width: 1400px;
 		margin: 0 auto;
 		padding: 0 40px;
 		box-sizing: border-box;
+		/* 本文開始前の境界線：パンくずリスト下の線と全く同じ左右幅に揃える */
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		padding-bottom: 32px;
 	}
 
-	/* パンくず */
+	/* パンくず行（下部に上品な1pxヘアライン境界線 & 編集リンク） */
+	.article-breadcrumb-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		padding-bottom: 14px;
+		margin-bottom: 28px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
 	.article-breadcrumb {
 		display: flex;
 		align-items: center;
@@ -554,7 +738,7 @@ const relatedStories = sidebarArticles;
 		font-weight: 700;
 		letter-spacing: 0.15em;
 		color: rgba(255, 255, 255, 0.6);
-		margin-bottom: 24px;
+		min-width: 0;
 	}
 
 	.bc-link {
@@ -564,7 +748,7 @@ const relatedStories = sidebarArticles;
 	}
 
 	.bc-link:hover {
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 	}
 
 	.bc-sep {
@@ -572,20 +756,80 @@ const relatedStories = sidebarArticles;
 	}
 
 	.bc-current {
-		color: #dfba73;
+		color: rgba(255, 255, 255, 0.7);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 500px;
+		max-width: 480px;
 	}
 
-	/* メタ情報行 */
+	/* 編集ボタン（パンくず右端） */
+	.article-edit-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 5px 12px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 4px;
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 11.5px;
+		font-weight: 600;
+		text-decoration: none;
+		letter-spacing: 0.05em;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	.article-edit-btn:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(255, 255, 255, 0.35);
+		color: #ffffff;
+		transform: translateY(-1px);
+	}
+
+	.article-edit-btn .edit-icon {
+		width: 13px;
+		height: 13px;
+	}
+
+	/* タイトル（自然な文節改行を担保） */
+	.article-main-title {
+		font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "SF Pro Display", sans-serif;
+		font-size: clamp(24px, 2.8vw, 40px);
+		font-weight: 700;
+		line-height: 1.48;
+		letter-spacing: -0.01em;
+		color: #ffffff;
+		margin: 0 0 16px 0;
+		max-width: 1200px;
+		word-break: normal;
+		overflow-wrap: break-word;
+	}
+
+	.article-main-title .title-phrase {
+		display: inline-block;
+	}
+
+	/* リード文（サブタイトル） */
+	.article-lead-text {
+		font-size: clamp(16px, 1.4vw, 19px);
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.85);
+		margin: 0 0 24px 0;
+		max-width: 980px;
+		padding-left: 0;
+		border-left: none;
+	}
+
+	/* メタ情報行（サブタイトルの下に配置） */
 	.article-meta-row {
 		display: flex;
 		align-items: center;
 		gap: 12px;
 		flex-wrap: wrap;
-		margin-bottom: 20px;
+		margin-bottom: 0;
 	}
 
 	.meta-brand-pill {
@@ -593,8 +837,8 @@ const relatedStories = sidebarArticles;
 		align-items: center;
 		gap: 6px;
 		padding: 4px 12px;
-		background: #dfba73;
-		color: #040507;
+		background: var(--color-nicole-red, #E60012);
+		color: #FFFFFF;
 		font-size: 11px;
 		font-weight: 800;
 		letter-spacing: 0.12em;
@@ -627,218 +871,225 @@ const relatedStories = sidebarArticles;
 		letter-spacing: 0.08em;
 	}
 
-	/* タイトル */
-	.article-main-title {
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: clamp(28px, 3.4vw, 48px);
-		font-weight: 800;
-		line-height: 1.25;
-		letter-spacing: -0.015em;
-		color: #ffffff;
-		margin: 20px 0 20px 0;
-		max-width: 1100px;
+	.meta-edit-pill {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 11px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 999px;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 11px;
+		font-weight: 600;
+		text-decoration: none;
+		letter-spacing: 0.05em;
+		transition: all 0.2s ease;
 	}
 
-	/* リード文（ゴールド縦線と下地は置かない） */
-	.article-lead-text {
-		font-size: clamp(16px, 1.4vw, 19px);
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 16px 0;
-		max-width: 980px;
-		padding-left: 0;
-		border-left: none;
+	.meta-edit-pill:hover {
+		background: rgba(230, 0, 18, 0.15);
+		border-color: var(--color-nicole-red, #E60012);
+		color: #ffffff;
+		transform: translateY(-1px);
+	}
+
+	.meta-edit-pill svg {
+		width: 12px;
+		height: 12px;
 	}
 
 	/* ============================================================== */
-	/* 2. HERO写真エリア（テキストは一切置かない） */
+	/* 1. 最上部フルブリード・アイキャッチ写真（下地なしヘッダー・グラデーション・写真内クレジット） */
 	/* ============================================================== */
 	.article-hero-media-wrap {
 		width: 100%;
-		background: #06070a;
-		padding: 0 0 40px 0;
-	}
-
-	.article-hero-media-container {
-		width: 100%;
-		max-width: 1440px;
-		margin: 0 auto;
-		padding: 0 40px;
-		box-sizing: border-box;
-	}
-
-	.article-hero-frame {
-		width: 100%;
+		padding-top: 0;
+		background: #000000;
 		overflow: hidden;
-		border-radius: 12px;
-		background: #000;
-		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+		position: relative;
+	}
+
+	/* 写真上部の薄いグレー/黒グラデーション（写真が白くてもヘッダー文字が見えるようにする） */
+	.article-hero-top-scrim {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 180px;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.22) 55%, transparent 100%);
+		pointer-events: none;
+		z-index: 2;
 	}
 
 	.article-hero-img {
 		width: 100%;
-		height: auto;
-		max-height: 78vh;
+		height: clamp(460px, 72vh, 800px);
 		object-fit: cover;
 		display: block;
 	}
 
-	.article-photo-credit {
+	/* 写真の右下に重ねるクレジット（黒い余計な下地をなくす） */
+	.article-photo-credit-overlay {
+		position: absolute;
+		bottom: 16px;
+		right: 28px;
+		z-index: 3;
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.45);
-		letter-spacing: 0.05em;
-		margin-top: 10px;
-		text-align: right;
+		color: rgba(255, 255, 255, 0.7);
+		letter-spacing: 0.04em;
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		padding: 4px 10px;
+		border-radius: 3px;
+		pointer-events: none;
 	}
 
 	/* ============================================================== */
-	/* 2. 現代的エディトリアル本文 ＆ 2カラムサイドバー */
+	/* 3. 洗練された2カラムエディトリアルレイアウト（白・黒・赤ベース） */
 	/* ============================================================== */
-	.article-body-container {
+	:root {
+		--color-nicole-red: #E60012;
+		--color-nicole-red-hover: #D60000;
+	}
+
+	.article-content-wrapper {
 		width: 100%;
-		max-width: 1440px;
+		padding: 20px 0 120px 0;
+		background: #06070a;
+	}
+
+	.article-two-col-layout {
+		width: 100%;
+		max-width: 1400px;
 		margin: 0 auto;
-		padding: 50px 40px 90px 40px;
-	}
-
-	.article-layout-grid {
+		padding: 0 40px;
 		display: grid;
-		grid-template-columns: 1fr 360px;
-		gap: 56px;
+		grid-template-columns: minmax(0, 1fr) 340px;
+		gap: 64px;
 		align-items: start;
+		box-sizing: border-box;
 	}
 
-	.article-main-column {
-		min-width: 0;
-	}
-
-	.article-prose-wrap {
+	.article-main-col {
 		width: 100%;
-		max-width: 100%;
-	}
-
-	/* サイドバー・スクロール追従 */
-	.article-sidebar-column {
+		max-width: 860px;
 		min-width: 0;
 	}
 
-	.sidebar-sticky-wrap {
+	/* サイドバー：シンプル・読みやすさ重視・スティッキー */
+	.article-sidebar-col {
+		width: 100%;
+		min-width: 0;
+	}
+
+	.sidebar-sticky-panel {
 		position: sticky;
-		top: 100px;
-		display: flex;
-		flex-direction: column;
-		gap: 32px;
+		top: 120px;
 	}
 
-	/* サイドバーウィジェット共通 */
-	.sidebar-widget {
-		background: rgba(14, 16, 22, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.09);
-		border-radius: 16px;
-		padding: 24px 22px;
-		backdrop-filter: blur(14px);
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	.sidebar-block {
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 4px;
+		padding: 28px 24px;
 	}
 
-	.widget-header {
-		margin-bottom: 20px;
-		padding-bottom: 12px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.widget-kicker {
-		display: block;
-		font-size: 10px;
-		font-weight: 800;
-		letter-spacing: 0.16em;
-		color: #dfba73;
-		margin-bottom: 4px;
-	}
-
-	.widget-title {
-		font-size: 17px;
+	.sidebar-heading {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: 16px;
 		font-weight: 700;
+		letter-spacing: 0.04em;
 		color: #ffffff;
-		margin: 0;
-		letter-spacing: -0.01em;
+		margin: 0 0 20px 0;
+		padding-bottom: 12px;
+		border-bottom: 2px solid var(--color-nicole-red);
 	}
 
-	/* 関連記事リスト */
-	.sidebar-post-list {
+	.sidebar-story-list {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 20px;
 	}
 
-	.sidebar-post-card {
-		display: flex;
+	.sidebar-story-card {
+		padding-bottom: 18px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.sidebar-story-card:last-child {
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+
+	.sidebar-story-link {
+		display: grid;
+		grid-template-columns: 88px 1fr;
 		gap: 14px;
-		align-items: center;
 		text-decoration: none;
 		color: inherit;
-		padding: 8px;
-		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid transparent;
-		transition: all 0.25s ease;
+		align-items: flex-start;
+		transition: opacity 0.2s ease;
 	}
 
-	.sidebar-post-card:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(223, 186, 115, 0.25);
-		transform: translateX(4px);
+	.sidebar-story-link:hover {
+		opacity: 0.85;
 	}
 
-	.sidebar-post-thumb {
+	.sidebar-story-media {
 		position: relative;
-		width: 96px;
-		height: 68px;
-		border-radius: 8px;
+		width: 88px;
+		height: 64px;
+		border-radius: 3px;
 		overflow: hidden;
+		background: #111111;
 		flex-shrink: 0;
-		background: #000;
 	}
 
-	.sidebar-post-thumb img {
+	.sidebar-story-media img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		display: block;
 		transition: transform 0.35s ease;
 	}
 
-	.sidebar-post-card:hover .sidebar-post-thumb img {
+	.sidebar-story-link:hover .sidebar-story-media img {
 		transform: scale(1.08);
 	}
 
-	.sidebar-brand-badge {
+	.sidebar-story-brand {
 		position: absolute;
 		top: 4px;
 		left: 4px;
-		font-size: 9px;
-		font-weight: 800;
-		padding: 2px 6px;
-		background: rgba(4, 5, 7, 0.9);
-		color: #dfba73;
-		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.75);
+		color: #FFFFFF;
+		font-size: 8px;
+		font-weight: 700;
 		letter-spacing: 0.06em;
+		padding: 2px 5px;
+		border-radius: 2px;
+		backdrop-filter: blur(4px);
 	}
 
-	.sidebar-post-body {
-		flex: 1;
+	.sidebar-story-body {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
 		min-width: 0;
 	}
 
-	.sidebar-post-date {
-		display: block;
+	.sidebar-story-date {
 		font-size: 11px;
 		color: rgba(255, 255, 255, 0.45);
-		margin-bottom: 4px;
 		letter-spacing: 0.04em;
 	}
 
-	.sidebar-post-title {
-		font-size: 13px;
-		font-weight: 600;
+	.sidebar-story-title {
+		font-size: 13.5px;
+		font-weight: 500;
 		line-height: 1.45;
 		color: rgba(255, 255, 255, 0.9);
 		margin: 0;
@@ -849,75 +1100,45 @@ const relatedStories = sidebarArticles;
 		transition: color 0.2s ease;
 	}
 
-	.sidebar-post-card:hover .sidebar-post-title {
-		color: #dfba73;
+	.sidebar-story-link:hover .sidebar-story-title {
+		color: var(--color-nicole-red);
 	}
 
-	/* Nicole コンシェルジュ・ショールーム案内CTA */
-	.sidebar-cta-widget {
-		background: linear-gradient(135deg, rgba(223, 186, 115, 0.1) 0%, rgba(14, 16, 22, 0.95) 100%);
-		border: 1px solid rgba(223, 186, 115, 0.25);
+	.sidebar-footer-link {
+		margin-top: 22px;
+		padding-top: 14px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		text-align: right;
 	}
 
-	.cta-kicker {
-		font-size: 10px;
-		font-weight: 800;
-		color: #dfba73;
-		letter-spacing: 0.2em;
-		display: block;
-		margin-bottom: 6px;
-	}
-
-	.cta-title {
-		font-size: 16px;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 8px 0;
-	}
-
-	.cta-desc {
+	.sidebar-all-link {
 		font-size: 12px;
-		line-height: 1.6;
-		color: rgba(255, 255, 255, 0.65);
-		margin: 0 0 16px 0;
-	}
-
-	.btn-sidebar-cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		width: 100%;
-		padding: 11px 16px;
-		background: #dfba73;
-		color: #040507;
-		font-size: 12px;
-		font-weight: 800;
-		letter-spacing: 0.05em;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.6);
 		text-decoration: none;
-		border-radius: 8px;
-		transition: all 0.2s ease;
+		transition: color 0.2s ease;
 	}
 
-	.btn-sidebar-cta:hover {
-		background: #f0cb84;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(223, 186, 115, 0.3);
+	.sidebar-all-link:hover {
+		color: var(--color-nicole-red);
 	}
 
-	.btn-sidebar-cta svg {
-		width: 14px;
-		height: 14px;
-	}
-
-	/* レスポンシブ切り替え（1024px以下は自然な1カラムレイアウトへ） */
-	@media (max-width: 1024px) {
-		.article-layout-grid {
-			grid-template-columns: 1fr;
-			gap: 48px;
+	@media (max-width: 1080px) {
+		.article-header-container,
+		.article-two-col-layout {
+			padding: 0 24px;
 		}
 
-		.sidebar-sticky-wrap {
+		.article-two-col-layout {
+			grid-template-columns: 1fr;
+			gap: 50px;
+		}
+
+		.article-main-col {
+			max-width: 100%;
+		}
+
+		.sidebar-sticky-panel {
 			position: static;
 		}
 	}
@@ -929,6 +1150,7 @@ const relatedStories = sidebarArticles;
 		letter-spacing: 0.02em;
 	}
 
+	/* 見出し（ゴールド縦線と下地なし・クリーンタイポグラフィ） */
 	.article-rich-text :global(h2) {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(24px, 2.4vw, 30px);
@@ -944,7 +1166,7 @@ const relatedStories = sidebarArticles;
 	.article-rich-text :global(h3) {
 		font-size: 20px;
 		font-weight: 700;
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 		margin: 44px 0 18px 0;
 		line-height: 1.4;
 	}
@@ -964,21 +1186,269 @@ const relatedStories = sidebarArticles;
 		margin: 36px 0;
 		padding: 20px 24px;
 		background: rgba(223, 186, 115, 0.05);
-		border-left: 3px solid #dfba73;
+		border-left: 3px solid var(--color-nicole-red, #E60012);
 		border-radius: 0 8px 8px 0;
 		font-style: italic;
 		color: rgba(255, 255, 255, 0.85);
 	}
 
 	.article-rich-text :global(a) {
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 		text-decoration: underline;
 		text-underline-offset: 4px;
 		transition: color 0.2s ease;
 	}
 
 	.article-rich-text :global(a:hover) {
-		color: #f0cb85;
+		color: #FFFFFF;
+	}
+
+	/* ============================================================== */
+	/* 4. スライダーギャラリーブロック（シンプル・枠線と背景なし・左右移動の楕円廃止） */
+	/* ============================================================== */
+	.gallery-slider-block {
+		margin: 60px 0;
+		padding: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	.block-header {
+		margin-bottom: 20px;
+	}
+
+	.block-kicker {
+		font-size: 10.5px;
+		font-weight: 800;
+		letter-spacing: 0.2em;
+		color: var(--color-nicole-red, #E60012);
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.block-title {
+		font-size: 22px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 8px 0;
+	}
+
+	.block-sub {
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.55);
+		margin: 0;
+	}
+
+	.slider-viewport {
+		position: relative;
+		overflow: hidden;
+		border-radius: 10px;
+		background: #000;
+	}
+
+	.slider-track {
+		display: flex;
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+		width: 100%;
+	}
+
+	.slider-slide {
+		min-width: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.slide-media {
+		position: relative;
+		height: 440px;
+		background: #000;
+	}
+
+	.slide-media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.slide-badge {
+		position: absolute;
+		top: 14px;
+		right: 14px;
+		padding: 3px 10px;
+		background: rgba(0, 0, 0, 0.75);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 700;
+		color: #ffffff;
+		backdrop-filter: blur(6px);
+	}
+
+	.slide-info {
+		padding: 14px 0 0 0;
+		background: transparent;
+	}
+
+	.slide-heading {
+		font-size: 15px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 4px 0;
+	}
+
+	.slide-caption {
+		font-size: 13px;
+		color: rgba(255, 255, 255, 0.75);
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	/* 左右移動の楕円をやめて、ミニマルで洗練されたフロート矢印に */
+	.slider-btn {
+		position: absolute;
+		top: 40%;
+		transform: translateY(-50%);
+		width: auto;
+		height: auto;
+		padding: 10px;
+		border-radius: 0;
+		background: transparent;
+		border: none;
+		color: rgba(255, 255, 255, 0.85);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		backdrop-filter: none;
+		transition: color 0.2s ease, transform 0.2s ease;
+		z-index: 10;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
+	}
+
+	.slider-btn svg {
+		width: 34px;
+		height: 34px;
+		stroke-width: 2.2;
+	}
+
+	.slider-btn:hover {
+		background: transparent;
+		color: #ffffff;
+		transform: translateY(-50%) scale(1.15);
+	}
+
+	.slider-btn--prev { left: 8px; }
+	.slider-btn--next { right: 8px; }
+
+	.slider-thumbnails {
+		display: flex;
+		gap: 10px;
+		margin-top: 14px;
+		overflow-x: auto;
+		padding-bottom: 6px;
+	}
+
+	.slider-thumb-btn {
+		width: 80px;
+		height: 52px;
+		border-radius: 6px;
+		overflow: hidden;
+		border: 2px solid transparent;
+		background: #000;
+		padding: 0;
+		cursor: pointer;
+		flex-shrink: 0;
+		opacity: 0.5;
+		transition: opacity 0.25s ease, border-color 0.25s ease;
+	}
+
+	.slider-thumb-btn.is-active {
+		border-color: #ffffff;
+		opacity: 1;
+	}
+
+	.slider-thumb-btn img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* ============================================================== */
+	/* 5. FAQ / アコーディオン（枠線・下地なし、テキストと同じ左右幅） */
+	/* ============================================================== */
+	.accordion-details-block {
+		margin: 60px 0;
+		padding: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		width: 100%;
+		box-shadow: none;
+	}
+
+	.modern-accordion-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.accordion-item {
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 0;
+		overflow: hidden;
+		transition: border-color 0.25s ease;
+	}
+
+	.accordion-item:first-child {
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.accordion-item[open] {
+		border-color: rgba(255, 255, 255, 0.22);
+		background: transparent;
+	}
+
+	.accordion-summary {
+		padding: 22px 0;
+		font-size: 16px;
+		font-weight: 700;
+		color: #ffffff;
+		cursor: pointer;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		user-select: none;
+		list-style: none;
+	}
+
+	.accordion-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.accordion-icon {
+		font-size: 18px;
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.7);
+		transition: transform 0.3s ease;
+	}
+
+	.accordion-item[open] .accordion-icon {
+		transform: rotate(45deg);
+	}
+
+	.accordion-content {
+		padding: 0 0 24px 0;
+		font-size: 15px;
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.accordion-content p {
+		margin: 0;
 	}
 
 	/* ============================================================== */
@@ -1031,9 +1501,9 @@ const relatedStories = sidebarArticles;
 
 	.showroom-kicker {
 		font-size: 10px;
-		font-weight: 800;
-		letter-spacing: 0.2em;
-		color: #dfba73;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.5);
 		margin-bottom: 6px;
 	}
 
@@ -1069,9 +1539,9 @@ const relatedStories = sidebarArticles;
 
 	.detail-label {
 		font-size: 9.5px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: #dfba73;
+		color: rgba(255, 255, 255, 0.45);
 		width: 90px;
 		flex-shrink: 0;
 	}
@@ -1093,12 +1563,12 @@ const relatedStories = sidebarArticles;
 		align-items: center;
 		gap: 8px;
 		padding: 11px 22px;
-		background: #dfba73;
-		color: #040507;
+		background: #ffffff;
+		color: #000000;
 		font-size: 12px;
-		font-weight: 800;
-		letter-spacing: 0.08em;
-		border-radius: 6px;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		border-radius: 4px;
 		text-decoration: none;
 		transition: all 0.25s ease;
 	}
@@ -1110,7 +1580,7 @@ const relatedStories = sidebarArticles;
 	}
 
 	.btn-showroom-detail:hover {
-		background: #f0cb85;
+		background: rgba(255, 255, 255, 0.85);
 		transform: translateY(-2px);
 	}
 
@@ -1126,7 +1596,7 @@ const relatedStories = sidebarArticles;
 	}
 
 	.btn-showroom-map:hover {
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 	}
 
 	/* ============================================================== */
@@ -1146,10 +1616,10 @@ const relatedStories = sidebarArticles;
 	}
 
 	.share-label {
-		font-size: 11px;
-		font-weight: 800;
-		letter-spacing: 0.2em;
-		color: #dfba73;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: rgba(255, 255, 255, 0.7);
 	}
 
 	.share-buttons {
@@ -1187,7 +1657,11 @@ const relatedStories = sidebarArticles;
 	}
 
 	.article-back-nav {
-		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
 		margin-top: 50px;
 	}
 
@@ -1195,16 +1669,16 @@ const relatedStories = sidebarArticles;
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		padding: 13px 28px;
+		padding: 12px 28px;
 		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(223, 186, 115, 0.4);
-		color: #dfba73;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		color: #ffffff;
 		border-radius: 999px;
 		font-size: 13px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
+		font-weight: 600;
+		letter-spacing: 0.06em;
 		text-decoration: none;
-		transition: all 0.3s ease;
+		transition: all 0.25s ease;
 	}
 
 	.btn-back-to-magazine svg {
@@ -1214,12 +1688,41 @@ const relatedStories = sidebarArticles;
 	}
 
 	.btn-back-to-magazine:hover {
-		background: #dfba73;
-		color: #040507;
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
 	}
 
 	.btn-back-to-magazine:hover svg {
 		transform: translateX(-4px);
+	}
+
+	.btn-edit-article-admin {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 11px 22px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-decoration: none;
+		transition: all 0.25s ease;
+	}
+
+	.btn-edit-article-admin:hover {
+		background: rgba(230, 0, 18, 0.15);
+		border-color: var(--color-nicole-red, #E60012);
+		color: #ffffff;
+		transform: translateY(-2px);
+	}
+
+	.btn-edit-article-admin svg {
+		width: 14px;
+		height: 14px;
 	}
 
 	/* ============================================================== */
@@ -1233,9 +1736,9 @@ const relatedStories = sidebarArticles;
 
 	.recommended-container {
 		width: 100%;
-		max-width: 1440px;
+		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 40px;
+		padding: 0 30px;
 	}
 
 	.recommended-header {
@@ -1251,7 +1754,7 @@ const relatedStories = sidebarArticles;
 		font-size: 10.5px;
 		font-weight: 800;
 		letter-spacing: 0.22em;
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 		display: block;
 		margin-bottom: 4px;
 	}
@@ -1271,7 +1774,7 @@ const relatedStories = sidebarArticles;
 	}
 
 	.rec-all-link:hover {
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 	}
 
 	.recommended-grid {
@@ -1346,7 +1849,7 @@ const relatedStories = sidebarArticles;
 		align-items: center;
 		gap: 6px;
 		font-size: 11px;
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 		font-weight: 600;
 		margin-bottom: 8px;
 	}
@@ -1370,25 +1873,13 @@ const relatedStories = sidebarArticles;
 	}
 
 	.rec-card:hover .rec-card-title {
-		color: #dfba73;
+		color: var(--color-nicole-red, #E60012);
 	}
 
 	/* ============================================================== */
-	/* レスポンシブ対応（ヘッダーと左右を完全一致） */
+	/* レスポンシブ対応 */
 	/* ============================================================== */
-	@media (max-width: 1024px) {
-		.article-hero-container {
-			padding: 30px 24px 44px 24px;
-		}
-
-		.article-body-container {
-			padding: 40px 24px 70px 24px;
-		}
-
-		.recommended-container {
-			padding: 0 24px;
-		}
-
+	@media (max-width: 992px) {
 		.showroom-card-modern {
 			grid-template-columns: 1fr;
 		}
@@ -1403,29 +1894,50 @@ const relatedStories = sidebarArticles;
 	}
 
 	@media (max-width: 768px) {
-		.article-hero-wrap {
-			min-height: 70vh;
-			padding-top: 80px;
-		}
-
-		.article-hero-container {
-			padding: 20px 20px 36px 20px;
-		}
-
-		.article-body-container {
-			padding: 30px 20px 60px 20px;
-		}
-
-		.recommended-container {
+		.article-header-container,
+		.article-two-col-layout {
 			padding: 0 20px;
 		}
 
+		.article-header-section {
+			padding-top: 36px;
+			padding-bottom: 0;
+		}
+
+		.article-header-container {
+			padding-bottom: 24px;
+		}
+
+		.article-breadcrumb-row {
+			gap: 10px;
+		}
+
+		.bc-current {
+			max-width: 170px;
+		}
+
+		.article-content-wrapper {
+			padding: 24px 0 80px 0;
+		}
+
 		.article-main-title {
-			font-size: 28px;
+			font-size: clamp(21px, 5.5vw, 28px);
+			line-height: 1.44;
+			margin: 14px 0 16px 0;
 		}
 
 		.article-lead-text {
 			font-size: 15px;
+			line-height: 1.75;
+		}
+
+		.slide-media {
+			height: 260px;
+		}
+
+		.gallery-slider-block,
+		.accordion-details-block {
+			padding: 20px;
 		}
 
 		.showroom-card-body {
@@ -1445,6 +1957,13 @@ const relatedStories = sidebarArticles;
 		.share-btn {
 			flex-grow: 1;
 			justify-content: center;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.article-header-container,
+		.article-two-col-layout {
+			padding: 0 16px;
 		}
 	}
 </style>

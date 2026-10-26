@@ -1,6 +1,6 @@
 ---
 // src/components/NicoleHomeMain.astro
-// ニコル・グループ公式 トップページ（シネマティック＆ミニマル・エディトリアル新デザイン）
+// ニコル・グループ公式 トップページ（洗練されたラグジュアリー・ミニマル新デザイン）
 
 import { getEmDashCollection } from "emdash";
 
@@ -117,7 +117,51 @@ const fallbackInsights = [
 		lead: "4万4000色以上のパレットと無限の素材。オーナーの夢を形にするロールス・ロイスの最高峰クラフト。",
 		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/"
 	}
-];
+,
+	{
+		id: "202606_bmw_m2_cup",
+		slug: "202606_bmw_m2_cup",
+		title: "富士スピードウェイを駆ける。BMW M2 CS Racingの圧倒的ポテンシャル",
+		category: "BMW",
+		date: "2026.06.24",
+		readTime: "5 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/02/DSC3504.jpg",
+		lead: "450馬力の直6ツインターボが奏でる咆哮。Nicole Racingがサポートする本格サーキット走行会の熱気をリポート。",
+		url: "https://www.nicole.co.jp/corporate/nicole-cars/"
+	},
+	{
+		id: "202606_rolls_royce_spectre_journey",
+		slug: "202606_rolls_royce_spectre_journey",
+		title: "静寂を走るラグジュアリー。スペクターで巡る湘南・西湘の海岸線",
+		category: "Rolls-Royce",
+		date: "2026.06.12",
+		readTime: "6 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
+		lead: "完全電動ウルトラ・ラグジュアリー・クーペが魅せる、異次元の浮遊感と洗練されたビスポーク・インテリア。",
+		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/"
+	},
+	{
+		id: "202605_ferrari_roma_spider",
+		slug: "202605_ferrari_roma_spider",
+		title: "『ラ・ヌオーヴァ・ドルチェ・ヴィータ』。ローマ・スパイダーと過ごす心地よい週末",
+		category: "Ferrari",
+		date: "2026.05.30",
+		readTime: "5 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		lead: "ソフトトップを開け放ち、V8ツインターボの甘美なサウンドとともに駆け抜ける至福のグランドツーリング。",
+		url: "https://yokohama.ferraridealers.com/ja-JP"
+	},
+	{
+		id: "202605_mini_aceman_first_drive",
+		slug: "202605_mini_aceman_first_drive",
+		title: "都市の冒険者へ。新型オールエレクトリック・クロスオーバー『MINI Aceman』試乗インプレッション",
+		category: "MINI",
+		date: "2026.05.20",
+		readTime: "4 MIN READ",
+		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		lead: "クーパーとカントリーマンの美点を融合した新世代EV。俊敏なハンドリングと遊び心あふれる室内空間を徹底解剖。",
+		url: "https://www.nicole.co.jp/mini/"
+	}];
 
 // CMS記事をBMW Group Insights形式に整形
 const formattedCmsArticles = (cmsPosts || []).map((p: any) => {
@@ -155,104 +199,35 @@ const allInsights = [
 	...fallbackInsights.filter(fb => !formattedCmsArticles.some(c => c.id === fb.id || c.slug === fb.slug))
 ];
 
-// スタッフストーリー・コラム
-const stories = [
-	{
-		quote: "「お客様がステアリングを握った瞬間、日常が特別な旅へと変わる。その感動の立ち会いに妥協はありません。」",
-		name: "熟練マイスター",
-		role: "BMW テクニカルディレクター（勤続20年）",
-		title: "BMW一筋20年。熟練マイスターのプライドと素顔",
-		url: "/magazine/"
-	},
-	{
-		quote: "「EVへの不安を『確信とワクワク』へ。航続距離や充電ライフの疑問に、実体験に基づき徹底的に寄り添います。」",
-		name: "シニアコンサルタント",
-		role: "MINI EV スペシャリスト（全国販売1位）",
-		title: "燃料代は5分の1に。不安を「納得」へと変えるメソッド",
-		url: "/magazine/"
-	},
-	{
-		quote: "「フェラーリを所有することは、美学と情熱のコミュニティの一員になること。最高峰のクラブライフをプロデュースします。」",
-		name: "ブランドアンバサダー",
-		role: "Nicole Competizione マーケティング",
-		title: "フェラーリスタの心を揺さぶる体験。その世界観を支える視点",
-		url: "/magazine/"
-	}
-];
-
-// ブランド定義
-const brands = [
-	{
-		name: "ALPINA",
-		corp: "Nicole Automobiles",
-		logo: "/brands/alpina.png",
-		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学。",
-		url: "https://nicole-automobiles.com/",
-		accent: "#00441b"
-	},
-	{
-		name: "BMW",
-		corp: "Nicole Cars",
-		logo: "/brands/bmw.svg",
-		desc: "歓びの純度を高める駆けぬける歓び。最新電動モデルからMハイパフォーマンスまで。",
-		url: "https://www.nicole.co.jp/bmw/",
-		accent: "#0066b1"
-	},
-	{
-		name: "MINI",
-		corp: "Nicole Cars",
-		logo: "/brands/mini.svg",
-		desc: "時代を切り拓くアイコニックデザインと心躍るゴーカート・フィーリング。",
-		url: "https://www.nicole.co.jp/mini/",
-		accent: "#e5e5e5"
-	},
-	{
-		name: "Rolls-Royce",
-		corp: "Nicole MotorCars",
-		logo: "/brands/rolls-royce.svg",
-		desc: "静寂と極限の美。ビスポークが紡ぎ出す、世界にただひとつの至高の移動空間。",
-		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
-		accent: "#8b6cb3"
-	},
-	{
-		name: "Ferrari",
-		corp: "Nicole Competizione",
-		logo: "/brands/ferrari.svg",
-		desc: "サーキットの情熱とイタリアの魂。マラネッロの真価を横浜から全国へ届ける。",
-		url: "https://yokohama.ferraridealers.com/ja-JP",
-		accent: "#cc0000"
-	}
-];
-
 // 最新インフォメーション
 const newsList = [
 	{
+		date: "2026.10.20",
+		title: "当グループのInstagram・Facebookで最新情報配信中｜LINEアカウント閉鎖のお知らせ",
+		url: "https://www.nicole.co.jp/202609_nicole_sns-announcement/"
+	},
+	{
 		date: "2026.07.31",
-		category: "NOTICE",
 		title: "ニコル・グループ 2026年 夏季休業のお知らせ",
 		url: "https://www.nicole.co.jp/%e3%83%8b%e3%82%b3%e3%83%ab%e3%83%bb%e3%82%b0%e3%83%ab%e3%83%bc%e3%83%97-2026%e5%b9%b4-%e5%a4%8f%e5%ad%a3%e4%bc%91%e6%a5%ad%e3%81%ae%e3%81%8a%e7%9f%a5%e3%82%89%e3%81%9b/"
 	},
 	{
 		date: "2026.04.30",
-		category: "COMMUNITY",
 		title: "新百合ヶ丘エリアマネジメントコンソーシアムの会員へ加入",
 		url: "https://www.nicole.co.jp/202604_inspire_hub_shinyuri/"
 	},
 	{
 		date: "2026.02.27",
-		category: "CSR / ESG",
 		title: "災害時帰宅支援ステーションの協定締結について",
 		url: "https://www.nicole.co.jp/202605_emergency-home-support/"
 	},
 	{
 		date: "2025.12.22",
-		category: "SHOWROOM",
 		title: "ニコル世田谷・青山ショールーム定休日変更のご案内",
 		url: "https://www.nicole.co.jp/202512_setagaya_aoyama_closedday/"
 	},
 	{
 		date: "2025.12.22",
-		category: "CORPORATE",
 		title: "ニコル・オートモビルズ、ドメインおよびSNSアカウント名変更のお知らせ",
 		url: "https://www.nicole.co.jp/202512_web_sns_account_change/"
 	}
@@ -261,11 +236,10 @@ const newsList = [
 
 <main id="main" class="nicole-editorial-main">
 	<!-- ============================================================== -->
-	<!-- 1. シネマティック・ヒーローセクション（スクロール連動フレーム） -->
+	<!-- 1. シネマティック・ヒーローセクション（クリーン・全画面動画） -->
 	<!-- ============================================================== -->
 	<section class="cinematic-hero" id="hero-section">
 		<div class="cinematic-hero__viewport" id="hero-viewport">
-			<!-- 背景動画レイヤー（YouTube埋め込み） -->
 			<div class="cinematic-hero__video-wrapper">
 				<iframe 
 					src="https://www.youtube-nocookie.com/embed/1Z0CddMzQBM?autoplay=1&mute=1&controls=0&loop=1&playlist=1Z0CddMzQBM&showinfo=0&rel=0&playsinline=1" 
@@ -276,25 +250,6 @@ const newsList = [
 				<div class="cinematic-hero__overlay"></div>
 			</div>
 
-			<!-- エディトリアル・タイポグラフィ（静謐な浮遊感） -->
-			<div class="cinematic-hero__content">
-				<div class="hero-badge editorial-reveal" data-delay="100">
-					<span class="hero-badge__dot"></span>
-					<span class="hero-badge__text">NICOLE GROUP 1977 — PRESENT</span>
-				</div>
-
-				<h1 class="hero-title editorial-reveal" data-delay="300">
-					<span class="hero-title__en">BEYOND</span>
-					<span class="hero-title__en hero-title__en--sub">EXPECTATIONS</span>
-				</h1>
-
-				<div class="hero-tagline editorial-reveal" data-delay="500">
-					<span class="hero-tagline__rule"></span>
-					<p class="hero-tagline__text">期待を超える喜びを</p>
-				</div>
-			</div>
-
-			<!-- スクロールダウンインジケーター（繊細な極細ライン） -->
 			<a href="#magazine-section" class="hero-scroll-indicator" aria-label="Scroll to Content">
 				<span class="hero-scroll-indicator__label">SCROLL</span>
 				<div class="hero-scroll-indicator__line">
@@ -305,47 +260,13 @@ const newsList = [
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 2. エディトリアル・ステートメント（理念・マニフェスト） -->
-	<!-- ============================================================== -->
-	<section class="editorial-statement">
-		<div class="editorial-container">
-			<div class="statement-grid">
-				<div class="statement-col statement-col--label editorial-reveal">
-					<span class="editorial-num">01</span>
-					<h2 class="editorial-subheading">PHILOSOPHY</h2>
-				</div>
-				<div class="statement-col statement-col--body">
-					<p class="statement-lead editorial-reveal" data-delay="200">
-						最高の自動車を通じて、<br class="hidden-sp" />
-						一人ひとりのお客様に最上級の歓びと感動を。
-					</p>
-					<div class="editorial-rule editorial-line"></div>
-					<p class="statement-desc editorial-reveal" data-delay="300">
-						1977年の設立以来、東京・神奈川エリアを中心にBMW、MINI、ロールス・ロイス、フェラーリの正規ディーラーとして歩み続けてきたニコル・グループ。半世紀に及ぶアルピナ総輸入元の歴史とクラフトマンシップを受け継ぎ、「One Nicole」の精神で、時代を超えて愛されるカーライフを提案いたします。
-					</p>
-					<div class="statement-meta editorial-reveal" data-delay="400">
-						<a href="/pages/corporate" class="editorial-link-btn">
-							会社案内・企業理念を見る
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- ============================================================== -->
-	<!-- 3. 特集マガジン：The latest Nicole Group Insights.（BMW Group Insights スタイル） -->
+	<!-- 2. 特集マガジン：The latest Nicole Group Insights.（BMW Group Insights スタイル） -->
 	<!-- ============================================================== -->
 	<section class="bmw-insights-section" id="magazine-section" aria-label="The latest Nicole Group Insights">
 		<div class="editorial-container">
-			<!-- セクションヘッダー：BMW Group Insightsレイアウト -->
 			<div class="bmw-insights-header">
 				<div class="bmw-insights-header__title-group editorial-reveal">
-					<div class="bmw-insights-header__meta">
-						<span class="editorial-num">02</span>
-						<span class="bmw-insights-eyebrow">NICOLE CONNECT • WEB MAGAZINE</span>
-					</div>
+					
 					<h2 class="bmw-insights-title">The latest Nicole Group Insights.</h2>
 					<p class="bmw-insights-subtitle">
 						最新モデルの試乗レポートから、オーナー様との対話、熟練メカニックのクラフトマンシップまで。
@@ -360,14 +281,7 @@ const newsList = [
 							</svg>
 						</span>
 					</a>
-					<div class="bmw-insights-nav">
-						<button type="button" class="insights-nav-btn insights-nav-btn--prev" id="insights-prev-btn" aria-label="Previous article" disabled>
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-						</button>
-						<button type="button" class="insights-nav-btn insights-nav-btn--next" id="insights-next-btn" aria-label="Next article">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-						</button>
-					</div>
+					
 				</div>
 			</div>
 
@@ -377,7 +291,6 @@ const newsList = [
 					{allInsights.map((item, idx) => (
 						<article class="bmw-insight-card editorial-reveal" data-delay={(idx % 6) * 80}>
 							<a href={item.url} class="bmw-insight-card__link">
-								<!-- メディアエリア：16:10 アスペクト比 ＆ 右下丸型アクションボタン -->
 								<div class="bmw-insight-card__media">
 									<img 
 										src={item.image} 
@@ -393,7 +306,6 @@ const newsList = [
 									</div>
 								</div>
 
-								<!-- メタオーバーライン：[CATEGORY] • [DATE] • [READING TIME] -->
 								<div class="bmw-insight-card__overline">
 									<span class="insight-overline__cat">{item.category}</span>
 									<span class="insight-overline__dot">•</span>
@@ -402,10 +314,8 @@ const newsList = [
 									<span class="insight-overline__read">{item.readTime}</span>
 								</div>
 
-								<!-- ヘッドライン（タイトル） -->
 								<h3 class="bmw-insight-card__title">{item.title}</h3>
 
-								<!-- リード文（抜粋） -->
 								{item.lead && (
 									<p class="bmw-insight-card__lead">{item.lead}</p>
 								)}
@@ -418,92 +328,114 @@ const newsList = [
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 4. 職人・スタッフストーリー（エディトリアル・クオート） -->
+	<!-- 3. フィロソフィー ＆ OUR BRAND（洗練されたモノトーン ＆ ロゴマーク単独反応） -->
 	<!-- ============================================================== -->
-	<section class="editorial-stories">
+	<section class="nicole-philosophy-brand-section" id="philosophy-brand-section">
 		<div class="editorial-container">
-			<div class="stories-header editorial-reveal">
-				<span class="editorial-num">03</span>
-				<span class="editorial-eyebrow">PEOPLE & PASSION</span>
-				<h2 class="editorial-title">CRAFTSMANSHIP</h2>
-			</div>
-
-			<div class="stories-grid">
-				{stories.map((story, idx) => (
-					<div class="story-item editorial-reveal" data-delay={idx * 150}>
-						<div class="story-item__line editorial-line"></div>
-						<p class="story-item__quote">{story.quote}</p>
-						<div class="story-item__footer">
-							<div class="story-item__person">
-								<h4 class="story-item__role">{story.role}</h4>
-								<span class="story-item__name">{story.name}</span>
-							</div>
-							<a href={story.url} class="story-item__link">インタビューを読む →</a>
-						</div>
-					</div>
-				))}
-			</div>
-		</div>
-	</section>
-
-	<!-- ============================================================== -->
-	<!-- 5. OUR BRANDS（5大ブランド・ショーケース） -->
-	<!-- ============================================================== -->
-	<section class="editorial-brands" id="brands-section">
-		<div class="editorial-container">
-			<div class="editorial-header">
-				<div class="editorial-header__left editorial-reveal">
-					<span class="editorial-num">04</span>
-					<span class="editorial-eyebrow">AUTHORISED DEALERSHIPS</span>
-					<h2 class="editorial-title">OUR BRANDS</h2>
-				</div>
-				<div class="editorial-header__right editorial-reveal" data-delay="200">
-					<p class="editorial-header__desc">
-						世界最高峰のモビリティブランドを正規ディーラーとして展開。それぞれのブランドが持つ哲学とクラフトマンシップを完璧にお届けします。
+			<!-- Part A: We Are NICOLE GROUP -->
+			<div class="nicole-we-are editorial-reveal">
+				<h2 class="nicole-we-are-title">We Are</h2>
+				<h2 class="nicole-group-title">NICOLE GROUP</h2>
+				
+				<div class="nicole-we-are-body">
+					<p>
+						ニコル・グループは1977年の設立以来、東京および神奈川エリアにて、BMW、MINI、ロールス・ロイス、フェラーリを取り扱う正規ディーラーとして歩んでまいりました。また、2025年末まではアルピナの日本総輸入元として、全国のお客様に感動を提供してきた実績も、私たちの誇りです。
+					</p>
+					<p style="margin-top: 1.6em;">
+						「One Nicole」を合言葉に、社会的責任を果たしながら、革新に挑み、常に高品質なサービスを追求し続けています。 これからも、皆さまの期待を超える喜びと、豊かなカーライフをお届けしてまいります。
 					</p>
 				</div>
+
+				<div class="nicole-we-are-cta">
+					<a href="https://www.nicole.co.jp/corporate/" class="btn-nicole-outline">会社案内へ</a>
+				</div>
 			</div>
 
-			<div class="brands-grid">
-				{brands.map((b, idx) => (
-					<div class="brand-panel editorial-reveal" data-delay={idx * 100} style={`--brand-accent: ${b.accent};`}>
-						<a href={b.url} class="brand-panel__link" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
-							<div class="brand-panel__logo">
-								<img src={b.logo} alt={`${b.name} logo`} class="brand-panel__logo-img" loading="lazy" />
-							</div>
+			<!-- Part B: OUR BRAND -->
+			<div class="nicole-our-brand-area editorial-reveal" data-delay="150">
+				<h2 class="nicole-our-brand-heading">OUR BRAND</h2>
 
-							<div class="brand-panel__body">
-								<h3 class="brand-panel__name">{b.name}</h3>
-								<h4 class="brand-panel__corp">{b.corp}</h4>
-								<p class="brand-panel__desc">{b.desc}</p>
-							</div>
+				<div class="nicole-our-brand-grid">
+					<!-- 1. ALPINA -->
+					<a href="https://nicole-automobiles.com/" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="0">
+						<div class="nicole-brand-icon-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70.55 49.25" aria-hidden="true" class="brand-svg-mark">
+								<polygon fill="#E60012" points="61.28 8.07 47.17 8.07 47.17 8.92 39.3 8.92 39.3 18.08 47.28 18.08 47.28 49.25 60.63 49.25 60.63 40.23 61.28 40.23 61.28 8.07"></polygon>
+								<polygon fill="#E60012" points="0 18.01 0 8.03 17.05 8.03 30.42 21.57 30.42 35.95 12.55 18.01 0 18.01"></polygon>
+								<polygon fill="#FFFFFF" points="0 49.25 8.1 49.25 8.1 30.61 26.79 49.25 47.28 49.25 47.28 18.04 30.42 18.04 30.42 35.95 12.5 18.04 0 18.04 0 49.25"></polygon>
+								<polygon fill="#FFFFFF" points="47.17 8.98 47.17 0 70.55 0 70.55 40.24 60.63 40.24 60.63 8.98 47.17 8.98"></polygon>
+								<polygon fill="#FFFFFF" points="39.3 18.07 30.42 18.07 30.42 22.46 16.98 8.85 0 8.85 0 0 21.48 0 39.3 18.07"></polygon>
+							</svg>
+						</div>
+						<h3 class="nicole-brand-title">ALPINA</h3>
+						<span class="nicole-brand-period">［1965-2025］</span>
+						<h4 class="nicole-brand-corp">Nicole Automobiles</h4>
+					</a>
 
-							<div class="brand-panel__action">
-								<span class="brand-panel__action-label">OFFICIAL SHOWROOM</span>
-								<div class="brand-panel__action-circle">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-								</div>
-							</div>
-						</a>
-					</div>
-				))}
+					<!-- 2. BMW -->
+					<a href="/location/#bmw" class="nicole-brand-item brand-reveal-item" data-delay="120">
+						<div class="nicole-brand-icon-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 157.24 157.24" aria-hidden="true" class="brand-svg-mark">
+								<path fill="#FFFFFF" d="M78.62,0C35.2,0,0,35.2,0,78.62s35.2,78.62,78.62,78.62,78.62-35.2,78.62-78.62S122.04,0,78.62,0M152.13,78.62c0,40.6-32.91,73.51-73.51,73.51S5.11,119.22,5.11,78.62,38.02,5.11,78.62,5.11s73.51,32.91,73.51,73.51"></path>
+								<path fill="#FFFFFF" d="M116.72,45.27c1.07,1.15,2.6,3,3.47,4.12l15.92-10.11c-.79-1.04-2.06-2.62-3.01-3.73l-10.08,6.67-.69.59.51-.75,4.45-8.89-3.15-3.15-8.89,4.45-.75.51.6-.69,6.67-10.08c-1.17-1-2.3-1.92-3.74-3.02l-10.11,15.91c1.28.99,2.97,2.43,4.04,3.42l9.51-4.94.61-.45-.45.61-4.93,9.52h.02Z"></path>
+								<path fill="#FFFFFF" d="M80.6,25.11l4.35-9.74.28-.86-.08.9.46,13.02c1.53.15,3.1.36,4.66.61l-.71-19.29c-2.18-.24-4.34-.41-6.5-.5l-4.28,10.64-.15.79-.15-.79-4.28-10.64c-2.16.09-4.33.26-6.5.5l-.71,19.29c1.56-.26,3.13-.47,4.66-.61l.46-13.02-.08-.9.28.86,4.35,9.74h3.96-.02Z"></path>
+								<path fill="#FFFFFF" d="M45.41,40.47c2.51-2.65,3.94-5.71,1.42-8.63-1.37-1.59-3.66-1.93-5.57-1.15l-.19.07.06-.17c.28-.75.46-3.15-1.59-4.82-1-.81-2.25-1.11-3.52-.98-2.36.24-4.18,1.85-9.13,7.37-1.49,1.66-3.66,4.29-4.97,5.99l13.58,12.89c4.51-4.99,6.35-6.84,9.9-10.58M27.69,37.32c2.74-3.35,5.64-6.38,6.96-7.59.42-.38.87-.76,1.42-.91.89-.25,1.81.39,2.02,1.31s-.37,1.79-1.01,2.51c-1.45,1.63-6.75,7.18-6.75,7.18l-2.64-2.51M33,42.37s5.17-5.46,6.85-7.21c.67-.7,1.1-1.11,1.56-1.34.59-.29,1.25-.35,1.83.04.57.38.84,1.05.69,1.7-.17.78-.81,1.52-1.34,2.09-.71.76-6.84,7.32-6.85,7.33l-2.75-2.61h.01Z"></path>
+								<path fill="#FFFFFF" d="M125.24,78.62h-46.62v-46.62c25.77,0,46.62,20.86,46.62,46.62"></path>
+								<path fill="#FFFFFF" d="M78.62,78.62v46.62c-25.77,0-46.62-20.86-46.62-46.62h46.62Z"></path>
+								<path fill="#0066B5" d="M78.62,32v46.62h-46.62c0-25.77,20.86-46.62,46.62-46.62"></path>
+								<path fill="#0066B5" d="M125.24,78.62c0,25.77-20.86,46.62-46.62,46.62v-46.62h46.62Z"></path>
+							</svg>
+						</div>
+						<h3 class="nicole-brand-title">BMW</h3>
+						<h4 class="nicole-brand-corp">Nicole Cars</h4>
+					</a>
+
+					<!-- 3. MINI -->
+					<a href="/location/#mini" class="nicole-brand-item brand-reveal-item" data-delay="240">
+						<div class="nicole-brand-icon-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234.96 103.21" aria-hidden="true" class="brand-svg-mark">
+								<path fill="#FFFFFF" d="M86.74,63.28h-4.56v-23.34h6.79l5.95,18.63,5.9-18.63h6.79v23.34h-4.7v-17.28l-5.46,17.28h-5.09l-5.61-17.41v17.41h-.01ZM117.73,63.28h-4.83v-23.34h4.83v23.34ZM127.66,63.28h-4.65v-23.34h5.69l9.31,16.92v-16.92h4.63v23.34h-5.7l-9.28-16.84v16.84ZM152.77,63.28h-4.83v-23.34h4.83v23.34ZM187.06,71.88h-22.15c1.19-2.75,2.12-5.62,2.81-8.6h27.93l7.38-7.37h-34.15c.11-1.42.2-2.85.2-4.3s-.08-2.88-.2-4.3h42.75l7.36-7.37h-51.27c-.69-2.97-1.63-5.86-2.81-8.61h62.69l7.36-7.37h-73.95C151.84,9.57,135.77,0,117.48,0s-34.37,9.57-43.54,23.96H0l7.36,7.37h62.67c-1.18,2.75-2.12,5.63-2.81,8.61H15.96l7.36,7.37h42.75c-.12,1.42-.19,2.85-.19,4.3s.07,2.88.19,4.3H31.93l7.36,7.37h27.93c.69,2.98,1.63,5.85,2.81,8.6h-22.14l7.37,7.37h18.68c9.17,14.39,25.25,23.96,43.54,23.96s34.37-9.57,43.53-23.96h18.68l7.37-7.37h0ZM117.47,95.84c-25.44,0-45.93-21.58-44.12-47.39,1.52-21.79,19.17-39.44,40.96-40.96,25.81-1.8,47.39,18.69,47.39,44.12s-19.84,44.23-44.24,44.23"></path>
+							</svg>
+						</div>
+						<h3 class="nicole-brand-title">MINI</h3>
+						<h4 class="nicole-brand-corp">Nicole Cars</h4>
+					</a>
+
+					<!-- 4. Rolls-Royce -->
+					<a href="/location/#rolls-royce" class="nicole-brand-item brand-reveal-item" data-delay="360">
+						<div class="nicole-brand-icon-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 114.55 150.86" aria-hidden="true" class="brand-svg-mark">
+								<path fill="#FFFFFF" d="M65.8,23.03h-21.37v43.16c-2.51,1.22-5.31,2.31-8.38,3.2-1.54.46-3.21.82-4.89,1.15V24.94s.42-6.55-3.35-8.76v-.82h34.22c1.54,1.86,2.93,4.38,3.77,7.65M71.8,82.07c15.51-7.43,23.05-20.52,23.19-35.51,0-10.2-3.49-16.45-7.54-19.78-.28-.19-.56-.38-.7-.56-.28-1.2-.56-2.37-.98-3.54-.84-2.4-1.82-4.61-2.93-6.63.7.1,1.4.24,2.1.35,11.18,2.39,20.25,9.03,24.59,21.84,3.35,10.44,1.68,23.39-5.73,33.8-1.81,2.45-6.43,7.68-11.87,11.57-.98.71-1.68,1.1-2.66,1.75,6.85,10.84,10.06,17.08,14.39,28.9,3.77,10.35,6.71,24.08,7.12,27.32.84,7.68,3.21,8.31,3.77,8.45v.82h-27.1v-.82c.84-.44,8.24-3.42,8.24-14.86,0-8.42-2.09-17.68-5.73-28.05-1.68-4.64-5.03-12.1-8.1-17.78v-.14c-1.4.64-3.35,1.32-5.59,2.02-1.4-3.25-2.8-6.2-4.47-9.17M44.42,81.15v7.02c2.1-.09,8.38-.59,14.25-1.72,1.26,2.94,2.38,5.72,3.21,7.89v.3c-2.24.38-4.89.73-7.68,1.05-3.77.44-7.54.68-9.78.83v45.33c0,.98.28,6.33,3.77,8.19v.82h-20.81v-.82c3.35-1.78,3.77-7.21,3.77-8.19v-58.28c4.33-.57,9.22-1.37,13.27-2.42M47.36,7.86l-2.93-.04h-26.96v66.46c2.65-.11,12.57-.95,19.14-2.87,21.79-6.44,32.27-21.67,32.41-39.56,0-10.42-3.63-16.8-7.68-20.2-2.66-2.11-6.01-3.12-8.52-3.47-1.26-.29-4.47-.32-5.45-.32M3.78,129.23V9.78S4.2,3.11.57.84v-.84h46.09c3.91,0,8.94.4,12.01,1.07,11.45,2.44,20.68,9.19,25.01,22.28,3.63,10.67,1.96,23.88-5.73,34.5-1.82,2.51-6.57,7.86-12.15,11.8-.98.72-1.54,1.12-2.66,1.79,6.98,11.08,10.34,17.42,14.81,29.49,3.77,10.56,6.71,24.59,7.12,27.88.98,7.83,3.35,8.62,3.77,8.79v.84h-27.52v-.84c.84-.45,8.24-3.67,8.38-15.36,0-8.56-2.1-18.01-5.87-28.6-1.68-4.73-5.03-12.34-8.24-18.14l-.14-.14c-3.63,1.66-11.32,3.92-16.34,4.87-3.63.68-7.26,1.24-11.73,1.75-3.91.45-7.68.7-9.92.85v46.4c0,1.02.14,6.46,3.77,8.37v.84H0v-.84c3.49-1.81,3.77-7.35,3.77-8.37"></path>
+							</svg>
+						</div>
+						<h3 class="nicole-brand-title">Rolls-Royce</h3>
+						<h4 class="nicole-brand-corp">Nicole MotorCars</h4>
+					</a>
+
+					<!-- 5. Ferrari -->
+					<a href="https://yokohama.ferraridealers.com/ja-JP" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="480">
+						<div class="nicole-brand-icon-wrap">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116.05 161.43" aria-hidden="true" class="brand-svg-mark">
+								<path fill="#FFFFFF" d="M54.85,3.84c.57.29.79.52,1.37.66.53.13,1.21.53,1.41.08s-.1-1.01-.43-1.55c-.56-.92-.85-1.14-1.68-2.42-.18-.27-.32-.57-.57-.61,0,0-.1.97-.33,1.55-.21.52-.78.88-.74,1.23.04.35.41.76.98,1.06"></path>
+								<path fill="#FFFFFF" d="M115.18,65.67c-.61.89-.96,2.58-1.89,4.05-1.26,1.99-3.2,4.44-4.08,4.47-.53.02-.66-1.16-.66-1.16,0,0-.65-1.93.47-4.42.78-1.74,1.25-2.24,2.22-3.56.92-1.24,1.53-1.84,2.19-3.21.58-1.18.71-1.4,1.09-3.18.09-.42-.1-1.34-.5-1.32-.6.03-2.13,3.47-3.86,5.39-1.59,1.78-4.53,4.13-4.53,4.13,0,0-.28.18-.32-.32-.04-.51-.17-2,.14-3.36.3-1.36.75-2.73,1.94-4.82,1.38-2.4,3.09-4,4.01-4.9.36-.35,1.43-1.03.89-1.37-.49-.31-1.99,1.02-3.15,1.86-1.46,1.05-1.93,1.34-3.41,3.11-1.45,1.74-1.83,2.47-1.83,2.47,0,0-1.35,2.21-1.74,4.4-.39,2.2-.39,3.39-.39,3.39,0,0,.03,1.94.18,3.14.16,1.2.64,3.09.64,3.09,0,0,.69,2.12.97,3.42.29,1.3.76,5.13.76,5.13,0,0,.35,2.75.16,5.34-.19,2.6-.44,4.11-.74,4.9s-1.12,2.9-2.38,4.3-1.5,1.61-1.5,1.61c0,0-1.29,1.09-2.37,1.66s-2.71,1.31-3.39,1.48c-.69.17-1.73.26-1.83.25l-.92-.03c-.1,0-.23-.12-.29-.22s-.12-.59-.12-.59c0,0-.69-2.79-1.55-4.63-.7-1.5-2.22-3.62-2.22-3.62,0,0-2.63-3.51-4.6-5.48-2.31-2.31-4.91-4.05-6.49-5.28-.56-.45-1.88-1.19-1.88-1.19,0,0-5.26-5.26-7.16-9.48-1.31-2.91-2.15-5.01-1.83-8.18.08-.76.39-2.06.52-2.08.13-.02.84.22.93.25.1.04.97.84,1.72,1.12.47.18,1.25.29,1.25.29,0,0,.65.04,1,.16s.98.35,1.45.59c.47.23,1.11.64,1.11.64,0,0,1.1.82,1.23.92s1.29,1.04,1.29,1.04c0,0,.74.51.94.59s.37.17.45.17.25.02.25.02c0,0,.31-.06.35-.39.04-.33-.33-.1-1.04-.78-.7-.69-.98-1.19-.98-1.19,0,0-.15-.61-.7-1.23-.55-.62-1.31-1.19-1.31-1.19,0,0-.49-.37-1.23-.56-.74-.2-.96-.21-1-.51-.04-.29.9-.16.9-.16,0,0,1.06.12,1.94.57s1.39.92,1.39.92l.61.49.37.35.37.23s.39.33.47-.14-.08-.76-.12-.88-.37-.39-.37-.39l-1.43-1.21c-.41-.43-.72-.74-1.15-1.01-.43-.28-1.1-.72-1.88-1.04-.69-.29-1.17-.22-1.85-.55-.51-.25-.91-.37-1.21-.78-.07-.09-.43-.35.21-.21.65.14,1.1.33,1.82.53,1.15.31,1.86.27,2.97.69.41.15,1.04.45,1.04.45l1.35.57s1.86,1.02,3.19,1.06c1.33.04,2.39-.25,2.82-.43s1.25-.63,1.46-.84.35-.41.35-.41c0,0,.1-.22.12-.33.02-.12.05-.19-.02-.27-.34-.41-1.07.72-2.27.96-1.19.23-1.18.33-1.93.22-.88-.13-1.4-.38-2.05-.98-1.17-1.07-1.62-2.08-3.09-2.76-.67-.31-1.82-.57-1.82-.57,0,0-1.57-.47-2.47-1-.66-.38-2.02-.55-1.58-1.14.22-.29,1.93.73,3.22.89.9.11,1.57.1,2.34.04.76-.06,1.76-.2,1.9-.23.13-.04.74,0,1.19.11.53.13.78.33,1.27.55.47.21,1.12.55,1.21.55.1,0,.32.04.32.04,0,0,.14-.08.17-.18.04-.1.06-.18.06-.18l-.06-.16-.23-.17-.45-.29s-.63-.37-1.19-.94c-.57-.57-1.11-1.19-1.97-1.5-.86-.31-1.86-.43-1.86-.43l-.98-.08-.41-.04s-.7-.22-.14-.37c.57-.16.9-.21,1-.25s1.06-.12,1.66.08c.6.2,1.5.69,1.58.73s.92.7,1.88.94c.96.23,2.19.27,2.19.27,0,0,.47-.08.58-.14.12-.06.16-.1.26-.1s.2-.08.21-.18c.02-.1-.04-.39-.04-.39,0,0,.02-.32-.43-.37-.45-.06-1.27-.21-2.09-.82-.82-.61-1.41-1.15-1.41-1.15,0,0-.6-.53-1.7-.78-1.09-.25-1.43-.31-1.43-.31l-.37-.12-.82-.37s-.37-.2-.65-.55c-.27-.35-.72-1.02.49-.62,1.21.39,1.49.56,1.49.56,0,0,.65.65,1.19.71.34.04.64.13.86-.12.33-.39-.68-.81-1.4-1.29-.55-.37-1.14-1.27-1.14-1.27,0,0-.41-.39.23-.21.65.18,1.82.84,1.82.84,0,0,.61.27.84.37.24.1.82.47,1.06.55.23.08.86.18,1.33.47.54.33.86.92,1.15,1.15.29.23.51.55.84.64.33.1.45.22.68.08.23-.14.27-.25.27-.25,0,0,.06-.18-.27-.37s-.78-.78-.78-.78l-.14-.31-.1-.26-.37-.55-.62-.96s-1.04-1.37-1.92-1.86-1.49-.76-1.49-.76c0,0-.44-.19-.68-.37-.35-.26-.47-.51-.76-.84-.38-.44-.54-.73-.94-1.15-.78-.83-3.28-1.23-2.3-1.8.49-.29,1.16-.17,1.46-.07.29.1.94.37,1.57.55.45.13.72.15,1.17.27.45.13.96.23,1.15.37.2.14.45.41.55.47.1.06.64.98,1.68,1.49,1.04.51,1.5.83,2.56.92.81.06,2.07-.25,2.07-.25,0,0,.39-.16.06-.51s-.36-.4-.66-.53c-1.14-.47-2.07-.29-2.95-1.15-.35-.35-.49-.45-.76-1.02-.28-.57-.15-.69-.33-1.1-.16-.36-.53-.88-.53-.88,0,0-1.05-1.27-2.27-1.93-1.21-.66-2.07-1.31-2.27-1.47-.2-.16-.65-.74-.65-.74,0,0-.33-.43-.39-.55-.06-.12-.17-.27-.22-.47-.17-.81,1.28.25,2.07.49,1.32.41,1.94.98,3.25,1.41.73.24,1.18.25,1.89.53,1.25.5,1.57,1.73,2.91,1.86.75.07,2.18.38,1.91-.31-.29-.73-1.72-.69-2.46-1.55-.33-.39-.38-.7-.71-1.09-.61-.71-1.95-1.39-1.95-1.39,0,0-.47-.37-.92-1.39s-1.53-1.71-3.44-2.65c-1.31-.65-3.9-.76-2.87-1.48.61-.42,1.1-.37,1.9-.12s1.06.63,1.7.94c.64.32.92.37,1.05.45.14.08.69.27.86.31.18.04,1.25.25,1.51.3.25.04,1.45.35,1.45.35l1.19.45s.55.21.94.19.96-.17.96-.17l.43-.29.1-.14s.19-.33-.33-.41c-.53-.08-.76-.08-.84-.1s-.35-.16-.49-.18c-.14-.02-.23-.1-.23-.1,0,0-.98-.8-1.9-1.17-.92-.37-1.11-.45-1.11-.45,0,0-.21-.06-.33-.08s-.43-.1-.43-.1c0,0-.37,0-.96-.52-.59-.53-.8-.78-1.3-1.28-.27-.27-.68-.67-.68-.67,0,0-.58-.43-.55-.8.04-.56,1.31.62,1.31.62l.84.57s.7.53,2.03.57c1.33.04,2.87-.39,2.87-.39,0,0,.24-.15.96.08.72.24,1.29.63,1.29.63l.56.49s.8.99.88.96c.08-.04.06,0,.14-.08.08-.08.45-.47-.19-1.23s-1.76-1.52-1.76-1.52c0,0-1.46-.88-2.89-1.17-1.43-.29-2.09-.29-2.09-.29,0,0-1.1.02-1.72-.72-.63-.74-1.11-1.41-1.11-1.41l-.47-.35s-.37-.45-1.06-.74c-.68-.3-1.39-.69-1.39-.69,0,0-1.04-.39-1.14-.84-.19-.94,1.77,0,2.87.23.99.2,1.47.59,2.46.8.88.18,1.39.26,2.29.25.52,0,.81-.09,1.33-.12.54-.02.86-.1,1.39,0,.73.13,1.05.48,1.72.79.45.21.66.45,1.14.53.45.07,1.28.33,1.15-.1-.04-.13-.11-.18-.19-.29-.36-.47-.76-.52-1.25-.87-.96-.69-1.37-1.32-2.43-1.84-.72-.35-1.16-.51-1.96-.65-.6-.11-.98.07-1.56-.1-.64-.18-.9-.53-1.48-.87-1.04-.6-1.55-1.09-2.67-1.53-.74-.29-1.96-.57-1.96-.57l-.51-.08s-.13-.03-.21-.06c-1-.34,1.78-1.18,3.07-1.51.61-.16.92-.29,1.61-.24.58.04,1.2.84,1.84.47.93-.52-1.11-1.88-1.72-2.11-.87-.33-2.39-.06-2.39-.06l-3.34-.06-.92-.12s-.57.02-1-.47-2.09-2.54-4.01-2.83c-1.92-.29-2.53.03-2.66-.17-1.64-2.58-3.4-3.2-4.71-4.43-.37-.34-.94-1.16-1.08-1.05-.12.1-.33,1.17-.74,2.09-.47,1.05-.16,1.6.09,1.99.26.41.67.7-.06,1.15s-1.66.32-1.66.32c0,0-.8-.16-1.47-.47-.66-.31-2.01-.92-2.01-.92,0,0-1.29-.37-2.19-.29s-.95.13-1.56.22c-.34.05-.53.04-.86.12-.26.06-.63-.12-.65.21s.75.39,1.24.59c.54.21,1.69.2,1.42.47-.28.27-1.34.33-1.42.29s-.82-.16-1.35-.13c-.97.04-1,.09-2.38.74-.19.09-.18.57.31.45s1.22-.29,2.01-.26c.88.04,1.35.3,2.21.51.73.18.81.37,1.86.49.21.02.67-.15.67.11,0,.18-.32.33-.32.33,0,0-.67.14-.56.38.14.3.76.02,1.02,0,.3-.03.74.1.67.39-.03.11-.08.17-.18.24-.78.2-1.22.34-1.98.63-1.79.7-2.55,1.61-4.28,2.45-1.65.81-4.35,1.8-4.35,1.8,0,0-.8.45-1.93.7s-1.23.25-2.03.33c-.81.09-1.19.19-1.84.56-.43.24-.66.42-1.01.77l-1.02,1.51-.55.88c-.17.26-.25.41-.38.7-.15.33-.24.53-.32.88-.2.85-.03,1.38.12,2.25.04.24.07.4.12.61.05.22.39.45.39.45l.3.08s.98-.08,1.66-.23c.68-.16,1.56-.35,1.56-.35,0,0,1.11-.35,1.19-.37.08-.02.78-.27.78-.27,0,0,.5.02.61.25.09.21-.14.57-.14.57,0,0-.41.21-.78.33s-1.21.39-1.29.41c-.08.02-.96.25-.96.25l-.62.16s-.18.04-.32.27c-.14.24-.09.22-.08.37.12.17.2.27.36.41.26.23.44.33.76.45.47.18.78.17,1.29.16.74-.02,1.17-.12,1.83-.43.57-.33.79-.39,1.56-.65.2-.07.62-.15.83-.17,1.37-.13,2.16.08,3.52.32,1.35.23,2.04.63,3.39.86,1.47.25,2.34.63,3.8.33.75-.16,1.16-.47,1.55.21.39.69.31,1.04.31,1.04,0,0,0,.45-.51,1.8s-2.09,4.74-2.09,4.74l-1.1,2.19s-.88,1.7-2.87,3.95c-1.99,2.25-2.15,2.4-2.15,2.4,0,0-1.05.76-2.16,2.13-1.11,1.37-1.12,1.89-2.1,2.87-.65.65-.99,1.03-1.82,1.49-.83.45-1.72.32-4.25,2.07-2.18,1.51-3.29,2.71-3.45,2.66-.15-.04-.9-.66-1.12-.81-.23-.15-4.4-2.99-4.4-2.99l-1.76-1.16-.78-.49-.25-.15-.4-.59s-.61-.77-1.44-1.46c-.82-.69-1.7-1.27-2.96-1.62-1.22-.33-2.03-.55-3.23-.16-.8.27-1.21.57-1.83,1.14-.74.68-.88,1.31-1.45,2.15-.57.83-1.16,1.68-1.45,2.13-.29.44-.89,1.62-.89,1.62,0,0-1.42,2.3-2.26,3.81-.91,1.64-1.29,2.64-2.18,4.28-1.38,2.51-3.29,5.15-3.81,6.28s-.55,1.27-.55,1.27c0,0-.17.65-.2,1.06-.04.41-.06,1.14-.12,1.47s-.26.71-.33.79c-.08.08-.9,1.71-1.18,2.81-.27,1.1-.94,4.49-.13,4.92.78.41,6.66-2.07,7.41-4.58.47-1.58-1.59-2.37-1.02-3.8.18-.47.37-.55.71-1.09.58-.92.34-2.91,1.46-4.72.8-1.31,2.37-2.98,4.55-5.44,1.35-1.51,2.68-3.99,2.68-3.99,0,0,.29-.86.9-.74s1.21.08,1.21.08c0,0,.25.19.32.23.08.04.55.58.55.58l.89,1.32s1.43,2.11,1.93,2.68,1.03.98,1.7,1.6c.79.73,1.07,1.07,2.06,1.84,1.47,1.15.91,1.57-.93.57-.65-.35-1.63-.7-2.46-.92s-4.15-1.1-5.76-1.3c-1.61-.2-1.85-.17-1.85-.17,0,0-.82-.04-1.73.51s-1.46,1.02-1.46,1.02c0,0-1.06,1.24-1.15,1.45-.09.21-.6,1.08-.6,1.08,0,0-.26.44-.39.96-.12.52-.09,1.03-.09,1.03l.04,1.06.1,1.02s.19,2.49.76,5.07c.16.74.29,1.91.29,1.91l.35,2.58s.25,2.77.44,3.64c.19.87.33.93.47,1.55.25,1.1-.24,1.61.32,2.88.56,1.26.96,1.12,1.47,1.92.34.55.49.71.78,1.45.29.74,1.22,3.08,2.33,4.86,1.14,1.82,2.7,4.05,3.71,3.81,1.01-.24,1.73-1.77,1.73-1.77,0,0,1.16-3.08.43-6.16-.74-3.13-4.07-1.63-4.44-3.9-.08-.49-.03-1.28-.03-1.28,0,0-.08-.96-.2-1.22-.12-.26-1.33-2.49-1.76-4.22-.33-1.34-.3-5.75-.61-7.01-.78-3.17-.89-2.88-.41-3.43.48-.56.95-.44.95-.44,0,0,.51.04.62.05.12,0,.5.2.5.2,0,0,.61.34.93.59s1.28,1.02,1.28,1.02l2.44,1.55s1.37.8,1.98,1.06c.61.27,1.1.67,1.1.67l.64.42,1.11.78s.16.11.25.21c.08.09.16.26.16.26,0,0,.51,1.15,2.65,2.41,1.76,1.03,3.27.72,3.93,1.51.12.14,1.34,1.77,1.98,2.82.72,1.17,1.57,2.55,1.86,2.97.29.43,2.11,2.66,2.11,2.66l2.35,2.61,3.1,2.86,2.79,2.36,1.78,1.41s1.59,1.53,3.41,2.76c1.71,1.14,1.81,1.33,2.95,2.07.89.59,2.04,1.34,3.15,2.25,1.14.93,2.43,2.65,1.94,3.24-.34.22-1.02-.71-2.28-1.79-1.03-.88-1.52-1.29-2.53-2.06-1.29-.97-1.94-1.49-3.41-2.36-.69-.41-2.02-1.25-2.08-1.09-.52,1.53-.41,2.99-.33,4.86.05,1.3.29,2.61.69,4.23.39,1.57.73,2.43,1.31,3.95.59,1.53,1.68,3.86,1.68,3.86l1.68,3.34,1.51,2.55.81,1.31.26.4s.34.85,0,1.42c-.33.57-.82,1.79-1.44,1.9-.61.12-2.15.24-2.15.24l-8.59-.11-4.49-.4s-.47-.31-3.12-.26c-1.53.03-2.76.63-3.61.69-.7.05-4.26-.22-6.62.75-2.21.9-3.27,1.14-4.05,2.57-.59,1.08,2.8,2.79,5.61,3.43,4.56,1.04,3.24-.96,4.98-2.17.21-.14.28-.31.53-.39,1.18-.35,1.79.57,2.97.59,1.31.02,2-.45,3.3-.63,6.54-.9,16.79,2.22,16.79,2.22,0,0,2.49.81,3.71.55,1.37-.3,1.11-.77,1.54-1.57.35-.65.22-.81.27-1.52.03-.41-.07-.65-.16-1.06-.27-1.2-1.05-2.92-1.05-2.92,0,0-.56-1.29-.77-1.98-.29-.97-.55-1.5-.69-2.5-.41-2.7-.35-2.42-.35-3.98,0-2.72.29-4.29,1.02-6.91,1.09-3.89,3.09-5.53,4.59-9.28.4-1,.45-2.49.98-2.57.55-.09.49,1.79.22,2.88-.94,3.78-3.27,5.37-4.31,9.2-.79,2.93-1.21,4.69-1.02,7.73.1,1.69.73,4.27.73,4.27,0,0,.86,2.89,1.31,3.96.45,1.07,1.27,2.92,1.27,2.92l1.95,3.49,1.02,1.66s.74.67.37,1.73-1.1,1.71-1.95,2.69c-2.47,2.85-8.15,7.11-9.57,8.17-2.02,1.5-1.96,1.92-2.13,2.41-.83,2.3-3.1,2.37-5.64,5.15-.55.61-2.11,2.15-1.77,3.51.12.48,6.36,1.61,9.99.04,2.82-1.22.38-2.57,1.12-3.95.55-1.01,2.03-1,2.67-1.85,1.06-1.41.33-1.35,1.33-2.53,3.13-3.74,5.11-5.91,10.67-9.27.53-.32,1.41-.72,1.41-.72,0,0,.78-.37,1.08-.8.39-.57.27-1.06.28-1.75,0-.44-.05-.68-.08-1.12-.03-.51.04-.8-.06-1.29-.16-.79-.67-1.47-.93-1.85-.26-.38-.77-1.02-1.11-2.41-.34-1.38-.38-2.55.22-4.06.6-1.5,1.89-2.77,1.89-2.77l3.26-2.17s2.79-2.03,3.7-2.82,2.73-2.46,4.07-4.35c1.48-2.11,2.31-3.42,2.94-5.92.23-.9.4-2.35.4-2.35,0,0-.02-1.02.54-1.06.57-.04.7.16.7.16,0,0,.52.27.62,1.74s-.37,3.08-.37,3.08c0,0-.43,1.62-.55,2.69-.08.66-.1,1.03-.1,1.7,0,1.22.52,2.21.52,2.21,0,0,.31.22.29-.32-.02-.55.13-1.45.4-2.34.22-.74.34-.57.76-1.81.54-1.58.04-1.41.4-2.35.17-.46.49-.84.92-.87.43-.02.49.61.49.61,0,0,.44,1.91.05,3.64-.39,1.72-1.63,4.1-1.63,4.1l-1.04,1.77s-.69,1.19-.99,2.01c-.31.86-.39,1.23-.22,1.99.18.83.86,2.05,1.19,1.82.32-.21-.42-.98.44-2.7.86-1.73,2.01-2.78,2.01-2.78,0,0,1.6-1.9,2.33-3.3.65-1.27,1.27-3.42,1.27-3.42,0,0,.48-1.9.37-3.45-.1-1.55-.35-2.34-.35-2.34,0,0-.57-1.03-.65-1.15-.07-.12-.39-.68-.38-.84,0-.16.02-.47.18-.52.16-.06.63.28,1.08.86.45.58.84,1.33,1.11,2.29.21.76.26,1.4.28,1.98s-.18,2.94.67,4.5c.39.71,1.24,2.37,1.29,1.63.12-1.69-.56-2.44-.48-3.94.1-1.71.48-1.31.64-2.17.17-.91.37-1.18.2-2.36-.17-1.18-.63-2.68-.63-2.68,0,0-.43-1.05-.49-1.17-.06-.12-.2-.41-.2-.41,0,0,.14-.19.36-.25.22-.05,1.74-.58,1.74-.58,0,0,2.2-1.04,3.13-1.71.92-.67,2.04-1.82,2.04-1.82,0,0,1.46-1.8,2.14-3.09,1.7-3.23,1.76-7.39,1.67-9.22-.09-1.82-.58-4.22-.58-4.22,0,0-.54-2.88-.42-4.77.12-1.89.29-2.76.29-2.76,0,0-.06-1.9,1.49-3.91,1.57-2.05,2.29-3.35,2.57-4.8.24-1.22-.26-3.3-.81-2.5"></path>
+							</svg>
+						</div>
+						<h3 class="nicole-brand-title">Ferrari</h3>
+						<h4 class="nicole-brand-corp">Nicole Competizione</h4>
+					</a>
+				</div>
 			</div>
 		</div>
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 6. INFORMATION & TOPICS（最新ニュース・リスト） -->
+	<!-- 4. 最新情報：INFORMATION & TOPICS（今日修正前のレイアウト復元） -->
 	<!-- ============================================================== -->
-	<section class="editorial-news">
+	<section class="editorial-news" id="info-section">
 		<div class="editorial-container">
 			<div class="editorial-header">
 				<div class="editorial-header__left editorial-reveal">
-					<span class="editorial-num">05</span>
-					<span class="editorial-eyebrow">LATEST ANNOUNCEMENTS</span>
 					<h2 class="editorial-title">INFORMATION</h2>
-				</div>
-				<div class="editorial-header__right editorial-reveal" data-delay="200">
-					<span class="editorial-tagline">Nicole Group Official News & Updates</span>
 				</div>
 			</div>
 
@@ -529,27 +461,121 @@ const newsList = [
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 7. SHOWROOMS & LOCATIONS CTA（インタラクティブ拠点導線） -->
+		<!-- ============================================================== -->
+	<!-- 5. NICOLE UNIVERSE：5大エディトリアル・ラグジュアリーセクション -->
 	<!-- ============================================================== -->
-	<section class="editorial-locations-cta">
+
+	<!-- 導入エディトリアル見出し -->
+	<div class="nicole-universe-intro editorial-reveal">
 		<div class="editorial-container">
-			<div class="locations-banner editorial-reveal">
-				<div class="locations-banner__bg"></div>
-				<div class="locations-banner__content">
-					<div class="locations-banner__badge">SHOWROOMS & NETWORKS</div>
-					<h2 class="locations-banner__title">
-						東京・神奈川エリアを結ぶ、<br />
-						11のプレミアムショールーム＆サービス拠点。
-					</h2>
-					<p class="locations-banner__desc">
-						全拠点のインタラクティブマップ、営業時間、連絡先、ショールームギャラリーを掲載したロケーション一覧ページをご用意しております。
-					</p>
-					<div class="locations-banner__actions">
-						<a href="/location/" class="btn-editorial-gold">
-							ショールーム・拠点マップを見る
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-						</a>
+			<h2 class="nicole-universe-lead">
+				妥協なきクオリティと信頼が織りなす、<br class="hidden-sp" />ニコル・グループの多面的な世界
+			</h2>
+		</div>
+	</div>
+
+	<!-- 1. 【SHOWROOMS & NETWORKS】大判シネマティック・パノラマ -->
+	<section class="nicole-panorama-section" id="location-banner">
+		<div class="nicole-panorama-card editorial-reveal">
+			<div class="nicole-panorama-img-wrap nicole-banner-img-wrap">
+				<img src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC2372.jpg" alt="事業拠点・ショールーム一覧" class="nicole-scroll-zoom-img" loading="lazy" />
+			</div>
+			<div class="nicole-panorama-content">
+				
+				<h2 class="nicole-banner-heading">
+					<a href="/location/">事業拠点・ショールーム一覧</a>
+				</h2>
+				<p class="nicole-banner-desc">
+					東京・神奈川エリアを中心に、世界最高峰のブランドを体現する拠点を展開。最高水準のクオリティをお届けする各ショールームおよびサービス工場の詳細情報はこちらからご覧いただけます。
+				</p>
+				<div class="nicole-banner-btn-wrap">
+					<a href="/location/" class="nicole-red-btn">拠点一覧へ</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 2 & 3. 【RECRUITMENT × PHILOSOPHY】アシンメトリー・デュアル・プレビューカード -->
+	<section class="nicole-dual-grid-section">
+		<div class="editorial-container">
+			<div class="nicole-dual-grid">
+				<!-- 左カード：採用情報（白背景、パララックスなし） -->
+				<div class="nicole-feature-card nicole-feature-card--light editorial-reveal" data-delay="0" id="recruit-banner">
+					<div class="nicole-feature-card__img-wrap">
+						<img src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/02/career001.webp" alt="ニコル・グループ採用情報" class="nicole-static-img" loading="lazy" />
 					</div>
+					<div class="nicole-feature-card__body">
+						<h2 class="nicole-banner-heading">
+							<a href="https://www.nicole-recruit.com/" target="_blank" rel="noopener noreferrer">ニコル・グループ採用情報</a>
+						</h2>
+						<p class="nicole-banner-desc">
+							妥協なきクオリティと、積み重ねてきた信頼。自動車業界をリードするグループの一員として、新たなキャリアを刻みませんか？　入社お祝い金、インセンティブ保証制度あり。
+						</p>
+						<div class="nicole-banner-btn-wrap">
+							<a href="https://www.nicole-recruit.com/" target="_blank" rel="noopener noreferrer" class="nicole-red-btn">採用情報を詳しく</a>
+						</div>
+					</div>
+				</div>
+
+				<!-- 右カード：私たちの志（白背景、パララックスなし） -->
+				<div class="nicole-feature-card nicole-feature-card--light editorial-reveal" data-delay="150" id="our-will-banner">
+					<div class="nicole-feature-card__img-wrap">
+						<img src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/02/DSC3504.jpg" alt="私たちの志" class="nicole-static-img" loading="lazy" />
+					</div>
+					<div class="nicole-feature-card__body">
+						<h2 class="nicole-banner-heading">
+							<a href="https://www.nicole.co.jp/corporate/philosophy/">私たちの志</a>
+						</h2>
+						<p class="nicole-banner-desc">
+							ニコル・グループを形作っているもの。それは、単なる事業の集合体ではなく、共通の意志です。私たちが社会に対して約束する、3つの核心（MISSION / VISION / VALUE）についてご説明します。
+						</p>
+						<div class="nicole-banner-btn-wrap">
+							<a href="https://www.nicole.co.jp/corporate/philosophy/" class="nicole-red-btn">3つの核心を詳しく</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 4. 【ESG / SDGs活動】フルブリード・サステナビリティ・バンド -->
+	<section class="nicole-strip-section nicole-strip-section--esg" id="esg-banner">
+		<div class="nicole-strip-grid editorial-reveal">
+			<div class="nicole-strip-img-wrap nicole-banner-img-wrap">
+				<img src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/02/AdobeStock_1808926524-scaled.webp" alt="ESG / SDGs活動" class="nicole-scroll-zoom-img" loading="lazy" />
+			</div>
+			<div class="nicole-strip-content">
+				
+				<h2 class="nicole-banner-heading nicole-banner-heading--white">
+					<a href="https://www.nicole.co.jp/corporate/esg_sdgs/">ESG / SDGs活動</a>
+				</h2>
+				<p class="nicole-banner-desc nicole-banner-desc--white">
+					私たちは、長年培った経験と信頼を基盤に、ESG / SDGsの観点から持続可能な社会の実現に取り組んでいます。ステークホルダーの皆さまと共に、次世代に誇れる未来を築くことを使命としています。
+				</p>
+				<div class="nicole-banner-btn-wrap">
+					<a href="https://www.nicole.co.jp/corporate/esg_sdgs/" class="nicole-red-btn">活動内容を詳しく</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 5. 【ONLINE STORE】ラグジュアリー・ブティックカード（パララックスなし） -->
+	<section class="nicole-boutique-section" id="store-banner">
+		<div class="editorial-container">
+			<div class="nicole-boutique-card editorial-reveal">
+				<div class="nicole-boutique-content">
+					<h2 class="nicole-banner-heading">
+						<a href="https://nicole-automobiles.shop/" target="_blank" rel="noopener noreferrer">オンラインストア</a>
+					</h2>
+					<p class="nicole-banner-desc">
+						アルピナ専用パーツや認定中古車をはじめ、BMW用アルピナ・ホイールなどを販売中。伝統が息づくデザインと確かなパフォーマンスで、自動車ライフをワンランク上のステージへ導きます。
+					</p>
+					<div class="nicole-banner-btn-wrap">
+						<a href="https://nicole-automobiles.shop/" target="_blank" rel="noopener noreferrer" class="nicole-red-btn">オンラインストアへ</a>
+					</div>
+				</div>
+				<div class="nicole-boutique-img-wrap">
+					<img src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/D3_BITURBO_08_end.jpg" alt="オンラインストア" class="nicole-static-img" loading="lazy" />
 				</div>
 			</div>
 		</div>
@@ -557,17 +583,15 @@ const newsList = [
 </main>
 
 <!-- ============================================================== -->
-<!-- モーション制御スクリプト（IntersectionObserver & スクロール連動） -->
+<!-- モーション制御スクリプト（IntersectionObserver & スライダー操作） -->
 <!-- ============================================================== -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
-		// 1. スクロール監視による要素の順次フェードイン（スタッガーアニメーション）
+		// 1. スクロール監視による要素の順次フェードイン
 		const reveals = document.querySelectorAll('.editorial-reveal');
-		const lines = document.querySelectorAll('.editorial-line');
-
 		const observerOptions = {
 			root: null,
-			rootMargin: '0px 0px -80px 0px',
+			rootMargin: '0px 0px -60px 0px',
 			threshold: 0.1
 		};
 
@@ -586,116 +610,91 @@ const newsList = [
 
 		reveals.forEach(el => revealObserver.observe(el));
 
-		// 2. ヘアラインの描画アニメーション監視
-		const lineObserver = new IntersectionObserver((entries, observer) => {
+		// ブランドカードのスタッガード出現
+		const brandItems = document.querySelectorAll(".brand-reveal-item");
+		const brandObserver = new IntersectionObserver((entries, observer) => {
 			entries.forEach(entry => {
 				if (entry.isIntersecting) {
-					entry.target.classList.add('is-drawn');
-					observer.unobserve(entry.target);
+					const el = entry.target;
+					const delay = el.getAttribute("data-delay") || 0;
+					setTimeout(() => {
+						el.classList.add("is-visible");
+					}, delay);
+					observer.unobserve(el);
 				}
 			});
-		}, { rootMargin: '0px 0px -40px 0px', threshold: 0.1 });
+		}, { root: null, rootMargin: "0px 0px -40px 0px", threshold: 0.15 });
+		brandItems.forEach(el => brandObserver.observe(el));
 
-		lines.forEach(line => lineObserver.observe(line));
+		// 2. ヒーローセクションは常にフル幅を維持（縮小処理なし）
 
-		// 3. ヒーローセクションのシネマティック・スクロール連動
-		const heroSection = document.getElementById('hero-section');
-		const heroViewport = document.getElementById('hero-viewport');
-
-		if (heroSection && heroViewport && window.innerWidth > 768) {
-			let ticking = false;
-
-			window.addEventListener('scroll', () => {
-				if (!ticking) {
-					window.requestAnimationFrame(() => {
-						const scrollY = window.scrollY;
-						const heroHeight = heroSection.offsetHeight;
-
-						if (scrollY <= heroHeight) {
-							const progress = Math.min(scrollY / heroHeight, 1);
-							// スクロールに伴い、インセット・角丸・スケールを滑らかに縮小
-							const insetPad = progress * 24; // 0px -> 24px
-							const radius = progress * 24;   // 0px -> 24px
-							const scale = 1 - (progress * 0.04); // 1.0 -> 0.96
-
-							heroViewport.style.transform = `scale(${scale})`;
-							heroViewport.style.borderRadius = `${radius}px`;
-							heroViewport.style.margin = `${insetPad}px`;
-						}
-						ticking = false;
-					});
-					ticking = true;
-				}
-			}, { passive: true });
+		// 3. The latest Nicole Group Insights スライダー（ボタンなし・スムーズスクロール）
+		const slider = document.getElementById('insights-slider');
+		if (slider) {
+			// マウスホイールやタッチによる快適なネイティブスワイプスクロール
 		}
 
-		// 4. The latest Nicole Group Insights スライダー（BMW Group TeaserSlider操作）
-		const slider = document.getElementById('insights-slider');
-		const prevBtn = document.getElementById('insights-prev-btn');
-		const nextBtn = document.getElementById('insights-next-btn');
-
-		if (slider && prevBtn && nextBtn) {
-			const updateSliderNav = () => {
-				const maxScroll = slider.scrollWidth - slider.clientWidth - 8;
-				prevBtn.disabled = slider.scrollLeft <= 5;
-				nextBtn.disabled = slider.scrollLeft >= maxScroll;
+		// 4. バナー画像のスクロール連動ズーム（枠サイズ維持・内部画像のみ拡大）
+		const zoomWrappers = document.querySelectorAll('.nicole-banner-img-wrap');
+		if (zoomWrappers.length > 0) {
+			let zoomTicking = false;
+			const handleScrollZoom = () => {
+				const winHeight = window.innerHeight;
+				zoomWrappers.forEach(wrap => {
+					const rect = wrap.getBoundingClientRect();
+					if (rect.bottom > 0 && rect.top < winHeight) {
+						// 画面に入ってから出るまでの進行度 (0.0 〜 1.0)
+						const totalRange = winHeight + rect.height;
+						const currentProgress = (winHeight - rect.top) / totalRange;
+						const progress = Math.max(0, Math.min(1, currentProgress));
+						// 1.0から最大1.16まで滑らかに拡大
+						const scale = 1.0 + progress * 0.16;
+						const targetImg = wrap.querySelector('.nicole-scroll-zoom-img');
+						if (targetImg) {
+							targetImg.style.transform = `scale(${scale.toFixed(4)})`;
+						}
+					}
+				});
+				zoomTicking = false;
 			};
 
-			const getCardStep = () => {
-				const firstCard = slider.querySelector('.bmw-insight-card');
-				if (firstCard) {
-					return firstCard.offsetWidth + 28; // card width + gap
+			window.addEventListener('scroll', () => {
+				if (!zoomTicking) {
+					window.requestAnimationFrame(handleScrollZoom);
+					zoomTicking = true;
 				}
-				return slider.clientWidth * 0.75;
-			};
-
-			prevBtn.addEventListener('click', () => {
-				slider.scrollBy({ left: -getCardStep(), behavior: 'smooth' });
-			});
-
-			nextBtn.addEventListener('click', () => {
-				slider.scrollBy({ left: getCardStep(), behavior: 'smooth' });
-			});
-
-			slider.addEventListener('scroll', updateSliderNav, { passive: true });
-			window.addEventListener('resize', updateSliderNav, { passive: true });
-			updateSliderNav();
+			}, { passive: true });
+			handleScrollZoom();
 		}
 	});
 </script>
 
 <style>
 	/* ============================================================== */
-	/* デザインシステム・トークン（静謐なエディトリアル・ラグジュアリー） */
+	/* 共通ベース ＆ タイポグラフィ（ゴールド完全排除・モノトーン＋レッド） */
 	/* ============================================================== */
 	:root {
-		--bg-pure-black: #060709;
-		--bg-card: #0e1014;
-		--bg-card-hover: #14171d;
-		--color-gold: #c5a059;
-		--color-gold-hover: #dfb970;
-		--border-subtle: rgba(255, 255, 255, 0.1);
-		--border-focus: rgba(197, 160, 89, 0.4);
-		--text-primary: #ffffff;
-		--text-secondary: #9ea4b0;
-		--text-muted: #5f6674;
-		--font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+		--bg-pure-black: #000000;
+		--bg-pure-white: #FFFFFF;
+		--color-nicole-red: #FF0000;
+		--color-nicole-red-hover: #D60000;
+		--text-primary: #111111;
+		--font-helvetica: "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", sans-serif;
 	}
 
 	.nicole-editorial-main {
-		background-color: var(--bg-pure-black);
+		background-color: var(--bg-pure-white);
 		color: var(--text-primary);
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		font-family: var(--font-helvetica);
 		overflow-x: hidden;
 		line-height: 1.7;
-		letter-spacing: 0.02em;
 	}
 
 	.editorial-container {
 		width: 100%;
 		max-width: 1360px;
 		margin: 0 auto;
-		padding: 0 32px;
+		padding: 0 40px;
 	}
 
 	/* ============================================================== */
@@ -723,8 +722,6 @@ const newsList = [
 		flex-direction: column;
 		justify-content: flex-end;
 		padding: 0 4vw 6vw 4vw;
-		transition: transform 0.1s cubic-bezier(0.2, 0, 0, 1), border-radius 0.1s ease, margin 0.1s ease;
-		will-change: transform;
 	}
 
 	.cinematic-hero__video-wrapper {
@@ -748,8 +745,7 @@ const newsList = [
 		min-height: 56.25vw;
 		transform: translate(-50%, -50%);
 		border: none;
-		opacity: 0.72;
-		filter: brightness(0.9) contrast(1.08);
+		filter: brightness(0.85);
 	}
 
 	.cinematic-hero__overlay {
@@ -758,119 +754,33 @@ const newsList = [
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(
-			180deg, 
-			rgba(6, 7, 9, 0.35) 0%, 
-			rgba(6, 7, 9, 0.2) 40%, 
-			rgba(6, 7, 9, 0.85) 90%, 
-			rgba(6, 7, 9, 0.98) 100%
-		);
-		z-index: 2;
+		background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.45) 100%);
 	}
 
-	.cinematic-hero__content {
-		position: relative;
-		z-index: 10;
-		max-width: 900px;
-	}
-
-	.hero-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 6px 14px;
-		background: rgba(255, 255, 255, 0.08);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
-		margin-bottom: 20px;
-	}
-
-	.hero-badge__dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		background: var(--color-gold);
-		box-shadow: 0 0 8px var(--color-gold);
-		animation: pulse-dot 2.5s infinite ease-in-out;
-	}
-
-	.hero-badge__text {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.18em;
-		color: rgba(255, 255, 255, 0.9);
-	}
-
-	.hero-title {
-		margin: 0 0 16px 0;
-		display: flex;
-		flex-direction: column;
-		line-height: 0.95;
-	}
-
-	.hero-title__en {
-		font-family: var(--font-display);
-		font-size: clamp(40px, 7.5vw, 96px);
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		color: #ffffff;
-		text-transform: uppercase;
-		text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-	}
-
-	.hero-title__en--sub {
-		color: rgba(255, 255, 255, 0.85);
-		font-weight: 300;
-		letter-spacing: 0.04em;
-	}
-
-	.hero-tagline {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		margin-top: 12px;
-	}
-
-	.hero-tagline__rule {
-		width: 48px;
-		height: 1.5px;
-		background-color: var(--color-gold);
-	}
-
-	.hero-tagline__text {
-		font-size: clamp(16px, 2vw, 22px);
-		font-weight: 400;
-		letter-spacing: 0.14em;
-		color: rgba(255, 255, 255, 0.92);
-		margin: 0;
-	}
-
-	/* スクロールインジケーター */
 	.hero-scroll-indicator {
 		position: absolute;
-		right: 4vw;
-		bottom: 4vw;
+		bottom: 36px;
+		right: 48px;
 		z-index: 10;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 		text-decoration: none;
-		color: rgba(255, 255, 255, 0.6);
-		transition: color 0.3s ease;
+		opacity: 0.7;
+		transition: opacity 0.3s ease;
 	}
 
 	.hero-scroll-indicator:hover {
-		color: #ffffff;
+		opacity: 1;
 	}
 
 	.hero-scroll-indicator__label {
 		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.24em;
-		transform: rotate(90deg);
-		margin-bottom: 12px;
+		letter-spacing: 0.25em;
+		color: #ffffff;
+		font-family: var(--font-helvetica);
+		writing-mode: vertical-rl;
 	}
 
 	.hero-scroll-indicator__line {
@@ -886,164 +796,37 @@ const newsList = [
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 50%;
-		background: var(--color-gold);
-		animation: scroll-runner 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+		height: 100%;
+		background: #ffffff;
+		animation: scrollRunner 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 	}
 
-	@keyframes scroll-runner {
+	@keyframes scrollRunner {
 		0% { transform: translateY(-100%); }
-		100% { transform: translateY(200%); }
-	}
-
-	@keyframes pulse-dot {
-		0%, 100% { opacity: 0.4; transform: scale(0.9); }
-		50% { opacity: 1; transform: scale(1.2); }
+		50% { transform: translateY(0%); }
+		100% { transform: translateY(100%); }
 	}
 
 	/* ============================================================== */
-	/* 共通エディトリアルヘッダー */
-	/* ============================================================== */
-	.editorial-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		gap: 32px;
-		margin-bottom: 56px;
-		padding-bottom: 24px;
-		border-bottom: 1px solid var(--border-subtle);
-	}
-
-	.editorial-num {
-		font-family: var(--font-display);
-		font-size: 12px;
-		font-weight: 700;
-		color: var(--color-gold);
-		letter-spacing: 0.2em;
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.editorial-eyebrow {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.2em;
-		color: var(--text-muted);
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 8px;
-	}
-
-	.editorial-title {
-		font-family: var(--font-display);
-		font-size: clamp(32px, 4vw, 48px);
-		font-weight: 700;
-		letter-spacing: -0.01em;
-		color: #ffffff;
-		margin: 0;
-		line-height: 1.1;
-	}
-
-	.editorial-header__desc {
-		max-width: 480px;
-		color: var(--text-secondary);
-		font-size: 14px;
-		margin: 0 0 16px 0;
-	}
-
-	.editorial-link-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 13px;
-		font-weight: 600;
-		letter-spacing: 0.1em;
-		color: #ffffff;
-		text-decoration: none;
-		transition: all 0.3s ease;
-	}
-
-	.editorial-link-btn:hover {
-		color: var(--color-gold);
-		transform: translateX(4px);
-	}
-
-	.arrow-svg {
-		width: 16px;
-		height: 16px;
-		transition: transform 0.3s ease;
-	}
-
-	.editorial-link-btn:hover .arrow-svg {
-		transform: translateX(4px);
-	}
-
-	/* ============================================================== */
-	/* 2. エディトリアル・ステートメント */
-	/* ============================================================== */
-	.editorial-statement {
-		padding: 120px 0 80px 0;
-	}
-
-	.statement-grid {
-		display: grid;
-		grid-template-columns: 240px 1fr;
-		gap: 64px;
-	}
-
-	.editorial-subheading {
-		font-family: var(--font-display);
-		font-size: 20px;
-		font-weight: 600;
-		letter-spacing: 0.1em;
-		color: #ffffff;
-		margin: 0;
-	}
-
-	.statement-lead {
-		font-size: clamp(22px, 2.5vw, 34px);
-		font-weight: 400;
-		line-height: 1.5;
-		color: #ffffff;
-		margin: 0 0 32px 0;
-		letter-spacing: 0.04em;
-	}
-
-	.editorial-rule {
-		height: 1px;
-		background: var(--border-subtle);
-		margin: 32px 0;
-	}
-
-	.statement-desc {
-		font-size: 15px;
-		color: var(--text-secondary);
-		line-height: 1.9;
-		max-width: 820px;
-		margin: 0 0 32px 0;
-	}
-
-	/* ============================================================== */
-	/* 3. 特集マガジン：The latest Nicole Group Insights.（BMW Group Insights スタイル） */
+	/* 2. 特集マガジン：The latest Nicole Group Insights. */
 	/* ============================================================== */
 	.bmw-insights-section {
-		padding: 96px 0 90px 0;
-		background: #08090b;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		padding: 110px 0 100px 0;
+		background-color: #000000;
 		position: relative;
+		overflow: hidden;
 	}
 
 	.bmw-insights-header {
 		display: flex;
-		align-items: flex-end;
 		justify-content: space-between;
+		align-items: flex-end;
 		gap: 32px;
-		margin-bottom: 44px;
+		margin-bottom: 48px;
 	}
 
 	.bmw-insights-header__title-group {
-		max-width: 720px;
+		max-width: 760px;
 	}
 
 	.bmw-insights-header__meta {
@@ -1054,130 +837,93 @@ const newsList = [
 	}
 
 	.bmw-insights-eyebrow {
-		display: inline-block;
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.18em;
+		color: var(--color-nicole-red);
 		text-transform: uppercase;
-		color: var(--color-gold, #e6ca65);
 	}
 
 	.bmw-insights-title {
-		font-size: clamp(28px, 3.4vw, 44px);
-		font-weight: 700;
+		font-size: clamp(30px, 3.8vw, 44px);
+		font-weight: 800;
 		letter-spacing: -0.02em;
-		line-height: 1.16;
 		color: #ffffff;
-		margin: 0 0 10px 0;
-		font-family: var(--font-heading, "Outfit", sans-serif);
+		line-height: 1.15;
+		margin: 0 0 12px 0;
 	}
 
 	.bmw-insights-subtitle {
-		font-size: 14.5px;
-		color: #9aa0a6;
+		font-size: 15px;
+		line-height: 1.7;
+		color: #9ea4b0;
 		margin: 0;
-		line-height: 1.6;
 	}
 
 	.bmw-insights-header__actions {
 		display: flex;
 		align-items: center;
-		gap: 20px;
+		gap: 24px;
 		flex-shrink: 0;
 	}
 
-	/* 「すべての記事を見る」ボタン（BMW Group "Discover all insights" 風） */
 	.bmw-insights-cta {
 		display: inline-flex;
 		align-items: center;
 		gap: 12px;
-		padding: 10px 20px 10px 24px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
+		font-size: 13.5px;
+		font-weight: 700;
 		color: #ffffff;
 		text-decoration: none;
-		font-size: 13.5px;
-		font-weight: 600;
 		letter-spacing: 0.04em;
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		padding: 12px 22px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		transition: all 0.3s ease;
 	}
 
 	.bmw-insights-cta:hover {
-		background: rgba(255, 255, 255, 0.12);
-		border-color: rgba(255, 255, 255, 0.5);
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
 		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 	}
 
 	.bmw-insights-cta__icon {
-		width: 30px;
-		height: 30px;
-		border-radius: 50%;
-		background: #ffffff;
-		color: #08090b;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
-	}
-
-	.bmw-insights-cta:hover .bmw-insights-cta__icon {
-		transform: scale(1.1) translateX(2px);
-		background: var(--color-gold, #e6ca65);
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		background: #ffffff;
+		color: #000000;
+		transition: transform 0.3s ease;
 	}
 
 	.cta-arrow-svg {
-		width: 14px;
-		height: 14px;
+		width: 12px;
+		height: 12px;
+		stroke: #000000;
 	}
 
-	/* スライダー左右ナビゲーションボタン */
-	.bmw-insights-nav {
-		display: flex;
-		gap: 8px;
+	.bmw-insights-cta:hover .bmw-insights-cta__icon {
+		background: #000000;
 	}
 
-	.insights-nav-btn {
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		background: rgba(20, 22, 28, 0.7);
-		backdrop-filter: blur(12px);
-		color: #ffffff;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-		padding: 0;
+	.bmw-insights-cta:hover .cta-arrow-svg {
+		stroke: #ffffff;
+		transform: translateX(2px);
 	}
 
-	.insights-nav-btn svg {
-		width: 18px;
-		height: 18px;
-		stroke-width: 2.2;
-	}
-
-	.insights-nav-btn:hover:not(:disabled) {
-		background: #ffffff;
-		color: #08090b;
-		border-color: #ffffff;
-		transform: scale(1.08);
-		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-	}
-
-	.insights-nav-btn:disabled {
-		opacity: 0.25;
-		cursor: not-allowed;
-		pointer-events: none;
-	}
-
-	/* スライダーコンテナ */
 	.bmw-insights-slider-wrapper {
 		position: relative;
-		width: 100%;
+		margin-left: -40px;
+		margin-right: -40px;
+		padding-left: 40px;
+		padding-right: 40px;
+		overflow: hidden;
 	}
 
 	.bmw-insights-slider {
@@ -1187,20 +933,38 @@ const newsList = [
 		scroll-snap-type: x mandatory;
 		scroll-behavior: smooth;
 		-webkit-overflow-scrolling: touch;
-		padding: 8px 4px 28px 4px;
 		scrollbar-width: none;
+		padding-bottom: 24px;
+	}
+
+	.bmw-insights-slider {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 	}
 
 	.bmw-insights-slider::-webkit-scrollbar {
-		display: none;
+		height: 3px;
+		display: block;
 	}
 
-	/* 記事カード（BMW Group TeaserNews仕様） */
+	.bmw-insights-slider::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 2px;
+	}
+
+	.bmw-insights-slider::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.35);
+		border-radius: 2px;
+	}
+
+	.bmw-insights-slider::-webkit-scrollbar-thumb:hover {
+		background: var(--color-nicole-red);
+	}
+
 	.bmw-insight-card {
-		flex: 0 0 calc((100% - 56px) / 3.15);
-		scroll-snap-align: start;
+		flex: 0 0 calc((100% - (28px * 2)) / 3);
 		min-width: 320px;
-		position: relative;
+		scroll-snap-align: start;
 	}
 
 	.bmw-insight-card__link {
@@ -1211,88 +975,80 @@ const newsList = [
 		color: inherit;
 	}
 
-	/* カードメディア：16:10 アスペクト比＆角丸 */
 	.bmw-insight-card__media {
 		position: relative;
 		width: 100%;
 		aspect-ratio: 16 / 10;
 		border-radius: 12px;
 		overflow: hidden;
-		background: #12141a;
-		box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+		background: #11141a;
+		margin-bottom: 20px;
 	}
 
 	.bmw-insight-card__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: transform;
+	}
+
+	.bmw-insight-card:hover .bmw-insight-card__img {
+		transform: scale(1.05);
 	}
 
 	.bmw-insight-card__overlay {
 		position: absolute;
-		inset: 0;
-		background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
 		pointer-events: none;
 	}
 
-	/* 右下フローティング丸型アクションボタン */
 	.bmw-insight-card__badge {
 		position: absolute;
 		bottom: 16px;
 		right: 16px;
-		width: 44px;
-		height: 44px;
+		width: 42px;
+		height: 42px;
 		border-radius: 50%;
-		background: rgba(14, 16, 20, 0.75);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.28);
-		color: #ffffff;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 		z-index: 2;
 	}
 
 	.card-arrow-svg {
 		width: 18px;
 		height: 18px;
-		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	/* ホバーアクション */
-	.bmw-insight-card:hover .bmw-insight-card__img {
-		transform: scale(1.06);
-		filter: brightness(1.04);
+		stroke: #ffffff;
+		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.bmw-insight-card:hover .bmw-insight-card__badge {
-		background: var(--color-gold, #e6ca65);
-		color: #08090b;
-		border-color: var(--color-gold, #e6ca65);
-		transform: scale(1.1);
-		box-shadow: 0 6px 20px rgba(230, 202, 101, 0.4);
+		background: #ffffff;
+		transform: scale(1.08);
 	}
 
 	.bmw-insight-card:hover .card-arrow-svg {
-		transform: translateX(3px);
+		stroke: #000000;
+		transform: translateX(2px);
 	}
 
-	/* メタオーバーライン：CATEGORY • DATE • READ TIME */
 	.bmw-insight-card__overline {
-		margin-top: 18px;
-		margin-bottom: 10px;
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
 		gap: 8px;
-		font-size: 11px;
+		font-size: 11.5px;
 		font-weight: 700;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: #8e95a0;
+		margin-bottom: 10px;
+		font-family: var(--font-helvetica);
 	}
 
 	.insight-overline__cat {
@@ -1305,15 +1061,11 @@ const newsList = [
 		font-size: 10px;
 	}
 
-	.insight-overline__date {
-		color: #8e95a0;
-	}
-
+	.insight-overline__date,
 	.insight-overline__read {
 		color: #8e95a0;
 	}
 
-	/* 記事タイトル */
 	.bmw-insight-card__title {
 		font-size: 19px;
 		font-weight: 700;
@@ -1325,14 +1077,14 @@ const newsList = [
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		transition: color 0.3s ease;
-		font-family: var(--font-heading, "Outfit", sans-serif);
 	}
 
 	.bmw-insight-card:hover .bmw-insight-card__title {
-		color: var(--color-gold, #e6ca65);
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 4px;
 	}
 
-	/* リード文 */
 	.bmw-insight-card__lead {
 		font-size: 13.5px;
 		line-height: 1.6;
@@ -1345,233 +1097,218 @@ const newsList = [
 	}
 
 	/* ============================================================== */
-	/* 4. 職人・スタッフストーリー（エディトリアル・クオート） */
+	/* 3. フィロソフィー ＆ OUR BRAND */
 	/* ============================================================== */
-	.editorial-stories {
-		padding: 100px 0;
-		background: #090a0d;
-		border-top: 1px solid var(--border-subtle);
-		border-bottom: 1px solid var(--border-subtle);
+	.nicole-philosophy-brand-section {
+		background-image: linear-gradient(180deg, #FF0000 0%, #000000 100%);
+		padding: 150px 0 130px 0;
+		color: #FFFFFF;
+		text-align: center;
+		position: relative;
 	}
 
-	.stories-header {
-		margin-bottom: 60px;
-	}
-
-	.stories-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 48px;
-	}
-
-	.story-item {
+	.nicole-we-are {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
+		margin-bottom: 120px;
 	}
 
-	.story-item__line {
-		height: 1px;
-		background: var(--border-subtle);
-		margin-bottom: 32px;
+	.nicole-we-are-title {
+		font-family: var(--font-helvetica);
+		font-size: clamp(2.8rem, 8.5vw, 5.5rem);
+		font-weight: 100;
+		line-height: 1.05;
+		color: #FFFFFF;
+		margin: 0;
+		letter-spacing: -0.01em;
 	}
 
-	.story-item__quote {
-		font-size: 15px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.88);
-		font-style: italic;
-		margin: 0 0 32px 0;
-		flex-grow: 1;
+	.nicole-group-title {
+		font-family: var(--font-helvetica);
+		font-size: clamp(2.8rem, 8.5vw, 5.5rem);
+		font-weight: 100;
+		line-height: 1.05;
+		color: #FFFFFF;
+		margin: 0 0 35px 0;
+		letter-spacing: -0.01em;
 	}
 
-	.story-item__footer {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
+	.nicole-we-are-body {
+		max-width: 820px;
+		margin: 0 auto 40px auto;
+		font-family: var(--font-helvetica);
+		font-size: 18px;
+		font-weight: 300;
+		line-height: 1.85;
+		color: #FFFFFF;
+		text-align: center;
 	}
 
-	.story-item__role {
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.1em;
-		color: var(--color-gold);
-		margin: 0 0 2px 0;
+	.nicole-we-are-cta {
+		margin-top: 10px;
+	}
+
+	.btn-nicole-outline {
+		display: inline-block;
+		padding: 20px 60px;
+		border: 1px solid #FFFFFF;
+		border-radius: 40px;
+		background-color: transparent;
+		color: #FFFFFF;
+		font-family: var(--font-helvetica);
+		font-size: 16px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+	}
+
+	.btn-nicole-outline:hover {
+		background-color: #FFFFFF;
+		color: #000000;
+		transform: translateY(-2px);
+	}
+
+	/* OUR BRAND */
+	.nicole-our-brand-heading {
+		font-family: var(--font-helvetica);
+		font-size: 22px;
+		font-weight: 500;
+		letter-spacing: 0.14em;
+		color: #FFFFFF;
+		margin: 0 0 52px 0;
+		text-align: center;
 		text-transform: uppercase;
 	}
 
-	.story-item__name {
-		font-size: 14px;
-		font-weight: 600;
-		color: #ffffff;
+	.nicole-our-brand-grid {
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		gap: 40px;
+		max-width: 1240px;
+		margin: 0 auto;
 	}
 
-	.story-item__link {
-		font-size: 12px;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color 0.3s ease;
-	}
-
-	.story-item__link:hover {
-		color: var(--color-gold);
-	}
-
-	/* ============================================================== */
-	/* 5. OUR BRANDS（5大ブランド・ショーケース） */
-	/* ============================================================== */
-	.editorial-brands {
-		padding: 100px 0;
-	}
-
-	.brands-grid {
-		display: grid;
-		grid-template-columns: repeat(5, 1fr);
-		gap: 18px;
-	}
-
-	.brand-panel {
-		background: var(--bg-card);
-		border: 1px solid var(--border-subtle);
-		border-radius: 12px;
-		overflow: hidden;
-		position: relative;
-		transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-	}
-
-	.brand-panel::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 3px;
-		background: var(--brand-accent, var(--color-gold));
-		opacity: 0.7;
-		transition: height 0.4s ease, opacity 0.4s ease;
-	}
-
-	.brand-panel:hover {
-		transform: translateY(-8px);
-		border-color: rgba(255, 255, 255, 0.25);
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-	}
-
-	.brand-panel:hover::before {
-		height: 4px;
-		opacity: 1;
-	}
-
-	.brand-panel__link {
+	/* ブランドカード：文字は固定、ロゴマークのみが反応する設計 */
+	.nicole-brand-item {
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-		padding: 32px 24px;
+		align-items: center;
 		text-decoration: none;
-		color: inherit;
+		color: #FFFFFF;
+		flex: 1 1 0px;
+		max-width: 210px;
+		cursor: pointer;
 	}
 
-	.brand-panel__logo {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		height: 56px;
-		margin-bottom: 24px;
-	}
-
-	.brand-panel__logo-img {
-		max-height: 48px;
-		max-width: 96px;
-		width: auto;
-		height: auto;
-		object-fit: contain;
-		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
-		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
-	}
-
-	.brand-panel:hover .brand-panel__logo-img {
-		transform: scale(1.08) translateY(-2px);
-		filter: drop-shadow(0 4px 16px rgba(255, 255, 255, 0.25));
-	}
-
-	.brand-panel__body {
-		flex-grow: 1;
-		margin-bottom: 36px;
-	}
-
-	.brand-panel__name {
-		font-family: var(--font-display);
-		font-size: 26px;
-		font-weight: 700;
-		letter-spacing: -0.01em;
-		color: #ffffff;
-		margin: 0 0 6px 0;
-	}
-
-	.brand-panel__corp {
-		font-size: 12px;
-		font-weight: 500;
-		color: var(--text-secondary);
-		margin: 0 0 16px 0;
-	}
-
-	.brand-panel__desc {
-		font-size: 12px;
-		color: var(--text-muted);
-		line-height: 1.6;
-		margin: 0;
-	}
-
-	.brand-panel__action {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-top: 18px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.brand-panel__action-label {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		color: rgba(255, 255, 255, 0.6);
-	}
-
-	.brand-panel__action-circle {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.08);
+	.nicole-brand-icon-wrap {
+		height: 64px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: all 0.3s ease;
+		margin-bottom: 16px;
 	}
 
-	.brand-panel__action-circle svg {
-		width: 14px;
-		height: 14px;
-		stroke: #ffffff;
-		transition: transform 0.3s ease;
+	/* ロゴマーク単独アニメーション（公式準拠のgrowエフェクト） */
+	.brand-svg-mark {
+		height: 55px;
+		width: auto;
+		max-width: 100px;
+		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+		will-change: transform;
 	}
 
-	.brand-panel:hover .brand-panel__action-circle {
-		background: var(--brand-accent, var(--color-gold));
+	.nicole-brand-item:hover .brand-svg-mark {
+		transform: scale(1.15);
 	}
 
-	.brand-panel:hover .brand-panel__action-circle svg {
-		transform: translate(2px, -2px);
+	/* テキストはホバー時も位置・色・不透明度を維持 */
+	.nicole-brand-title {
+		font-family: var(--font-helvetica);
+		font-size: 27px;
+		font-weight: 300;
+		line-height: 1.1;
+		color: #FFFFFF;
+		margin: 0 0 3px 0;
+		text-align: center;
+	}
+
+	.nicole-brand-period {
+		font-family: var(--font-helvetica);
+		font-size: 11px;
+		font-weight: 300;
+		line-height: 1.2;
+		color: #FFFFFF;
+		opacity: 0.9;
+		margin: 0 0 4px 0;
+		text-align: center;
+	}
+
+	.nicole-brand-corp {
+		font-family: var(--font-helvetica);
+		font-size: 18px;
+		font-weight: 300;
+		line-height: 1.2;
+		color: #FFFFFF;
+		margin: 0;
+		text-align: center;
 	}
 
 	/* ============================================================== */
-	/* 6. INFORMATION & TOPICS */
+	/* 4. 最新情報：INFORMATION & TOPICS（今日修正前のレイアウト復元） */
 	/* ============================================================== */
 	.editorial-news {
-		padding: 80px 0;
+		padding: 90px 0 110px 0;
+		background-color: #000000;
+	}
+
+	.editorial-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 32px;
+		margin-bottom: 56px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.editorial-num {
+		font-family: var(--font-helvetica);
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--color-nicole-red);
+		letter-spacing: 0.2em;
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.editorial-eyebrow {
+		font-family: var(--font-helvetica);
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.2em;
+		color: rgba(255, 255, 255, 0.5);
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	.editorial-title {
+		font-family: var(--font-helvetica);
+		font-size: clamp(32px, 4vw, 48px);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: #ffffff;
+		margin: 0;
+		line-height: 1.1;
 	}
 
 	.editorial-tagline {
+		font-family: var(--font-helvetica);
 		font-size: 13px;
-		color: var(--text-muted);
+		color: rgba(255, 255, 255, 0.5);
 		letter-spacing: 0.1em;
 	}
 
@@ -1596,7 +1333,7 @@ const newsList = [
 	}
 
 	.news-row__link:hover {
-		background: rgba(255, 255, 255, 0.03);
+		background: rgba(255, 255, 255, 0.04);
 		padding-left: 20px;
 	}
 
@@ -1607,37 +1344,39 @@ const newsList = [
 	}
 
 	.news-row__date {
-		font-size: 13px;
-		font-family: var(--font-display);
-		color: var(--text-muted);
+		font-family: var(--font-helvetica);
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.6);
 	}
 
 	.news-row__cat {
+		font-family: var(--font-helvetica);
 		font-size: 10px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		padding: 3px 8px;
-		background: rgba(255, 255, 255, 0.06);
+		background: rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
-		color: var(--color-gold);
+		color: #ffffff;
 	}
 
 	.news-row__title {
-		font-size: 15px;
+		font-family: var(--font-helvetica);
+		font-size: 16px;
 		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255, 0.92);
 		margin: 0;
 		transition: color 0.3s ease;
 	}
 
 	.news-row__link:hover .news-row__title {
-		color: var(--color-gold);
+		color: var(--color-nicole-red);
 	}
 
 	.news-row__arrow {
 		display: flex;
 		justify-content: flex-end;
-		opacity: 0.3;
+		opacity: 0.4;
 		transition: opacity 0.3s ease, transform 0.3s ease;
 	}
 
@@ -1654,89 +1393,337 @@ const newsList = [
 
 	.news-row__line {
 		height: 1px;
-		background: var(--border-subtle);
+		background: rgba(255, 255, 255, 0.12);
 	}
 
 	/* ============================================================== */
-	/* 7. SHOWROOMS & LOCATIONS CTA */
+	/* 5. NICOLE UNIVERSE：5大エディトリアル・ラグジュアリーレイアウト */
 	/* ============================================================== */
-	.editorial-locations-cta {
-		padding: 80px 0 140px 0;
+
+	/* 導入エディトリアルヘッダー */
+	.nicole-universe-intro {
+		padding: 90px 0 44px 0;
+		background: #FFFFFF;
 	}
 
-	.locations-banner {
-		position: relative;
-		border-radius: 16px;
-		overflow: hidden;
-		border: 1px solid var(--border-subtle);
-		background: #0d0f14;
-		padding: 72px 64px;
-	}
-
-	.locations-banner__bg {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 55%;
-		height: 100%;
-		background: radial-gradient(circle at 70% 50%, rgba(197, 160, 89, 0.15) 0%, transparent 70%);
-		pointer-events: none;
-	}
-
-	.locations-banner__content {
-		position: relative;
-		z-index: 2;
-		max-width: 680px;
-	}
-
-	.locations-banner__badge {
+	.nicole-universe-eyebrow {
+		font-family: var(--font-helvetica);
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.2em;
-		color: var(--color-gold);
-		margin-bottom: 16px;
+		color: var(--color-nicole-red);
+		display: block;
+		margin-bottom: 12px;
 	}
 
-	.locations-banner__title {
-		font-size: clamp(24px, 3vw, 36px);
-		font-weight: 600;
-		line-height: 1.4;
-		color: #ffffff;
-		margin: 0 0 20px 0;
-	}
-
-	.locations-banner__desc {
-		font-size: 15px;
-		color: var(--text-secondary);
-		line-height: 1.7;
-		margin: 0 0 36px 0;
-	}
-
-	.btn-editorial-gold {
-		display: inline-flex;
-		align-items: center;
-		gap: 12px;
-		padding: 16px 36px;
-		background: linear-gradient(135deg, #c5a059 0%, #a8833e 100%);
-		color: #000000;
-		font-size: 14px;
+	.nicole-universe-lead {
+		font-family: var(--font-helvetica);
+		font-size: clamp(24px, 3.2vw, 38px);
 		font-weight: 700;
-		letter-spacing: 0.08em;
+		line-height: 1.35;
+		color: #111111;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	/* 共通見出し・バッジ・ボタン */
+	.nicole-banner-badge {
+		font-family: var(--font-helvetica);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		color: #666666;
+		text-transform: uppercase;
+	}
+
+	.nicole-banner-badge--red {
+		color: var(--color-nicole-red);
+	}
+
+	.nicole-banner-heading {
+		border-left: 8px solid var(--color-nicole-red);
+		padding: 4px 0 4px 20px;
+		font-family: var(--font-helvetica);
+		font-size: clamp(24px, 3vw, 36px);
+		font-weight: 700;
+		line-height: 1.3;
+		color: #000000;
+		margin: 0;
+	}
+
+	.nicole-banner-heading a {
+		color: inherit;
 		text-decoration: none;
-		border-radius: 999px;
-		box-shadow: 0 10px 24px rgba(197, 160, 89, 0.25);
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		transition: opacity 0.2s ease;
 	}
 
-	.btn-editorial-gold:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 16px 32px rgba(197, 160, 89, 0.4);
-		background: linear-gradient(135deg, #dfb970 0%, #b8934b 100%);
+	.nicole-banner-heading a:hover {
+		opacity: 0.8;
+	}
+
+	.nicole-banner-heading--white {
+		color: #FFFFFF;
+	}
+
+	.nicole-banner-desc {
+		font-family: var(--font-helvetica);
+		font-size: 15.5px;
+		font-weight: 400;
+		line-height: 1.85;
+		color: #444444;
+		margin: 0;
+	}
+
+	.nicole-banner-desc--white {
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.nicole-banner-btn-wrap {
+		margin-top: 10px;
+	}
+
+	/* 赤いボタン：影なしフラット */
+	.nicole-red-btn {
+		display: inline-block;
+		background-color: var(--color-nicole-red);
+		color: #FFFFFF;
+		font-family: var(--font-helvetica);
+		font-size: 15px;
+		font-weight: 500;
+		border-radius: 40px;
+		padding: 16px 44px;
+		text-decoration: none;
+		box-shadow: none !important;
+		transition: background-color 0.25s ease, opacity 0.25s ease;
+	}
+
+	.nicole-red-btn:hover {
+		background-color: var(--color-nicole-red-hover);
+		transform: none !important;
+		box-shadow: none !important;
+	}
+
+	/* 共通画像ラッパー（枠サイズ固定・スクロールズーム・影なし） */
+	.nicole-banner-img-wrap {
+		overflow: hidden;
+		position: relative;
+		box-shadow: none !important;
+		background: #111111;
+	}
+
+	.nicole-scroll-zoom-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		will-change: transform;
+		transform: scale(1.0);
+		transform-origin: center center;
+		box-shadow: none !important;
+	}
+
+	.nicole-static-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		box-shadow: none !important;
+	}
+
+	/* --- 1. 大判シネマティック・パノラマ (SHOWROOMS) --- */
+	.nicole-panorama-section {
+		width: 100%;
+		position: relative;
+		background: #111111;
+		margin-bottom: 70px;
+	}
+
+	.nicole-panorama-card {
+		position: relative;
+		width: 100%;
+		min-height: 560px;
+		display: flex;
+		align-items: flex-end;
+	}
+
+	.nicole-panorama-img-wrap {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
+
+	.nicole-panorama-content {
+		position: relative;
+		z-index: 2;
+		margin: 0 0 60px max(40px, calc((100vw - 1440px) / 2 + 40px));
+		background: rgba(0, 0, 0, 0.62);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 4px;
+		padding: 50px 60px;
+		max-width: 820px;
+		width: calc(100% - max(80px, calc((100vw - 1440px) + 80px)));
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		gap: 22px;
+		color: #FFFFFF;
+	}
+
+	.nicole-panorama-content .nicole-banner-heading {
+		color: #FFFFFF;
+		white-space: nowrap;
+	}
+
+	.nicole-panorama-content .nicole-banner-desc {
+		color: rgba(255, 255, 255, 0.88);
+	}
+
+	/* --- 2 & 3. アシンメトリー・デュアル・プレビューカード (RECRUIT × PHILOSOPHY) --- */
+	.nicole-dual-grid-section {
+		padding: 40px 0 80px 0;
+		background: #FFFFFF;
+	}
+
+	.nicole-dual-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 36px;
+	}
+
+	.nicole-feature-card {
+		display: flex;
+		flex-direction: column;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.nicole-feature-card--dark {
+		background: #000000;
+		color: #FFFFFF;
+	}
+
+	.nicole-feature-card--light {
+		background: #FFFFFF;
+		color: #000000;
+		border: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	.nicole-feature-card__img-wrap {
+		width: 100%;
+		height: 360px;
+		min-height: 360px;
+	}
+
+	.nicole-feature-card__body {
+		padding: 48px 44px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		flex: 1;
+	}
+
+	/* --- 4. フルブリード・サステナビリティ・バンド (ESG / SDGs) --- */
+	.nicole-strip-section--esg {
+		width: 100%;
+		background: #000000;
+		color: #FFFFFF;
+		position: relative;
+		overflow: hidden;
+		margin: 30px 0 90px 0;
+	}
+
+	.nicole-strip-grid {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		width: 100%;
+		min-height: 500px;
+	}
+
+	.nicole-strip-img-wrap {
+		flex: 1 1 50%;
+		width: 50%;
+		min-height: 500px;
+	}
+
+	.nicole-strip-content {
+		flex: 1 1 50%;
+		width: 50%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 80px max(40px, calc((100vw - 1440px) / 2 + 40px)) 80px 6vw;
+		gap: 22px;
+		box-sizing: border-box;
+	}
+
+	/* --- 5. ラグジュアリー・ブティックカード (ONLINE STORE) --- */
+	.nicole-boutique-section {
+		padding: 0 0 130px 0;
+		background: #FFFFFF;
+	}
+
+	.nicole-boutique-card {
+		display: flex;
+		flex-direction: row;
+		align-items: stretch;
+		background: #000000;
+		color: #FFFFFF;
+		border-radius: 4px;
+		overflow: hidden;
+		min-height: 440px;
+	}
+
+	.nicole-boutique-content {
+		flex: 1 1 52%;
+		width: 52%;
+		padding: 64px 56px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 22px;
+		box-sizing: border-box;
+	}
+
+	.nicole-boutique-content .nicole-banner-heading {
+		color: #FFFFFF;
+	}
+
+	.nicole-boutique-content .nicole-banner-desc {
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.nicole-boutique-img-wrap {
+		flex: 1 1 48%;
+		width: 48%;
+		min-height: 440px;
 	}
 
 	/* ============================================================== */
+	/* ブランドロゴ出現モーション（スタッガード＆エレベーション＆ブラー解除） */
+	/* ============================================================== */
+	.brand-reveal-item {
+		opacity: 0;
+		transform: translateY(32px) scale(0.92);
+		filter: blur(6px);
+		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+		            transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+		            filter 0.75s ease;
+		will-change: opacity, transform, filter;
+	}
+
+	.brand-reveal-item.is-visible {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+		filter: blur(0);
+	}
+
 	/* モーションアニメーション・ユーティリティ */
-	/* ============================================================== */
 	.editorial-reveal {
 		opacity: 0;
 		transform: translateY(24px);
@@ -1749,26 +1736,150 @@ const newsList = [
 		transform: translateY(0);
 	}
 
-	.editorial-line {
-		width: 0%;
-		transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: width;
-	}
-
-	.editorial-line.is-drawn {
-		width: 100%;
-	}
-
 	/* ============================================================== */
 	/* レスポンシブ対応 */
 	/* ============================================================== */
-	@media (max-width: 1100px) {
-		.brands-grid {
-			grid-template-columns: repeat(3, 1fr);
+	@media (max-width: 1024px) {
+		.editorial-container {
+			padding: 0 30px;
 		}
+
+		.nicole-philosophy-brand-section {
+			padding: 100px 0 90px 0;
+		}
+
+		.nicole-our-brand-grid {
+			flex-wrap: wrap;
+			gap: 40px 24px;
+		}
+
+		.nicole-brand-item {
+			flex: 0 0 calc(33.333% - 16px);
+			max-width: 100%;
+		}
+
 		.bmw-insight-card {
 			flex: 0 0 calc((100% - 28px) / 2.2);
 			min-width: 280px;
+		}
+	}
+
+	@media (max-width: 900px) {
+		/* 1. パノラマスマホ */
+		.nicole-panorama-card {
+			flex-direction: column !important;
+			min-height: auto;
+		}
+
+		.nicole-panorama-img-wrap {
+			position: relative !important;
+			order: 1 !important;
+			width: 100% !important;
+			height: 300px !important;
+			min-height: 260px !important;
+		}
+
+		.nicole-panorama-content {
+			order: 2 !important;
+			margin: 0 !important;
+			width: 100% !important;
+			max-width: 100% !important;
+			border-radius: 0 !important;
+			padding: 40px 20px 48px 20px !important;
+			background: rgba(0, 0, 0, 0.88) !important;
+			backdrop-filter: blur(12px) !important;
+		}
+
+		.nicole-panorama-content .nicole-banner-heading {
+			white-space: normal !important;
+		}
+
+		/* 2 & 3. デュアルグリッドスマホ */
+		.nicole-dual-grid {
+			grid-template-columns: 1fr !important;
+			gap: 40px !important;
+		}
+
+		.nicole-feature-card__img-wrap {
+			height: 260px !important;
+			min-height: 260px !important;
+		}
+
+		.nicole-feature-card__body {
+			padding: 36px 20px 44px 20px !important;
+		}
+
+		/* 4. サステナビリティ・バンドスマホ */
+		.nicole-strip-grid {
+			flex-direction: column !important;
+			min-height: auto;
+		}
+
+		.nicole-strip-img-wrap {
+			order: 1 !important;
+			width: 100% !important;
+			height: 280px !important;
+			min-height: 260px !important;
+		}
+
+		.nicole-strip-content {
+			order: 2 !important;
+			width: 100% !important;
+			padding: 40px 20px 48px 20px !important;
+		}
+
+		/* 5. ブティックカードスマホ */
+		.nicole-boutique-card {
+			flex-direction: column !important;
+			min-height: auto;
+		}
+
+		.nicole-boutique-img-wrap {
+			order: 1 !important;
+			width: 100% !important;
+			height: 280px !important;
+			min-height: 260px !important;
+		}
+
+		.nicole-boutique-content {
+			order: 2 !important;
+			width: 100% !important;
+			padding: 40px 20px 48px 20px !important;
+		}
+
+		/* 共通テキスト・見出し */
+		.nicole-banner-heading {
+			font-size: 24px;
+			padding-left: 14px;
+			border-left-width: 6px;
+		}
+
+		.nicole-banner-desc {
+			font-size: 14.5px;
+			line-height: 1.75;
+		}
+
+		.nicole-red-btn {
+			padding: 14px 36px;
+			font-size: 14px;
+		}
+
+		/* インフォメーションスマホ */
+		.editorial-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 16px;
+			margin-bottom: 36px;
+		}
+
+		.news-row__link {
+			grid-template-columns: 1fr;
+			gap: 8px;
+			padding: 16px 0;
+		}
+
+		.news-row__arrow {
+			display: none;
 		}
 	}
 
@@ -1783,18 +1894,6 @@ const newsList = [
 
 		.hero-scroll-indicator {
 			display: none;
-		}
-
-		.statement-grid {
-			grid-template-columns: 1fr;
-			gap: 24px;
-		}
-
-		.editorial-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 16px;
-			margin-bottom: 36px;
 		}
 
 		.bmw-insights-section {
@@ -1826,31 +1925,35 @@ const newsList = [
 			font-size: 17px;
 		}
 
-		.stories-grid {
-			grid-template-columns: 1fr;
-			gap: 36px;
+		.nicole-philosophy-brand-section {
+			padding: 70px 0 80px 0;
 		}
 
-		.brands-grid {
-			grid-template-columns: 1fr;
+		.nicole-we-are {
+			margin-bottom: 80px;
 		}
 
-		.news-row__link {
-			grid-template-columns: 1fr;
-			gap: 8px;
-			padding: 16px 0;
+		.nicole-we-are-body {
+			font-size: 15px;
+			line-height: 1.7;
+			text-align: start;
 		}
 
-		.news-row__arrow {
-			display: none;
+		.btn-nicole-outline {
+			padding: 18px 48px;
+			font-size: 15px;
 		}
 
-		.locations-banner {
-			padding: 36px 24px;
+		.nicole-brand-item {
+			flex: 0 0 calc(50% - 15px);
 		}
 
-		.hidden-sp {
-			display: none;
+		.nicole-brand-title {
+			font-size: 22px;
+		}
+
+		.nicole-brand-corp {
+			font-size: 15px;
 		}
 	}
 </style>

@@ -16,7 +16,14 @@
 			"label": "Posts",
 			"labelSingular": "Post",
 			"urlPattern": "/posts/{slug}",
-			"supports": ["drafts", "revisions", "preview", "scheduling", "search", "seo"],
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
 			"commentsEnabled": true,
 			"fields": [
 				{
@@ -52,15 +59,42 @@
 					"label": "関連拠点 (Related Showroom)",
 					"type": "select",
 					"options": [
-						{ "label": "なし（設定しない）", "value": "" },
-						{ "label": "Nicole BMW 本社ショールーム（川崎）", "value": "nicole-bmw-kawasaki" },
-						{ "label": "Nicole BMW 大田支店", "value": "nicole-bmw-ota" },
-						{ "label": "Nicole BMW 青葉宮前支店", "value": "nicole-bmw-aobamiyamae" },
-						{ "label": "Nicole BMW 横浜港北支店", "value": "nicole-bmw-yokohama-kohoku" },
-						{ "label": "Nicole BMW 新百合ヶ丘支店", "value": "nicole-bmw-shin-yurigaoka" },
-						{ "label": "ロールス・ロイス・モーター・カーズ横浜", "value": "rolls-royce-yokohama" },
-						{ "label": "Nicole Competizione 青山（Ferrari）", "value": "ferrari-aoyama" },
-						{ "label": "ニコル世田谷ショールーム（ALPINA）", "value": "alpina-setagaya" }
+						{
+							"label": "なし（設定しない）",
+							"value": ""
+						},
+						{
+							"label": "Nicole BMW 本社ショールーム（川崎）",
+							"value": "nicole-bmw-kawasaki"
+						},
+						{
+							"label": "Nicole BMW 大田支店",
+							"value": "nicole-bmw-ota"
+						},
+						{
+							"label": "Nicole BMW 青葉宮前支店",
+							"value": "nicole-bmw-aobamiyamae"
+						},
+						{
+							"label": "Nicole BMW 横浜港北支店",
+							"value": "nicole-bmw-yokohama-kohoku"
+						},
+						{
+							"label": "Nicole BMW 新百合ヶ丘支店",
+							"value": "nicole-bmw-shin-yurigaoka"
+						},
+						{
+							"label": "ロールス・ロイス・モーター・カーズ横浜",
+							"value": "rolls-royce-yokohama"
+						},
+						{
+							"label": "Nicole Competizione 青山（Ferrari）",
+							"value": "ferrari-aoyama"
+						},
+						{
+							"label": "ニコル世田谷ショールーム（ALPINA）",
+							"value": "alpina-setagaya"
+						}
 					]
 				}
 			]
@@ -70,7 +104,13 @@
 			"label": "Pages",
 			"labelSingular": "Page",
 			"urlPattern": "/pages/{slug}",
-			"supports": ["drafts", "revisions", "preview", "search", "seo"],
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
 			"fields": [
 				{
 					"slug": "title",
@@ -94,7 +134,9 @@
 			"label": "Categories",
 			"labelSingular": "Category",
 			"hierarchical": true,
-			"collections": ["posts"],
+			"collections": [
+				"posts"
+			],
 			"terms": [
 				{
 					"slug": "development",
@@ -115,7 +157,9 @@
 			"label": "Tags",
 			"labelSingular": "Tag",
 			"hierarchical": false,
-			"collections": ["posts"],
+			"collections": [
+				"posts"
+			],
 			"terms": [
 				{
 					"slug": "webdev",
@@ -244,7 +288,12 @@
 			"slug": "newsletter-signup",
 			"title": "Newsletter Signup",
 			"description": "A call-to-action block for newsletter subscriptions",
-			"keywords": ["newsletter", "subscribe", "email", "cta"],
+			"keywords": [
+				"newsletter",
+				"subscribe",
+				"email",
+				"cta"
+			],
 			"source": "theme",
 			"content": [
 				{
@@ -277,7 +326,11 @@
 			"slug": "about-author",
 			"title": "About the Author",
 			"description": "Brief author bio for use in posts or pages",
-			"keywords": ["author", "bio", "about"],
+			"keywords": [
+				"author",
+				"bio",
+				"about"
+			],
 			"source": "theme",
 			"content": [
 				{
@@ -333,6 +386,864 @@
 			}
 		],
 		"posts": [
+			{
+				"id": "01M5F4BMW001KIDSMECHANIC01",
+				"slug": "202608_bmw_kids_mechanic",
+				"status": "published",
+				"published_at": "2026-10-21 16:01:14",
+				"data": {
+					"title": "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
+					"excerpt": "Nicole BMWでは、夏休みの特別なプログラムとして、弊社をご愛顧いただいているオーナー様、ならびに近隣にお住まいの小学生のお子様を対象としたイベント「キッズメカニック」を開催いたしました。",
+					"featured_image": {
+						"src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+						"alt": "BMW キッズメカニック"
+					},
+					"related_location": "nicole-bmw-kawasaki",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k0",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s1",
+									"text": "Nicole BMWでは、夏休みの特別なプログラムとして、弊社をご愛顧いただいているオーナー様、ならびに近隣にお住まいの小学生のお子様を対象としたイベント「キッズメカニック」を開催いたしました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s3",
+									"text": "BMWの厳しい研修と試験をクリアし、最高峰の技術と知識を持つ者にのみ与えられる称号「BMWマイスター」。 その卓越したプロフェッショナルたちと同じワークウエアに身を包み、真剣な眼差しで車両に向き合う子どもたち。 自動車の精緻な仕組みに触れ、仕事としての「働くよろこび」を肌で感じていただく、かけがえのない時間。 現場の熱気と、未来の才能が躍動したBMWメカニック体験の模様をお伝えします。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "k4",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s5",
+									"text": "憧れの姿への第一歩。非日常のワークスペースでのBMWメカニック体験"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k6",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s7",
+									"text": "イベントの幕開けは、本格的なメカニックウエアへの着替えから。 見慣れない自身の姿に少し照れながらも、袖を通した瞬間に彼らの表情はプロフェッショナルへと変化。 心地よい緊張感と、未知なる体験への期待が入り交じる様子が、見守る私どもにもひしひしと伝わってまいりました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k8",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s9",
+									"text": "今回のBMWメカニック体験の舞台としてご用意したのは、Nicole BMW 本社ショールーム（川崎）併設のハンドオーバー（納車）スペース。 本来、お客様が新しい愛車との出会いを祝う華やかな空間が、この日ばかりは未来のマイスターたちのための特別なワークプレイスへと変貌を遂げました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h3",
+							"_key": "k10",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s11",
+									"text": "探求心を育む、実践的なアプローチ"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k12",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s13",
+									"text": "今回ご用意したプログラムは、単なる見学や作業の模倣にとどまりません。 安全な走行に欠かせないタイヤの空気圧の点検・調整や、「クラクション音が鳴らない」という不具合を想定した原因究明と改修など、プロが実際に行う本格的な整備プロセスに挑戦していただきました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k14",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s15",
+									"text": "「この部分、普段と何が違うか分かるかな？」\n「なぜこのような状態になったと思う？」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k16",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s17",
+									"text": "現場の第一線で活躍するスタッフからの問いかけを契機に、参加者自身が実車を観察し、思考を巡らせ、自らの言葉で答えを導き出します。 真剣にエンジンルームを覗き込み、堂々と意見を発表する姿は、すでに立派なエンジニアの風格。 新たな発見のたびに輝く瞳が、自動車という工業製品の奥深さを物語っていました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "k18",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s19",
+									"text": "労働の価値と喜びを知る、有意義な学び"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h3",
+							"_key": "k20",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s21",
+									"text": "自身の力で手にする「成果」の重み"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k22",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s23",
+									"text": "すべてのミッションを無事に完遂した参加者には、修了を証明する認定書とともに、ささやかながら「お給料」をお渡しいたしました。 手渡されたのは、今回のイベント限定で使用できる独自の通貨「ニコル・ユーロ」。 より本格的な体験を追求するため、一人ひとりの名前が入った専用の給与明細もご用意いたしました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k24",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s25",
+									"text": "「お給料の額は、他の人と比べないこと」\n「明細書は他人には見せない、秘密の書類だからね」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k26",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s27",
+									"text": "スタッフからのユーモアを交えた社会人としてのアドバイスに、会場からは温かい笑い声が溢れます。 自らの知識と技術を提供し、その対価を得る。 そして、得た対価をどのように運用するかを自ら決断する。 社会の根幹を成す「働く意義」を、実体験を通して自然に学んでいただけるよう配慮いたしました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "k28",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s29",
+									"text": "妥協なき技術の舞台裏へ。大人も一緒に楽しむ特別ファクトリー見学"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k30",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s31",
+									"text": "今回のイベントでは、お子様だけでなく、ご同行いただいた保護者の皆様にもお楽しみいただけるプログラムをご用意いたしました。 それが、普段はご覧いただくことのできない「サービス工場見学」です。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k32",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s33",
+									"text": "本来、安全管理の観点からお客様が立ち入ることのないNicole BMW 本社サービス工場の整備エリア。 最新鋭の専用診断機材や特殊工具が整然と並ぶファクトリーの裏側を、特別に公開いたしました。 愛車がどのような環境で、いかにして最高のコンディションに保たれているのか。 お子様たちがBMWメカニック体験に励むその裏側で、大人の方々にもニコル・グループの高度なサービス体制と、技術者たちの情熱をより深くご理解いただける貴重な機会となりました。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "k34",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s35",
+									"text": "未来へ繋がる、上質なカーライフの第一歩として"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k36",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s37",
+									"text": "自らの手で車両に触れ、考え、プロフェッショナルの仕事に向き合った夏の1日。 普段は遠い存在である「大人の仕事」を我が事として捉えることで、自動車の仕組みへの興味はもちろん、挑戦する楽しさや、やり遂げた後の充実感も味わっていただけたのではないでしょうか。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k38",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s39",
+									"text": "このBMWメカニック体験が、彼らの中でクルマを愛する心の萌芽となり、いつか「メカニックになりたい」と夢を描く小さなきっかけとなれたなら。 私どもにとっても、それほど嬉しいことはありません。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "k40",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "s41",
+									"text": "ニコル・グループが目指すのは、単なる自動車の販売やメンテナンスにとどまらず、クルマを通じてお客様のライフスタイルに寄り添い、共に豊かな時間を紡いでいくパートナーであること。 これからも、世代を超えてBMWの深い魅力と歓びを分かち合えるような、心躍る体験をご提供してまいります。"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "01M5F4BMW002NEUEKLASSE2027",
+				"slug": "2027_new_bmw_3series_neue_klasse",
+				"status": "published",
+				"published_at": "2026-10-21T16:24:14.000Z",
+				"data": {
+					"title": "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
+					"excerpt": "50年以上にわたり駆けぬける歓びの象徴であり続けてきたBMW 3シリーズがフルモデルチェンジ。完全電動モデル『BMW i3』と、直6エンジンを極めた『BMW M350 xDrive』を擁する新型3シリーズの公式発表内容を詳報。",
+					"featured_image": {
+						"id": "",
+						"provider": "external",
+						"src": "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
+					},
+					"related_location": "nicole-bmw-kawasaki",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "9a7y5ml0b",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "535fx2gzq",
+									"text": "【公式発表】50年の伝統を受け継ぎ、新たな時代へと飛躍する「新型BMW 3シリーズ」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "vn3by0aqj",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "3eied2vr2",
+									"text": "BMWグループは、スポーツセダンの世界的ベンチマークであり続ける「新型BMW 3シリーズ（The new BMW 3 Series）」を世界初公開しました。1975年の初代誕生以来、半世紀以上にわたりドライバーを魅了してきた伝統の「駆けぬける歓び」を継承しながら、BMWの次世代アーキテクチャ「ノイエ・クラッセ（Neue Klasse）」の革新技術を全身に宿した記念碑的モデルです。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "tqwdn7610",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "7sz8nt6mp",
+									"text": "今回のフルモデルチェンジでは、完全電動（BEV）モデルである「BMW i3」と、新世代の高効率ガソリンエンジンおよび48Vマイルドハイブリッドを搭載した内燃機関（ICE）モデルが同時に登場。BMWが掲げる「技術的オープンアプローチ（Technology-open approach）」を力強く具現化しています。"
+								}
+							]
+						},
+						{
+							"_type": "slider",
+							"_key": "3ow44c6ir",
+							"id": "/_emdash/api/media/file/01M5F52YAA3WC5X93E51R1YX84.01M5F52YDM3PV45MM33AJVCPGQ.jpg"
+						},
+						{
+							"_type": "table",
+							"_key": "1aba8abc3340",
+							"rows": [
+								{
+									"_type": "tableRow",
+									"_key": "afe68a002506",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "41dd4861a92f",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "duockb9q3",
+													"text": "；；；；"
+												}
+											],
+											"isHeader": true
+										},
+										{
+											"_type": "tableCell",
+											"_key": "d8e343281abe",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "ub4jbnxt9",
+													"text": ""
+												}
+											],
+											"isHeader": true
+										},
+										{
+											"_type": "tableCell",
+											"_key": "d3837c8744ae",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "iok97s4ct",
+													"text": ""
+												}
+											],
+											"isHeader": true
+										},
+										{
+											"_type": "tableCell",
+											"_key": "cd9f94543581",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "pkgm0bje7",
+													"text": ""
+												}
+											],
+											"isHeader": true
+										},
+										{
+											"_type": "tableCell",
+											"_key": "d8ec278eada6",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "nqttzeoxo",
+													"text": ""
+												}
+											],
+											"isHeader": true
+										},
+										{
+											"_type": "tableCell",
+											"_key": "0e7a56be16d6",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "o5fcxz84z",
+													"text": ""
+												}
+											],
+											"isHeader": true
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "652939b7fcbb",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "8f8fb0612df2",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "1jgp0tgsw",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "2ee0364a02e3",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "su973ysjg",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "cab33409a2d5",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "0brixvwca",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "928ad5fe1a6a",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "w4z8t14rw",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "0ed32df56a96",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "lxpkder3f",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "54cfeda7b9a9",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "wstkkd2fh",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										}
+									]
+								},
+								{
+									"_type": "tableRow",
+									"_key": "1c97d21bcbde",
+									"cells": [
+										{
+											"_type": "tableCell",
+											"_key": "73b8458a53af",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "g8cpqxxpi",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "d46ecb12157f",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "60cdauidc",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "dc78e7dc6b52",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "qmtxlrdch",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "92df1fd0936b",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "8ttn3wonb",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "142df3be0395",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "q9mt0oj0z",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										},
+										{
+											"_type": "tableCell",
+											"_key": "0ccb46857a82",
+											"content": [
+												{
+													"_type": "span",
+													"_key": "x9tlxwm9h",
+													"text": ""
+												}
+											],
+											"isHeader": false
+										}
+									]
+								}
+							],
+							"hasHeaderRow": true
+						},
+						{
+							"_type": "slider",
+							"_key": "slider_block_01",
+							"id": "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
+							"title": "新型BMW 3シリーズ オフィシャルフォトギャラリー",
+							"images": "https://mediapool.bmwgroup.com/cache/P9/202609/P90657631/P90657631-the-new-bmw-3-series-exterior-2250px.jpg\nhttps://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg\nhttps://mediapool.bmwgroup.com/cache/P9/202609/P90657728/P90657728-the-new-bmw-320-exterior-09-26-2250px.jpg"
+						},
+						{
+							"_type": "block",
+							"_key": "7wahespw4",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "8uvgp2t9a",
+									"text": "ノイエ・クラッセのデザイン言語を昇華した、モダンで精緻な2.5ボックススタイリング"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "o5gryhk9i",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "5fttrtvda",
+									"text": "新型BMW 3シリーズのエクステリアは、無駄を削ぎ落とした彫刻的でクリーンな「2.5ボックス」デザインを採用。ロングホイールベースとショートオーバーハングが生み出す引き締まったアスリートのようなプロポーションは、ひと目でBMWとわかるアイデンティティを確立しています。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "nwig8jl4r",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "57zpjtwqt",
+									"text": "フロントマスクでは、BMWの象徴であるキドニーグリルとツインヘッドライトが融合した新たな光のシグネチャーを採用。Mパフォーマンスモデルには、モータースポーツ直系の「Mイエローライト（M Yellow Lights）」が与えられ、圧倒的な存在感を放ちます。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "3r4cnnkw6",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "rz7firm8t",
+									"text": "サイドでは自動格納式のフラッシュドアハンドルと低重心なキャラクターラインが伸びやかな美しさを演出。リアには水平基調のライトアレンジメントと力強く張り出したホイールアーチが、セダンとしてのワイド＆ローなスタンスを強調しています。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "3aherr4xo",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k0oujxafh",
+									"text": "新感覚のデジタル空間「BMW パノラミック・アイドライブ」と「OS X」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "usivz0wcd",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "1904li7e9",
+									"text": "インテリアには、革新のコックピット思想「BMW Panoramic iDrive」を採用。4つの要素（BMW Panoramic Vision、BMW 3D Head-Up Display、17.9インチ Central Display、新設計ステアリングホイール）で構成されています。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "4u8upummy",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "0icfqxn8q",
+									"text": "なかでも最大の注目は、フロントガラス下端の全幅に走行関連情報をシームレスに投影する「BMW Panoramic Vision」。ドライバーは視線を路面から外すことなく、必要な情報を瞬時に把握できます。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2n6zpyum",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "puer7gkto",
+									"text": "さらに、ドライバー側に傾斜配置された大画面「17.9インチ Central Display」には、Android Open Source Project（AOSP）ベースの「BMW Operating System X」を初搭載。Amazon Alexa+ AIテクノロジーを統合した対話型インテリジェント・パーソナル・アシスタントや、最新のBMW Maps、高速OTA（Over-The-Air）アップデートに対応し、常に最新のデジタル体験をお届けします。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "xvunr35hj",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "u0qp19np7",
+									"text": "完全電動モデル「BMW i3」：第6世代eDriveと超高性能ECU「Heart of Joy」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "gmgjqivt2",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "keg5eu8d4",
+									"text": "ノイエ・クラッセの中核を担う完全電動モデル「BMW i3 50 xDrive」は、第6世代（Gen6）BMW eDriveテクノロジーと800V高電圧システムを搭載。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "wvqmv21ym",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "mk9dhpo08",
+									"text": "システム最高出力 345 kW（469 hp）、最大トルク 645 Nmを発揮し、0-100km/h加速はわずか4.7秒。新開発の大径円筒セルを採用した108.7 kWhのバッテリーにより、一充電あたりの航続距離は驚異の最大912 km（WLTP欧州モード値）に到達します。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "py202as9u",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "h4vu2srle",
+									"text": "最大400 kWのDC超急速充電に対応しており、わずか10分間の充電で最大423 km分の航続距離をチャージ可能。長距離ドライブでも充電ストレスを感じさせない圧倒的なパフォーマンスを誇ります。さらにシステム最高出力 275 kW（374 hp）・航続最大710 kmの「BMW i3 40 xDrive」もラインナップされます。"
+								}
+							]
+						},
+						{
+							"_type": "accordion",
+							"_key": "accordion_block_01",
+							"id": "1. 【主要諸元・技術スペック】第6世代eDrive & 800Vシステム",
+							"content": "プラットフォーム & 駆動：BMW Neue Klasse Gen6 eDrive BEV ＆ 高効率ICEアーキテクチャ\n統合制御ECU：Heart of Joy（従来比10倍の処理速度を誇る次世代統合ドライビングスタック）\nバッテリー技術 & 電圧：新開発 大径円筒形リチウムイオンセル ＆ 800V高電圧システム（最大400kW DC急速充電）\n急速充電性能：わずか10分間の充電で最大423km分（WLTP）の航続距離を急速チャージ\n一充電航続距離：最大912km（WLTP欧州モード値 / BMW i3 50 xDrive）\nコックピット & OS：BMW Panoramic iDrive（全幅BMW Panoramic Vision ＋ 17.9インチ画面 ＋ OS X）\n先進運転支援：SAE Level 2、Motorway Assistant（時速130km/hハンズオフ走行対応）、Amazon Alexa+"
+						},
+						{
+							"_type": "block",
+							"_key": "l3aba7gt4",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "y2oc5eg55",
+									"text": "直列6気筒の頂点「BMW M350 xDrive」と新機能「Drift Moment」"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "cf5nd48l2",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "zo2roitba",
+									"text": "一方、熱心なガソリンファンに向けて登場するのが、内燃機関ラインナップのフラッグシップ「BMW M350 xDrive」です。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "4xd22p93e",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "t1v56ky0l",
+									"text": "ボンネットの下には、熟成を極めた3.0L 直列6気筒 BMW TwinPower Turboガソリンエンジンを搭載。クランクシャフト駆動のスタータージェネレーターを備えた48Vマイルドハイブリッドシステムとの組み合わせにより、最高出力 326 kW（443 hp）を叩き出し、0-100km/h加速4.1秒、最高速度250km/h（電子リミッター）の卓越した走りを実現します。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "jdv6o49cp",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "9peu6to3b",
+									"text": "さらにエキサイティングなのが、新機能「Drift Moment（ドリフト・モーメント）」。センターディスプレイから選択することで、駆動力を一時的に後輪（FR）のみに100%集中配分。従来のBMW Mハイパフォーマンスモデルのような、ピュアで刺激的なFRスライドコントロールの快感を意のままに楽しむことができます。"
+								}
+							]
+						},
+						{
+							"_type": "accordion",
+							"_key": "accordion_block_02",
+							"id": "2. 【ラインナップ構成】完全電動（i3）から直6ガソリン（M350 xDrive）まで",
+							"content": "BMW i3 50 xDrive：システム最高出力 345 kW（469 hp）、最大トルク 645 Nm、0-100km/h 4.7秒、108.7 kWh、航続最大912 km（WLTP）\nBMW i3 40 xDrive：システム最高出力 275 kW（374 hp）、82.8 kWh、航続最大710 km（WLTP）\nBMW M350 xDrive：3.0L 直6 TwinPower Turbo＋48V（326 kW / 443 hp）、0-100km/h 4.1秒、新機能「Drift Moment」標準装備\nBMW 320：2.0L 直4 TwinPower Turbo＋48Vマイルドハイブリッド\nBMW i3 M60 xDrive：2027年登場予定のノイエ・クラッセ初超高性能Mモデル"
+						},
+						{
+							"_type": "accordion",
+							"_key": "accordion_block_03",
+							"id": "3. 【よくあるご質問（FAQ）】生産拠点・Drift Moment・急速充電について",
+							"content": "Q: 新型3シリーズはどこで生産されますか？\nA: 完全電動モデルのBMW i3は初代3シリーズ誕生の地「ミュンヘン工場」、ガソリンエンジン搭載モデルは欧州最大の「ディンゴルフィング工場」で生産されます。\n\nQ: M350 xDriveの「Drift Moment」とは？\nA: センターディスプレイからワンタッチで起動でき、一時的に駆動力を後輪（FR）のみに100%集中配分。ピュアなFRスライドコントロールを楽しめる機能です。\n\nQ: 国内のNicoleショールームで急速充電できますか？\nA: はい。Nicole BMW 本社ショールーム（川崎）の150kW超急速充電器をはじめ、全国のCHAdeMO規格急速充電ネットワークに幅広く対応いたします。"
+						},
+						{
+							"_type": "block",
+							"_key": "jozzodp29",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "zlr9hmbd6",
+									"text": "伝統のミュンヘン工場で生産されるBMW i3、ディンゴルフィングで紡がれるICE"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "zych8v4eg",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "3yiuard30",
+									"text": "新型BMW i3は、1975年に初代BMW 3シリーズが誕生した歴史の地「BMWグループ ミュンヘン工場」にて生産されます。100年以上の歴史を誇るこのマザープラントは、ノイエ・クラッセの登場とともに完全電動モデル専用工場へと生まれ変わります。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "qdut6a3mp",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "1oaklg7j2",
+									"text": "そして高効率ガソリンエンジン搭載モデルは、欧州最大の製造拠点であるバイエルン州「ディンゴルフィング工場」で生産。心臓部のエンジンおよび電動ドライブコンポーネントはオーストリアのシュタイア工場、高電圧バッテリーはイルバッハ・シュトラースキルヒェン工場が供給します。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "ju05vlu57",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "zzyi1es2g",
+									"text": "Nicole BMW 本社（川崎）にて最新情報・先行情報のご案内を承っております"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "hnvhj2a5r",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "1uh7dpxk1",
+									"text": "半世紀にわたる歴史の中で、常に「スポーツセダンとは何か」を定義し続けてきたBMW 3シリーズ。完全電動のノイエ・クラッセへと飛躍した新型3シリーズは、これからのモビリティの未来を切り拓く存在となります。"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "klwbi6nez",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "cvh1em65c",
+									"text": "神奈川・東京エリアで長年にわたりBMWのプレステージをお届けしてきたNicole BMWでは、新型3シリーズに関する最新情報や先行予約のご相談を随時承っております。本社ショールーム（川崎）には150kW級の超急速充電ステーションや最新鋭のサービスファクトリーを完備。新時代のモビリティライフも万全の体制でサポートいたします。"
+								}
+							]
+						}
+					]
+				}
+			},
 			{
 				"id": "post-1",
 				"slug": "building-for-the-long-term",
@@ -432,8 +1343,12 @@
 					}
 				],
 				"taxonomies": {
-					"category": ["development"],
-					"tag": ["opinion"]
+					"category": [
+						"development"
+					],
+					"tag": [
+						"opinion"
+					]
 				}
 			},
 			{
@@ -519,8 +1434,13 @@
 					}
 				],
 				"taxonomies": {
-					"category": ["development"],
-					"tag": ["webdev", "opinion"]
+					"category": [
+						"development"
+					],
+					"tag": [
+						"webdev",
+						"opinion"
+					]
 				}
 			},
 			{
@@ -601,8 +1521,12 @@
 					]
 				},
 				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
+					"category": [
+						"notes"
+					],
+					"tag": [
+						"opinion"
+					]
 				}
 			},
 			{
@@ -683,8 +1607,12 @@
 					]
 				},
 				"taxonomies": {
-					"category": ["development"],
-					"tag": ["tools"]
+					"category": [
+						"development"
+					],
+					"tag": [
+						"tools"
+					]
 				}
 			},
 			{
@@ -765,8 +1693,12 @@
 					]
 				},
 				"taxonomies": {
-					"category": ["design"],
-					"tag": ["creativity"]
+					"category": [
+						"design"
+					],
+					"tag": [
+						"creativity"
+					]
 				}
 			},
 			{
@@ -847,8 +1779,12 @@
 					]
 				},
 				"taxonomies": {
-					"category": ["development"],
-					"tag": ["creativity"]
+					"category": [
+						"development"
+					],
+					"tag": [
+						"creativity"
+					]
 				}
 			},
 			{
@@ -929,8 +1865,12 @@
 					]
 				},
 				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
+					"category": [
+						"notes"
+					],
+					"tag": [
+						"opinion"
+					]
 				}
 			},
 			{
