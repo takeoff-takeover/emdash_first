@@ -108,47 +108,42 @@ const brands = [
 	{
 		name: "ALPINA",
 		corp: "Nicole Automobiles",
-		years: "［1965-2025］",
+		logo: "/brands/alpina.png",
 		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学。",
 		url: "https://nicole-automobiles.com/",
-		accent: "#00441b",
-		badge: "LEGACY & CRAFT"
+		accent: "#00441b"
 	},
 	{
 		name: "BMW",
 		corp: "Nicole Cars",
-		years: "正規ディーラー",
+		logo: "/brands/bmw.svg",
 		desc: "歓びの純度を高める駆けぬける歓び。最新電動モデルからMハイパフォーマンスまで。",
 		url: "https://www.nicole.co.jp/bmw/",
-		accent: "#0066b1",
-		badge: "SHEER DRIVING PLEASURE"
+		accent: "#0066b1"
 	},
 	{
 		name: "MINI",
 		corp: "Nicole Cars",
-		years: "正規ディーラー",
+		logo: "/brands/mini.svg",
 		desc: "時代を切り拓くアイコニックデザインと心躍るゴーカート・フィーリング。",
 		url: "https://www.nicole.co.jp/mini/",
-		accent: "#18181b",
-		badge: "BIG LOVE"
+		accent: "#e5e5e5"
 	},
 	{
 		name: "Rolls-Royce",
 		corp: "Nicole MotorCars",
-		years: "正規ディーラー",
+		logo: "/brands/rolls-royce.svg",
 		desc: "静寂と極限の美。ビスポークが紡ぎ出す、世界にただひとつの至高の移動空間。",
 		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
-		accent: "#2d1c3a",
-		badge: "INSPIRING GREATNESS"
+		accent: "#8b6cb3"
 	},
 	{
 		name: "Ferrari",
 		corp: "Nicole Competizione",
-		years: "正規ディーラー",
+		logo: "/brands/ferrari.svg",
 		desc: "サーキットの情熱とイタリアの魂。マラネッロの真価を横浜から全国へ届ける。",
 		url: "https://yokohama.ferraridealers.com/ja-JP",
-		accent: "#cc0000",
-		badge: "ESSENCE OF RACING"
+		accent: "#cc0000"
 	}
 ];
 
@@ -397,9 +392,8 @@ const newsList = [
 				{brands.map((b, idx) => (
 					<div class="brand-panel editorial-reveal" data-delay={idx * 100} style={`--brand-accent: ${b.accent};`}>
 						<a href={b.url} class="brand-panel__link" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
-							<div class="brand-panel__top">
-								<span class="brand-panel__badge">{b.badge}</span>
-								<span class="brand-panel__years">{b.years}</span>
+							<div class="brand-panel__logo">
+								<img src={b.logo} alt={`${b.name} logo`} class="brand-panel__logo-img" loading="lazy" />
 							</div>
 
 							<div class="brand-panel__body">
@@ -1304,23 +1298,27 @@ const newsList = [
 		color: inherit;
 	}
 
-	.brand-panel__top {
+	.brand-panel__logo {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 32px;
+		justify-content: flex-start;
+		height: 56px;
+		margin-bottom: 24px;
 	}
 
-	.brand-panel__badge {
-		font-size: 9px;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: var(--color-gold);
+	.brand-panel__logo-img {
+		max-height: 48px;
+		max-width: 96px;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
 	}
 
-	.brand-panel__years {
-		font-size: 10px;
-		color: var(--text-muted);
+	.brand-panel:hover .brand-panel__logo-img {
+		transform: scale(1.08) translateY(-2px);
+		filter: drop-shadow(0 4px 16px rgba(255, 255, 255, 0.25));
 	}
 
 	.brand-panel__body {
