@@ -73,26 +73,27 @@ const tableRows = isTableFormat
 
 <style>
 	.cms-accordion-block {
-		margin: 2rem 0;
-		background: #0f172a;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
+		margin: 1.5rem 0;
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 0;
 		overflow: hidden;
-		transition: border-color 0.2s, box-shadow 0.2s;
+		transition: border-color 0.2s;
 	}
 	.cms-accordion-block:hover {
-		border-color: rgba(59, 130, 246, 0.4);
+		border-color: rgba(223, 186, 115, 0.4);
 	}
 	.cms-accordion-block[open] {
-		border-color: rgba(59, 130, 246, 0.6);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+		border-color: rgba(223, 186, 115, 0.6);
+		box-shadow: none;
 	}
 	.cms-acc-summary {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1.25rem 1.5rem;
-		background: #1e293b;
+		padding: 1.25rem 0;
+		background: transparent;
 		cursor: pointer;
 		user-select: none;
 		list-style: none;
@@ -102,7 +103,7 @@ const tableRows = isTableFormat
 		display: none;
 	}
 	.cms-acc-summary:hover {
-		background: #24334a;
+		background: transparent;
 	}
 	.summary-left {
 		display: flex;
@@ -113,8 +114,8 @@ const tableRows = isTableFormat
 		width: 28px;
 		height: 28px;
 		border-radius: 6px;
-		background: rgba(59, 130, 246, 0.15);
-		color: #3b82f6;
+		background: rgba(223, 186, 115, 0.15);
+		color: #dfba73;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -126,8 +127,8 @@ const tableRows = isTableFormat
 	}
 	.cms-accordion-block[open] .acc-chevron-badge {
 		transform: rotate(180deg);
-		background: #3b82f6;
-		color: #ffffff;
+		background: #dfba73;
+		color: #040507;
 	}
 	.summary-title {
 		font-size: 1.05rem;
@@ -144,12 +145,12 @@ const tableRows = isTableFormat
 	}
 	.cms-accordion-block[open] .acc-status-tag {
 		content: "閉じる";
-		color: #38bdf8;
+		color: #dfba73;
 	}
 	.cms-acc-body {
-		padding: 1.5rem;
-		background: #0f172a;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 0 0 1.5rem 0;
+		background: transparent;
+		border-top: none;
 	}
 	.cms-acc-table {
 		width: 100%;
