@@ -393,7 +393,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 				<div class="toc-grid">
 					{highlightStories.map((story, index) => (
-						<article class="toc-card">
+						<article class="toc-card editorial-reveal" data-delay={index * 90}>
 							<a href={story.url} class="toc-card__link">
 								<div class="toc-card__media">
 									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" />
@@ -487,9 +487,10 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 				<!-- 記事グリッド（JSフィルタリング対象） -->
 				<div class="articles-grid" id="articles-grid">
-					{allArticles.map((art) => (
+					{allArticles.map((art, idx) => (
 						<article 
-							class="article-item" 
+							class="article-item editorial-reveal" 
+							data-delay={(idx % 6) * 80}
 							data-brand={art.brand} 
 							data-topic={art.topic}
 							data-title={art.title.toLowerCase()}
@@ -594,6 +595,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 				if (matchBrand && matchTopic && matchSearch) {
 					article.style.display = '';
+					article.classList.add('is-visible');
 					visibleCount++;
 				} else {
 					article.style.display = 'none';
@@ -657,6 +659,24 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				applyFilters();
 			});
 		}
+
+		// ==============================================================
+		// 3. Adobe風 スクロール連動カード＆画像出現オブザーバー
+		// ==============================================================
+		const revealObserver = new IntersectionObserver((entries, observer) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					const el = entry.target;
+					const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
+					setTimeout(() => {
+						el.classList.add('is-visible');
+					}, delay);
+					observer.unobserve(el);
+				}
+			});
+		}, { root: null, rootMargin: '0px 0px -40px 0px', threshold: 0.08 });
+
+		document.querySelectorAll('.editorial-reveal').forEach(el => revealObserver.observe(el));
 	});
 </script>
 
@@ -1077,13 +1097,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 14px;
 		overflow: hidden;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.toc-card:hover {
+	.toc-card.is-visible:hover {
 		transform: translateY(-6px);
 		border-color: rgba(223, 186, 115, 0.4);
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
 	}
 
 	.toc-card__link {
@@ -1101,15 +1121,23 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		background: #000;
 	}
 
+	/* Adobe風 画像出現カウンターズーム：初期は1.08倍、出現時に1.0倍へ緩やかに着地 */
 	.toc-card__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+		transform: scale(1.08) translateZ(0);
+		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: transform;
 	}
 
-	.toc-card:hover .toc-card__img {
-		transform: scale(1.06);
+	.toc-card.is-visible .toc-card__img {
+		transform: scale(1) translateZ(0);
+	}
+
+	.toc-card.is-visible:hover .toc-card__img {
+		transform: scale(1.05) translateZ(0);
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.toc-card__overlay {
@@ -1411,13 +1439,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 		overflow: hidden;
-		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.article-item:hover {
-		transform: translateY(-5px);
+	.article-item.is-visible:hover {
+		transform: translateY(-6px);
 		border-color: rgba(223, 186, 115, 0.4);
-		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
 	}
 
 	.article-item__link {
@@ -1435,15 +1463,23 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		background: #000;
 	}
 
+	/* Adobe風 画像出現カウンターズーム：初期は1.08倍、出現時に1.0倍へ緩やかに着地 */
 	.article-item__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+		transform: scale(1.08) translateZ(0);
+		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: transform;
 	}
 
-	.article-item:hover .article-item__img {
-		transform: scale(1.05);
+	.article-item.is-visible .article-item__img {
+		transform: scale(1) translateZ(0);
+	}
+
+	.article-item.is-visible:hover .article-item__img {
+		transform: scale(1.05) translateZ(0);
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.article-item__overlay {
@@ -1688,6 +1724,32 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 		.articles-grid {
 			grid-template-columns: 1fr;
+		}
+	}
+
+	/* Adobe風 モーションアニメーション・ユーティリティ */
+	.editorial-reveal {
+		opacity: 0;
+		transform: translateY(32px);
+		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+		            transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: opacity, transform;
+	}
+
+	.editorial-reveal.is-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.editorial-reveal {
+			opacity: 1 !important;
+			transform: none !important;
+			transition: none !important;
+		}
+		.toc-card__img, .article-item__img {
+			transform: none !important;
+			transition: none !important;
 		}
 	}
 </style>

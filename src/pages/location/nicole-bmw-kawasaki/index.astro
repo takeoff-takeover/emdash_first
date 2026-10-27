@@ -206,8 +206,8 @@ const amenities = [
 						</div>
 
 						<div class="car-cards-grid">
-							{featuredVehicles.map((car) => (
-								<div class="car-card">
+							{featuredVehicles.map((car, idx) => (
+								<div class="car-card editorial-reveal" data-delay={(idx % 4) * 90}>
 									<div class="car-card__media">
 										<img src={car.image} alt={car.model} class="car-card__img" loading="lazy" />
 										<span class="car-tag">{car.tag}</span>
@@ -426,6 +426,26 @@ const amenities = [
 			</div>
 		</div>
 	</div>
+
+	<!-- Adobe風 スクロール連動カード出現オブザーバー -->
+	<script is:inline>
+		document.addEventListener('DOMContentLoaded', function() {
+			const revealObserver = new IntersectionObserver((entries, observer) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						const el = entry.target;
+						const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
+						setTimeout(() => {
+							el.classList.add('is-visible');
+						}, delay);
+						observer.unobserve(el);
+					}
+				});
+			}, { root: null, rootMargin: '0px 0px -40px 0px', threshold: 0.08 });
+
+			document.querySelectorAll('.editorial-reveal').forEach(el => revealObserver.observe(el));
+		});
+	</script>
 </NicoleLayout>
 
 <style>
@@ -780,13 +800,13 @@ const amenities = [
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 		overflow: hidden;
-		transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.car-card:hover {
-		transform: translateY(-4px);
+	.car-card.is-visible:hover {
+		transform: translateY(-6px);
 		border-color: rgba(0, 102, 177, 0.6);
-		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 	}
 
 	.car-card__media {
@@ -796,15 +816,23 @@ const amenities = [
 		background: #000000;
 	}
 
+	/* Adobe風 画像出現カウンターズーム */
 	.car-card__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 0.5s ease;
+		transform: scale(1.08) translateZ(0);
+		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: transform;
 	}
 
-	.car-card:hover .car-card__img {
-		transform: scale(1.05);
+	.car-card.is-visible .car-card__img {
+		transform: scale(1) translateZ(0);
+	}
+
+	.car-card.is-visible:hover .car-card__img {
+		transform: scale(1.05) translateZ(0);
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.car-tag {
@@ -1351,6 +1379,32 @@ const amenities = [
 
 		.btn-gmap-direct {
 			justify-content: center;
+		}
+	}
+
+	/* Adobe風 モーションアニメーション・ユーティリティ */
+	.editorial-reveal {
+		opacity: 0;
+		transform: translateY(32px);
+		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+		            transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: opacity, transform;
+	}
+
+	.editorial-reveal.is-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.editorial-reveal {
+			opacity: 1 !important;
+			transform: none !important;
+			transition: none !important;
+		}
+		.car-card__img {
+			transform: none !important;
+			transition: none !important;
 		}
 	}
 </style>
