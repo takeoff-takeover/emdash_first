@@ -511,7 +511,7 @@ const editUrl = postDbId
 				<!-- 関連拠点（ショールーム）カード（拠点情報がある場合のみ表示） -->
 				{hasShowroom && (
 				<section class="showroom-feature-block">
-					<div class="showroom-card-modern editorial-reveal">
+					<div class="showroom-card-modern">
 						<div class="showroom-card-media">
 							<img src={relatedShowroom.image} alt={relatedShowroom.name} />
 							<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
@@ -603,8 +603,8 @@ const editUrl = postDbId
 					<div class="sidebar-block">
 						<h3 class="sidebar-heading">関連記事</h3>
 						<div class="sidebar-story-list">
-							{relatedStories.map((story, index) => (
-								<article class="sidebar-story-card editorial-reveal" data-delay={index * 90}>
+							{relatedStories.map((story) => (
+								<article class="sidebar-story-card">
 									<a href={story.url} class="sidebar-story-link">
 										<div class="sidebar-story-media">
 											<img src={story.image} alt={story.title} loading="lazy" />
@@ -684,22 +684,6 @@ const editUrl = postDbId
 				});
 			});
 		}
-
-		// 3. Adobe風 スクロール連動カード出現オブザーバー
-		const revealObserver = new IntersectionObserver((entries, observer) => {
-			entries.forEach(entry => {
-				if (entry.isIntersecting) {
-					const el = entry.target;
-					const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
-					setTimeout(() => {
-						el.classList.add('is-visible');
-					}, delay);
-					observer.unobserve(el);
-				}
-			});
-		}, { root: null, rootMargin: '0px 0px -40px 0px', threshold: 0.08 });
-
-		document.querySelectorAll('.editorial-reveal').forEach(el => revealObserver.observe(el));
 	});
 </script>
 
@@ -939,26 +923,11 @@ const editUrl = postDbId
 		z-index: 2;
 	}
 
-	/* Adobe風 ヒーロー画像の緩やかな着地 settle アニメーション */
 	.article-hero-img {
 		width: 100%;
 		height: clamp(460px, 72vh, 800px);
 		object-fit: cover;
 		display: block;
-		transform: scale(1.05) translateZ(0);
-		animation: adobeHeroSettle 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-		will-change: transform;
-	}
-
-	@keyframes adobeHeroSettle {
-		from {
-			opacity: 0.88;
-			transform: scale(1.05) translateZ(0);
-		}
-		to {
-			opacity: 1;
-			transform: scale(1) translateZ(0);
-		}
 	}
 
 	/* 写真の右下に重ねるクレジット（黒い余計な下地をなくす） */
@@ -1048,11 +1017,6 @@ const editUrl = postDbId
 	.sidebar-story-card {
 		padding-bottom: 18px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.sidebar-story-card.is-visible:hover {
-		transform: translateY(-3px);
 	}
 
 	.sidebar-story-card:last-child {
@@ -1084,24 +1048,16 @@ const editUrl = postDbId
 		flex-shrink: 0;
 	}
 
-	/* Adobe風 画像カウンターズーム */
 	.sidebar-story-media img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		display: block;
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: transform;
+		transition: transform 0.35s ease;
 	}
 
-	.sidebar-story-card.is-visible .sidebar-story-media img {
-		transform: scale(1) translateZ(0);
-	}
-
-	.sidebar-story-card.is-visible:hover .sidebar-story-media img {
-		transform: scale(1.06) translateZ(0);
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	.sidebar-story-link:hover .sidebar-story-media img {
+		transform: scale(1.08);
 	}
 
 	.sidebar-story-brand {
@@ -1510,37 +1466,17 @@ const editUrl = postDbId
 		border-radius: 16px;
 		overflow: hidden;
 		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.showroom-card-modern.is-visible:hover {
-		transform: translateY(-6px);
-		box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
 	}
 
 	.showroom-card-media {
 		position: relative;
 		background: #000;
-		overflow: hidden;
 	}
 
-	/* Adobe風 画像カウンターズーム */
 	.showroom-card-media img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: transform;
-	}
-
-	.showroom-card-modern.is-visible .showroom-card-media img {
-		transform: scale(1) translateZ(0);
-	}
-
-	.showroom-card-modern.is-visible:hover .showroom-card-media img {
-		transform: scale(1.045) translateZ(0);
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.showroom-brand-tag {
@@ -2028,33 +1964,6 @@ const editUrl = postDbId
 		.article-header-container,
 		.article-two-col-layout {
 			padding: 0 16px;
-		}
-	}
-
-	/* Adobe風 モーションアニメーション・ユーティリティ */
-	.editorial-reveal {
-		opacity: 0;
-		transform: translateY(32px);
-		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-		            transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: opacity, transform;
-	}
-
-	.editorial-reveal.is-visible {
-		opacity: 1;
-		transform: translateY(0);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.editorial-reveal {
-			opacity: 1 !important;
-			transform: none !important;
-			transition: none !important;
-		}
-		.article-hero-img, .showroom-card-media img, .sidebar-story-media img {
-			transform: none !important;
-			animation: none !important;
-			transition: none !important;
 		}
 	}
 </style>

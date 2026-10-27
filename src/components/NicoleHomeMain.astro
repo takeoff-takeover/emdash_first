@@ -587,12 +587,12 @@ const newsList = [
 <!-- ============================================================== -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
-		// 1. スクロール監視による要素の順次フェードイン（Adobe Spectrum流の応答性）
+		// 1. スクロール監視による要素の順次フェードイン
 		const reveals = document.querySelectorAll('.editorial-reveal');
 		const observerOptions = {
 			root: null,
-			rootMargin: '0px 0px -40px 0px',
-			threshold: 0.08
+			rootMargin: '0px 0px -60px 0px',
+			threshold: 0.1
 		};
 
 		const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -965,11 +965,6 @@ const newsList = [
 		flex: 0 0 calc((100% - (28px * 2)) / 3);
 		min-width: 320px;
 		scroll-snap-align: start;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.bmw-insight-card.is-visible:hover {
-		transform: translateY(-6px) translateZ(0);
 	}
 
 	.bmw-insight-card__link {
@@ -988,30 +983,18 @@ const newsList = [
 		overflow: hidden;
 		background: #11141a;
 		margin-bottom: 20px;
-		transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.bmw-insight-card.is-visible:hover .bmw-insight-card__media {
-		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-	}
-
-	/* Adobe風 画像出現カウンターズーム：初期は1.08倍、出現時に1.0倍へ緩やかに着地 */
 	.bmw-insight-card__img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 		will-change: transform;
 	}
 
-	.bmw-insight-card.is-visible .bmw-insight-card__img {
-		transform: scale(1) translateZ(0);
-	}
-
-	.bmw-insight-card.is-visible:hover .bmw-insight-card__img {
-		transform: scale(1.045) translateZ(0);
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	.bmw-insight-card:hover .bmw-insight-card__img {
+		transform: scale(1.05);
 	}
 
 	.bmw-insight-card__overlay {
@@ -1045,18 +1028,17 @@ const newsList = [
 		width: 18px;
 		height: 18px;
 		stroke: #ffffff;
-		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.35s ease;
+		transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.bmw-insight-card:hover .bmw-insight-card__badge {
 		background: #ffffff;
-		border-color: #ffffff;
 		transform: scale(1.08);
 	}
 
 	.bmw-insight-card:hover .card-arrow-svg {
 		stroke: #000000;
-		transform: translateX(3px);
+		transform: translateX(2px);
 	}
 
 	.bmw-insight-card__overline {
@@ -1618,12 +1600,6 @@ const newsList = [
 		flex-direction: column;
 		border-radius: 4px;
 		overflow: hidden;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.nicole-feature-card.is-visible:hover {
-		transform: translateY(-6px);
-		box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
 	}
 
 	.nicole-feature-card--dark {
@@ -1641,23 +1617,6 @@ const newsList = [
 		width: 100%;
 		height: 360px;
 		min-height: 360px;
-		overflow: hidden;
-	}
-
-	/* Adobe風 画像カウンターズーム（カード浮上と逆相関で優雅に着地） */
-	.nicole-feature-card .nicole-static-img {
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: transform;
-	}
-
-	.nicole-feature-card.is-visible .nicole-static-img {
-		transform: scale(1) translateZ(0);
-	}
-
-	.nicole-feature-card.is-visible:hover .nicole-static-img {
-		transform: scale(1.045) translateZ(0);
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.nicole-feature-card__body {
@@ -1690,16 +1649,6 @@ const newsList = [
 		flex: 1 1 50%;
 		width: 50%;
 		min-height: 500px;
-		overflow: hidden;
-	}
-
-	.nicole-strip-grid .nicole-scroll-zoom-img {
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.nicole-strip-grid.is-visible .nicole-scroll-zoom-img {
-		transform: scale(1) translateZ(0);
 	}
 
 	.nicole-strip-content {
@@ -1728,12 +1677,6 @@ const newsList = [
 		border-radius: 4px;
 		overflow: hidden;
 		min-height: 440px;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.nicole-boutique-card.is-visible:hover {
-		transform: translateY(-6px);
-		box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
 	}
 
 	.nicole-boutique-content {
@@ -1759,22 +1702,6 @@ const newsList = [
 		flex: 1 1 48%;
 		width: 48%;
 		min-height: 440px;
-		overflow: hidden;
-	}
-
-	.nicole-boutique-card .nicole-static-img {
-		transform: scale(1.08) translateZ(0);
-		transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
-		will-change: transform;
-	}
-
-	.nicole-boutique-card.is-visible .nicole-static-img {
-		transform: scale(1) translateZ(0);
-	}
-
-	.nicole-boutique-card.is-visible:hover .nicole-static-img {
-		transform: scale(1.045) translateZ(0);
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	/* ============================================================== */
@@ -1796,30 +1723,17 @@ const newsList = [
 		filter: blur(0);
 	}
 
-	/* Adobe風 モーションアニメーション・ユーティリティ */
+	/* モーションアニメーション・ユーティリティ */
 	.editorial-reveal {
 		opacity: 0;
-		transform: translateY(32px);
-		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-		            transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+		transform: translateY(24px);
+		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 		will-change: opacity, transform;
 	}
 
 	.editorial-reveal.is-visible {
 		opacity: 1;
 		transform: translateY(0);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.editorial-reveal, .brand-reveal-item {
-			opacity: 1 !important;
-			transform: none !important;
-			transition: none !important;
-		}
-		.bmw-insight-card__img, .nicole-static-img, .nicole-scroll-zoom-img {
-			transform: none !important;
-			transition: none !important;
-		}
 	}
 
 	/* ============================================================== */
