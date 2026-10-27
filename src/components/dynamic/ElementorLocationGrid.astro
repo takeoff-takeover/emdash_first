@@ -1,0 +1,72 @@
+---
+// src/components/dynamic/ElementorLocationGrid.astro
+// Elementor Location Loop Grid 再現コンポーネント（locations.json から動的取得）
+import locationsData from "../../data/locations.json";
+
+interface Props {
+  brand?: "BMW" | "MINI" | "Rolls-Royce" | "Ferrari" | string;
+  facilityType?: string;
+  limit?: number;
+}
+
+const { brand, facilityType, limit } = Astro.props;
+
+let locations = locationsData;
+if (brand) {
+  locations = locations.filter(l => l.brand.toUpperCase() === brand.toUpperCase());
+}
+if (facilityType) {
+  locations = locations.filter(l => l.facilityType.includes(facilityType) || l.services?.some(s => s.includes(facilityType)));
+}
+if (limit) {
+  locations = locations.slice(0, limit);
+}
+---
+
+<div class="elementor-loop-container elementor-grid" role="list">
+  {locations.map((loc) => (
+    <div
+      data-elementor-type="loop-item"
+      data-elementor-id="7256"
+      class="elementor elementor-7256 e-loop-item post-location status-publish hentry"
+    >
+      <div class="elementor-element elementor-element-1e1c8d3 e-flex e-con-boxed e-con e-parent">
+        <div class="e-con-inner" style="padding: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          {loc.image && (
+            <div class="elementor-element elementor-widget elementor-widget-image" style="margin-bottom: 16px;">
+              <img
+                src={loc.image}
+                alt={loc.name}
+                loading="lazy"
+                decoding="async"
+                style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px;"
+              />
+            </div>
+          )}
+
+          <div class="elementor-element elementor-widget elementor-widget-heading" style="margin-bottom: 8px;">
+            <h3 class="elementor-heading-title elementor-size-default" style="font-size: 1.15rem; font-weight: 600; color: #fff;">
+              <a href={loc.detailUrl || `/locations/${loc.id}/`} style="color: inherit; text-decoration: none;">
+                {loc.name}
+              </a>
+            </h3>
+          </div>
+
+          <div class="elementor-element elementor-widget elementor-widget-text-editor" style="font-size: 0.88rem; color: #a1a1aa; line-height: 1.6;">
+            <p style="margin: 4px 0;">
+              📍 <a href={`https://maps.google.com/?q=${encodeURIComponent(loc.address)}`} target="_blank" rel="noopener" style="color: #cbb279; text-decoration: none;">
+                {loc.address}
+              </a>
+            </p>
+            <p style="margin: 4px 0;">
+              📞 <a href={`tel:${loc.tel}`} style="color: inherit; text-decoration: none;">{loc.tel}</a>
+            </p>
+            <p style="margin: 4px 0; font-size: 0.8rem; color: #71717a;">
+              🕒 {loc.hours} {loc.closed ? `（休: ${loc.closed}）` : ""}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>

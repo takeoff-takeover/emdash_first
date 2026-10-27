@@ -1,0 +1,6 @@
+---
+// src/pages/admin.astro
+// 管理画面アクセス用ショートカット
+// ローカル開発環境では自動認証（dev-bypass）を通して管理画面へダイレクトに入室します
+return Astro.redirect("/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin");
+---

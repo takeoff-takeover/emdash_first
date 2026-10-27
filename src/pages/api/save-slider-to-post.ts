@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 
 export const POST: APIRoute = async ({ request }) => {
 	try {
-		const body = await request.json();
+		const body = (await request.json()) as any;
 		const { slug, title, images } = body;
 
 		if (!slug || !Array.isArray(images) || images.length === 0) {

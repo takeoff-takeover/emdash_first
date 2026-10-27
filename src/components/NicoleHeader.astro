@@ -7,45 +7,47 @@ const brands = [
 		name: "ALPINA", 
 		corp: "Nicole Automobiles", 
 		logo: "/brands/alpina.png", 
-		url: "https://nicole-automobiles.com/",
+		url: "/pages/nicole-automobiles",
 		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学"
 	},
 	{ 
 		name: "BMW", 
 		corp: "Nicole Cars", 
 		logo: "/brands/bmw.svg", 
-		url: "https://www.nicole.co.jp/bmw/",
+		url: "/bmw",
 		desc: "駆けぬける歓びの真価を東京・神奈川からお届けする正規ディーラー"
 	},
 	{ 
 		name: "MINI", 
 		corp: "Nicole Cars", 
 		logo: "/brands/mini.svg", 
-		url: "https://www.nicole.co.jp/mini/",
+		url: "/mini",
 		desc: "時代を切り拓くアイコニックデザインとゴーカート・フィーリング"
 	},
 	{ 
 		name: "Rolls-Royce", 
 		corp: "Nicole MotorCars", 
 		logo: "/brands/rolls-royce.svg", 
-		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
+		url: "/pages/nicole-motorcars",
 		desc: "静寂と至高の美。ビスポークが紡ぎ出す世界唯一のラグジュアリー"
 	},
 	{ 
 		name: "Ferrari", 
 		corp: "Nicole Competizione", 
 		logo: "/brands/ferrari.svg", 
-		url: "https://yokohama.ferraridealers.com/ja-JP",
+		url: "/pages/nicole-competizione",
 		desc: "跳ね馬の情熱とレーシングスピリットを横浜から体現"
 	}
 ];
 
 const corporateLinks = [
-	{ title: "会社概要", desc: "ニコル・グループの沿革と概要", url: "/pages/corporate" },
-	{ title: "グループ構成", desc: "各正規ディーラー法人と組織構造", url: "https://www.nicole.co.jp/corporate/#structure" },
-	{ title: "企業データ", desc: "資本金、拠点数、主要役員データ", url: "https://www.nicole.co.jp/corporate/#corporatedata" },
-	{ title: "企業理念", desc: "One Nicole — 期待を超える喜びを", url: "/pages/philosophy" },
-	{ title: "ESG / SDGs活動", desc: "地域社会への貢献とサステナビリティ", url: "https://www.nicole.co.jp/corporate/esg_sdgs/" }
+	{ title: "会社概要", desc: "ニコル・グループの沿革と概要", url: "/corporate" },
+	{ title: "グループ構成", desc: "各正規ディーラー法人と組織構造", url: "/corporate#structure" },
+	{ title: "企業データ", desc: "資本金、拠点数、主要役員データ", url: "/corporate#corporatedata" },
+	{ title: "企業理念", desc: "One Nicole — 期待を超える喜びを", url: "/philosophy" },
+	{ title: "ESG / SDGs活動", desc: "地域社会への貢献とサステナビリティ", url: "/esg_sdgs" },
+	{ title: "拠点一覧", desc: "東京・神奈川の全20拠点マップ", url: "/locations" },
+	{ title: "FD宣言", desc: "お客さま本位の業務運営方針", url: "/customer-policy" }
 ];
 ---
 
@@ -54,7 +56,7 @@ const corporateLinks = [
 		<!-- ブランドロゴ -->
 		<a href="/" class="header-logo" aria-label="Nicole Group Home">
 			<img 
-				src="https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole_Group_LOGO_neg.svg" 
+				src="/uploads/2026/01/Nicole_Group_LOGO_neg.svg" 
 				alt="Nicole Group" 
 				width="168" 
 				height="28" 
@@ -130,14 +132,14 @@ const corporateLinks = [
 
 				<!-- 3. LOCATION -->
 				<li class="nav-item">
-					<a href="/location/" class="nav-link">
+					<a href="/locations" class="nav-link">
 						<span>LOCATION</span>
 					</a>
 				</li>
 
 				<!-- 4. MAGAZINE -->
 				<li class="nav-item">
-					<a href="/magazine/" class="nav-link">
+					<a href="/posts" class="nav-link">
 						<span>MAGAZINE</span>
 					</a>
 				</li>
@@ -152,7 +154,7 @@ const corporateLinks = [
 
 				<!-- 6. CONTACT (アクセントボタン) -->
 				<li class="nav-item nav-item--cta">
-					<a href="https://www.nicole.co.jp/contact/?form_type=inquiry" target="_blank" rel="noopener noreferrer" class="nav-cta-btn">
+					<a href="/contact" class="nav-cta-btn">
 						<span>CONTACT</span>
 					</a>
 				</li>
@@ -211,14 +213,14 @@ const corporateLinks = [
 					</li>
 
 					<li class="mobile-nav-item">
-						<a href="/location/" class="mobile-main-link">
+						<a href="/locations" class="mobile-main-link">
 							<span>LOCATION</span>
 							<span class="mobile-link-sub">ショールーム・拠点マップ</span>
 						</a>
 					</li>
 
 					<li class="mobile-nav-item">
-						<a href="/magazine/" class="mobile-main-link">
+						<a href="/posts" class="mobile-main-link">
 							<span>MAGAZINE</span>
 							<span class="mobile-link-sub">特集記事・ストーリー</span>
 						</a>
@@ -234,8 +236,8 @@ const corporateLinks = [
 			</div>
 
 			<div class="mobile-drawer__footer">
-				<a href="https://www.nicole.co.jp/contact/?form_type=inquiry" target="_blank" rel="noopener noreferrer" class="mobile-contact-btn">
-					お問い合わせフォーム ↗
+				<a href="/contact" class="mobile-contact-btn">
+					お問い合わせフォーム
 				</a>
 				<p class="mobile-copyright">© Nicole Group. All rights reserved.</p>
 			</div>

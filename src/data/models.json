@@ -1,0 +1,530 @@
+[
+  {
+    "id": "156",
+    "name": "1シリーズ",
+    "catchphrase": "叶う歓びは、大きい",
+    "brand": "BMW",
+    "series": "1-series",
+    "bodyType": "hatch-back",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/01/bmw-120-list-1024x576.png",
+    "detailUrl": "/bmw1-series/"
+  },
+  {
+    "id": "158",
+    "name": "2シリーズ アクティブ ツアラー",
+    "catchphrase": "好奇心を、連れ出そう。",
+    "brand": "BMW",
+    "series": "2-series",
+    "bodyType": "active-tourer",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/02/bmw-218i-active-tourer-m-sport-1024x576.png",
+    "detailUrl": "/bmw2-series-active-tourer/"
+  },
+  {
+    "id": "164",
+    "name": "2シリーズ クーペ",
+    "catchphrase": "凝縮されたスポーティネス",
+    "brand": "BMW",
+    "series": "2-series",
+    "bodyType": "coupe",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/01/bmw-220i-coupe-m-sport-1-1024x576.png",
+    "detailUrl": "/bmw2-series-coupe/"
+  },
+  {
+    "id": "2462",
+    "name": "2シリーズ グラン クーペ",
+    "catchphrase": "インスピレーションが加速する、情熱のシルエット",
+    "brand": "BMW",
+    "series": "2-series",
+    "bodyType": "gran-coupe",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/02/bmw-220-gran-coupe-m-sport-1024x576.png",
+    "detailUrl": "/bmw2-series-gran-coupe/"
+  },
+  {
+    "id": "135",
+    "name": "3シリーズ セダン",
+    "catchphrase": "颯爽たるリーダーへ",
+    "brand": "BMW",
+    "series": "3-series",
+    "bodyType": "sedan",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "phev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "プラグインHV"
+    ],
+    "image": "/uploads/2026/01/bmw-318i-sedan-m-sport-1024x576.png",
+    "detailUrl": "/bmw3-series-sedan/"
+  },
+  {
+    "id": "155",
+    "name": "3シリーズ ツーリング",
+    "catchphrase": "広がる愉悦、果てしなく",
+    "brand": "BMW",
+    "series": "3-series",
+    "bodyType": "touring",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/01/bmw-318i-touring-m-sport-list-1024x576.png",
+    "detailUrl": "/bmw3-series-touring/"
+  },
+  {
+    "id": "2585",
+    "name": "4シリーズ クーペ",
+    "catchphrase": "ピュア・スポーツという名の誘惑",
+    "brand": "BMW",
+    "series": "4-series",
+    "bodyType": "coupe",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/02/bmw-420i-coupe-m-sport-1024x576.png",
+    "detailUrl": "/bmw4-series-coupe/"
+  },
+  {
+    "id": "2647",
+    "name": "4シリーズ グラン クーペ",
+    "catchphrase": "情熱的で、グラマラスな日常を",
+    "brand": "BMW",
+    "series": "4-series",
+    "bodyType": "gran-coupe",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-420i-gran-coupe-m-sport-1024x576.png",
+    "detailUrl": "/bmw4-series-gran-coupe/"
+  },
+  {
+    "id": "2788",
+    "name": "4シリーズ カブリオレ",
+    "catchphrase": "大胆であれ、ピュアであれ",
+    "brand": "BMW",
+    "series": "4-series",
+    "bodyType": "convertible",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/02/bmw-420i-cabriolet-m-sport-1024x576.png",
+    "detailUrl": "/bmw4-series-convertible/"
+  },
+  {
+    "id": "2504",
+    "name": "5シリーズ セダン",
+    "catchphrase": "感性で選ぶ。あなたにふさわしい5を。",
+    "brand": "BMW",
+    "series": "5-series",
+    "bodyType": "sedan",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-523i-sedan-exclusive-1024x576.png",
+    "detailUrl": "/bmw5-series-sedan/"
+  },
+  {
+    "id": "2516",
+    "name": "5シリーズ ツーリング",
+    "catchphrase": "先駆する、美しき日常",
+    "brand": "BMW",
+    "series": "5-series",
+    "bodyType": "touring",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-523i-touring-exclusive-1024x576.png",
+    "detailUrl": "/bmw5-series-touring/"
+  },
+  {
+    "id": "2550",
+    "name": "7シリーズ",
+    "catchphrase": "悠然と、気高く、越えてゆく",
+    "brand": "BMW",
+    "series": "7-series",
+    "bodyType": "sedan",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-740i-excellence-1024x576.png",
+    "detailUrl": "/bmw7-series/"
+  },
+  {
+    "id": "2412",
+    "name": "X1",
+    "catchphrase": "未知のルートへ、未到の世界へ、その心を走らせる",
+    "brand": "BMW",
+    "series": "x1",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-x1-sdrive18i-m-sport-1024x576.png",
+    "detailUrl": "/bmwx1/"
+  },
+  {
+    "id": "2467",
+    "name": "X2",
+    "catchphrase": "ひと目で、情熱が走り出す",
+    "brand": "BMW",
+    "series": "x2",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-x2-xdrive20i-m-sport-1024x576.png",
+    "detailUrl": "/bmwx2/"
+  },
+  {
+    "id": "1491",
+    "name": "X3",
+    "catchphrase": "すべての道が、冒険のステージに",
+    "brand": "BMW",
+    "series": "x3",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/02/bmw-x3-20-xdrive-xline-1024x576.png",
+    "detailUrl": "/bmwx3/"
+  },
+  {
+    "id": "9129",
+    "name": "iX3",
+    "catchphrase": "新時代への発進",
+    "brand": "BMW",
+    "series": "ix3",
+    "bodyType": "suv",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/03/ix3_20260319-1024x578.jpg",
+    "detailUrl": "/bmwix3/"
+  },
+  {
+    "id": "2480",
+    "name": "X5",
+    "catchphrase": "知性と風格のオールラウンダー",
+    "brand": "BMW",
+    "series": "x5",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel",
+      "phev"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル",
+      "プラグインHV"
+    ],
+    "image": "/uploads/2026/02/bmw-x5-xdrive50e-m-sport-1024x576.png",
+    "detailUrl": "/bmwx5/"
+  },
+  {
+    "id": "2570",
+    "name": "X6",
+    "catchphrase": "官能は、とめどなく。昂揚は、果てしなく。",
+    "brand": "BMW",
+    "series": "x6",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/02/bmw-x6-xdrive35d-m-sport-1024x576.png",
+    "detailUrl": "/bmwx6/"
+  },
+  {
+    "id": "2576",
+    "name": "X7",
+    "catchphrase": "誇り高き野性、深遠なる品格",
+    "brand": "BMW",
+    "series": "x7",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline",
+      "diesel"
+    ],
+    "badges": [
+      "ガソリン",
+      "ディーゼル"
+    ],
+    "image": "/uploads/2026/02/bmw-x7-xdrive40d-excellence-1024x576.png",
+    "detailUrl": "/bmwx7/"
+  },
+  {
+    "id": "2846",
+    "name": "XM",
+    "catchphrase": "尽きせぬ渇望を満たす、昂揚の世界へ",
+    "brand": "BMW",
+    "series": "xm",
+    "bodyType": "suv",
+    "powertrains": [
+      "phev"
+    ],
+    "badges": [
+      "プラグインHV"
+    ],
+    "image": "/uploads/2026/02/bmw-xm-label-1024x576.png",
+    "detailUrl": "/bmwxm/"
+  },
+  {
+    "id": "2836",
+    "name": "iX",
+    "catchphrase": "次世代EVが切り拓く、新たな美と躍動の地平へ",
+    "brand": "BMW",
+    "series": "ix",
+    "bodyType": "suv",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/bmw-ix-xdrive60-m-sport-1024x576.png",
+    "detailUrl": "/bmwix/"
+  },
+  {
+    "id": "160",
+    "name": "MINI COOPER 3 DOOR",
+    "catchphrase": "MINIのアイコン、MINI COOPER.",
+    "brand": "MINI",
+    "series": "cooper",
+    "bodyType": "3-door",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/01/mini-cooper-c-essential-trim-1024x585.png",
+    "detailUrl": "/minimini-cooper-3-door/"
+  },
+  {
+    "id": "3596",
+    "name": "MINI COOPER 5 DOOR",
+    "catchphrase": "際立つCooperのカリスマ性。",
+    "brand": "MINI",
+    "series": "cooper",
+    "bodyType": "5-door",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/02/mini-cooper-5-door-s-classic-trim-1024x585.png",
+    "detailUrl": "/minimini-cooper-5-door/"
+  },
+  {
+    "id": "3629",
+    "name": "MINI COOPER CONVERTIBLE",
+    "catchphrase": "かつてない爽快感。",
+    "brand": "MINI",
+    "series": "cooper",
+    "bodyType": "convertible-2",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/02/mini-cooper-convertible-s-classic-trim-1024x585.png",
+    "detailUrl": "/minimini-cooper-convertible/"
+  },
+  {
+    "id": "3637",
+    "name": "MINI COUNTRYMAN",
+    "catchphrase": "MINIらしさを、さらに大きく。",
+    "brand": "MINI",
+    "series": "countryman",
+    "bodyType": "suv",
+    "powertrains": [
+      "gasoline"
+    ],
+    "badges": [
+      "ガソリン"
+    ],
+    "image": "/uploads/2026/02/mini-countryman-d-classic-trim-1024x585.png",
+    "detailUrl": "/minimini-countryman/"
+  },
+  {
+    "id": "3642",
+    "name": "ALL-ELECTRIC MINI COOPER",
+    "catchphrase": "ELECTRICで進化した、ゴーカート・フィーリング。",
+    "brand": "MINI",
+    "series": "cooper",
+    "bodyType": "3-door",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/mini-cooper-se-classic-trim-1024x585.png",
+    "detailUrl": "/miniall-electric-mini-cooper/"
+  },
+  {
+    "id": "3647",
+    "name": "ALL-ELECTRIC MINI ACEMAN",
+    "catchphrase": "都市を駆ける、新時代の電動プレミアム・コンパクトSUV.",
+    "brand": "MINI",
+    "series": "aceman",
+    "bodyType": "suv",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/mini-aceman-se-classic-trim-1024x585.png",
+    "detailUrl": "/miniall-electric-mini-aceman/"
+  },
+  {
+    "id": "3652",
+    "name": "ALL-ELECTRIC MINI COUNTRYMAN",
+    "catchphrase": "全身に電気が走るような興奮が、待っている。",
+    "brand": "MINI",
+    "series": "countryman",
+    "bodyType": "suv",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/mini-countryman-se-all4-classic-trim-1024x585.png",
+    "detailUrl": "/miniall-electric-mini-countryman/"
+  },
+  {
+    "id": "3658",
+    "name": "JOHN COOPER WORKS",
+    "catchphrase": "受け継がれたレーシング・スピリット",
+    "brand": "MINI",
+    "series": "jcw",
+    "bodyType": "",
+    "powertrains": [
+      "gasoline",
+      "bev"
+    ],
+    "badges": [
+      "ガソリン",
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/mini-jcw-john-cooper-works-trim-1024x585.png",
+    "detailUrl": "/minijohn-cooper-works/"
+  },
+  {
+    "id": "6116",
+    "name": "THE MINI PAUL SMITH EDITION",
+    "catchphrase": "The perfect match.",
+    "brand": "MINI",
+    "series": "cooper",
+    "bodyType": "3-door",
+    "powertrains": [
+      "bev"
+    ],
+    "badges": [
+      "電気自動車"
+    ],
+    "image": "/uploads/2026/02/mini-cooper-se-paul-smith-edition-1024x585.png",
+    "detailUrl": "/minithe-mini-paul-smith-edition/"
+  }
+]

@@ -91,7 +91,7 @@ const staticArticlesCatalog: Record<string, any> = {
 		data: {
 			title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 			excerpt: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。",
-			featured_image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+			featured_image: "/uploads/2026/08/DSC5134.jpg",
 			published_at: "2026-08-20T10:00:00.000Z",
 			related_location: "nicole-bmw-kawasaki",
 			content: [
@@ -128,7 +128,7 @@ const showroomCatalog: Record<string, any> = {
 		tel: "044-511-2000",
 		hours: "10:00～18:00",
 		closed: "水曜日（祝日を除く）",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/Nicole-BMW-本社.jpg",
+		image: "/uploads/2026/01/Nicole-BMW-本社.jpg",
 		detailUrl: "/location/nicole-bmw-kawasaki/",
 		googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7",
 		features: ["新車ショールーム", "BMWマイスター在籍ファクトリー併設", "納車ハンドオーバースペース", "150kW急速充電"]
@@ -143,7 +143,7 @@ const showroomCatalog: Record<string, any> = {
 		tel: "03-5743-2000",
 		hours: "10:00～18:00",
 		closed: "水曜日（祝日を除く）",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/01/大田支店.jpg",
+		image: "/uploads/2026/01/大田支店.jpg",
 		detailUrl: "/location/nicole-bmw-ota/",
 		googleMapsUrl: "https://maps.google.com/?q=Nicole+BMW+大田支店",
 		features: ["都内正規拠点", "新車ショールーム", "サービス工場併設"]
@@ -174,7 +174,7 @@ const isDemoArticle = isNeueKlasse || slug === "202608_bmw_kids_mechanic";
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
 
-const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg");
+const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg");
 const heroImageUrlSp = getImageUrl(featuredImageSp);
 const hasShowroom = Boolean((post.data as any).related_location) || isDemoArticle;
 
@@ -206,22 +206,22 @@ const kidsGallery = [
 	{
 		title: "メカニックウエアへの着替え",
 		caption: "BMWマイスターと同じつなぎに身を包み、少し緊張しながらも誇らしげな笑顔",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5139.jpg"
+		image: "/uploads/2026/08/DSC5139.jpg"
 	},
 	{
 		title: "実車を使ったタイヤ空気圧・点検作業",
 		caption: "プロのBMWマイスターの手ほどきを受けながら、エアゲージを使って適正空気圧をチェック",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5162.jpg"
+		image: "/uploads/2026/08/DSC5162.jpg"
 	},
 	{
 		title: "「ニコル・ユーロ」給与明細の授与",
 		caption: "すべての点検ミッションを終え、自らの労働の対価として給与明細とお給料を受け取る",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5188.jpg"
+		image: "/uploads/2026/08/DSC5188.jpg"
 	},
 	{
 		title: "特別ファクトリー見学ツアー",
 		caption: "普段は立ち入ることのできないNicole BMW 本社サービス工場を保護者様と共に見学",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5206.jpg"
+		image: "/uploads/2026/08/DSC5206.jpg"
 	}
 ];
 
@@ -247,7 +247,7 @@ const relatedStories = [
 		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 		brand: "BMW",
 		date: "2026.08.20",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC5134.jpg",
+		image: "/uploads/2026/08/DSC5134.jpg",
 		url: "/magazine/202608_bmw_kids_mechanic/"
 	},
 	{
@@ -255,7 +255,7 @@ const relatedStories = [
 		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
 		brand: "MINI",
 		date: "2026.10.15",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/10/DSC6593-1-scaled.jpg",
+		image: "/uploads/2026/10/DSC6593-1-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
 	},
 	{
@@ -263,7 +263,7 @@ const relatedStories = [
 		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
 		brand: "Ferrari",
 		date: "2026.08.17",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/08/DSC4983-3.jpg",
+		image: "/uploads/2026/08/DSC4983-3.jpg",
 		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
 	},
 	{
@@ -271,7 +271,7 @@ const relatedStories = [
 		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
 		brand: "MINI",
 		date: "2026.07.14",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/minijcwtrack-scaled.jpg",
+		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/"
 	},
 	{
@@ -279,7 +279,7 @@ const relatedStories = [
 		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
 		brand: "ALPINA",
 		date: "2026.05.15",
-		image: "https://www.nicole.co.jp/wp/wp-content/uploads/2026/07/DSC7756.jpg",
+		image: "/uploads/2026/07/DSC7756.jpg",
 		url: "https://nicole-automobiles.com/"
 	}
 ].filter(s => s.slug !== slug);

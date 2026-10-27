@@ -1,0 +1,642 @@
+---
+// src/pages/locations.astro
+// ニコル・グループ 拠点一覧ページ（シネマティック＆インタラクティブ・ディレクトリ）
+import NicoleLayout from "../layouts/NicoleLayout.astro";
+import locationsData from "../data/locations.json";
+
+// ブランド一覧と拠点件数
+const brandCounts = {
+	ALL: locationsData.length,
+	BMW: locationsData.filter(l => l.brand === "BMW").length,
+	MINI: locationsData.filter(l => l.brand === "MINI").length,
+	"Rolls-Royce": locationsData.filter(l => l.brand === "Rolls-Royce").length,
+	Ferrari: locationsData.filter(l => l.brand === "Ferrari").length
+};
+---
+
+<NicoleLayout
+	title="拠点一覧 | SHOWROOM & SERVICE LOCATIONS - ニコル・グループ公式"
+	description="ニコル・グループの正規ディーラーショールームおよびサービスセンター拠点一覧。BMW、MINI、Rolls-Royce、Ferrariの住所、電話番号、営業時間、アクセス情報をご案内します。"
+>
+	<main class="locs-page">
+		<!-- 1. Hero Showcase -->
+		<section class="locs-hero">
+			<div class="locs-container">
+				<!-- パンくずナビ -->
+				<nav class="locs-breadcrumbs" aria-label="Breadcrumb">
+					<ol class="locs-breadcrumbs__list">
+						<li><a href="/">HOME</a></li>
+						<li class="locs-breadcrumbs__sep">/</li>
+						<li><a href="/corporate">CORPORATE</a></li>
+						<li class="locs-breadcrumbs__sep">/</li>
+						<li aria-current="page">LOCATIONS</li>
+					</ol>
+				</nav>
+
+				<div class="locs-hero__content">
+					<span class="locs-eyebrow">FACILITIES & NETWORK</span>
+					<h1 class="locs-hero__title">
+						卓越したサービスをお届けする、<br />
+						20の拠点ネットワーク。
+					</h1>
+					<p class="locs-hero__lead">
+						東京都内および神奈川県の主要ロケーションに展開する正規ディーラーショールーム、認定中古車センター、最高峰のサービスファクトリー。お客様の一生涯のパートナーとして万全の体制でお迎えいたします。
+					</p>
+				</div>
+
+				<!-- インタラクティブ・フィルターバー -->
+				<div class="locs-filter-bar">
+					<div class="locs-filter-group" id="brand-filters">
+						<button type="button" class="locs-filter-btn is-active" data-filter="all">
+							すべて <span class="locs-filter-count">({brandCounts.ALL})</span>
+						</button>
+						<button type="button" class="locs-filter-btn" data-filter="BMW">
+							BMW <span class="locs-filter-count">({brandCounts.BMW})</span>
+						</button>
+						<button type="button" class="locs-filter-btn" data-filter="MINI">
+							MINI <span class="locs-filter-count">({brandCounts.MINI})</span>
+						</button>
+						<button type="button" class="locs-filter-btn" data-filter="Rolls-Royce">
+							Rolls-Royce <span class="locs-filter-count">({brandCounts["Rolls-Royce"]})</span>
+						</button>
+						<button type="button" class="locs-filter-btn" data-filter="Ferrari">
+							Ferrari <span class="locs-filter-count">({brandCounts.Ferrari})</span>
+						</button>
+					</div>
+
+					<div class="locs-filter-group locs-filter-group--sub" id="area-filters">
+						<button type="button" class="locs-pill-btn is-active" data-area="all">全エリア</button>
+						<button type="button" class="locs-pill-btn" data-area="神奈川">神奈川</button>
+						<button type="button" class="locs-pill-btn" data-area="東京">東京</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 2. 拠点カードグリッド -->
+		<section class="locs-section">
+			<div class="locs-container">
+				<div class="locs-grid" id="locations-grid">
+					{locationsData.map((loc) => (
+						<article 
+							class="loc-card" 
+							data-brand={loc.brand} 
+							data-area={loc.areaGroup}
+							data-facility={loc.facilityType}
+						>
+							<div class="loc-card__img-wrap">
+								<img 
+									src={loc.image || "/uploads/2026/01/Nicole-BMW-本社-1024x682.jpg"} 
+									alt={loc.name} 
+									class="loc-card__img" 
+									loading="lazy" 
+								/>
+								<div class="loc-card__badges">
+									<span class="loc-card__brand-badge">{loc.brand}</span>
+									<span class="loc-card__facility-badge">{loc.facilityType}</span>
+								</div>
+							</div>
+
+							<div class="loc-card__body">
+								<span class="loc-card__area-label">{loc.specificArea}</span>
+								<h2 class="loc-card__name">{loc.name}</h2>
+								
+								<div class="loc-card__details">
+									<p class="loc-card__addr">
+										<span class="loc-card__postal">{loc.postal}</span>
+										{loc.address}
+									</p>
+
+									<div class="loc-card__meta-row">
+										<span class="loc-card__meta-label">TEL</span>
+										<a href={`tel:${loc.tel.replace(/-/g, '')}`} class="loc-card__tel">{loc.tel}</a>
+									</div>
+
+									<div class="loc-card__meta-row">
+										<span class="loc-card__meta-label">営業時間</span>
+										<span>{loc.hours}</span>
+									</div>
+
+									<div class="loc-card__meta-row">
+										<span class="loc-card__meta-label">定休日</span>
+										<span>{loc.closed}</span>
+									</div>
+
+									{loc.services && loc.services.length > 0 && (
+										<div class="loc-card__services">
+											{loc.services.map((srv) => (
+												<span class="loc-card__service-tag">{srv}</span>
+											))}
+										</div>
+									)}
+								</div>
+
+								<div class="loc-card__footer">
+									<a 
+										href={`https://maps.google.com/?q=${loc.mapQuery}`} 
+										target="_blank" 
+										rel="noopener noreferrer" 
+										class="loc-card__btn loc-card__btn--map"
+									>
+										Google Maps ↗
+									</a>
+									<a href="/contact" class="loc-card__btn loc-card__btn--contact">
+										お問い合わせ
+									</a>
+								</div>
+							</div>
+						</article>
+					))}
+				</div>
+
+				<!-- 該当なしメッセージ -->
+				<div class="locs-empty" id="locs-empty" style="display: none;">
+					<p class="locs-empty__text">選択された条件に一致する拠点は見つかりませんでした。</p>
+					<button type="button" class="locs-empty__reset" id="reset-filters">フィルターをリセット</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- 3. フッターCTA -->
+		<section class="locs-cta">
+			<div class="locs-container locs-cta__container">
+				<span class="locs-eyebrow locs-eyebrow--gold">CUSTOMER SUPPORT</span>
+				<h2 class="locs-cta__title">お車に関するあらゆるご相談を承ります。</h2>
+				<p class="locs-cta__desc">
+					新車・認定中古車のご購入相談から、点検・整備・車検のお見積もりまで。お近くのNicole Group各拠点へお気軽にお問い合わせください。
+				</p>
+				<div class="locs-cta__actions">
+					<a href="/contact" class="locs-btn locs-btn--gold">総合お問い合わせフォーム</a>
+					<a href="/corporate" class="locs-btn locs-btn--outline">会社概要を見る</a>
+				</div>
+			</div>
+		</section>
+	</main>
+</NicoleLayout>
+
+<!-- クライアントサイド・フィルタリングスクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', () => {
+		let currentBrand = 'all';
+		let currentArea = 'all';
+
+		const brandBtns = document.querySelectorAll('#brand-filters .locs-filter-btn');
+		const areaBtns = document.querySelectorAll('#area-filters .locs-pill-btn');
+		const cards = document.querySelectorAll('.loc-card');
+		const emptyMsg = document.getElementById('locs-empty');
+		const resetBtn = document.getElementById('reset-filters');
+
+		function applyFilters() {
+			let visibleCount = 0;
+			cards.forEach(card => {
+				const brand = card.getAttribute('data-brand');
+				const area = card.getAttribute('data-area');
+
+				const matchBrand = (currentBrand === 'all') || (brand === currentBrand);
+				const matchArea = (currentArea === 'all') || (area === currentArea);
+
+				if (matchBrand && matchArea) {
+					card.style.display = 'flex';
+					visibleCount++;
+				} else {
+					card.style.display = 'none';
+				}
+			});
+
+			if (emptyMsg) {
+				emptyMsg.style.display = (visibleCount === 0) ? 'block' : 'none';
+			}
+		}
+
+		brandBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				brandBtns.forEach(b => b.classList.remove('is-active'));
+				btn.classList.add('is-active');
+				currentBrand = btn.getAttribute('data-filter');
+				applyFilters();
+			});
+		});
+
+		areaBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				areaBtns.forEach(b => b.classList.remove('is-active'));
+				btn.classList.add('is-active');
+				currentArea = btn.getAttribute('data-area');
+				applyFilters();
+			});
+		});
+
+		if (resetBtn) {
+			resetBtn.addEventListener('click', () => {
+				currentBrand = 'all';
+				currentArea = 'all';
+				brandBtns.forEach((b, i) => b.classList.toggle('is-active', i === 0));
+				areaBtns.forEach((b, i) => b.classList.toggle('is-active', i === 0));
+				applyFilters();
+			});
+		}
+	});
+</script>
+
+<style>
+	/* === Locations Luxury Directory Styles === */
+	.locs-page {
+		background: #000000;
+		color: #ffffff;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.locs-container {
+		max-width: 1240px;
+		margin: 0 auto;
+		padding: 0 32px;
+	}
+
+	@media (max-width: 768px) {
+		.locs-container {
+			padding: 0 20px;
+		}
+	}
+
+	/* Breadcrumbs */
+	.locs-breadcrumbs {
+		margin-bottom: 24px;
+	}
+	.locs-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 11px;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.6);
+	}
+	.locs-breadcrumbs__list a {
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+	.locs-breadcrumbs__list a:hover {
+		color: #cbb279;
+	}
+	.locs-breadcrumbs__sep {
+		margin: 0 10px;
+		color: rgba(255, 255, 255, 0.3);
+	}
+
+	/* Hero */
+	.locs-hero {
+		padding-top: 140px;
+		padding-bottom: 40px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.locs-hero__content {
+		max-width: 840px;
+		margin-bottom: 40px;
+	}
+	.locs-eyebrow {
+		display: inline-block;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.25em;
+		color: #cbb279;
+		margin-bottom: 14px;
+	}
+	.locs-eyebrow--gold {
+		color: #cbb279;
+	}
+	.locs-hero__title {
+		font-size: clamp(2.2rem, 1.8rem + 2.2vw, 3.8rem);
+		font-weight: 300;
+		line-height: 1.25;
+		letter-spacing: -0.02em;
+		margin: 0 0 20px 0;
+		color: #ffffff;
+	}
+	.locs-hero__lead {
+		font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.1rem);
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.75);
+		margin: 0;
+	}
+
+	/* Filters */
+	.locs-filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 20px;
+		padding-top: 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	.locs-filter-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.locs-filter-btn {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.8);
+		padding: 10px 18px;
+		font-size: 13px;
+		font-weight: 500;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.locs-filter-btn:hover {
+		border-color: #cbb279;
+		color: #ffffff;
+	}
+	.locs-filter-btn.is-active {
+		background: #cbb279;
+		border-color: #cbb279;
+		color: #000000;
+		font-weight: 600;
+	}
+	.locs-filter-count {
+		font-size: 11px;
+		opacity: 0.8;
+	}
+
+	.locs-pill-btn {
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: rgba(255, 255, 255, 0.6);
+		padding: 6px 14px;
+		font-size: 12px;
+		border-radius: 20px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.locs-pill-btn:hover {
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.5);
+	}
+	.locs-pill-btn.is-active {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: #ffffff;
+		color: #ffffff;
+	}
+
+	/* Section & Grid */
+	.locs-section {
+		padding: 60px 0 100px 0;
+	}
+	.locs-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 30px;
+	}
+	@media (max-width: 1024px) {
+		.locs-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (max-width: 680px) {
+		.locs-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	/* Card */
+	.loc-card {
+		background: #0d0d0d;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 4px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		transition: transform 0.3s ease, border-color 0.3s ease;
+	}
+	.loc-card:hover {
+		transform: translateY(-4px);
+		border-color: rgba(203, 178, 121, 0.4);
+	}
+	.loc-card__img-wrap {
+		position: relative;
+		height: 200px;
+		background: #181818;
+		overflow: hidden;
+	}
+	.loc-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.5s ease;
+	}
+	.loc-card:hover .loc-card__img {
+		transform: scale(1.05);
+	}
+	.loc-card__badges {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		display: flex;
+		gap: 6px;
+	}
+	.loc-card__brand-badge {
+		background: rgba(0, 0, 0, 0.85);
+		backdrop-filter: blur(4px);
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: #cbb279;
+		padding: 4px 8px;
+		border-radius: 2px;
+	}
+	.loc-card__facility-badge {
+		background: rgba(255, 255, 255, 0.15);
+		backdrop-filter: blur(4px);
+		font-size: 10px;
+		font-weight: 500;
+		color: #ffffff;
+		padding: 4px 8px;
+		border-radius: 2px;
+	}
+	.loc-card__body {
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+	.loc-card__area-label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.15em;
+		color: #cbb279;
+		margin-bottom: 6px;
+	}
+	.loc-card__name {
+		font-size: 18px;
+		font-weight: 500;
+		color: #ffffff;
+		margin: 0 0 16px 0;
+		line-height: 1.4;
+	}
+	.loc-card__details {
+		margin-bottom: 24px;
+		flex-grow: 1;
+	}
+	.loc-card__addr {
+		font-size: 13px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0 0 12px 0;
+	}
+	.loc-card__postal {
+		display: block;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.4);
+		margin-bottom: 2px;
+	}
+	.loc-card__meta-row {
+		display: flex;
+		font-size: 12px;
+		margin-bottom: 6px;
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.loc-card__meta-label {
+		width: 65px;
+		color: rgba(255, 255, 255, 0.4);
+		flex-shrink: 0;
+	}
+	.loc-card__tel {
+		color: #ffffff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+	.loc-card__tel:hover {
+		color: #cbb279;
+	}
+	.loc-card__services {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		margin-top: 12px;
+	}
+	.loc-card__service-tag {
+		font-size: 10px;
+		background: rgba(255, 255, 255, 0.05);
+		color: rgba(255, 255, 255, 0.6);
+		padding: 2px 6px;
+		border-radius: 2px;
+	}
+	.loc-card__footer {
+		padding-top: 16px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		display: flex;
+		gap: 10px;
+	}
+	.loc-card__btn {
+		flex: 1;
+		padding: 9px;
+		font-size: 12px;
+		font-weight: 600;
+		text-align: center;
+		text-decoration: none;
+		border-radius: 2px;
+		transition: all 0.2s ease;
+	}
+	.loc-card__btn--map {
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: rgba(255, 255, 255, 0.8);
+	}
+	.loc-card__btn--map:hover {
+		border-color: #ffffff;
+		color: #ffffff;
+	}
+	.loc-card__btn--contact {
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+	}
+	.loc-card__btn--contact:hover {
+		background: #cbb279;
+		color: #000000;
+	}
+
+	/* Empty Message */
+	.locs-empty {
+		text-align: center;
+		padding: 60px 20px;
+		background: #0d0d0d;
+		border: 1px dashed rgba(255, 255, 255, 0.15);
+		border-radius: 4px;
+	}
+	.locs-empty__text {
+		font-size: 15px;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0 0 16px 0;
+	}
+	.locs-empty__reset {
+		background: #cbb279;
+		color: #000000;
+		border: none;
+		padding: 10px 20px;
+		font-size: 13px;
+		font-weight: 600;
+		border-radius: 2px;
+		cursor: pointer;
+	}
+
+	/* Footer CTA */
+	.locs-cta {
+		padding: 80px 0 120px 0;
+		background: #080808;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		text-align: center;
+	}
+	.locs-cta__container {
+		max-width: 800px;
+	}
+	.locs-cta__title {
+		font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.8rem);
+		font-weight: 300;
+		margin: 14px 0 18px 0;
+		color: #ffffff;
+	}
+	.locs-cta__desc {
+		font-size: 15px;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0 0 36px 0;
+	}
+	.locs-cta__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 16px;
+	}
+	.locs-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 14px 28px;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		border-radius: 2px;
+		transition: all 0.3s ease;
+	}
+	.locs-btn--gold {
+		background: #cbb279;
+		color: #000000;
+	}
+	.locs-btn--gold:hover {
+		background: #e2cc98;
+	}
+	.locs-btn--outline {
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		color: #ffffff;
+	}
+	.locs-btn--outline:hover {
+		border-color: #cbb279;
+		color: #cbb279;
+	}
+</style>

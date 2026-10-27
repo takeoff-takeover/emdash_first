@@ -1,0 +1,90 @@
+---
+// src/components/dynamic/ElementorModelGrid.astro
+// Elementor Loop Grid 再現コンポーネント（models.json から動的取得）
+import modelsData from "../../data/models.json";
+
+interface Props {
+  brand?: "BMW" | "MINI" | "Rolls-Royce" | "Ferrari" | "ALPINA" | string;
+  series?: string;
+  bodyType?: string;
+  limit?: number;
+}
+
+const { brand, series, bodyType, limit } = Astro.props;
+
+let models = modelsData;
+if (brand) {
+  models = models.filter(m => m.brand.toUpperCase() === brand.toUpperCase());
+}
+if (series) {
+  models = models.filter(m => m.series === series);
+}
+if (bodyType) {
+  models = models.filter(m => m.bodyType === bodyType);
+}
+if (limit) {
+  models = models.slice(0, limit);
+}
+
+// Badge class helper
+const getBadgeClass = (badge: string) => {
+  if (badge.includes("ガソリン")) return "ng-badge--gasoline";
+  if (badge.includes("ディーゼル")) return "ng-badge--diesel";
+  if (badge.includes("電気")) return "ng-badge--bev";
+  if (badge.includes("プラグイン")) return "ng-badge--phev";
+  return "ng-badge--default";
+};
+---
+
+<div class="elementor-loop-container elementor-grid" role="list">
+  {models.map((model) => (
+    <div
+      data-elementor-type="loop-item"
+      data-elementor-id="143"
+      class={`elementor elementor-143 e-loop-item e-loop-item-${model.id} post-${model.id} vehicle type-vehicle status-publish hentry brand-${model.brand.toLowerCase()} series-${model.series} body_type-${model.bodyType} ${model.powertrains.map(p => `powertrain-${p}`).join(" ")} nicole-brand-content nicole-brand-${model.brand.toLowerCase()}`}
+      data-elementor-post-type="elementor_library"
+    >
+      <div class="elementor-element elementor-element-dbbb6e0 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container">
+        <div class="e-con-inner">
+          <div class="elementor-element elementor-element-ef5b364 elementor-widget elementor-widget-image" data-element_type="widget" data-widget_type="image.default">
+            <a href={model.detailUrl}>
+              <img
+                loading="lazy"
+                decoding="async"
+                width="1024"
+                height="576"
+                src={model.image}
+                alt={model.name}
+                class="attachment-large size-large"
+              />
+            </a>
+          </div>
+
+          {model.catchphrase && (
+            <div class="elementor-element elementor-element-1da3959 elementor-widget elementor-widget-heading" data-element_type="widget" data-widget_type="heading.default">
+              <h5 class="elementor-heading-title elementor-size-default">
+                <a href={model.detailUrl}>{model.catchphrase}</a>
+              </h5>
+            </div>
+          )}
+
+          <div class="elementor-element elementor-element-3bdf977 elementor-widget elementor-widget-heading" data-element_type="widget" data-widget_type="heading.default">
+            <h3 class="elementor-heading-title elementor-size-default">
+              <a href={model.detailUrl}>{model.name}</a>
+            </h3>
+          </div>
+
+          {model.badges && model.badges.length > 0 && (
+            <div class="elementor-element elementor-element-87d8a36 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-widget_type="text-editor.default">
+              <div class="ng-badges ng-badges-powertrain">
+                {model.badges.map((b) => (
+                  <span class={`ng-badge ${getBadgeClass(b)}`}>{b}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>

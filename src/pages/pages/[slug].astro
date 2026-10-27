@@ -1,14 +1,10 @@
 ---
-import {
-	getEmDashEntry,
-	getSeoMeta,
-	decodeSlug,
-	getSiteSettings,
-} from "emdash";
-import { PortableText } from "emdash/ui";
+// src/pages/pages/[slug].astro
+// ニコル・グループ 固定ページ動的ルーティング＆事業会社Elementorデザイン完全継承
+import { decodeSlug } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
-import { resolveBlogSiteIdentity } from "../../utils/site-identity";
-import "../../styles/prose.css";
+import fs from "node:fs";
+import path from "node:path";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -16,113 +12,81 @@ if (!slug) {
 	return Astro.rewrite("/404");
 }
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+// 1. トップレベル独立ページへの301リダイレクト
+const redirectMap: Record<string, string> = {
+	corporate: "/corporate",
+	philosophy: "/philosophy",
+	bmw: "/bmw",
+	mini: "/mini",
+	locations: "/locations",
+	esg_sdgs: "/esg_sdgs",
+	privacystatement: "/privacystatement",
+	"customer-policy": "/customer-policy",
+	contact: "/contact",
+	"contact-thanks": "/contact-thanks"
+};
 
-if (!page) {
-	return Astro.rewrite("/404");
+if (redirectMap[slug]) {
+	return Astro.redirect(redirectMap[slug], 301);
 }
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
-const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
-const seo = getSeoMeta(page, {
-	siteTitle,
-	siteUrl: Astro.url.origin,
-	path: Astro.url.pathname.replace(/\/$/, ""),
-});
+// 2. 5大事業会社のElementorデータロード
+const companyFileMap: Record<string, string> = {
+	"nicole-cars": "NicoleCarsElementor",
+	"nicole-automobiles": "NicoleAutomobilesElementor",
+	"nicole-motorcars": "NicoleMotorcarsElementor",
+	"nicole-competizione": "NicoleCompetizioneElementor",
+	"nicole-racing-japan": "NicoleRacingJapanElementor"
+};
+
+let pageData: { title: string; description: string; cssFiles: string[]; html: string } | null = null;
+
+if (companyFileMap[slug]) {
+	const baseName = companyFileMap[slug];
+	const dir = path.resolve("./src/components/companies");
+	const jsonPath = path.join(dir, `${baseName}.json`);
+	const htmlPath = path.join(dir, `${baseName}.html`);
+	
+	if (fs.existsSync(jsonPath) && fs.existsSync(htmlPath)) {
+		const meta = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+		const html = fs.readFileSync(htmlPath, "utf-8");
+		pageData = {
+			title: meta.title,
+			description: meta.description,
+			cssFiles: meta.cssFiles || [],
+			html
+		};
+	}
+}
+
+if (!pageData) {
+	return Astro.rewrite("/404");
+}
 ---
 
-<NicoleLayout title={`${page.data.title} - ニコル・グループ`} description={seo.description}>
-	<div class="nicole-page-container">
-		<header class="nicole-page-header">
-			<div class="nicole-page-header__inner">
-				<span class="nicole-page-header__badge">CORPORATE</span>
-				<h1 class="nicole-page-title" {...page.edit.title}>{page.data.title}</h1>
-			</div>
-		</header>
+<NicoleLayout title={pageData.title} description={pageData.description}>
+  <slot name="head" slot="head">
+    {pageData.cssFiles.map((css: string) => (
+      <link rel="stylesheet" href={css} />
+    ))}
+    <style is:global>
+      .elementor {
+        box-sizing: border-box;
+      }
+      .entry-content {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .elementor img {
+        height: auto;
+        max-width: 100%;
+      }
+    </style>
+  </slot>
 
-		<div class="nicole-page-content">
-			<div class="prose nicole-page-prose" {...page.edit.content}>
-				<PortableText value={page.data.content} />
-			</div>
-		</div>
-	</div>
+  <div class="elementor-page-wrapper">
+    <div class="entry-content" set:html={pageData.html} />
+  </div>
 </NicoleLayout>
-
-<style>
-	.nicole-page-container {
-		background: #000000;
-		color: #ffffff;
-		min-height: 80vh;
-		padding-top: 140px;
-		padding-bottom: 100px;
-	}
-
-	.nicole-page-header {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-		padding-bottom: 40px;
-		margin-bottom: 60px;
-	}
-
-	.nicole-page-header__inner {
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 0 40px;
-	}
-
-	.nicole-page-header__badge {
-		display: inline-block;
-		font-family: "Helvetica", sans-serif;
-		font-size: 13px;
-		font-weight: 500;
-		letter-spacing: 0.15em;
-		color: #e60012;
-		margin-bottom: 12px;
-	}
-
-	.nicole-page-title {
-		font-family: "Helvetica", sans-serif;
-		font-size: clamp(2rem, 1.5rem + 2.5vw, 3.2rem);
-		font-weight: 300;
-		line-height: 1.2;
-		color: #ffffff;
-		margin: 0;
-	}
-
-	.nicole-page-content {
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 0 40px;
-	}
-
-	.nicole-page-prose {
-		color: #d1d5db;
-		font-size: 16px;
-		line-height: 1.9;
-	}
-
-	.nicole-page-prose :global(h2) {
-		color: #ffffff;
-		font-family: "Helvetica", sans-serif;
-		font-weight: 400;
-		font-size: 1.8rem;
-		border-left: 4px solid #e60012;
-		padding-left: 16px;
-		margin-top: 3rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.nicole-page-prose :global(h3) {
-		color: #ffffff;
-		font-size: 1.4rem;
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-	}
-
-	.nicole-page-prose :global(p) {
-		margin-bottom: 1.8rem;
-	}
-
-	.nicole-page-prose :global(strong) {
-		color: #ffffff;
-	}
-</style>
