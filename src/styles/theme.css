@@ -24,6 +24,11 @@
 	--color-on-brand: #09090b;
 	--color-brand-ring: rgb(255 255 255 / 0.2);
 
+	/* Strategic Accent Red ("ここぞという時の赤") - Reserved for vital CTAs and key focal points */
+	--color-accent-red: #e11d48;
+	--color-accent-red-hover: #be123c;
+	--color-on-accent-red: #ffffff;
+
 	/* Premium subtle shadows */
 	--shadow-card: 0 0 0 1px var(--color-ring), 0 4px 20px -2px rgba(0, 0, 0, 0.7);
 	--shadow-card-hover: 0 0 0 1px rgba(255, 255 255, 0.18), 0 12px 32px -4px rgba(0, 0, 0, 0.9);

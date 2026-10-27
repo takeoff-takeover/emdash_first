@@ -15,6 +15,19 @@ if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 // 静的アーカイブ記事データ（Nicole Connect公式マガジン記事マスタ）
 const staticArticles = [
 	{
+		id: "202607_new_bmw_x5",
+		slug: "202607_new_bmw_x5",
+		title: "【公式発表】新型BMW X5誕生。Neue Klasseの革新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代",
+		brand: "BMW",
+		topic: "Feature",
+		date: "2026.07.01",
+		views: "9,420",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg",
+		lead: "プレミアムSAVのパイオニアが第5世代（G65）へ進化。Neue Klasseデザイン言語、BMWパノラミックiDrive、そしてBEV・水素・PHEV・ガソリン・ディーゼルの5つの動力源を揃えた最高峰SAV。",
+		url: "/magazine/202607_new_bmw_x5/",
+		isFeatured: true
+	},
+	{
 		id: "2027_new_bmw_3series_neue_klasse",
 		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
@@ -25,7 +38,7 @@ const staticArticles = [
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
 		lead: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。",
 		url: "/magazine/2027_new_bmw_3series_neue_klasse/",
-		isFeatured: true
+		isFeatured: false
 	},
 	{
 		id: "202610_mini_united-japan-2026",
@@ -90,19 +103,6 @@ const staticArticles = [
 		image: "/uploads/2026/07/DSC7756.jpg",
 		lead: "サーキットを疾走する純粋な興奮。オーナー限定ワンメイクレースシリーズの世界へ。",
 		url: "https://www.nicole.co.jp/magazine/20260707_ferrari_challenge_invitation/",
-		isFeatured: false
-	},
-	{
-		id: "202607_new_bmw_x5",
-		slug: "202607_new_bmw_x5",
-		title: "新たなデザイン言語と5つの動力。第5世代、New BMW X5 誕生",
-		brand: "BMW",
-		topic: "Feature",
-		date: "2026.07.01",
-		views: "1,120",
-		image: "/uploads/2026/07/DSC6630.jpg",
-		lead: "プレミアムSUVのパイオニアが劇的な進化。新世代オペレーティングシステムと極上の快適性。",
-		url: "https://www.nicole.co.jp/magazine/202607_new_bmw_x5/",
 		isFeatured: false
 	},
 	{
@@ -268,8 +268,8 @@ const allArticles = [
 // 一番目玉の記事（Cover Story）
 const coverArticle = allArticles.find(a => a.isFeatured) || allArticles[0];
 
-// 特集ハイライト記事（Chapters）
-const highlightStories = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 4);
+// 特集ハイライト記事（最新記事 2枠）
+const highlightStories = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
 const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
@@ -278,6 +278,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 <NicoleLayout 
 	title="Nicole Connect - Web Magazine ｜ ニコル・グループ公式" 
 	description="Appleのような大迫力のビジュアルと洗練されたエディトリアルで綴るWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新モデル情報から特集記事まで。"
+	isMagazine={true}
 >
 	<main class="apple-magazine-main">
 		<!-- ============================================================== -->
@@ -298,73 +299,27 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				<div class="apple-hero__side-vignette"></div>
 			</div>
 
-			<!-- 雑誌表紙のエディトリアル・フレーム（Hairline Border & Corner Badges） -->
-			<div class="apple-hero__frame">
-				<div class="frame-edge top-left"></div>
-				<div class="frame-edge top-right"></div>
-				<div class="frame-edge bottom-left"></div>
-				<div class="frame-edge bottom-right"></div>
-			</div>
+
 
 			<!-- 表紙コンテンツ（Apple風の大胆かつ洗練されたタイポグラフィ） -->
 			<div class="apple-hero__content">
 				<div class="mag-container apple-hero__container">
-					<!-- トップメタ：号数 ＆ 誌名マストヘッド -->
-					<div class="apple-hero__header">
-						<div class="apple-hero__issue-pill">
-							<span class="pulse-dot"></span>
-							<span>VOLUME 08 — AUTUMN / WINTER 2026-2027</span>
-						</div>
-						<div class="apple-hero__masthead">
-							<span class="masthead-name">NICOLE CONNECT</span>
-							<span class="masthead-edition">COLLECTOR'S EDITION</span>
-						</div>
-					</div>
-
 					<!-- センター：目玉記事の超巨大ヘッドライン ＆ コピー -->
 					<div class="apple-hero__center">
-						<div class="apple-hero__brand-kicker">
-							<span class="kicker-brand">{coverArticle.brand}</span>
-							<span class="kicker-sep">/</span>
-							<span class="kicker-topic">COVER STORY</span>
-						</div>
-
 						<h1 class="apple-hero__title">
-							THE NEW DAWN.
+							THE ALL-NEW BMW X5.
 						</h1>
 
 						<p class="apple-hero__lead">
-							【世界初公開】新型BMW 3シリーズ誕生。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く、新世代モビリティの夜明け。
+							【世界初公開】プレミアムSAVの開拓者が第5世代へ。Neue Klasseのエッセンスを宿した力強い新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代。
 						</p>
 
 						<!-- Apple風の洗練されたアクションボタン群 -->
 						<div class="apple-hero__actions">
-							<a href={coverArticle.url} class="apple-cta-btn apple-cta-btn--primary">
-								<span>特集記事を開く</span>
+							<a href={coverArticle.url} class="apple-cta-btn apple-cta-btn--secondary">
+								<span>記事を読む</span>
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 							</a>
-							<a href="#table-of-contents" class="apple-cta-btn apple-cta-btn--secondary">
-								<span>今号の目次を見る</span>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-							</a>
-						</div>
-					</div>
-
-					<!-- ボトム：本の表紙ならではのスペック＆クレジット情報 -->
-					<div class="apple-hero__footer">
-						<div class="footer-spec-col">
-							<span class="spec-label">ARCHITECTURE</span>
-							<span class="spec-value">Neue Klasse 800V EV</span>
-						</div>
-						<div class="footer-spec-divider"></div>
-						<div class="footer-spec-col">
-							<span class="spec-label">POWERTRAIN</span>
-							<span class="spec-value">Dual Motor AWD / 3.0L M TwinPower Turbo</span>
-						</div>
-						<div class="footer-spec-divider"></div>
-						<div class="footer-spec-col">
-							<span class="spec-label">EDITORIAL</span>
-							<span class="spec-value">Nicole Automobiles Magazine Issue</span>
 						</div>
 					</div>
 				</div>
@@ -378,27 +333,22 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. 本の見開き目次（TABLE OF CONTENTS / FEATURED CHAPTERS） -->
+		<!-- 2. 最新記事ハイライト（LATEST STORIES） -->
 		<!-- ============================================================== -->
 		<section class="toc-section" id="table-of-contents">
 			<div class="mag-container">
 				<div class="toc-header">
-					<div class="toc-badge">
-						<span class="badge-accent"></span>
-						<span>TABLE OF CONTENTS — VOL. 08</span>
-					</div>
-					<h2 class="toc-heading">今号の主な特集ストーリー</h2>
-					<p class="toc-sub">ページをめくるように、Nicoleが厳選した特別なストーリーをお楽しみください。</p>
+					<h2 class="toc-heading">LATEST STORIES</h2>
+					<p class="toc-sub">Nicoleが厳選した最新の特集ストーリーをお届けします。</p>
 				</div>
 
 				<div class="toc-grid">
-					{highlightStories.map((story, index) => (
+					{highlightStories.map((story) => (
 						<article class="toc-card">
 							<a href={story.url} class="toc-card__link">
 								<div class="toc-card__media">
 									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" />
 									<div class="toc-card__overlay"></div>
-									<span class="toc-card__chapter">CHAP. 0{index + 2}</span>
 									<span class="toc-card__brand">{story.brand}</span>
 								</div>
 								<div class="toc-card__body">
@@ -410,7 +360,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 									<h3 class="toc-card__title">{story.title}</h3>
 									{story.lead && <p class="toc-card__lead">{story.lead}</p>}
 									<div class="toc-card__arrow">
-										<span>読む</span>
+										<span>記事を読む</span>
 										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 									</div>
 								</div>
@@ -477,7 +427,6 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 			<div class="mag-container">
 				<div class="section-title-bar">
 					<div>
-						<span class="section-num">ARCHIVE LIBRARY</span>
 						<h2 class="section-heading">ALL STORIES & ESSAYS</h2>
 					</div>
 					<div class="count-display">
@@ -510,7 +459,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 									<h3 class="article-item__title">{art.title}</h3>
 									{art.lead && <p class="article-item__lead">{art.lead}</p>}
 									<div class="article-item__footer">
-										<span class="article-item__more">記事を開く →</span>
+										<span class="article-item__more">記事を読む →</span>
 										<span class="article-item__views">👁 {art.views}</span>
 									</div>
 								</div>
@@ -518,6 +467,9 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 						</article>
 					))}
 				</div>
+
+				<!-- ページネーション（20件超の場合に動的表示） -->
+				<div id="mag-pagination" class="mag-pagination" style="display: none;"></div>
 
 				<!-- 検索該当なしプレースホルダー -->
 				<div id="no-articles" class="no-articles-state" style="display: none;">
@@ -565,8 +517,10 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		}
 
 		// ==============================================================
-		// 2. インタラクティブ・フィルタリング制御
+		// 2. インタラクティブ・フィルタリング＆ページネーション制御（20件/ページ）
 		// ==============================================================
+		const PAGE_SIZE = 20;
+		let currentPage = 1;
 		let currentBrand = 'ALL';
 		let currentTopic = 'ALL';
 		let searchQuery = '';
@@ -578,9 +532,64 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		const countDisplay = document.getElementById('current-article-count');
 		const noArticles = document.getElementById('no-articles');
 		const resetBtn = document.getElementById('btn-reset-filters');
+		const paginationEl = document.getElementById('mag-pagination');
 
-		function applyFilters() {
-			let visibleCount = 0;
+		function renderPagination(totalPages) {
+			if (!paginationEl) return;
+
+			if (totalPages <= 1) {
+				paginationEl.style.display = 'none';
+				paginationEl.innerHTML = '';
+				return;
+			}
+
+			paginationEl.style.display = 'flex';
+			let html = '';
+
+			// 前へボタン
+			html += `<button type="button" class="page-btn page-btn--nav" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" aria-label="前のページへ">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="page-btn__icon"><path d="M15 18l-6-6 6-6"/></svg>
+				<span>前へ</span>
+			</button>`;
+
+			// ページ番号ボタン群
+			html += `<div class="page-numbers">`;
+			for (let p = 1; p <= totalPages; p++) {
+				html += `<button type="button" class="page-btn page-btn--num ${p === currentPage ? 'is-active' : ''}" data-page="${p}" aria-label="${p}ページ目">${p}</button>`;
+			}
+			html += `</div>`;
+
+			// 次へボタン
+			html += `<button type="button" class="page-btn page-btn--nav" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" aria-label="次のページへ">
+				<span>次へ</span>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="page-btn__icon"><path d="M9 18l6-6-6-6"/></svg>
+			</button>`;
+
+			paginationEl.innerHTML = html;
+
+			// クリックイベント
+			paginationEl.querySelectorAll('.page-btn').forEach(btn => {
+				btn.addEventListener('click', () => {
+					if (btn.disabled || btn.classList.contains('is-active')) return;
+					const targetPage = parseInt(btn.getAttribute('data-page'), 10);
+					if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages) {
+						currentPage = targetPage;
+						applyFilters(false);
+						const archiveSection = document.getElementById('magazine-archive');
+						if (archiveSection) {
+							archiveSection.scrollIntoView({ behavior: 'smooth' });
+						}
+					}
+				});
+			});
+		}
+
+		function applyFilters(resetPage = true) {
+			if (resetPage) {
+				currentPage = 1;
+			}
+
+			const matchedArticles = [];
 
 			articles.forEach(article => {
 				const brand = article.getAttribute('data-brand') || '';
@@ -593,25 +602,48 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				const matchSearch = (!searchQuery) || (title.includes(searchQuery) || lead.includes(searchQuery) || brand.toLowerCase().includes(searchQuery));
 
 				if (matchBrand && matchTopic && matchSearch) {
+					matchedArticles.push(article);
+				} else {
+					article.style.display = 'none';
+				}
+			});
+
+			const totalCount = matchedArticles.length;
+			const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+			if (currentPage > totalPages) {
+				currentPage = totalPages;
+			}
+
+			// 現在のページに応じた20件の表示制御
+			const startIndex = (currentPage - 1) * PAGE_SIZE;
+			const endIndex = startIndex + PAGE_SIZE;
+
+			matchedArticles.forEach((article, idx) => {
+				if (idx >= startIndex && idx < endIndex) {
 					article.style.display = '';
-					visibleCount++;
 				} else {
 					article.style.display = 'none';
 				}
 			});
 
 			if (countDisplay) {
-				countDisplay.textContent = visibleCount.toString();
+				countDisplay.textContent = totalCount.toString();
 			}
 
 			if (noArticles) {
-				if (visibleCount === 0) {
+				if (totalCount === 0) {
 					noArticles.style.display = 'block';
 				} else {
 					noArticles.style.display = 'none';
 				}
 			}
+
+			renderPagination(totalPages);
 		}
+
+		// 初期ロード時の実行（20件表示制限とページネーション生成）
+		applyFilters(true);
 
 		// ブランドピルクリック切り替え
 		brandPills.forEach(pill => {
@@ -619,7 +651,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				brandPills.forEach(p => p.classList.remove('is-active'));
 				pill.classList.add('is-active');
 				currentBrand = pill.getAttribute('data-value') || 'ALL';
-				applyFilters();
+				applyFilters(true);
 			});
 		});
 
@@ -627,7 +659,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		if (topicSelect) {
 			topicSelect.addEventListener('change', (e) => {
 				currentTopic = e.target.value;
-				applyFilters();
+				applyFilters(true);
 			});
 		}
 
@@ -635,7 +667,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		if (searchInput) {
 			searchInput.addEventListener('input', (e) => {
 				searchQuery = e.target.value.toLowerCase().trim();
-				applyFilters();
+				applyFilters(true);
 			});
 		}
 
@@ -654,7 +686,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				if (topicSelect) topicSelect.value = 'ALL';
 				if (searchInput) searchInput.value = '';
 
-				applyFilters();
+				applyFilters(true);
 			});
 		}
 	});
@@ -739,29 +771,6 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(4, 5, 7, 0.6) 100%);
 	}
 
-	/* 雑誌の表紙フレーム（四隅のエッジ） */
-	.apple-hero__frame {
-		position: absolute;
-		top: 30px;
-		left: 30px;
-		right: 30px;
-		bottom: 30px;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		pointer-events: none;
-		z-index: 3;
-	}
-
-	.frame-edge {
-		position: absolute;
-		width: 16px;
-		height: 16px;
-		border: 2px solid #dfba73;
-	}
-
-	.frame-edge.top-left { top: -2px; left: -2px; border-right: none; border-bottom: none; }
-	.frame-edge.top-right { top: -2px; right: -2px; border-left: none; border-bottom: none; }
-	.frame-edge.bottom-left { bottom: -2px; left: -2px; border-right: none; border-top: none; }
-	.frame-edge.bottom-right { bottom: -2px; right: -2px; border-left: none; border-top: none; }
 
 	/* 表紙コンテンツ */
 	.apple-hero__content {
@@ -774,71 +783,8 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	.apple-hero__container {
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
-		min-height: 74vh;
-	}
-
-	/* トップヘッダー */
-	.apple-hero__header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-bottom: 24px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-	}
-
-	.apple-hero__issue-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		color: #dfba73;
-		text-transform: uppercase;
-		background: rgba(0, 0, 0, 0.5);
-		padding: 6px 14px;
-		border-radius: 999px;
-		border: 1px solid rgba(223, 186, 115, 0.3);
-		backdrop-filter: blur(10px);
-	}
-
-	.pulse-dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		background: #dfba73;
-		box-shadow: 0 0 10px #dfba73;
-		animation: pulseGlow 2s infinite ease-in-out;
-	}
-
-	@keyframes pulseGlow {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.4; transform: scale(0.85); }
-	}
-
-	.apple-hero__masthead {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		text-align: right;
-	}
-
-	.masthead-name {
-		font-family: 'Times New Roman', 'Didot', 'Playfair Display', serif;
-		font-size: clamp(20px, 2.2vw, 30px);
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		background: linear-gradient(135deg, #ffffff 0%, #dfba73 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-
-	.masthead-edition {
-		font-size: 9px;
-		font-weight: 700;
-		letter-spacing: 0.25em;
-		color: rgba(255, 255, 255, 0.6);
+		justify-content: center;
+		min-height: 70vh;
 	}
 
 	/* センタータイトル＆コピー */
@@ -847,29 +793,12 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		margin: 40px 0;
 	}
 
-	.apple-hero__brand-kicker {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 13px;
-		font-weight: 800;
-		letter-spacing: 0.25em;
-		color: #dfba73;
-		margin-bottom: 12px;
-		text-transform: uppercase;
-		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-	}
-
-	.kicker-sep {
-		opacity: 0.5;
-	}
-
 	.apple-hero__title {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(48px, 7vw, 96px);
-		font-weight: 800;
-		letter-spacing: -0.025em;
-		line-height: 1.02;
+		font-weight: 300;
+		letter-spacing: -0.015em;
+		line-height: 1.04;
 		color: #ffffff;
 		margin: 0 0 20px 0;
 		text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
@@ -913,15 +842,15 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.apple-cta-btn--primary {
-		background: #dfba73;
+		background: #ffffff;
 		color: #040507;
-		box-shadow: 0 4px 20px rgba(223, 186, 115, 0.4);
+		box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
 	}
 
 	.apple-cta-btn--primary:hover {
-		background: #f2ce89;
+		background: #e4e4e7;
 		transform: translateY(-2px);
-		box-shadow: 0 8px 30px rgba(223, 186, 115, 0.6);
+		box-shadow: 0 8px 30px rgba(255, 255, 255, 0.4);
 	}
 
 	.apple-cta-btn--primary:hover svg {
@@ -929,55 +858,23 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.apple-cta-btn--secondary {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.12);
 		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.25);
-		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 	}
 
 	.apple-cta-btn--secondary:hover {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: rgba(255, 255, 255, 0.5);
+		background: rgba(255, 255, 255, 0.22);
+		border-color: rgba(255, 255, 255, 0.6);
 		transform: translateY(-2px);
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
 	}
 
 	.apple-cta-btn--secondary:hover svg {
-		transform: translateY(3px);
-	}
-
-	/* ボトムバー：表紙スペック情報 */
-	.apple-hero__footer {
-		display: flex;
-		align-items: center;
-		gap: 32px;
-		padding-top: 24px;
-		border-top: 1px solid rgba(255, 255, 255, 0.12);
-		flex-wrap: wrap;
-	}
-
-	.footer-spec-col {
-		display: flex;
-		flex-direction: column;
-		gap: 3px;
-	}
-
-	.spec-label {
-		font-size: 9.5px;
-		font-weight: 700;
-		letter-spacing: 0.2em;
-		color: #dfba73;
-	}
-
-	.spec-value {
-		font-size: 13px;
-		font-weight: 600;
-		color: rgba(255, 255, 255, 0.85);
-	}
-
-	.footer-spec-divider {
-		width: 1px;
-		height: 24px;
-		background: rgba(255, 255, 255, 0.15);
+		transform: translateX(4px);
 	}
 
 	/* スクロールキュー */
@@ -996,7 +893,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.apple-hero__scroll-cue:hover {
-		color: #dfba73;
+		color: #ffffff;
 	}
 
 	.scroll-cue-text {
@@ -1009,7 +906,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	.scroll-cue-line {
 		width: 1px;
 		height: 36px;
-		background: linear-gradient(180deg, #dfba73 0%, transparent 100%);
+		background: linear-gradient(180deg, #ffffff 0%, transparent 100%);
 		animation: scrollDrop 1.8s infinite ease-in-out;
 	}
 
@@ -1040,7 +937,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.2em;
-		color: #dfba73;
+		color: #a0a0aa;
 		margin-bottom: 10px;
 	}
 
@@ -1048,7 +945,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
-		background: #dfba73;
+		background: #ffffff;
 	}
 
 	.toc-heading {
@@ -1068,8 +965,8 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.toc-grid {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 24px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 32px;
 	}
 
 	.toc-card {
@@ -1082,7 +979,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.toc-card:hover {
 		transform: translateY(-6px);
-		border-color: rgba(223, 186, 115, 0.4);
+		border-color: rgba(255, 255, 255, 0.35);
 		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 	}
 
@@ -1096,7 +993,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.toc-card__media {
 		position: relative;
-		height: 190px;
+		height: 320px;
 		overflow: hidden;
 		background: #000;
 	}
@@ -1121,35 +1018,23 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		background: linear-gradient(180deg, transparent 40%, rgba(10, 13, 18, 0.8) 100%);
 	}
 
-	.toc-card__chapter {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		padding: 3px 8px;
-		background: #dfba73;
-		color: #040507;
-		font-size: 10px;
-		font-weight: 800;
-		letter-spacing: 0.12em;
-		border-radius: 4px;
-	}
-
 	.toc-card__brand {
 		position: absolute;
 		top: 14px;
-		right: 14px;
+		left: 14px;
 		padding: 3px 10px;
-		background: rgba(0, 0, 0, 0.7);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgba(7, 8, 10, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 999px;
-		font-size: 10px;
+		font-size: 10.5px;
 		font-weight: 700;
+		letter-spacing: 0.1em;
 		color: #ffffff;
-		backdrop-filter: blur(6px);
+		backdrop-filter: blur(8px);
 	}
 
 	.toc-card__body {
-		padding: 22px;
+		padding: 28px;
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
@@ -1165,48 +1050,58 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.toc-meta-topic {
-		color: #dfba73;
+		color: #a0a0aa;
 		font-weight: 600;
 	}
 
 	.toc-card__title {
-		font-size: 15px;
+		font-size: 20px;
 		font-weight: 600;
-		line-height: 1.45;
-		color: #ffffff;
-		margin: 0 0 10px 0;
+		line-height: 1.4;
+		color: rgba(255, 255, 255, 0.88);
+		margin: 0 0 12px 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
-		transition: color 0.3s ease;
+		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
 	}
 
 	.toc-card:hover .toc-card__title {
-		color: #dfba73;
+		color: #ffffff;
+		text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
 	}
 
 	.toc-card__lead {
-		font-size: 12.5px;
-		color: rgba(255, 255, 255, 0.65);
-		line-height: 1.5;
-		margin: 0 0 18px 0;
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.6);
+		line-height: 1.6;
+		margin: 0 0 20px 0;
 		display: -webkit-box;
-		-webkit-line-clamp: 2;
+		-webkit-line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		flex-grow: 1;
+		transition: color 0.3s ease;
+	}
+
+	.toc-card:hover .toc-card__lead {
+		color: rgba(255, 255, 255, 0.85);
 	}
 
 	.toc-card__arrow {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		font-size: 11.5px;
+		font-size: 13px;
 		font-weight: 700;
-		color: #dfba73;
+		color: rgba(255, 255, 255, 0.7);
 		margin-top: auto;
-		transition: transform 0.3s ease;
+		transition: color 0.3s ease, transform 0.3s ease;
+	}
+
+	.toc-card:hover .toc-card__arrow {
+		color: #ffffff;
 	}
 
 	.toc-card__arrow svg {
@@ -1282,12 +1177,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		border-color: rgba(255, 255, 255, 0.35);
 	}
 
+	/* ブランドを選択するボタン：今押されている（アクティブ）ボタンは赤地に白文字 */
 	.filter-pill.is-active {
-		background: #dfba73;
-		border-color: #dfba73;
-		color: #040507;
+		background: #e50012;
+		border-color: #e50012;
+		color: #ffffff;
 		font-weight: 700;
-		box-shadow: 0 2px 10px rgba(223, 186, 115, 0.35);
+		box-shadow: 0 2px 14px rgba(229, 0, 18, 0.45);
 	}
 
 	.filter-controls-right {
@@ -1297,19 +1193,23 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.topic-dropdown {
+		height: 40px;
+		box-sizing: border-box;
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		color: #ffffff;
-		padding: 7px 14px;
+		padding: 0 14px;
 		border-radius: 8px;
 		font-size: 12.5px;
 		outline: none;
 		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
 		transition: border-color 0.25s ease;
 	}
 
 	.topic-dropdown:focus {
-		border-color: #dfba73;
+		border-color: #ffffff;
 	}
 
 	.topic-dropdown option {
@@ -1322,16 +1222,18 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		display: flex;
 		align-items: center;
 		gap: 8px;
+		height: 40px;
+		box-sizing: border-box;
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 8px;
-		padding: 6px 14px;
+		padding: 0 14px;
 		width: 220px;
 		transition: border-color 0.25s ease, width 0.3s ease;
 	}
 
 	.filter-search-box:focus-within {
-		border-color: #dfba73;
+		border-color: #ffffff;
 		width: 280px;
 	}
 
@@ -1375,7 +1277,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 		font-size: 11px;
 		font-weight: 700;
-		color: #dfba73;
+		color: #a0a0aa;
 		letter-spacing: 0.2em;
 		display: block;
 		margin-bottom: 4px;
@@ -1396,7 +1298,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.count-display span {
-		color: #dfba73;
+		color: #ffffff;
 		font-weight: 700;
 	}
 
@@ -1416,7 +1318,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.article-item:hover {
 		transform: translateY(-5px);
-		border-color: rgba(223, 186, 115, 0.4);
+		border-color: rgba(255, 255, 255, 0.35);
 		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 	}
 
@@ -1491,7 +1393,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.meta-topic {
-		color: #dfba73;
+		color: #a0a0aa;
 		font-weight: 600;
 	}
 
@@ -1499,21 +1401,27 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 		font-size: 16px;
 		font-weight: 600;
 		line-height: 1.45;
-		color: #ffffff;
+		color: rgba(255, 255, 255, 0.88);
 		margin: 0 0 10px 0;
-		transition: color 0.3s ease;
+		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
 	}
 
 	.article-item:hover .article-item__title {
-		color: #dfba73;
+		color: #ffffff;
+		text-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
 	}
 
 	.article-item__lead {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.65);
+		color: rgba(255, 255, 255, 0.6);
 		line-height: 1.55;
 		margin: 0 0 18px 0;
 		flex-grow: 1;
+		transition: color 0.3s ease;
+	}
+
+	.article-item:hover .article-item__lead {
+		color: rgba(255, 255, 255, 0.82);
 	}
 
 	.article-item__footer {
@@ -1527,17 +1435,109 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.article-item__more {
-		color: rgba(255, 255, 255, 0.7);
+		color: rgba(255, 255, 255, 0.65);
 		font-weight: 600;
-		transition: color 0.25s ease;
+		transition: color 0.25s ease, transform 0.25s ease;
 	}
 
 	.article-item:hover .article-item__more {
-		color: #dfba73;
+		color: #ffffff;
 	}
 
 	.article-item__views {
 		color: rgba(255, 255, 255, 0.4);
+	}
+
+	/* ============================================================== */
+	/* ページネーション（全体のモノトーントーンに調和したエディトリアルデザイン） */
+	/* ============================================================== */
+	.mag-pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		margin-top: 50px;
+		padding-top: 36px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.mag-pagination :global(.page-numbers) {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0 4px;
+	}
+
+	.mag-pagination :global(.page-btn) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 40px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.75);
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		user-select: none;
+	}
+
+	.mag-pagination :global(.page-btn--num) {
+		min-width: 40px;
+		padding: 0;
+	}
+
+	.mag-pagination :global(.page-btn--nav) {
+		padding: 0 16px;
+		gap: 6px;
+		font-size: 12.5px;
+		letter-spacing: 0.04em;
+	}
+
+	.mag-pagination :global(.page-btn__icon) {
+		width: 14px;
+		height: 14px;
+		flex-shrink: 0;
+		transition: transform 0.25s ease;
+	}
+
+	.mag-pagination :global(.page-btn:hover:not(:disabled):not(.is-active)) {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(255, 255, 255, 0.35);
+		color: #ffffff;
+		transform: translateY(-1px);
+	}
+
+	.mag-pagination :global(.page-btn--nav:hover:not(:disabled) .page-btn__icon) {
+		transform: translateX(0);
+	}
+
+	.mag-pagination :global(.page-btn--nav:first-child:hover:not(:disabled) .page-btn__icon) {
+		transform: translateX(-2px);
+	}
+
+	.mag-pagination :global(.page-btn--nav:last-child:hover:not(:disabled) .page-btn__icon) {
+		transform: translateX(2px);
+	}
+
+	.mag-pagination :global(.page-btn.is-active) {
+		background: #ffffff;
+		border-color: #ffffff;
+		color: #040507;
+		font-weight: 700;
+		box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+		cursor: default;
+	}
+
+	.mag-pagination :global(.page-btn:disabled) {
+		opacity: 0.25;
+		cursor: not-allowed;
+		background: transparent;
+		border-color: rgba(255, 255, 255, 0.06);
+		color: rgba(255, 255, 255, 0.3);
 	}
 
 	/* 検索該当なし状態 */
@@ -1576,7 +1576,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.btn-reset-filters {
-		background: #dfba73;
+		background: #ffffff;
 		color: #040507;
 		border: none;
 		padding: 10px 24px;
@@ -1588,7 +1588,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 	}
 
 	.btn-reset-filters:hover {
-		background: #f0cb85;
+		background: #e4e4e7;
 		transform: translateY(-2px);
 	}
 

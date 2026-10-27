@@ -139,7 +139,7 @@ const corporateLinks = [
 
 				<!-- 4. MAGAZINE -->
 				<li class="nav-item">
-					<a href="/posts" class="nav-link">
+					<a href="/magazine/" class="nav-link">
 						<span>MAGAZINE</span>
 					</a>
 				</li>
@@ -220,7 +220,7 @@ const corporateLinks = [
 					</li>
 
 					<li class="mobile-nav-item">
-						<a href="/posts" class="mobile-main-link">
+						<a href="/magazine/" class="mobile-main-link">
 							<span>MAGAZINE</span>
 							<span class="mobile-link-sub">特集記事・ストーリー</span>
 						</a>
@@ -416,8 +416,22 @@ const corporateLinks = [
 		width: 100%;
 		z-index: 10000;
 		background: transparent;
-		transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-		border-bottom: 1px solid transparent;
+		transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+		border-bottom: none;
+	}
+
+	/* 背景が白い時に文字を保護する自然な薄い黒スクリム（ヘッダー下まで滑らかにフェード） */
+	.nicole-header::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 140px;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.22) 45%, rgba(0, 0, 0, 0.06) 75%, rgba(0, 0, 0, 0) 100%);
+		pointer-events: none;
+		z-index: -1;
+		transition: opacity 0.4s ease;
 	}
 
 	/* スクロール時のフロストガラス状態 */
@@ -427,6 +441,10 @@ const corporateLinks = [
 		-webkit-backdrop-filter: blur(20px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+
+	.nicole-header.is-scrolled::before {
+		opacity: 0;
 	}
 
 	/* スマートハイド（下スクロール時の一時退避） */
@@ -495,6 +513,7 @@ const corporateLinks = [
 		font-weight: 600;
 		letter-spacing: 0.16em;
 		color: rgba(255, 255, 255, 0.85);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 		text-decoration: none;
 		background: none;
 		border: none;
@@ -511,7 +530,7 @@ const corporateLinks = [
 		left: 0;
 		width: 0%;
 		height: 1.5px;
-		background: #c5a059;
+		background: #ffffff;
 		transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
@@ -563,10 +582,10 @@ const corporateLinks = [
 	}
 
 	.nav-cta-btn:hover {
-		background: #c5a059;
-		border-color: #c5a059;
+		background: #ffffff;
+		border-color: #ffffff;
 		color: #000000;
-		box-shadow: 0 4px 16px rgba(197, 160, 89, 0.35);
+		box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
 		transform: translateY(-1px);
 	}
 

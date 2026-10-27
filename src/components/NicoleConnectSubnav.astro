@@ -1,0 +1,236 @@
+---
+// src/components/NicoleConnectSubnav.astro
+// Apple MacBook Proスタイルのスクロール連動サブナビゲーションバー（Nicole Connect専用）
+interface Props {
+	currentSlug?: string;
+}
+
+const { currentSlug } = Astro.props;
+const isDetailPage = Boolean(currentSlug);
+---
+
+<div class="nicole-connect-subnav" id="connectSubnav" aria-label="Nicole Connect ローカルナビゲーション">
+	<div class="subnav-container">
+		<!-- ブランド表示（Apple風：Nicole Connect） -->
+		<div class="subnav-brand">
+			<a href="/magazine/" class="subnav-title" aria-label="Nicole Connect トップ">
+				<span class="brand-monogram-wrap" aria-hidden="true">
+					<svg class="brand-monogram-svg" viewBox="0 0 71 50" width="22" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<polygon fill="#e50012" points="61.28 8.07 47.17 8.07 47.17 8.92 39.3 8.92 39.3 18.08 47.28 18.08 47.28 49.25 60.63 49.25 60.63 40.23 61.28 40.23 61.28 8.07"></polygon>
+						<polygon fill="#ffffff" points="0 49.25 8.1 49.25 8.1 30.61 26.79 49.25 47.28 49.25 47.28 18.04 30.42 18.04 30.42 35.95 12.5 18.04 0 18.04 0 49.25"></polygon>
+						<polygon fill="#e50012" points="0 18.01 0 8.03 17.05 8.03 30.42 21.57 30.42 35.95 12.55 18.01 0 18.01"></polygon>
+						<polygon fill="#000000" points="47.17 8.98 47.17 0 70.55 0 70.55 40.24 60.63 40.24 60.63 8.98 47.17 8.98"></polygon>
+						<polygon fill="#000000" points="39.3 18.07 30.42 18.07 30.42 22.46 16.98 8.85 0 8.85 0 0 21.48 0 39.3 18.07"></polygon>
+						<polygon fill="#000000" points="26.79 49.25 8.1 30.61 8.1 49.25 26.79 49.25"></polygon>
+					</svg>
+				</span>
+				<span class="brand-name">Nicole Connect</span>
+			</a>
+		</div>
+
+		<!-- ローカルナビゲーション（右側リンク） -->
+		<nav class="subnav-menu" aria-label="Nicole Connect ナビゲーション">
+			{isDetailPage ? (
+				<>
+					<a href="/magazine/" class="subnav-link">マガジントップ</a>
+					<a href="/magazine/#table-of-contents" class="subnav-link">今号の特集</a>
+					<a href="/magazine/#interactive-filter" class="subnav-link">記事一覧</a>
+					<a href="#article-top" class="subnav-btn">トップへ</a>
+				</>
+			) : (
+				<>
+					<a href="#table-of-contents" class="subnav-link">今号の特集</a>
+					<a href="#interactive-filter" class="subnav-link">記事一覧</a>
+					<a href="#hero-cover" class="subnav-btn">トップへ</a>
+				</>
+			)}
+		</nav>
+	</div>
+</div>
+
+<style>
+	/* ============================================================== */
+	/* Apple MacBook Pro Local Navigation Style */
+	/* ファーストビューをしっかり読み進めた後にスッと出現 */
+	/* ============================================================== */
+	.nicole-connect-subnav {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 52px;
+		z-index: 10005;
+		background: rgba(10, 12, 16, 0.7);
+		backdrop-filter: saturate(180%) blur(20px);
+		-webkit-backdrop-filter: saturate(180%) blur(20px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+
+		/* 最初は画面上部に隠れている */
+		transform: translateY(-100%);
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.4s ease;
+	}
+
+	/* スクロールして表示された時（Appleスタイルでスッと下りてくる） */
+	.nicole-connect-subnav.is-visible {
+		transform: translateY(0);
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.subnav-container {
+		max-width: 1440px;
+		height: 100%;
+		margin: 0 auto;
+		padding: 0 40px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.subnav-brand {
+		display: flex;
+		align-items: center;
+	}
+
+	.subnav-title {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		text-decoration: none;
+		color: #ffffff;
+		transition: opacity 0.2s ease;
+	}
+
+	.subnav-title:hover {
+		opacity: 0.85;
+	}
+
+	.brand-monogram-wrap {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 20px;
+		flex-shrink: 0;
+	}
+
+	.brand-monogram-svg {
+		display: block;
+		width: 22px;
+		height: auto;
+	}
+
+	.brand-name {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+		font-size: 15px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: #ffffff;
+	}
+
+	.subnav-menu {
+		display: flex;
+		align-items: center;
+		gap: 22px;
+	}
+
+	.subnav-link {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+		font-size: 12px;
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		letter-spacing: 0.02em;
+		transition: color 0.2s ease;
+	}
+
+	.subnav-link:hover {
+		color: #ffffff;
+	}
+
+	.subnav-btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 4px 12px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffffff;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		text-decoration: none;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.subnav-btn:hover {
+		background: rgba(255, 255, 255, 0.22);
+		border-color: rgba(255, 255, 255, 0.4);
+		transform: translateY(-1px);
+	}
+
+	@media (max-width: 768px) {
+		.subnav-container {
+			padding: 0 20px;
+		}
+
+		.subnav-link {
+			display: none;
+		}
+
+		.brand-name {
+			font-size: 14px;
+		}
+
+		.subnav-btn {
+			padding: 4px 10px;
+			font-size: 10px;
+		}
+	}
+</style>
+
+<style is:global>
+	/* サブメニュー表示中（スクロール中）は、上スクロールしてもメインヘッダーが重ならないように制御 */
+	body.subnav-active #nicole-site-header {
+		transform: translateY(-100%) !important;
+		pointer-events: none !important;
+		transition: transform 0.35s ease !important;
+	}
+</style>
+
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', () => {
+		const subnav = document.getElementById('connectSubnav');
+		if (!subnav) return;
+
+		// Apple流：ファーストビューをしっかり読み進めてから出現させる閾値（px）
+		const SCROLL_THRESHOLD = 520;
+
+		let ticking = false;
+
+		const handleScroll = () => {
+			const currentY = window.scrollY;
+			if (currentY > SCROLL_THRESHOLD) {
+				subnav.classList.add('is-visible');
+				document.body.classList.add('subnav-active');
+			} else {
+				subnav.classList.remove('is-visible');
+				document.body.classList.remove('subnav-active');
+			}
+			ticking = false;
+		};
+
+		window.addEventListener('scroll', () => {
+			if (!ticking) {
+				window.requestAnimationFrame(handleScroll);
+				ticking = true;
+			}
+		}, { passive: true });
+
+		handleScroll();
+	});
+</script>

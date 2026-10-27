@@ -2,15 +2,20 @@
 interface Props {
 	title?: string;
 	description?: string;
+	isMagazine?: boolean;
+	currentSlug?: string;
 }
 
 const {
 	title = "HOME - ニコル・グループ",
-	description = "東京・神奈川エリアを中心に、世界のプレミアムブランドを通じて最高の喜びをお届けするカーディーラー・グループ。"
+	description = "東京・神奈川エリアを中心に、世界のプレミアムブランドを通じて最高の喜びをお届けするカーディーラー・グループ。",
+	isMagazine = false,
+	currentSlug
 } = Astro.props;
 
 import NicoleHeader from "../components/NicoleHeader.astro";
 import NicoleFooter from "../components/NicoleFooter.astro";
+import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 ---
 
 <!DOCTYPE html>
@@ -54,9 +59,10 @@ import NicoleFooter from "../components/NicoleFooter.astro";
 	<slot name="head" />
 </head>
 
-<body class="home wp-singular page-template-default page page-id-2030 wp-custom-logo wp-embed-responsive wp-theme-astra eio-default nicole-brand nicole-brand-nicole nicole-brand-slug-nicole ast-desktop ast-page-builder-template ast-no-sidebar astra-4.14.1 group-blog ast-single-post ast-inherit-site-logo-transparent ast-hfb-header ast-full-width-primary-header ast-normal-title-enabled elementor-default elementor-kit-8 elementor-page elementor-page-2030 astra-addon-4.13.11">
+<body class={`home wp-singular page-template-default page page-id-2030 wp-custom-logo wp-embed-responsive wp-theme-astra eio-default nicole-brand nicole-brand-nicole nicole-brand-slug-nicole ast-desktop ast-page-builder-template ast-no-sidebar astra-4.14.1 group-blog ast-single-post ast-inherit-site-logo-transparent ast-hfb-header ast-full-width-primary-header ast-normal-title-enabled elementor-default elementor-kit-8 elementor-page elementor-page-2030 astra-addon-4.13.11 ${isMagazine ? 'is-magazine-page' : ''}`}>
 	<div class="hfeed site" id="page">
 		<NicoleHeader />
+		{isMagazine && <NicoleConnectSubnav currentSlug={currentSlug} />}
 
 		<div id="content" class="site-content">
 			<div class="ast-container">

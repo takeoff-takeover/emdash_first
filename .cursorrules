@@ -1,0 +1,17 @@
+# Project Rules & Design Guidelines
+
+## Color Palette & Visual Style
+- **Monotone Base (Black, White, Gray)**:
+  - All pages and UI elements must strictly adhere to a **Black, White, and Gray (Monotone)** color scheme.
+  - Maintain a clean, minimalist, and luxury editorial aesthetic.
+  - No unnecessary colors (blue, yellow, green, purple, etc.).
+- **Strategic Red Accent ("ここぞという時の赤")**:
+  - Red (`#e11d48` / `#dc2626`) is reserved **STRICTLY for critical focal points**:
+    - Most important call-to-action buttons (e.g. key conversion points, test drive reservations).
+    - Crucial badges/alerts.
+  - Never use red casually on routine text, regular links, or secondary elements.
+
+## Gallery Formatting Rules
+- Do NOT add redundant headings or promotional labels above galleries (e.g. "PHOTO GALLERY", "全○点", "公式プレスキットギャラリー").
+- Do NOT prepend category tags or brackets to captions (e.g. "【エクステリア】", "【インテリア】").
+- Keep gallery minimal: photos, number counter (`1 / 10`), and clean captions only.

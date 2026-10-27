@@ -41,6 +41,8 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - `entry.id` is the slug (for URLs). `entry.data.id` is the database ULID (for API calls like `getEntryTerms`).
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
+- **Color policy rule**: デザインは徹底して「黒・白・グレー（モノトーン）」を基調とし、無駄な多色使いを禁ずる。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトなど「ここぞという時」にのみ限定して使用する。日常的なテキストや通常の装飾に赤色を乱用しない。
+- **Gallery format rule**: ギャラリーには「PHOTO GALLERY」「全○点」などの冗長な見出しや宣伝ラベル、キャプション先頭の「【エクステリア】」などの不要なテキストを入れない。写真、番号カウント、シンプルな説明文のみでミニマルに表示する。
 
 ## This Template
 
