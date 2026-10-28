@@ -1,7 +1,8 @@
 ---
 /**
  * SliderBlock.astro
- * EmDash Portable Text カスタムブロック：写真スライダー（ギャラリー）
+ * EmDash Portable Text カスタムブロック：ギャラリー（フィルムストリップ）
+ * 標準採用デザイン：角型サムネイル連動 ＆ グレーのミニマルキャプション
  */
 interface Props {
 	node: {
@@ -9,6 +10,8 @@ interface Props {
 		_key?: string;
 		id?: string;
 		title?: string;
+		caption?: string;
+		captions?: string;
 		images?: string;
 		[key: string]: any;
 	};
@@ -16,7 +19,6 @@ interface Props {
 
 const { node } = Astro.props;
 const mainImg = (node.id || "").trim();
-const title = node.title || "";
 const extraImgsRaw = node.images || "";
 
 // 番号付き画像スロット (image_2 〜 image_12, slide_2 〜 slide_12)
@@ -34,18 +36,35 @@ const extraImgs = extraImgsRaw
 	.map((url: string) => url.trim())
 	.filter((url: string) => url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/"));
 
-const allImages: Array<{ image: string; title: string }> = [];
+// キャプション行の分割（改行区切り対応）
+const captionsRaw = node.captions || node.caption || "";
+const captionList = captionsRaw
+	.split("\n")
+	.map((c: string) => c.trim());
+
+const allImages: Array<{ image: string; caption: string }> = [];
 if (mainImg && (mainImg.startsWith("http://") || mainImg.startsWith("https://") || mainImg.startsWith("/"))) {
-	allImages.push({ image: mainImg, title: title || "ギャラリー写真 1" });
+	allImages.push({
+		image: mainImg,
+		caption: captionList[0] || (node.caption && !node.captions ? node.caption : "")
+	});
 }
 slotImages.forEach((url: string) => {
 	if (!allImages.some(img => img.image === url)) {
-		allImages.push({ image: url, title: title ? `${title} (${allImages.length + 1})` : `ギャラリー写真 ${allImages.length + 1}` });
+		const capIdx = allImages.length;
+		allImages.push({
+			image: url,
+			caption: captionList[capIdx] || ""
+		});
 	}
 });
 extraImgs.forEach((url: string) => {
 	if (!allImages.some(img => img.image === url)) {
-		allImages.push({ image: url, title: title ? `${title} (${allImages.length + 1})` : `ギャラリー写真 ${allImages.length + 1}` });
+		const capIdx = allImages.length;
+		allImages.push({
+			image: url,
+			caption: captionList[capIdx] || ""
+		});
 	}
 });
 
@@ -53,233 +72,221 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 ---
 
 {allImages.length > 0 && (
-	<div class="cms-slider-block" id={blockId}>
-		<div class="cms-slider-header">
-			<div class="slider-header-left">
-				
-				{title && <h4 class="slider-heading">{title}</h4>}
-			</div>
-			<div class="slider-counter">
-				<span class="counter-current">1</span> / <span class="counter-total">{allImages.length}</span>
-			</div>
-		</div>
-
-		<div class="cms-slider-container">
-			<div class="cms-slider-track" id={`${blockId}-track`}>
+	<div class="cms-filmstrip-gallery" id={blockId}>
+		<!-- メインビューポート -->
+		<div class="filmstrip-viewport">
+			<div class="filmstrip-track" id={`${blockId}-track`}>
 				{allImages.map((item, idx) => (
-					<div class={`cms-slide-item ${idx === 0 ? 'active' : ''}`} data-index={idx}>
-						<div class="slide-media-wrap">
-							<img src={item.image} alt={item.title || "Gallery image"} loading="lazy" />
-						</div>
-						{item.title && <div class="slide-caption">{item.title}</div>}
+					<div class={`filmstrip-slide ${idx === 0 ? 'is-active' : ''}`} data-index={idx}>
+						<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading={idx === 0 ? "eager" : "lazy"} />
+						<span class="filmstrip-badge">{idx + 1} / {allImages.length}</span>
 					</div>
 				))}
 			</div>
 
 			{allImages.length > 1 && (
 				<>
-					<button type="button" class="slider-nav slider-nav--prev" id={`${blockId}-prev`} aria-label="前へ">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+					<button type="button" class="filmstrip-nav filmstrip-nav--prev" id={`${blockId}-prev`} aria-label="前の写真">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
 					</button>
-					<button type="button" class="slider-nav slider-nav--next" id={`${blockId}-next`} aria-label="次へ">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+					<button type="button" class="filmstrip-nav filmstrip-nav--next" id={`${blockId}-next`} aria-label="次の写真">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
 					</button>
-
-					<div class="slider-dots" id={`${blockId}-dots`}>
-						{allImages.map((_, idx) => (
-							<button type="button" class={`dot-btn ${idx === 0 ? 'active' : ''}`} data-index={idx} aria-label={`写真 ${idx + 1}`}></button>
-						))}
-					</div>
 				</>
 			)}
 		</div>
+
+		<!-- キャプション（ご指示通り：グレーの小さい文字のみ表示） -->
+		<div class="filmstrip-caption-wrap">
+			<p class="filmstrip-caption" id={`${blockId}-caption`}>{allImages[0]?.caption || ""}</p>
+		</div>
+
+		<!-- フィルムストリップ・サムネイル一覧（角型・楕円なし） -->
+		{allImages.length > 1 && (
+			<div class="filmstrip-thumbs" id={`${blockId}-thumbs`}>
+				{allImages.map((item, idx) => (
+					<button type="button" class={`filmstrip-thumb ${idx === 0 ? 'is-active' : ''}`} data-thumb={idx} aria-label={`写真 ${idx + 1}`}>
+						<img src={item.image} alt="" />
+					</button>
+				))}
+			</div>
+		)}
 	</div>
 )}
 
 <style>
-	.cms-slider-block {
+	.cms-filmstrip-gallery {
 		margin: 2.5rem 0;
 		background: transparent;
-		border-radius: 0;
 		border: none;
 		padding: 0;
-		box-shadow: none;
 	}
-	.cms-slider-header {
-		margin-bottom: 1.25rem;
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-	.slider-header-left {
-		flex: 1;
-	}
-	.slider-counter {
-		font-family: var(--font-mono, monospace);
-		font-size: 0.85rem;
-		font-weight: 500;
-		color: #9ca3af;
-		background: transparent;
-		border: none;
-		padding: 0;
-		border-radius: 0;
-		letter-spacing: 0.08em;
-	}
-	.counter-current {
-		color: #ffffff;
-		font-weight: 700;
-	}
-	.slider-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-family: var(--font-mono, monospace);
-		font-size: 0.72rem;
-		letter-spacing: 0.12em;
-		color: #ffffff;
-		background: rgba(255, 255, 255, 0.08);
-		padding: 0.25rem 0.5rem;
-		border-radius: 0;
-		font-weight: 600;
-	}
-	.badge-icon {
-		width: 14px;
-		height: 14px;
-	}
-	.slider-heading {
-		font-size: 1.2rem;
-		color: #ffffff;
-		margin: 0.5rem 0 0;
-		font-weight: 700;
-	}
-	.cms-slider-container {
-		position: relative;
-		overflow: hidden;
-		border-radius: 12px;
-		background: #000;
-	}
-	.cms-slider-track {
+
+	.filmstrip-viewport {
 		position: relative;
 		width: 100%;
 		aspect-ratio: 16 / 10;
-		min-height: 280px;
+		background: #000000;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
-	.cms-slide-item {
+
+	.filmstrip-track {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	.filmstrip-slide {
 		position: absolute;
 		inset: 0;
 		opacity: 0;
 		visibility: hidden;
-		transition: opacity 0.4s ease, visibility 0.4s ease;
+		transition: opacity 0.35s ease;
 		display: flex;
-		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
-	.cms-slide-item.active {
+
+	.filmstrip-slide.is-active {
 		opacity: 1;
 		visibility: visible;
 		z-index: 1;
 	}
-	.slide-media-wrap {
-		flex: 1;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.slide-media-wrap img {
+
+	.filmstrip-slide img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 	}
-	.slide-caption {
-		background: transparent;
-		color: rgba(255, 255, 255, 0.85);
-		padding: 0.75rem 0;
-		font-size: 0.88rem;
-		border-top: none;
-	}
-	.slider-nav {
+
+	/* 右上のカウンターバッジ（角型・モノトーン・楕円なし） */
+	.filmstrip-badge {
 		position: absolute;
-		top: calc(50% - 20px);
-		z-index: 10;
-		width: auto;
-		height: auto;
-		padding: 8px;
+		top: 12px;
+		right: 12px;
+		background: rgba(0, 0, 0, 0.8);
+		border: 1px solid rgba(255, 255, 255, 0.25);
 		border-radius: 0;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 3px 8px;
+		color: #ffffff;
+		letter-spacing: 0.05em;
+		z-index: 2;
+	}
+
+	/* 左右矢印（背景なし・フロートシェブロン・楕円なし） */
+	.filmstrip-nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
 		background: transparent;
 		border: none;
-		color: #fff;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		color: #ffffff;
+		padding: 12px;
 		cursor: pointer;
-		backdrop-filter: none;
-		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
-		transition: transform 0.2s, color 0.2s;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
+		transition: transform 0.2s ease, opacity 0.2s;
+		z-index: 5;
 	}
-	.slider-nav:hover {
-		background: transparent;
-		color: #FFFFFF;
-		border-color: transparent;
-		transform: scale(1.15);
+
+	.filmstrip-nav:hover {
+		transform: translateY(-50%) scale(1.15);
 	}
-	.slider-nav svg {
-		width: 30px;
-		height: 30px;
+
+	.filmstrip-nav svg {
+		width: 32px;
+		height: 32px;
 	}
-	.slider-nav--prev {
+
+	.filmstrip-nav--prev {
 		left: 8px;
 	}
-	.slider-nav--next {
+
+	.filmstrip-nav--next {
 		right: 8px;
 	}
-	.slider-dots {
+
+	/* キャプション（グレーの小さい文字のみ・見出しなし） */
+	.filmstrip-caption-wrap {
+		padding: 10px 0 4px 0;
+		min-height: 24px;
+	}
+
+	.filmstrip-caption {
+		font-size: 0.88rem;
+		color: #9ca3af;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	/* フィルムストリップ・サムネイルバー（角型・楕円なし） */
+	.filmstrip-thumbs {
 		display: flex;
-		justify-content: center;
-		gap: 0.5rem;
-		padding: 0.8rem 0;
-		background: transparent;
+		gap: 8px;
+		margin-top: 8px;
+		overflow-x: auto;
+		padding-bottom: 4px;
+		scrollbar-width: thin;
 	}
-	.dot-btn {
-		width: 24px;
-		height: 2px;
+
+	.filmstrip-thumb {
+		width: 76px;
+		height: 48px;
+		border: 1px solid transparent;
+		background: #000000;
 		border-radius: 0;
-		background: rgba(255, 255, 255, 0.25);
-		border: none;
-		cursor: pointer;
 		padding: 0;
-		transition: background 0.2s ease;
+		cursor: pointer;
+		opacity: 0.45;
+		flex-shrink: 0;
+		transition: opacity 0.2s ease, border-color 0.2s ease;
 	}
-	.dot-btn.active {
-		background: #ffffff;
-		transform: none;
+
+	.filmstrip-thumb:hover {
+		opacity: 0.8;
+	}
+
+	.filmstrip-thumb.is-active {
+		opacity: 1;
+		border-color: #ffffff;
+	}
+
+	.filmstrip-thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 </style>
 
-<script define:vars={{ blockId, count: allImages.length }}>
-	if (count > 1) {
+<script define:vars={{ blockId, images: allImages }}>
+	if (images.length > 1) {
 		let current = 0;
 		const container = document.getElementById(blockId);
 		if (container) {
-			const slides = container.querySelectorAll('.cms-slide-item');
-			const dots = container.querySelectorAll('.dot-btn');
+			const slides = container.querySelectorAll('.filmstrip-slide');
+			const thumbs = container.querySelectorAll('.filmstrip-thumb');
+			const captionEl = document.getElementById(`${blockId}-caption`);
 			const prevBtn = document.getElementById(`${blockId}-prev`);
 			const nextBtn = document.getElementById(`${blockId}-next`);
 
-			const counterCurrent = container.querySelector('.counter-current');
-
 			function goTo(idx) {
-				current = (idx + count) % count;
-				slides.forEach((s, i) => s.classList.toggle('active', i === current));
-				dots.forEach((d, i) => d.classList.toggle('active', i === current));
-				if (counterCurrent) counterCurrent.textContent = String(current + 1);
+				current = (idx + images.length) % images.length;
+				slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+				thumbs.forEach((t, i) => t.classList.toggle('is-active', i === current));
+				if (captionEl) {
+					captionEl.textContent = images[current]?.caption || '';
+				}
+				if (thumbs[current]) {
+					thumbs[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+				}
 			}
 
 			if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
 			if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
-			dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+			thumbs.forEach((t, i) => t.addEventListener('click', () => goTo(i)));
 		}
 	}
 </script>

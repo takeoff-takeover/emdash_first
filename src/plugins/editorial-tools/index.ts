@@ -12,16 +12,16 @@ export function editorialToolsPlugin() {
 		portableTextBlocks: [
 			{
 				type: "slider",
-				label: "スライダー（写真ギャラリー）",
+				label: "ギャラリー（フィルムストリップ）",
 				icon: "photo",
-				description: "写真が表示され、ドラッグ＆ドロップで追加できる写真ギャラリー",
+				description: "角型サムネイル一覧付きの標準ギャラリー（写真をクリックや左右矢印で切り替え）",
 				category: "メディア",
 				fields: [
 					{
 						type: "text_input",
-						action_id: "title",
-						label: "ギャラリータイトル / キャプション（任意）",
-						placeholder: "例：新型BMW 3シリーズ ギャラリー"
+						action_id: "caption",
+						label: "キャプション / 写真説明文（任意）",
+						placeholder: "例：流麗なルーフラインと力強いショルダーライン"
 					},
 					{
 						type: "media_picker",

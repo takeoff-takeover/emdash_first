@@ -2,9 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { DatabaseSync } from 'node:sqlite';
 
-// 1. ギャラリーデータ定義（EXTERIOR 10枚 ＋ INTERIOR 5枚 ＝ 計15枚）
-// ルール準拠：余計な見出しやカテゴリプレフィックス「【エクステリア】」等を排除し、
-// 写真、番号カウント（1 / 15）、シンプルなタイトルと洗練された解説文のみでミニマルに表示。
 export const ix4Gallery = [
   // EXTERIOR (10点)
   {
@@ -85,26 +82,12 @@ export const ix4Gallery = [
   }
 ];
 
-const extImagesNewline = [
-  '/uploads/ix4/ext-02.jpg',
-  '/uploads/ix4/ext-03.jpg',
-  '/uploads/ix4/ext-04.jpg',
-  '/uploads/ix4/ext-05.jpg',
-  '/uploads/ix4/ext-06.jpg',
-  '/uploads/ix4/ext-07.jpg',
-  '/uploads/ix4/ext-08.jpg',
-  '/uploads/ix4/ext-09.jpg',
-  '/uploads/ix4/ext-10.jpg'
-].join('\n');
+const extImagesNewline = ix4Gallery.slice(1, 10).map(g => g.image).join('\n');
+const extCaptionsNewline = ix4Gallery.slice(0, 10).map(g => g.caption).join('\n');
 
-const intImagesNewline = [
-  '/uploads/ix4/int-02.jpg',
-  '/uploads/ix4/int-03.jpg',
-  '/uploads/ix4/int-04.jpg',
-  '/uploads/ix4/int-05.jpg'
-].join('\n');
+const intImagesNewline = ix4Gallery.slice(11).map(g => g.image).join('\n');
+const intCaptionsNewline = ix4Gallery.slice(10).map(g => g.caption).join('\n');
 
-// 2. 31ブロック構成のリッチなPortable Textコンテンツ
 export const ix4PortableText = [
   {
     _type: 'block',
@@ -129,7 +112,7 @@ export const ix4PortableText = [
     _key: 'slider_exterior',
     id: '/uploads/ix4/ext-01.jpg',
     images: extImagesNewline,
-    title: 'エクステリア デザイン（10点）'
+    captions: extCaptionsNewline
   },
   {
     _type: 'table',
@@ -191,7 +174,7 @@ export const ix4PortableText = [
     _key: 'slider_interior',
     id: '/uploads/ix4/int-01.jpg',
     images: intImagesNewline,
-    title: 'インテリア ＆ デジタルキャビン（5点）'
+    captions: intCaptionsNewline
   },
   {
     _type: 'block',
@@ -378,47 +361,27 @@ A5: 2026年後半より順次欧州での生産が立ち上がり、日本市場
   }
 ];
 
-// 3. D1データベースの更新
+// D1データベース更新
 const d1Dir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject';
 const files = fs.readdirSync(d1Dir);
 const dbFile = files.find(f => f.endsWith('.sqlite') && !f.includes('metadata') && !f.includes('bak'));
-if (!dbFile) {
-  console.error('Database file not found');
-  process.exit(1);
-}
+if (dbFile) {
+  const db = new DatabaseSync(path.join(d1Dir, dbFile));
+  const postSlug = '2027_new_bmw_ix4_neue_klasse';
+  const postTitle = '【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代';
+  const postExcerpt = 'BMW公式プレスリリースより完全電動スポーツ・アクティビティ・クーペ『BMW iX4』が世界初公開。Cd値0.23の流麗なファストバック、最大出力612馬力のM60 xDrive、そして最大828kmの航続性能を誇る新世代SAC。';
+  const postFeaturedImage = JSON.stringify({
+    id: '',
+    provider: 'external',
+    src: '/uploads/ix4/key-visual.jpg'
+  });
+  const postContentStr = JSON.stringify(ix4PortableText);
 
-const db = new DatabaseSync(path.join(d1Dir, dbFile));
-
-const postSlug = '2027_new_bmw_ix4_neue_klasse';
-const postTitle = '【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代';
-const postExcerpt = 'BMW公式プレスリリースより完全電動スポーツ・アクティビティ・クーペ『BMW iX4』が世界初公開。Cd値0.23の流麗なファストバック、最大出力612馬力のM60 xDrive、そして最大828kmの航続性能を誇る新世代SAC。';
-const postFeaturedImage = JSON.stringify({
-  id: '',
-  provider: 'external',
-  src: '/uploads/ix4/key-visual.jpg'
-});
-const postContentStr = JSON.stringify(ix4PortableText);
-
-// Update ec_posts
-const stmt = db.prepare(`
-  UPDATE ec_posts 
-  SET title = ?, excerpt = ?, featured_image = ?, content = ?, updated_at = ?
-  WHERE slug = ?
-`);
-stmt.run(postTitle, postExcerpt, postFeaturedImage, postContentStr, new Date().toISOString(), postSlug);
-console.log('Updated D1 ec_posts for iX4');
-
-// Update _emdash_fts_posts
-try {
-  const ftsStmt = db.prepare(`
-    UPDATE _emdash_fts_posts
-    SET title = ?
-    WHERE id = '01M5F4BMWIX4NEUEKLASSE2027'
+  const stmt = db.prepare(`
+    UPDATE ec_posts 
+    SET title = ?, excerpt = ?, featured_image = ?, content = ?, updated_at = ?
+    WHERE slug = ?
   `);
-  ftsStmt.run(postTitle);
-  console.log('Updated FTS table');
-} catch (e) {
-  console.log('FTS update note:', e.message);
+  stmt.run(postTitle, postExcerpt, postFeaturedImage, postContentStr, new Date().toISOString(), postSlug);
+  console.log('Updated D1 ec_posts with new filmstrip captions for iX4');
 }
-
-console.log('D1 database successfully updated with 31 blocks of editorial content!');
