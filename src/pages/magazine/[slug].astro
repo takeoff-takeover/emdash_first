@@ -3071,4 +3071,159 @@ const editUrl = postDbId
 	:global(.prose table tbody tr:hover td p) {
 		color: #ffffff !important;
 	}
+
+	/* ============================================================== */
+	/* 日中モード（ライトテーマ）時のエディトリアル配色 ＆ テーブル色変換 */
+	/* ============================================================== */
+	:global(html.theme-light) .article-detail-page,
+	:global(html.theme-light) .article-container,
+	:global(html.theme-light) .article-main-column {
+		background-color: #ffffff !important;
+		color: #18181b !important;
+	}
+
+	:global(html.theme-light) .article-title {
+		color: #09090b !important;
+	}
+
+	:global(html.theme-light) .article-meta-topic,
+	:global(html.theme-light) .article-meta-date {
+		color: #71717a !important;
+	}
+
+	:global(html.theme-light) .article-rich-text,
+	:global(html.theme-light) .prose {
+		color: #27272a !important;
+	}
+
+	:global(html.theme-light) .article-rich-text h2,
+	:global(html.theme-light) .prose h2 {
+		color: #09090b !important;
+		border-left-color: #09090b !important;
+	}
+
+	:global(html.theme-light) .article-rich-text h3,
+	:global(html.theme-light) .prose h3 {
+		color: #18181b !important;
+		border-bottom-color: #e4e4e7 !important;
+	}
+
+	:global(html.theme-light) .article-rich-text p,
+	:global(html.theme-light) .prose p,
+	:global(html.theme-light) .article-rich-text li,
+	:global(html.theme-light) .prose li {
+		color: #27272a !important;
+	}
+
+	/* 日中モード時のテーブル（白・薄グレー・引き締まった黒文字・上品な均等グレー罫線） */
+	:global(html.theme-light .emdash-table-wrapper),
+	:global(html.theme-light .article-rich-text .emdash-table-wrapper),
+	:global(html.theme-light .prose .emdash-table-wrapper) {
+		background: #ffffff !important;
+		border: 1px solid #e4e4e7 !important;
+		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06) !important;
+	}
+
+	:global(html.theme-light .emdash-table),
+	:global(html.theme-light .article-rich-text table),
+	:global(html.theme-light .prose table) {
+		background: #ffffff !important;
+		color: #18181b !important;
+	}
+
+	:global(html.theme-light .emdash-table thead),
+	:global(html.theme-light .article-rich-text table thead),
+	:global(html.theme-light .prose table thead) {
+		background: #f4f4f5 !important;
+	}
+
+	:global(html.theme-light .emdash-table th),
+	:global(html.theme-light .article-rich-text table th),
+	:global(html.theme-light .prose table th) {
+		background: #f4f4f5 !important;
+		color: #09090b !important;
+		border: 1px solid #e4e4e7 !important;
+	}
+
+	:global(html.theme-light .emdash-table th p),
+	:global(html.theme-light .article-rich-text table th p),
+	:global(html.theme-light .prose table th p) {
+		color: #09090b !important;
+	}
+
+	:global(html.theme-light .emdash-table tr),
+	:global(html.theme-light .emdash-table tbody tr),
+	:global(html.theme-light .article-rich-text table tr),
+	:global(html.theme-light .article-rich-text table tbody tr),
+	:global(html.theme-light .prose table tr),
+	:global(html.theme-light .prose table tbody tr) {
+		background: #ffffff !important;
+	}
+
+	:global(html.theme-light .emdash-table td),
+	:global(html.theme-light .article-rich-text table td),
+	:global(html.theme-light .prose table td) {
+		background: #ffffff !important;
+		color: #27272a !important;
+		border: 1px solid #e4e4e7 !important;
+	}
+
+	:global(html.theme-light .emdash-table td:first-child),
+	:global(html.theme-light .article-rich-text table td:first-child),
+	:global(html.theme-light .prose table td:first-child) {
+		color: #09090b !important;
+		background: #fafafa !important;
+	}
+
+	:global(html.theme-light .emdash-table td p),
+	:global(html.theme-light .article-rich-text table td p),
+	:global(html.theme-light .prose table td p) {
+		color: #27272a !important;
+	}
+
+	:global(html.theme-light .emdash-table tbody tr:nth-child(even)),
+	:global(html.theme-light .article-rich-text table tbody tr:nth-child(even)),
+	:global(html.theme-light .prose table tbody tr:nth-child(even)) {
+		background: #fafafa !important;
+	}
+
+	:global(html.theme-light .emdash-table tbody tr:hover),
+	:global(html.theme-light .article-rich-text table tbody tr:hover),
+	:global(html.theme-light .prose table tbody tr:hover) {
+		background: #f4f4f5 !important;
+	}
+
+	:global(html.theme-light .emdash-table tbody tr:hover td),
+	:global(html.theme-light .article-rich-text table tbody tr:hover td),
+	:global(html.theme-light .prose table tbody tr:hover td) {
+		color: #000000 !important;
+	}
+
+	:global(html.theme-light .emdash-table tbody tr:hover td p),
+	:global(html.theme-light .article-rich-text table tbody tr:hover td p),
+	:global(html.theme-light .prose table tbody tr:hover td p) {
+		color: #000000 !important;
+	}
+
+	/* 日中モード時のFAQアコーディオン */
+	:global(html.theme-light .faq-item) {
+		background: #ffffff !important;
+		border-color: #e4e4e7 !important;
+	}
+
+	:global(html.theme-light .faq-question) {
+		color: #09090b !important;
+	}
+
+	:global(html.theme-light .faq-answer) {
+		background: #fafafa !important;
+		color: #27272a !important;
+	}
+
+	/* 日中モード時の注釈エリア */
+	:global(html.theme-light .article-notes-block) {
+		background: #f4f4f5 !important;
+		border-color: #e4e4e7 !important;
+		color: #52525b !important;
+	}
 </style>

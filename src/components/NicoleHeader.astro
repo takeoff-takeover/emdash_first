@@ -169,6 +169,27 @@ const corporateLinks = [
 						<span>ADMIN</span>
 					</a>
 				</li>
+
+				<!-- 8. THEME TOGGLE (日中 / ナイトモード切替) -->
+				<li class="nav-item nav-item--theme">
+					<button type="button" class="nav-theme-btn js-theme-toggle" aria-label="日中/ナイトモード切替" title="日中/ナイトモード切替">
+						<svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<circle cx="12" cy="12" r="5"></circle>
+							<line x1="12" y1="1" x2="12" y2="3"></line>
+							<line x1="12" y1="21" x2="12" y2="23"></line>
+							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+							<line x1="1" y1="12" x2="3" y2="12"></line>
+							<line x1="21" y1="12" x2="23" y2="12"></line>
+							<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+							<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+						</svg>
+						<svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+						</svg>
+						<span class="theme-text">MODE</span>
+					</button>
+				</li>
 			</ul>
 		</nav>
 
@@ -250,13 +271,32 @@ const corporateLinks = [
 				<a href="/contact" class="mobile-contact-btn">
 					お問い合わせフォーム
 				</a>
-				<a href="/admin" class="mobile-admin-btn">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" width="16" height="16" aria-hidden="true">
-						<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-						<circle cx="12" cy="12" r="3"></circle>
-					</svg>
-					<span>管理画面（ADMIN）</span>
-				</a>
+				<div class="mobile-actions-row">
+					<a href="/admin" class="mobile-admin-btn">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" width="16" height="16" aria-hidden="true">
+							<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+							<circle cx="12" cy="12" r="3"></circle>
+						</svg>
+						<span>管理画面</span>
+					</a>
+					<button type="button" class="mobile-theme-btn js-theme-toggle" aria-label="日中/ナイトモード切替">
+						<svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+							<circle cx="12" cy="12" r="5"></circle>
+							<line x1="12" y1="1" x2="12" y2="3"></line>
+							<line x1="12" y1="21" x2="12" y2="23"></line>
+							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+							<line x1="1" y1="12" x2="3" y2="12"></line>
+							<line x1="21" y1="12" x2="23" y2="12"></line>
+							<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+							<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+						</svg>
+						<svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+						</svg>
+						<span class="theme-mode-text">日中 / 夜間</span>
+					</button>
+				</div>
 				<p class="mobile-copyright">© Nicole Group. All rights reserved.</p>
 			</div>
 		</div>
@@ -419,6 +459,24 @@ const corporateLinks = [
 					item.querySelector('.nav-link--btn')?.setAttribute('aria-expanded', 'false');
 				});
 			}
+		});
+
+		// 5. 日中 / ナイトモード切り替え
+		const themeToggles = document.querySelectorAll('.js-theme-toggle');
+		themeToggles.forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				e.preventDefault();
+				const isCurrentlyLight = document.documentElement.classList.contains('theme-light');
+				if (isCurrentlyLight) {
+					document.documentElement.classList.remove('theme-light');
+					document.documentElement.classList.add('theme-dark');
+					try { localStorage.setItem('nicole-theme', 'dark'); } catch(err) {}
+				} else {
+					document.documentElement.classList.remove('theme-dark');
+					document.documentElement.classList.add('theme-light');
+					try { localStorage.setItem('nicole-theme', 'light'); } catch(err) {}
+				}
+			});
 		});
 	});
 </script>
@@ -638,6 +696,119 @@ const corporateLinks = [
 		width: 13px;
 		height: 13px;
 		opacity: 0.85;
+	}
+
+	/* 日中 / ナイトモード切り替えボタン */
+	.nav-theme-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 7px 13px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 999px;
+		color: #ffffff;
+		cursor: pointer;
+		font-family: 'Inter', -apple-system, sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		transition: all 0.25s ease;
+	}
+
+	.nav-theme-btn:hover {
+		background: rgba(255, 255, 255, 0.18);
+		border-color: rgba(255, 255, 255, 0.4);
+		transform: translateY(-1px);
+	}
+
+	.theme-icon {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.3s ease;
+	}
+
+	/* モードに応じたアイコン切り替え */
+	/* デフォルト（ダーク）：月を表示、太陽を隠す */
+	.theme-icon--sun {
+		display: none;
+	}
+	.theme-icon--moon {
+		display: block;
+	}
+
+	/* ライトモード時：太陽を表示、月を隠す */
+	:global(html.theme-light) .theme-icon--sun {
+		display: block;
+	}
+	:global(html.theme-light) .theme-icon--moon {
+		display: none;
+	}
+
+	/* モバイル用アクション行 */
+	.mobile-actions-row {
+		display: flex;
+		gap: 10px;
+		width: 100%;
+		margin-bottom: 20px;
+	}
+
+	.mobile-actions-row .mobile-admin-btn {
+		margin-bottom: 0;
+		flex: 1;
+	}
+
+	.mobile-theme-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 16px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 8px;
+		color: #ffffff;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		flex: 1;
+		transition: all 0.2s ease;
+	}
+
+	.mobile-theme-btn:hover {
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	/* ライトモード時のヘッダー */
+	:global(html.theme-light) .nicole-header.is-scrolled {
+		background: rgba(255, 255, 255, 0.88);
+		border-bottom-color: rgba(0, 0, 0, 0.08);
+	}
+
+	:global(html.theme-light) .nav-link {
+		color: #18181b;
+	}
+
+	:global(html.theme-light) .nav-link:hover {
+		color: #000000;
+	}
+
+	:global(html.theme-light) .nav-admin-btn,
+	:global(html.theme-light) .nav-theme-btn {
+		background: rgba(0, 0, 0, 0.05);
+		border-color: rgba(0, 0, 0, 0.15);
+		color: #18181b;
+	}
+
+	:global(html.theme-light) .nav-admin-btn:hover,
+	:global(html.theme-light) .nav-theme-btn:hover {
+		background: rgba(0, 0, 0, 0.1);
+		border-color: rgba(0, 0, 0, 0.3);
+		color: #000000;
+	}
+
+	:global(html.theme-light) .hamburger-line {
+		background: #18181b;
 	}
 
 	/* ============================================================== */
