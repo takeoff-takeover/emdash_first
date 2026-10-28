@@ -374,7 +374,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 				<div class="mag-container apple-hero__container">
 					<!-- 1. 左上固定：マガジンマストヘッド（どの記事でも固定） -->
 					<div class="hero-masthead">
-						<h1 class="hero-masthead__brand">Nicole Connect</h1>
+						<h1 class="hero-masthead__brand">Nicole<br />Connect</h1>
 						<p class="hero-masthead__tagline">A web magazine curating the world of Nicole Group</p>
 					</div>
 
@@ -934,32 +934,34 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		min-height: calc(88vh - 110px);
 	}
 
-	/* 1. 左上固定：マガジンマストヘッド */
+	/* 1. 左上固定：マガジンマストヘッド（3倍の特大エディトリアル表示） */
 	.hero-masthead {
 		text-align: left;
-		max-width: 720px;
-		margin-bottom: 40px;
+		max-width: 1200px;
+		margin-bottom: 48px;
 	}
 
 	.hero-masthead__brand {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-		font-size: clamp(38px, 4.8vw, 68px);
+		font-size: clamp(80px, 9.5vw, 150px);
 		font-weight: 800;
-		letter-spacing: -0.03em;
-		line-height: 1.05;
+		letter-spacing: -0.035em;
+		line-height: 0.98;
 		color: #ffffff;
-		margin: 0 0 10px 0;
-		text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
+		margin: 0 0 16px 0;
+		text-shadow: 0 6px 32px rgba(0, 0, 0, 0.95);
 	}
 
 	.hero-masthead__tagline {
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-		font-size: clamp(13px, 1.3vw, 16px);
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+		font-size: clamp(13px, 1.3vw, 18px);
 		font-weight: 500;
-		letter-spacing: 0.04em;
+		letter-spacing: 0.03em;
+		line-height: 1.45;
 		color: rgba(255, 255, 255, 0.85);
+		max-width: 720px;
 		margin: 0;
-		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
 	}
 
 	/* 2. 画面左側に並ぶ最新記事情報（文字サイズ縮小・左揃え） */
@@ -1783,15 +1785,17 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		}
 
 		.hero-masthead {
-			margin-bottom: 30px;
+			margin-bottom: 32px;
 		}
 
 		.hero-masthead__brand {
-			font-size: 34px;
+			font-size: clamp(48px, 11vw, 68px);
+			line-height: 1.0;
 		}
 
 		.hero-masthead__tagline {
 			font-size: 13px;
+			line-height: 1.45;
 		}
 
 		.hero-story-title {
