@@ -332,32 +332,8 @@ A3: EV専用のノイエ・クラッセ・アーキテクチャにより、エ�
 Q4: 日本での国の補助金（CEV補助金）や税制優遇は対象になりますか？
 A4: はい。完全ゼロエミッション電気自動車（BEV）であるため、経済産業省のCEV補助金（クリーンエネルギー自動車導入促進補助金）の交付対象となる予定です。また、自動車税の環境性能割（非課税）および重量税の免税措置など、手厚い税制優遇を受けられます。
 
-Q5: 日本市場への導入時期と先行予約のスケジュールは？
-A5: 2026年後半より順次欧州での生産が立ち上がり、日本市場への正式導入およびデリバリーは2027年春頃を予定しております。Nicole BMW各ショールームでは、最新情報の先行ご案内と優先購入相談の受付を開始しております。`
-  },
-  {
-    _type: 'block',
-    _key: 'h2_dealer',
-    style: 'h2',
-    children: [{ _type: 'span', _key: 's23', text: 'Nicole BMW 本社ショールーム（川崎）にて最新情報・先行優先相談を受付中' }]
-  },
-  {
-    _type: 'block',
-    _key: 'p_dealer_1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's24', text: '半世紀近くにわたり、神奈川および東京エリアでBMWの卓越したドライビングプレジャーと上質なプレステージをお届けしてきたNicole BMW。次世代EV専用『ノイエ・クラッセ』SACの誕生は、私たちが提案するカーライフの未来を大きく前進させるマイルストーンです。' }]
-  },
-  {
-    _type: 'block',
-    _key: 'p_dealer_2',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's25', text: 'Nicole BMW 本社ショールーム（川崎市幸区）をはじめ、大田支店、新百合ヶ丘支店、都筑支店におきまして、新型BMW iX4に関する最新技術資料の先行閲覧、ならびに日本導入初期ロットの優先ご案内相談を承っております。高電圧EVシステムに精通した「BMW公認EVマイスター」が常駐し、ご自宅への普通充電器設置やEV補助金申請、将来の下取りシミュレーションまで、トータルでサポートいたします。' }]
-  },
-  {
-    _type: 'block',
-    _key: 'p_dealer_3',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's26', text: '未来の扉を開く革新のクーペ『BMW iX4』。先行優先案内をご希望のお客様は、お気軽にNicole BMW各ショールームの専任コンサルタントまでお問い合わせください。' }]
+Q5: 日本市場への導入時期と先行スケジュールの見通しは？
+A5: 2026年後半より順次欧州での生産が立ち上がり、日本市場への正式導入およびデリバリーは2027年春頃を予定しています。最新の公式技術資料や詳細装備スペックは順次アナウンスされる見通しです。`
   }
 ];
 
@@ -379,7 +355,7 @@ if (dbFile) {
 
   const stmt = db.prepare(`
     UPDATE ec_posts 
-    SET title = ?, excerpt = ?, featured_image = ?, content = ?, updated_at = ?
+    SET title = ?, excerpt = ?, featured_image = ?, content = ?, related_location = NULL, updated_at = ?
     WHERE slug = ?
   `);
   stmt.run(postTitle, postExcerpt, postFeaturedImage, postContentStr, new Date().toISOString(), postSlug);
