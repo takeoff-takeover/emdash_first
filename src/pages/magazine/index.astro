@@ -297,22 +297,45 @@ const allArticles = [
 	...staticArticles
 ];
 
+// ESG / SDGs 記事判定ヘルパー
+const isESGArticle = (p: any): boolean => {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
+	const title = (p.title || "").toLowerCase();
+	const esgSlugs = [
+		"tamagawa", "shinyurigaoka_cleanup", "japanesenight", "inspire_hub",
+		"traffic-safety", "food-for-community", "sustainable-marche",
+		"emergency-home-support", "kids-mechanic-event", "haruhinofes",
+		"work-experience", "junior_high_shool_experience", "fire-department-award",
+		"international-employee-meetup", "mochitsuki", "norimonofes",
+		"sdgs_partner", "summerconference", "esg-sdgs-activities", "esg", "sdgs"
+	];
+	if (esgSlugs.some(s => slug.includes(s))) return true;
+	if (topic.includes("esg") || topic.includes("sdgs")) return true;
+	if (title.includes("美化活動") || title.includes("クリーンアップ") || title.includes("sdgs") || title.includes("交通安全") || title.includes("防災") || title.includes("寄付") || title.includes("職場体験") || title.includes("サステナブル") || title.includes("餅つき") || title.includes("インター会") || title.includes("交流会") || title.includes("感謝状") || title.includes("のりものフェスタ")) return true;
+	return false;
+};
+
+// ユーザー指示（A案）：通常一覧からESG記事を完全に除外し、最下部の専用ブロックへ集約
+const mainArticles = allArticles.filter(a => !isESGArticle(a));
+const esgArticles = allArticles.filter(a => isESGArticle(a)).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
 // 一番目玉の記事（Cover Story）
 // 最新の最重要記事（BMW iX4）を確実に先頭（Cover Story）にする
-allArticles.sort((a, b) => {
+mainArticles.sort((a, b) => {
 	if (a.id === "2027_new_bmw_ix4_neue_klasse" || a.slug === "2027_new_bmw_ix4_neue_klasse") return -1;
 	if (b.id === "2027_new_bmw_ix4_neue_klasse" || b.slug === "2027_new_bmw_ix4_neue_klasse") return 1;
 	return 0;
 });
 
 // 一番目玉の記事（Cover Story）
-const coverArticle = allArticles[0];
+const coverArticle = mainArticles[0];
 
 // 特集ハイライト記事（最新記事 2枠）
-const highlightStories = allArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
+const highlightStories = mainArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
-const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
+const topicsList = ["ALL", "Feature", "Guide", "People"];
 ---
 
 <NicoleLayout 
@@ -474,13 +497,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 						<h2 class="section-heading">ALL STORIES & ESSAYS</h2>
 					</div>
 					<div class="count-display">
-						収録記事：<span id="current-article-count">{allArticles.length}</span>篇
+						収録記事：<span id="current-article-count">{mainArticles.length}</span>篇
 					</div>
 				</div>
 
 				<!-- 記事グリッド（JSフィルタリング対象） -->
 				<div class="articles-grid" id="articles-grid">
-					{allArticles.map((art) => (
+					{mainArticles.map((art) => (
 						<article 
 							class="article-item" 
 							data-brand={art.brand} 
@@ -524,6 +547,52 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 					<p class="no-articles-desc">選択中のブランドまたは検索キーワードを変更してお試しください。</p>
 					<button type="button" id="btn-reset-filters" class="btn-reset-filters">すべてのフィルターを解除</button>
 				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 5. ESG / SDGs 専用ブロック（SUSTAINABILITY & COMMUNITY） -->
+		<!-- ============================================================== -->
+		<section class="magazine-esg-section" id="esg-section">
+			<div class="mag-container">
+				<div class="esg-section__header">
+					<div class="esg-section__titles">
+						<span class="esg-section__eyebrow">SUSTAINABILITY & COMMUNITY</span>
+						<h2 class="esg-section__heading">ESG / SDGs — 持続可能な未来への取り組み</h2>
+						<p class="esg-section__desc">地域社会への貢献、環境保全、そして未来を担う次世代育成。ニコル・グループが取り組む活動の歩みをお届けします。</p>
+					</div>
+					<a href="/esg_sdgs" class="esg-section__portal-link">
+						<span>ニコル・グループのESG方針を見る</span>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+					</a>
+				</div>
+
+				<!-- 4カラム・コンパクトカードグリッド（初期4件、もっと見るで展開） -->
+				<div class="esg-cards-grid" id="esg-cards-grid">
+					{esgArticles.map((art, index) => (
+						<article class={`esg-card ${index >= 4 ? 'is-collapsed' : ''}`} data-esg-index={index}>
+							<a href={art.url} class="esg-card__link">
+								<div class="esg-card__media">
+									<img src={art.image} alt={art.title} loading="lazy" class="esg-card__img" />
+									<span class="esg-card__badge">ESG / SDGs</span>
+								</div>
+								<div class="esg-card__body">
+									<time class="esg-card__date">{art.date}</time>
+									<h3 class="esg-card__title">{art.title}</h3>
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+
+				{esgArticles.length > 4 && (
+					<div class="esg-more-wrap">
+						<button type="button" id="btn-toggle-esg-more" class="btn-esg-more" data-total={esgArticles.length}>
+							<span class="btn-esg-more__text">もっと見る（全{esgArticles.length}件）</span>
+							<svg class="btn-esg-more__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+						</button>
+					</div>
+				)}
 			</div>
 		</section>
 	</main>
@@ -731,6 +800,43 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 				if (searchInput) searchInput.value = '';
 
 				applyFilters(true);
+			});
+		}
+
+		// ==============================================================
+		// 3. ESG / SDGs 「もっと見る」展開・格納トグル制御
+		// ==============================================================
+		const toggleEsgBtn = document.getElementById('btn-toggle-esg-more');
+		if (toggleEsgBtn) {
+			const collapsedCards = document.querySelectorAll('.esg-card.is-collapsed');
+			let isExpanded = false;
+			const totalCount = toggleEsgBtn.getAttribute('data-total') || '0';
+			const btnText = toggleEsgBtn.querySelector('.btn-esg-more__text');
+			const btnIcon = toggleEsgBtn.querySelector('.btn-esg-more__icon');
+
+			toggleEsgBtn.addEventListener('click', () => {
+				isExpanded = !isExpanded;
+				collapsedCards.forEach(card => {
+					if (isExpanded) {
+						card.classList.remove('is-collapsed');
+						card.classList.add('is-expanded');
+					} else {
+						card.classList.add('is-collapsed');
+						card.classList.remove('is-expanded');
+					}
+				});
+
+				if (isExpanded) {
+					if (btnText) btnText.textContent = '閉じる';
+					if (btnIcon) btnIcon.style.transform = 'rotate(180deg)';
+				} else {
+					if (btnText) btnText.textContent = `もっと見る（全${totalCount}件）`;
+					if (btnIcon) btnIcon.style.transform = 'rotate(0deg)';
+					const esgSec = document.getElementById('esg-section');
+					if (esgSec) {
+						esgSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				}
 			});
 		}
 	});
@@ -1736,6 +1842,244 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 		.articles-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.magazine-esg-section {
+			padding: 60px 0 80px;
+		}
+
+		.esg-section__heading {
+			font-size: 21px;
+		}
+
+		.esg-cards-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 12px;
+		}
+
+		.esg-card__body {
+			padding: 10px 10px 12px;
+		}
+
+		.esg-card__title {
+			font-size: 12.5px;
+			line-height: 1.42;
+		}
+	}
+
+	/* ============================================================== */
+	/* 5. ESG / SDGs 専用ブロック（SUSTAINABILITY & COMMUNITY） */
+	/* ============================================================== */
+	.magazine-esg-section {
+		padding: 88px 0 110px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 100%);
+	}
+
+	.esg-section__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 36px;
+		gap: 24px;
+		flex-wrap: wrap;
+	}
+
+	.esg-section__titles {
+		max-width: 720px;
+	}
+
+	.esg-section__eyebrow {
+		display: block;
+		font-family: var(--font-mono, monospace);
+		font-size: 11px;
+		letter-spacing: 0.16em;
+		color: #8e95a5;
+		text-transform: uppercase;
+		margin-bottom: 8px;
+	}
+
+	.esg-section__heading {
+		font-size: 26px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: #ffffff;
+		margin: 0 0 10px;
+		line-height: 1.35;
+	}
+
+	.esg-section__desc {
+		font-size: 13.5px;
+		color: #9aa1b2;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.esg-section__portal-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+		font-weight: 500;
+		color: #ffffff;
+		text-decoration: none;
+		padding: 10px 20px;
+		border-radius: 9999px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		transition: all 0.25s ease;
+	}
+
+	.esg-section__portal-link svg {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.2s ease;
+	}
+
+	.esg-section__portal-link:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(255, 255, 255, 0.35);
+	}
+
+	.esg-section__portal-link:hover svg {
+		transform: translate(2px, -2px);
+	}
+
+	/* ESG 4カラム・コンパクトカードグリッド（他のカードより一回り小さく） */
+	.esg-cards-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 20px;
+	}
+
+	.esg-card {
+		border-radius: 10px;
+		background: #0d0f14;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		overflow: hidden;
+		transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.esg-card.is-collapsed {
+		display: none;
+	}
+
+	.esg-card:hover {
+		transform: translateY(-3px);
+		border-color: rgba(255, 255, 255, 0.25);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+	}
+
+	.esg-card__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.esg-card__media {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background: #141720;
+	}
+
+	.esg-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+	}
+
+	.esg-card:hover .esg-card__img {
+		transform: scale(1.04);
+	}
+
+	.esg-card__badge {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		padding: 2px 7px;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.72);
+		backdrop-filter: blur(4px);
+		color: #e2e8f0;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.esg-card__body {
+		padding: 12px 14px 16px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.esg-card__date {
+		font-family: var(--font-mono, monospace);
+		font-size: 11px;
+		color: #7a8294;
+		margin-bottom: 6px;
+	}
+
+	.esg-card__title {
+		font-size: 13.5px;
+		font-weight: 500;
+		line-height: 1.48;
+		color: #f1f5f9;
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.2s ease;
+	}
+
+	.esg-card:hover .esg-card__title {
+		color: #ffffff;
+	}
+
+	/* もっと見るボタン */
+	.esg-more-wrap {
+		display: flex;
+		justify-content: center;
+		margin-top: 36px;
+	}
+
+	.btn-esg-more {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 9999px;
+		padding: 11px 28px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.btn-esg-more:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(255, 255, 255, 0.35);
+	}
+
+	.btn-esg-more__icon {
+		width: 14px;
+		height: 14px;
+		transition: transform 0.25s ease;
+	}
+
+	@media (max-width: 1024px) {
+		.esg-cards-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 16px;
 		}
 	}
 </style>
