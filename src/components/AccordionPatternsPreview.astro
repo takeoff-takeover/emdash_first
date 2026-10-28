@@ -1,0 +1,796 @@
+---
+/**
+ * AccordionPatternsPreview.astro
+ * アコーディオンのデザイン選定用 5パターンプレビューコンポーネント
+ * カラーポリシー（黒・白・グレーのモノトーン、角型、丸み排除）を徹底遵守
+ */
+---
+
+<section class="accordion-patterns-section" id="accordion-patterns-preview">
+	<div class="patterns-intro-banner">
+		<div class="patterns-badge">DESIGN CANDIDATES</div>
+		<h3 class="patterns-title">アコーディオン デザイン選定候補（全5パターン）</h3>
+		<p class="patterns-desc">
+			当ウェブサイトのモノトーン・高級感・角型デザイン基準に沿って制作した5つのスタイルです。
+			各アコーディオンをクリックして開閉挙動や視認性を比較いただき、お好みのパターンをお選びください。
+		</p>
+	</div>
+
+	<!-- ============================================================== -->
+	<!-- パターンA：ミニマル・ヘアライン型 -->
+	<!-- ============================================================== -->
+	<div class="pattern-card">
+		<div class="pattern-header">
+			<div class="pattern-tag">パターン A</div>
+			<div class="pattern-name">ミニマル・ヘアライン型（Minimal Hairline）</div>
+			<div class="pattern-summary">背景を持たず、極細ヘアラインと余白だけで魅せる静謐で知的なエディトリアルスタイル。右端の十字「＋」が静かに「−」へ変化。</div>
+		</div>
+
+		<div class="acc-demo-wrap">
+			<details class="acc-pattern-a" open>
+				<summary class="acc-summary-a">
+					<span class="acc-title-a">主要諸元・800V高電圧システム詳細</span>
+					<span class="acc-toggle-icon-a">
+						<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+						<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+					</span>
+				</summary>
+				<div class="acc-body-a">
+					<table class="acc-spec-table">
+						<tbody>
+							<tr><th>パワートレイン</th><td>第6世代（Gen6）BMW eDrive 前後デュアルモーター</td></tr>
+							<tr><th>最高出力 / 最大トルク</th><td>345 kW (469 hp) / 645 Nm</td></tr>
+							<tr><th>バッテリー正味容量</th><td>108.7 kWh（新開発大径円筒形リチウムイオン）</td></tr>
+							<tr><th>急速充電性能</th><td>最大400kW DC超急速充電対応（10%→80%：約21分）</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="acc-pattern-a">
+				<summary class="acc-summary-a">
+					<span class="acc-title-a">航続可能距離と実用走行シミュレーション</span>
+					<span class="acc-toggle-icon-a">
+						<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+						<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+					</span>
+				</summary>
+				<div class="acc-body-a">
+					<p class="acc-text-a">欧州WLTPモード値で最大828kmをマーク。エアコン使用時や高速道路走行を含む日本の実環境下でも600km〜700km前後の無充電走行が可能で、東京〜大阪間（約500km）を途中充電なしで快適に走破できます。</p>
+				</div>
+			</details>
+		</div>
+	</div>
+
+	<!-- ============================================================== -->
+	<!-- パターンB：ソリッド・カード型 -->
+	<!-- ============================================================== -->
+	<div class="pattern-card">
+		<div class="pattern-header">
+			<div class="pattern-tag">パターン B</div>
+			<div class="pattern-name">ソリッド・カード型（Solid Monotone Box）</div>
+			<div class="pattern-summary">独立した角型カードボックス。開くと外枠が白くハイライトされ、確実なクリック感と高い視認性を提供（確定したギャラリーと同系統の思想）。</div>
+		</div>
+
+		<div class="acc-demo-wrap">
+			<details class="acc-pattern-b" open>
+				<summary class="acc-summary-b">
+					<div class="summary-left-b">
+						<span class="acc-chevron-b">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+						</span>
+						<span class="acc-title-b">主要諸元・800V高電圧システム詳細</span>
+					</div>
+					<span class="acc-badge-b">SPEC</span>
+				</summary>
+				<div class="acc-body-b">
+					<table class="acc-spec-table">
+						<tbody>
+							<tr><th>パワートレイン</th><td>第6世代（Gen6）BMW eDrive 前後デュアルモーター</td></tr>
+							<tr><th>最高出力 / 最大トルク</th><td>345 kW (469 hp) / 645 Nm</td></tr>
+							<tr><th>バッテリー正味容量</th><td>108.7 kWh（新開発大径円筒形リチウムイオン）</td></tr>
+							<tr><th>急速充電性能</th><td>最大400kW DC超急速充電対応（10%→80%：約21分）</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="acc-pattern-b">
+				<summary class="acc-summary-b">
+					<div class="summary-left-b">
+						<span class="acc-chevron-b">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+						</span>
+						<span class="acc-title-b">航続可能距離と実用走行シミュレーション</span>
+					</div>
+					<span class="acc-badge-b">FAQ</span>
+				</summary>
+				<div class="acc-body-b">
+					<p class="acc-text-b">欧州WLTPモード値で最大828kmをマーク。エアコン使用時や高速道路走行を含む日本の実環境下でも600km〜700km前後の無充電走行が可能で、東京〜大阪間（約500km）を途中充電なしで快適に走破できます。</p>
+				</div>
+			</details>
+		</div>
+	</div>
+
+	<!-- ============================================================== -->
+	<!-- パターンC：エディトリアル・インデックス型 -->
+	<!-- ============================================================== -->
+	<div class="pattern-card">
+		<div class="pattern-header">
+			<div class="pattern-tag">パターン C</div>
+			<div class="pattern-name">エディトリアル・インデックス型（Editorial Spec Index）</div>
+			<div class="pattern-summary">雑誌の目次やカタログ巻末のテクニカルデータ仕様。左端に「01 / INDEX」の等幅ラベル、右端に「OPEN / CLOSE」のステータス表示。</div>
+		</div>
+
+		<div class="acc-demo-wrap">
+			<details class="acc-pattern-c" open>
+				<summary class="acc-summary-c">
+					<div class="summary-left-c">
+						<span class="acc-num-c">01</span>
+						<span class="acc-title-c">主要諸元・800V高電圧システム詳細</span>
+					</div>
+					<div class="summary-right-c">
+						<span class="acc-action-text-c">VIEW SPEC</span>
+						<span class="acc-arrow-c">→</span>
+					</div>
+				</summary>
+				<div class="acc-body-c">
+					<table class="acc-spec-table">
+						<tbody>
+							<tr><th>パワートレイン</th><td>第6世代（Gen6）BMW eDrive 前後デュアルモーター</td></tr>
+							<tr><th>最高出力 / 最大トルク</th><td>345 kW (469 hp) / 645 Nm</td></tr>
+							<tr><th>バッテリー正味容量</th><td>108.7 kWh（新開発大径円筒形リチウムイオン）</td></tr>
+							<tr><th>急速充電性能</th><td>最大400kW DC超急速充電対応（10%→80%：約21分）</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="acc-pattern-c">
+				<summary class="acc-summary-c">
+					<div class="summary-left-c">
+						<span class="acc-num-c">02</span>
+						<span class="acc-title-c">航続可能距離と実用走行シミュレーション</span>
+					</div>
+					<div class="summary-right-c">
+						<span class="acc-action-text-c">VIEW SPEC</span>
+						<span class="acc-arrow-c">→</span>
+					</div>
+				</summary>
+				<div class="acc-body-c">
+					<p class="acc-text-c">欧州WLTPモード値で最大828kmをマーク。エアコン使用時や高速道路走行を含む日本の実環境下でも600km〜700km前後の無充電走行が可能で、東京〜大阪間（約500km）を途中充電なしで快適に走破できます。</p>
+				</div>
+			</details>
+		</div>
+	</div>
+
+	<!-- ============================================================== -->
+	<!-- パターンD：レフト・アクセントレール型 -->
+	<!-- ============================================================== -->
+	<div class="pattern-card">
+		<div class="pattern-header">
+			<div class="pattern-tag">パターン D</div>
+			<div class="pattern-name">レフト・アクセントレール型（Left Monotone Rail）</div>
+			<div class="pattern-summary">左端に3pxの垂直レールを配置。通常時はダークグレー、開くとソリッドホワイトに点灯。建築的で整然とした幾何学美学。</div>
+		</div>
+
+		<div class="acc-demo-wrap">
+			<details class="acc-pattern-d" open>
+				<summary class="acc-summary-d">
+					<span class="acc-title-d">主要諸元・800V高電圧システム詳細</span>
+					<span class="acc-chevron-d">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+					</span>
+				</summary>
+				<div class="acc-body-d">
+					<table class="acc-spec-table">
+						<tbody>
+							<tr><th>パワートレイン</th><td>第6世代（Gen6）BMW eDrive 前後デュアルモーター</td></tr>
+							<tr><th>最高出力 / 最大トルク</th><td>345 kW (469 hp) / 645 Nm</td></tr>
+							<tr><th>バッテリー正味容量</th><td>108.7 kWh（新開発大径円筒形リチウムイオン）</td></tr>
+							<tr><th>急速充電性能</th><td>最大400kW DC超急速充電対応（10%→80%：約21分）</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="acc-pattern-d">
+				<summary class="acc-summary-d">
+					<span class="acc-title-d">航続可能距離と実用走行シミュレーション</span>
+					<span class="acc-chevron-d">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+					</span>
+				</summary>
+				<div class="acc-body-d">
+					<p class="acc-text-d">欧州WLTPモード値で最大828kmをマーク。エアコン使用時や高速道路走行を含む日本の実環境下でも600km〜700km前後の無充電走行が可能で、東京〜大阪間（約500km）を途中充電なしで快適に走破できます。</p>
+				</div>
+			</details>
+		</div>
+	</div>
+
+	<!-- ============================================================== -->
+	<!-- パターンE：反転コントラスト型 -->
+	<!-- ============================================================== -->
+	<div class="pattern-card">
+		<div class="pattern-header">
+			<div class="pattern-tag">パターン E</div>
+			<div class="pattern-name">反転コントラスト型（Inverted Contrast / Black & White）</div>
+			<div class="pattern-summary">開いた瞬間にヘッダーが純白（#ffffff）に反転し、太字の黒文字で浮き上がるドラマティックな仕様。重要項目に強烈なフォーカスを当てる。</div>
+		</div>
+
+		<div class="acc-demo-wrap">
+			<details class="acc-pattern-e" open>
+				<summary class="acc-summary-e">
+					<div class="summary-left-e">
+						<span class="acc-indicator-e"></span>
+						<span class="acc-title-e">主要諸元・800V高電圧システム詳細</span>
+					</div>
+					<span class="acc-tag-e">STATUS</span>
+				</summary>
+				<div class="acc-body-e">
+					<table class="acc-spec-table">
+						<tbody>
+							<tr><th>パワートレイン</th><td>第6世代（Gen6）BMW eDrive 前後デュアルモーター</td></tr>
+							<tr><th>最高出力 / 最大トルク</th><td>345 kW (469 hp) / 645 Nm</td></tr>
+							<tr><th>バッテリー正味容量</th><td>108.7 kWh（新開発大径円筒形リチウムイオン）</td></tr>
+							<tr><th>急速充電性能</th><td>最大400kW DC超急速充電対応（10%→80%：約21分）</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</details>
+
+			<details class="acc-pattern-e">
+				<summary class="acc-summary-e">
+					<div class="summary-left-e">
+						<span class="acc-indicator-e"></span>
+						<span class="acc-title-e">航続可能距離と実用走行シミュレーション</span>
+					</div>
+					<span class="acc-tag-e">STATUS</span>
+				</summary>
+				<div class="acc-body-e">
+					<p class="acc-text-e">欧州WLTPモード値で最大828kmをマーク。エアコン使用時や高速道路走行を含む日本の実環境下でも600km〜700km前後の無充電走行が可能で、東京〜大阪間（約500km）を途中充電なしで快適に走破できます。</p>
+				</div>
+			</details>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* 全体コンテナ */
+	.accordion-patterns-section {
+		margin: 4rem 0 3rem;
+		padding: 2.5rem 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.patterns-intro-banner {
+		margin-bottom: 2.5rem;
+		padding: 1.75rem 2rem;
+		background: #0d0d12;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-left: 3px solid #ffffff;
+	}
+
+	.patterns-badge {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.6875rem;
+		letter-spacing: 0.12em;
+		color: #a1a1aa;
+		text-transform: uppercase;
+		margin-bottom: 0.5rem;
+	}
+
+	.patterns-title {
+		font-family: var(--font-heading, inherit);
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 0.5rem;
+		letter-spacing: -0.01em;
+	}
+
+	.patterns-desc {
+		font-size: 0.875rem;
+		color: #a1a1aa;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	/* パターン個別カード */
+	.pattern-card {
+		margin-bottom: 2.5rem;
+		background: #070709;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 1.75rem;
+	}
+
+	.pattern-header {
+		margin-bottom: 1.25rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.pattern-tag {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		color: #000000;
+		background: #ffffff;
+		padding: 2px 8px;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.5rem;
+	}
+
+	.pattern-name {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin-bottom: 0.35rem;
+	}
+
+	.pattern-summary {
+		font-size: 0.8125rem;
+		color: #71717a;
+		line-height: 1.5;
+	}
+
+	.acc-demo-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	/* 共通テーブルスタイル（アコーディオン内） */
+	.acc-spec-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.875rem;
+		margin: 0;
+	}
+
+	.acc-spec-table tr {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.acc-spec-table tr:last-child {
+		border-bottom: none;
+	}
+
+	.acc-spec-table th {
+		width: 32%;
+		padding: 0.75rem 1rem 0.75rem 0;
+		text-align: left;
+		font-weight: 600;
+		color: #a1a1aa;
+		font-size: 0.8125rem;
+		vertical-align: top;
+	}
+
+	.acc-spec-table td {
+		padding: 0.75rem 0;
+		color: #f4f4f5;
+		line-height: 1.5;
+	}
+
+	/* --------------------------------------------------
+	   パターン A：ミニマル・ヘアライン型
+	   -------------------------------------------------- */
+	.acc-pattern-a {
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		transition: border-color 0.2s;
+	}
+
+	.acc-pattern-a:hover {
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+
+	.acc-pattern-a[open] {
+		border-color: rgba(255, 255, 255, 0.35);
+	}
+
+	.acc-summary-a {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.1rem 0;
+		background: transparent;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+	}
+
+	.acc-summary-a::-webkit-details-marker {
+		display: none;
+	}
+
+	.acc-title-a {
+		font-size: 0.98rem;
+		font-weight: 600;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+	}
+
+	.acc-toggle-icon-a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #a1a1aa;
+		width: 20px;
+		height: 20px;
+	}
+
+	.acc-toggle-icon-a svg {
+		width: 18px;
+		height: 18px;
+		stroke: currentColor;
+	}
+
+	.acc-pattern-a .icon-minus {
+		display: none;
+	}
+
+	.acc-pattern-a[open] .icon-plus {
+		display: none;
+	}
+
+	.acc-pattern-a[open] .icon-minus {
+		display: block;
+		color: #ffffff;
+	}
+
+	.acc-body-a {
+		padding: 0.25rem 0 1.25rem;
+	}
+
+	.acc-text-a {
+		font-size: 0.9rem;
+		color: #a1a1aa;
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	/* --------------------------------------------------
+	   パターン B：ソリッド・カード型
+	   -------------------------------------------------- */
+	.acc-pattern-b {
+		background: #111116;
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 0;
+		transition: border-color 0.2s, background 0.2s;
+	}
+
+	.acc-pattern-b:hover {
+		border-color: rgba(255, 255, 255, 0.18);
+	}
+
+	.acc-pattern-b[open] {
+		border-color: rgba(255, 255, 255, 0.3);
+		background: #131319;
+	}
+
+	.acc-summary-b {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.1rem 1.25rem;
+		background: transparent;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+	}
+
+	.acc-summary-b::-webkit-details-marker {
+		display: none;
+	}
+
+	.summary-left-b {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+
+	.acc-chevron-b {
+		width: 24px;
+		height: 24px;
+		background: rgba(255, 255, 255, 0.06);
+		color: #ffffff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s, background 0.2s;
+	}
+
+	.acc-chevron-b svg {
+		width: 14px;
+		height: 14px;
+	}
+
+	.acc-pattern-b[open] .acc-chevron-b {
+		transform: rotate(180deg);
+		background: #ffffff;
+		color: #000000;
+	}
+
+	.acc-title-b {
+		font-size: 0.96rem;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.acc-badge-b {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.6875rem;
+		color: #71717a;
+		background: rgba(255, 255, 255, 0.04);
+		padding: 2px 6px;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.acc-pattern-b[open] .acc-badge-b {
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.acc-body-b {
+		padding: 0 1.25rem 1.25rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		margin-top: 0;
+		padding-top: 1rem;
+	}
+
+	.acc-text-b {
+		font-size: 0.9rem;
+		color: #a1a1aa;
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	/* --------------------------------------------------
+	   パターン C：エディトリアル・インデックス型
+	   -------------------------------------------------- */
+	.acc-pattern-c {
+		background: #0d0d12;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.acc-pattern-c[open] {
+		background: #101016;
+	}
+
+	.acc-summary-c {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.15rem 1.25rem;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s;
+	}
+
+	.acc-summary-c::-webkit-details-marker {
+		display: none;
+	}
+
+	.summary-left-c {
+		display: flex;
+		align-items: center;
+		gap: 1.1rem;
+	}
+
+	.acc-num-c {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: #71717a;
+		letter-spacing: 0.08em;
+	}
+
+	.acc-pattern-c[open] .acc-num-c {
+		color: #ffffff;
+	}
+
+	.acc-title-c {
+		font-size: 0.96rem;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.summary-right-c {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.acc-action-text-c {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.6875rem;
+		letter-spacing: 0.08em;
+		color: #71717a;
+		text-transform: uppercase;
+	}
+
+	.acc-arrow-c {
+		font-size: 0.85rem;
+		color: #71717a;
+		transition: transform 0.2s;
+	}
+
+	.acc-pattern-c[open] .acc-arrow-c {
+		transform: rotate(90deg);
+		color: #ffffff;
+	}
+
+	.acc-pattern-c[open] .acc-action-text-c {
+		color: #ffffff;
+	}
+
+	.acc-body-c {
+		padding: 0 1.25rem 1.25rem 3.5rem;
+	}
+
+	.acc-text-c {
+		font-size: 0.9rem;
+		color: #a1a1aa;
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	/* --------------------------------------------------
+	   パターン D：レフト・アクセントレール型
+	   -------------------------------------------------- */
+	.acc-pattern-d {
+		background: #0f0f14;
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-left: 3px solid #27272a;
+		transition: border-left-color 0.2s, background 0.2s;
+	}
+
+	.acc-pattern-d:hover {
+		border-left-color: #71717a;
+	}
+
+	.acc-pattern-d[open] {
+		border-left-color: #ffffff;
+		background: #121218;
+	}
+
+	.acc-summary-d {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.1rem 1.25rem;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+	}
+
+	.acc-summary-d::-webkit-details-marker {
+		display: none;
+	}
+
+	.acc-title-d {
+		font-size: 0.96rem;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.acc-chevron-d {
+		color: #71717a;
+		width: 18px;
+		height: 18px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s, color 0.2s;
+	}
+
+	.acc-chevron-d svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.acc-pattern-d[open] .acc-chevron-d {
+		transform: rotate(90deg);
+		color: #ffffff;
+	}
+
+	.acc-body-d {
+		padding: 0 1.25rem 1.25rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		padding-top: 1rem;
+	}
+
+	.acc-text-d {
+		font-size: 0.9rem;
+		color: #a1a1aa;
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	/* --------------------------------------------------
+	   パターン E：反転コントラスト型
+	   -------------------------------------------------- */
+	.acc-pattern-e {
+		background: #09090c;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: border-color 0.2s;
+	}
+
+	.acc-summary-e {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 1.25rem;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		background: transparent;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.acc-summary-e::-webkit-details-marker {
+		display: none;
+	}
+
+	.summary-left-e {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.acc-indicator-e {
+		width: 6px;
+		height: 6px;
+		background: rgba(255, 255, 255, 0.3);
+		display: inline-block;
+	}
+
+	.acc-title-e {
+		font-size: 0.96rem;
+		font-weight: 600;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+	}
+
+	.acc-tag-e {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.65rem;
+		color: #71717a;
+		letter-spacing: 0.08em;
+	}
+
+	.acc-pattern-e[open] .acc-summary-e {
+		background: #ffffff;
+	}
+
+	.acc-pattern-e[open] .acc-title-e {
+		color: #000000;
+		font-weight: 700;
+	}
+
+	.acc-pattern-e[open] .acc-indicator-e {
+		background: #000000;
+	}
+
+	.acc-pattern-e[open] .acc-tag-e {
+		color: #000000;
+		font-weight: 700;
+	}
+
+	.acc-body-e {
+		padding: 1.25rem;
+		background: #09090c;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.acc-text-e {
+		font-size: 0.9rem;
+		color: #a1a1aa;
+		line-height: 1.7;
+		margin: 0;
+	}
+</style>

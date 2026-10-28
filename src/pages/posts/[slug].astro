@@ -6,6 +6,7 @@ import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
 import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
+import AccordionPatternsPreview from "../../components/AccordionPatternsPreview.astro";
 import "../../styles/prose.css";
 
 const portableTextComponents = {
@@ -1022,6 +1023,8 @@ const editUrl = postDbId
 				<div class="article-rich-text prose prose-invert">
 					<PortableText value={post.data.content} components={portableTextComponents} />
 				</div>
+
+				<AccordionPatternsPreview />
 
 				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->
 				{!hasSliderBlock && isDemoArticle && (
@@ -2625,6 +2628,107 @@ const editUrl = postDbId
 	}
 	.monotone-spec-table .highlight-row {
 		background: rgba(255, 255, 255, 0.03);
+	}
+
+
+	/* Monotone Table Styling - 白背景・白文字解消 */
+	:global(.emdash-table-wrapper),
+	:global(.article-rich-text .emdash-table-wrapper),
+	:global(.prose .emdash-table-wrapper) {
+		width: 100% !important;
+		margin: 2rem 0 !important;
+		overflow-x: auto !important;
+		-webkit-overflow-scrolling: touch !important;
+		background: #0d0d11 !important;
+		border: 1px solid rgba(255, 255, 255, 0.12) !important;
+		border-radius: 0 !important;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+	}
+	:global(.emdash-table),
+	:global(.article-rich-text table),
+	:global(.prose table) {
+		width: 100% !important;
+		border-collapse: collapse !important;
+		font-size: 0.875rem !important;
+		line-height: 1.6 !important;
+		background: #0d0d11 !important;
+		color: #e4e4e7 !important;
+		margin: 0 !important;
+	}
+	:global(.emdash-table thead),
+	:global(.article-rich-text table thead),
+	:global(.prose table thead) {
+		background: #18181f !important;
+	}
+	:global(.emdash-table th),
+	:global(.article-rich-text table th),
+	:global(.prose table th) {
+		background: #18181f !important;
+		color: #ffffff !important;
+		font-weight: 600 !important;
+		padding: 14px 18px !important;
+		border: none !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+		text-align: left !important;
+		white-space: nowrap !important;
+		font-size: 0.8125rem !important;
+		letter-spacing: 0.04em !important;
+	}
+	:global(.emdash-table th:last-child),
+	:global(.article-rich-text table th:last-child),
+	:global(.prose table th:last-child) {
+		border-right: none !important;
+	}
+	:global(.emdash-table th p),
+	:global(.article-rich-text table th p),
+	:global(.prose table th p) {
+		color: #ffffff !important;
+		margin: 0 !important;
+		font-weight: 600 !important;
+	}
+	:global(.emdash-table td),
+	:global(.article-rich-text table td),
+	:global(.prose table td) {
+		background: transparent !important;
+		color: #d4d4d8 !important;
+		padding: 13px 18px !important;
+		border: none !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+		vertical-align: middle !important;
+	}
+	:global(.emdash-table td:last-child),
+	:global(.article-rich-text table td:last-child),
+	:global(.prose table td:last-child) {
+		border-right: none !important;
+	}
+	:global(.emdash-table td p),
+	:global(.article-rich-text table td p),
+	:global(.prose table td p) {
+		color: #d4d4d8 !important;
+		margin: 0 !important;
+	}
+	:global(.emdash-table tbody tr:nth-child(even) td),
+	:global(.article-rich-text table tbody tr:nth-child(even) td),
+	:global(.prose table tbody tr:nth-child(even) td) {
+		background: rgba(255, 255, 255, 0.02) !important;
+	}
+	:global(.emdash-table tbody tr:hover td),
+	:global(.article-rich-text table tbody tr:hover td),
+	:global(.prose table tbody tr:hover td) {
+		background: rgba(255, 255, 255, 0.06) !important;
+		color: #ffffff !important;
+	}
+	:global(.emdash-table tbody tr:hover td p),
+	:global(.article-rich-text table tbody tr:hover td p),
+	:global(.prose table tbody tr:hover td p) {
+		color: #ffffff !important;
+	}
+	:global(.emdash-table tbody tr:last-child td),
+	:global(.article-rich-text table tbody tr:last-child td),
+	:global(.prose table tbody tr:last-child td) {
+		border-bottom: none !important;
 	}
 
 </style>

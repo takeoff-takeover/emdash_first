@@ -238,3 +238,107 @@
 .prose .emdash-file {
 	border-radius: var(--radius-lg) !important;
 }
+
+/* ==============================================================
+   Nicole Group Monotone Table Styles
+   白背景・白文字の完全解消 ＆ 高級感あるモノトーン仕様
+   ============================================================== */
+.emdash-table-wrapper,
+.prose .emdash-table-wrapper,
+.table-wrapper {
+	width: 100% !important;
+	margin: 2rem 0 !important;
+	overflow-x: auto !important;
+	-webkit-overflow-scrolling: touch !important;
+	background: #0d0d11 !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	border-radius: 0 !important;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.emdash-table,
+.prose table,
+table.cms-table {
+	width: 100% !important;
+	border-collapse: collapse !important;
+	font-size: 0.875rem !important;
+	line-height: 1.6 !important;
+	background: transparent !important;
+	color: #e4e4e7 !important;
+	margin: 0 !important;
+}
+
+.emdash-table thead,
+.prose table thead {
+	background: #18181f !important;
+}
+
+.emdash-table th,
+.prose table th {
+	background: #18181f !important;
+	color: #ffffff !important;
+	font-weight: 600 !important;
+	padding: 14px 18px !important;
+	border: none !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+	border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+	text-align: left !important;
+	white-space: nowrap !important;
+	font-size: 0.8125rem !important;
+	letter-spacing: 0.04em !important;
+}
+
+.emdash-table th:last-child,
+.prose table th:last-child {
+	border-right: none !important;
+}
+
+.emdash-table th p,
+.prose table th p {
+	color: #ffffff !important;
+	margin: 0 !important;
+	font-weight: 600 !important;
+}
+
+.emdash-table td,
+.prose table td {
+	background: transparent !important;
+	color: #d4d4d8 !important;
+	padding: 13px 18px !important;
+	border: none !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+	border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+	vertical-align: middle !important;
+}
+
+.emdash-table td:last-child,
+.prose table td:last-child {
+	border-right: none !important;
+}
+
+.emdash-table td p,
+.prose table td p {
+	color: #d4d4d8 !important;
+	margin: 0 !important;
+}
+
+.emdash-table tbody tr:nth-child(even) td,
+.prose table tbody tr:nth-child(even) td {
+	background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.emdash-table tbody tr:hover td,
+.prose table tbody tr:hover td {
+	background: rgba(255, 255, 255, 0.05) !important;
+	color: #ffffff !important;
+}
+
+.emdash-table tbody tr:hover td p,
+.prose table tbody tr:hover td p {
+	color: #ffffff !important;
+}
+
+.emdash-table tbody tr:last-child td,
+.prose table tbody tr:last-child td {
+	border-bottom: none !important;
+}
