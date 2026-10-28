@@ -6,7 +6,6 @@ import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
 import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
-import AccordionPatternsPreview from "../../components/AccordionPatternsPreview.astro";
 import "../../styles/prose.css";
 
 const portableTextComponents = {
@@ -1023,8 +1022,6 @@ const editUrl = postDbId
 				<div class="article-rich-text prose prose-invert">
 					<PortableText value={post.data.content} components={portableTextComponents} />
 				</div>
-
-				<AccordionPatternsPreview />
 
 				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->
 				{!hasSliderBlock && isDemoArticle && (
@@ -2631,49 +2628,50 @@ const editUrl = postDbId
 	}
 
 
-	/* Monotone Table Styling - 白背景・白文字解消 */
+	/* Monotone Luxury Table Styling - ゆったりパディング＆美文字空間 */
 	:global(.emdash-table-wrapper),
 	:global(.article-rich-text .emdash-table-wrapper),
 	:global(.prose .emdash-table-wrapper) {
 		width: 100% !important;
-		margin: 2rem 0 !important;
+		margin: 2.5rem 0 !important;
 		overflow-x: auto !important;
 		-webkit-overflow-scrolling: touch !important;
-		background: #0d0d11 !important;
-		border: 1px solid rgba(255, 255, 255, 0.12) !important;
+		background: #0b0b0e !important;
+		border: 1px solid rgba(255, 255, 255, 0.1) !important;
 		border-radius: 0 !important;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
 	}
 	:global(.emdash-table),
 	:global(.article-rich-text table),
 	:global(.prose table) {
 		width: 100% !important;
 		border-collapse: collapse !important;
-		font-size: 0.875rem !important;
-		line-height: 1.6 !important;
-		background: #0d0d11 !important;
+		font-size: 0.9rem !important;
+		line-height: 1.7 !important;
+		background: #0b0b0e !important;
 		color: #e4e4e7 !important;
 		margin: 0 !important;
 	}
 	:global(.emdash-table thead),
 	:global(.article-rich-text table thead),
 	:global(.prose table thead) {
-		background: #18181f !important;
+		background: #141419 !important;
 	}
 	:global(.emdash-table th),
 	:global(.article-rich-text table th),
 	:global(.prose table th) {
-		background: #18181f !important;
+		background: #141419 !important;
 		color: #ffffff !important;
 		font-weight: 600 !important;
-		padding: 14px 18px !important;
+		padding: 18px 24px !important;
 		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-		border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
 		text-align: left !important;
 		white-space: nowrap !important;
 		font-size: 0.8125rem !important;
-		letter-spacing: 0.04em !important;
+		letter-spacing: 0.05em !important;
+		text-transform: uppercase !important;
 	}
 	:global(.emdash-table th:last-child),
 	:global(.article-rich-text table th:last-child),
@@ -2686,17 +2684,19 @@ const editUrl = postDbId
 		color: #ffffff !important;
 		margin: 0 !important;
 		font-weight: 600 !important;
+		line-height: 1.6 !important;
 	}
 	:global(.emdash-table td),
 	:global(.article-rich-text table td),
 	:global(.prose table td) {
 		background: transparent !important;
 		color: #d4d4d8 !important;
-		padding: 13px 18px !important;
+		padding: 18px 24px !important;
 		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-		border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
 		vertical-align: middle !important;
+		line-height: 1.7 !important;
 	}
 	:global(.emdash-table td:last-child),
 	:global(.article-rich-text table td:last-child),
@@ -2708,16 +2708,17 @@ const editUrl = postDbId
 	:global(.prose table td p) {
 		color: #d4d4d8 !important;
 		margin: 0 !important;
+		line-height: 1.7 !important;
 	}
 	:global(.emdash-table tbody tr:nth-child(even) td),
 	:global(.article-rich-text table tbody tr:nth-child(even) td),
 	:global(.prose table tbody tr:nth-child(even) td) {
-		background: rgba(255, 255, 255, 0.02) !important;
+		background: rgba(255, 255, 255, 0.018) !important;
 	}
 	:global(.emdash-table tbody tr:hover td),
 	:global(.article-rich-text table tbody tr:hover td),
 	:global(.prose table tbody tr:hover td) {
-		background: rgba(255, 255, 255, 0.06) !important;
+		background: rgba(255, 255, 255, 0.045) !important;
 		color: #ffffff !important;
 	}
 	:global(.emdash-table tbody tr:hover td p),
@@ -2730,5 +2731,4 @@ const editUrl = postDbId
 	:global(.prose table tbody tr:last-child td) {
 		border-bottom: none !important;
 	}
-
 </style>

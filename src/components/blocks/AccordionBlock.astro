@@ -1,7 +1,8 @@
 ---
 /**
  * AccordionBlock.astro
- * EmDash Portable Text カスタムブロック：アコーディオン（開閉詳細・スペック・FAQ）
+ * EmDash Portable Text カスタムブロック：アコーディオン（ミニマル・ヘアライン型）
+ * 背景なし・極細線ヘアライン・ミニマルな「＋ / −」アイコン・ゆったりとした余白
  */
 interface Props {
 	node: {
@@ -38,15 +39,18 @@ const tableRows = isTableFormat
 	: [];
 ---
 
-<details class="cms-accordion-block">
+<details class="cms-accordion-block acc-minimal-hairline">
 	<summary class="cms-acc-summary">
-		<div class="summary-left">
-			<span class="acc-chevron-badge">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-			</span>
-			<span class="summary-title">{title}</span>
-		</div>
-		<span class="acc-status-tag">詳細を表示</span>
+		<span class="summary-title">{title}</span>
+		<span class="acc-toggle-icon">
+			<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+				<line x1="12" y1="5" x2="12" y2="19"></line>
+				<line x1="5" y1="12" x2="19" y2="12"></line>
+			</svg>
+			<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+				<line x1="5" y1="12" x2="19" y2="12"></line>
+			</svg>
+		</span>
 	</summary>
 
 	<div class="cms-acc-body">
@@ -72,118 +76,133 @@ const tableRows = isTableFormat
 </details>
 
 <style>
-	.cms-accordion-block {
-		margin: 1.5rem 0;
+	.cms-accordion-block.acc-minimal-hairline {
+		margin: 2rem 0;
 		background: transparent;
 		border: none;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 0;
 		overflow: hidden;
-		transition: border-color 0.2s;
+		transition: border-color 0.25s ease;
 	}
-	.cms-accordion-block:hover {
-		border-color: rgba(255, 255, 255, 0.2);
+
+	.cms-accordion-block.acc-minimal-hairline:hover {
+		border-top-color: rgba(255, 255, 255, 0.22);
+		border-bottom-color: rgba(255, 255, 255, 0.22);
 	}
-	.cms-accordion-block[open] {
-		border-color: rgba(255, 255, 255, 0.35);
-		box-shadow: none;
+
+	.cms-accordion-block.acc-minimal-hairline[open] {
+		border-top-color: rgba(255, 255, 255, 0.35);
+		border-bottom-color: rgba(255, 255, 255, 0.35);
 	}
+
 	.cms-acc-summary {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1.25rem 0;
+		padding: 1.35rem 0;
 		background: transparent;
 		cursor: pointer;
 		user-select: none;
 		list-style: none;
-		transition: background-color 0.2s;
+		transition: opacity 0.2s;
 	}
+
 	.cms-acc-summary::-webkit-details-marker {
 		display: none;
 	}
+
 	.cms-acc-summary:hover {
-		background: transparent;
+		opacity: 0.9;
 	}
-	.summary-left {
-		display: flex;
-		align-items: center;
-		gap: 0.85rem;
+
+	.summary-title {
+		font-family: var(--font-heading, inherit);
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		line-height: 1.45;
 	}
-	.acc-chevron-badge {
-		width: 28px;
-		height: 28px;
-		border-radius: 6px;
-		background: rgba(223, 186, 115, 0.15);
-		color: #FFFFFF;
+
+	.acc-toggle-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: transform 0.2s;
+		color: #a1a1aa;
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+		transition: color 0.2s ease, transform 0.2s ease;
 	}
-	.acc-chevron-badge svg {
-		width: 16px;
-		height: 16px;
+
+	.acc-toggle-icon svg {
+		width: 20px;
+		height: 20px;
+		stroke: currentColor;
 	}
-	.cms-accordion-block[open] .acc-chevron-badge {
-		transform: rotate(180deg);
-		background: #FFFFFF;
-		color: #040507;
+
+	.cms-accordion-block .icon-minus {
+		display: none;
 	}
-	.summary-title {
-		font-size: 1.05rem;
-		font-weight: 700;
+
+	.cms-accordion-block[open] .icon-plus {
+		display: none;
+	}
+
+	.cms-accordion-block[open] .icon-minus {
+		display: block;
 		color: #ffffff;
-		letter-spacing: -0.01em;
 	}
-	.acc-status-tag {
-		font-size: 0.75rem;
-		color: #94a3b8;
-		background: rgba(255, 255, 255, 0.05);
-		padding: 0.25rem 0.6rem;
-		border-radius: 4px;
-	}
-	.cms-accordion-block[open] .acc-status-tag {
-		content: "閉じる";
-		color: #FFFFFF;
-	}
+
 	.cms-acc-body {
-		padding: 0 0 1.5rem 0;
+		padding: 0.5rem 0 1.75rem 0;
 		background: transparent;
-		border-top: none;
 	}
+
+	/* アコーディオン内テーブル：文字と線が近すぎないゆったりとした美しい余白 */
 	.cms-acc-table {
 		width: 100%;
 		border-collapse: collapse;
-		margin: 0;
+		margin: 0.5rem 0 0;
+		font-size: 0.875rem;
 	}
+
 	.cms-acc-table tr {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 	}
+
 	.cms-acc-table tr:last-child {
 		border-bottom: none;
 	}
+
 	.cms-acc-table th {
 		width: 32%;
-		padding: 0.85rem 1rem 0.85rem 0;
+		padding: 1.1rem 1.5rem 1.1rem 0;
 		text-align: left;
-		font-size: 0.9rem;
 		font-weight: 600;
-		color: #94a3b8;
+		color: #a1a1aa;
+		font-size: 0.85rem;
 		vertical-align: top;
-	}
-	.cms-acc-table td {
-		padding: 0.85rem 0;
-		font-size: 0.95rem;
-		color: #e2e8f0;
 		line-height: 1.6;
+		letter-spacing: 0.02em;
 	}
+
+	.cms-acc-table td {
+		padding: 1.1rem 0;
+		color: #f4f4f5;
+		line-height: 1.65;
+		font-size: 0.9rem;
+	}
+
 	.cms-acc-text p {
-		margin: 0 0 1rem;
-		color: #cbd5e1;
+		margin: 0 0 1.15rem;
+		color: #d4d4d8;
 		line-height: 1.8;
-		font-size: 0.96rem;
+		font-size: 0.95rem;
 	}
+
 	.cms-acc-text p:last-child {
 		margin-bottom: 0;
 	}

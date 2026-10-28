@@ -89,7 +89,7 @@ export function editorialToolsPlugin() {
 			},
 			{
 				type: "accordion",
-				label: "アコーディオン（開閉詳細・スペック・FAQ）",
+				label: "アコーディオン（ミニマル）",
 				icon: "link",
 				description: "クリック（タップ）で開閉する詳細情報・スペック表・FAQツール",
 				category: "レイアウト",
