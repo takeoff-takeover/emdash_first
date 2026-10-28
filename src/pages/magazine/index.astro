@@ -334,6 +334,11 @@ const coverArticle = mainArticles[0];
 // 特集ハイライト記事（最新記事 2枠）
 const highlightStories = mainArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
 
+// トップ最新3記事のIDセット（Cover Story 1件 + LATEST STORIES 2件）
+const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.id)]);
+// 初期表示時のアーカイブ収録記事数（最新3記事を除いた件数）
+const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).length;
+
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
 const topicsList = ["ALL", "Feature", "Guide", "People"];
 ---
@@ -497,7 +502,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 						<h2 class="section-heading">ALL STORIES & ESSAYS</h2>
 					</div>
 					<div class="count-display">
-						収録記事：<span id="current-article-count">{mainArticles.length}</span>篇
+						収録記事：<span id="current-article-count">{initialArchiveCount}</span>篇
 					</div>
 				</div>
 
@@ -506,6 +511,8 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 					{mainArticles.map((art) => (
 						<article 
 							class="article-item" 
+							data-id={art.id}
+							data-is-top3={top3ArticleIds.has(art.id) ? "true" : "false"}
 							data-brand={art.brand} 
 							data-topic={art.topic}
 							data-title={art.title.toLowerCase()}
@@ -535,8 +542,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 					))}
 				</div>
 
-				<!-- ページネーション（20件超の場合に動的表示） -->
-				<div id="mag-pagination" class="mag-pagination" style="display: none;"></div>
+				<!-- 「もっと見る」ボタン（初期9件、クリックで古い記事を順次展開） -->
+				<div class="all-articles-more-wrap" id="articles-more-wrap" style="display: none;">
+					<button type="button" id="btn-articles-load-more" class="btn-articles-load-more">
+						<span class="btn-articles-load-more__text">もっと見る</span>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-articles-load-more__icon"><path d="M6 9l6 6 6-6"/></svg>
+					</button>
+				</div>
 
 				<!-- 検索該当なしプレースホルダー -->
 				<div id="no-articles" class="no-articles-state" style="display: none;">
@@ -630,10 +642,11 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		}
 
 		// ==============================================================
-		// 2. インタラクティブ・フィルタリング＆ページネーション制御（20件/ページ）
+		// 2. インタラクティブ・フィルタリング＆「もっと見る」制御（初期9件、古い記事を展開）
 		// ==============================================================
-		const PAGE_SIZE = 20;
-		let currentPage = 1;
+		const INITIAL_COUNT = 9;
+		const LOAD_STEP = 9;
+		let visibleCount = INITIAL_COUNT;
 		let currentBrand = 'ALL';
 		let currentTopic = 'ALL';
 		let searchQuery = '';
@@ -641,74 +654,36 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		const brandPills = document.querySelectorAll('#brand-filters .filter-pill');
 		const topicSelect = document.getElementById('topic-select');
 		const searchInput = document.getElementById('article-search-input');
-		const articles = document.querySelectorAll('.article-item');
+		const articles = Array.from(document.querySelectorAll('.article-item'));
 		const countDisplay = document.getElementById('current-article-count');
 		const noArticles = document.getElementById('no-articles');
 		const resetBtn = document.getElementById('btn-reset-filters');
-		const paginationEl = document.getElementById('mag-pagination');
+		const moreWrap = document.getElementById('articles-more-wrap');
+		const loadMoreBtn = document.getElementById('btn-articles-load-more');
 
-		function renderPagination(totalPages) {
-			if (!paginationEl) return;
-
-			if (totalPages <= 1) {
-				paginationEl.style.display = 'none';
-				paginationEl.innerHTML = '';
-				return;
+		function applyFilters(resetCount = true) {
+			if (resetCount) {
+				visibleCount = INITIAL_COUNT;
 			}
 
-			paginationEl.style.display = 'flex';
-			let html = '';
-
-			// 前へボタン
-			html += `<button type="button" class="page-btn page-btn--nav" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}" aria-label="前のページへ">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="page-btn__icon"><path d="M15 18l-6-6 6-6"/></svg>
-				<span>前へ</span>
-			</button>`;
-
-			// ページ番号ボタン群
-			html += `<div class="page-numbers">`;
-			for (let p = 1; p <= totalPages; p++) {
-				html += `<button type="button" class="page-btn page-btn--num ${p === currentPage ? 'is-active' : ''}" data-page="${p}" aria-label="${p}ページ目">${p}</button>`;
-			}
-			html += `</div>`;
-
-			// 次へボタン
-			html += `<button type="button" class="page-btn page-btn--nav" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}" aria-label="次のページへ">
-				<span>次へ</span>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="page-btn__icon"><path d="M9 18l6-6-6-6"/></svg>
-			</button>`;
-
-			paginationEl.innerHTML = html;
-
-			// クリックイベント
-			paginationEl.querySelectorAll('.page-btn').forEach(btn => {
-				btn.addEventListener('click', () => {
-					if (btn.disabled || btn.classList.contains('is-active')) return;
-					const targetPage = parseInt(btn.getAttribute('data-page'), 10);
-					if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages) {
-						currentPage = targetPage;
-						applyFilters(false);
-						const archiveSection = document.getElementById('magazine-archive');
-						if (archiveSection) {
-							archiveSection.scrollIntoView({ behavior: 'smooth' });
-						}
-					}
-				});
-			});
-		}
-
-		function applyFilters(resetPage = true) {
-			if (resetPage) {
-				currentPage = 1;
-			}
+			// 絞り込み（ブランド/カテゴリー）または検索が行われているか
+			const isFiltered = (currentBrand !== 'ALL') || (currentTopic !== 'ALL') || (searchQuery.length > 0);
 
 			const matchedArticles = [];
 
 			articles.forEach(article => {
+				const isTop3 = article.getAttribute('data-is-top3') === 'true';
 				const brand = article.getAttribute('data-brand') || '';
 				const topic = article.getAttribute('data-topic') || '';
 				const title = article.getAttribute('data-title') || '';
 				const lead = article.getAttribute('data-lead') || '';
+
+				// 初期状態（絞り込みなし）では最新3記事を除外。
+				// ブランドやカテゴリーの絞り込み、またはキーワード検索時は最新3記事も含めてマッチ判定
+				if (!isFiltered && isTop3) {
+					article.style.display = 'none';
+					return;
+				}
 
 				const matchBrand = (currentBrand === 'ALL') || (brand === currentBrand);
 				const matchTopic = (currentTopic === 'ALL') || (topic === currentTopic);
@@ -722,18 +697,10 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 			});
 
 			const totalCount = matchedArticles.length;
-			const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
 
-			if (currentPage > totalPages) {
-				currentPage = totalPages;
-			}
-
-			// 現在のページに応じた20件の表示制御
-			const startIndex = (currentPage - 1) * PAGE_SIZE;
-			const endIndex = startIndex + PAGE_SIZE;
-
+			// visibleCount までの記事を表示し、それ以降は非表示
 			matchedArticles.forEach((article, idx) => {
-				if (idx >= startIndex && idx < endIndex) {
+				if (idx < visibleCount) {
 					article.style.display = '';
 				} else {
 					article.style.display = 'none';
@@ -745,18 +712,34 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 			}
 
 			if (noArticles) {
-				if (totalCount === 0) {
-					noArticles.style.display = 'block';
-				} else {
-					noArticles.style.display = 'none';
-				}
+				noArticles.style.display = totalCount === 0 ? 'block' : 'none';
 			}
 
-			renderPagination(totalPages);
+			// 「もっと見る」ボタンの表示および残り件数の制御
+			if (moreWrap && loadMoreBtn) {
+				if (visibleCount < totalCount) {
+					moreWrap.style.display = 'flex';
+					const remaining = totalCount - visibleCount;
+					const btnText = loadMoreBtn.querySelector('.btn-articles-load-more__text');
+					if (btnText) {
+						btnText.textContent = `もっと見る（残り${remaining}件）`;
+					}
+				} else {
+					moreWrap.style.display = 'none';
+				}
+			}
 		}
 
-		// 初期ロード時の実行（20件表示制限とページネーション生成）
+		// 初期ロード時の実行（初期9件表示）
 		applyFilters(true);
+
+		// 「もっと見る」ボタンクリックで古い記事を9件ずつ追加表示
+		if (loadMoreBtn) {
+			loadMoreBtn.addEventListener('click', () => {
+				visibleCount += LOAD_STEP;
+				applyFilters(false);
+			});
+		}
 
 		// ブランドピルクリック切り替え
 		brandPills.forEach(pill => {
@@ -1603,95 +1586,47 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 	}
 
 	/* ============================================================== */
-	/* ページネーション（全体のモノトーントーンに調和したエディトリアルデザイン） */
+	/* ALL STORIES & ESSAYS 「もっと見る」ボタン（モノトーンエディトリアルデザイン） */
 	/* ============================================================== */
-	.mag-pagination {
+	.all-articles-more-wrap {
 		display: flex;
 		justify-content: center;
-		align-items: center;
-		gap: 10px;
-		margin-top: 50px;
+		margin-top: 48px;
 		padding-top: 36px;
 		border-top: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.mag-pagination :global(.page-numbers) {
+	.btn-articles-load-more {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
-		margin: 0 4px;
-	}
-
-	.mag-pagination :global(.page-btn) {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		height: 40px;
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: rgba(255, 255, 255, 0.75);
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-		font-size: 13px;
+		gap: 10px;
+		font-size: 13.5px;
 		font-weight: 600;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 9999px;
+		padding: 12px 34px;
 		cursor: pointer;
 		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 		user-select: none;
 	}
 
-	.mag-pagination :global(.page-btn--num) {
-		min-width: 40px;
-		padding: 0;
-	}
-
-	.mag-pagination :global(.page-btn--nav) {
-		padding: 0 16px;
-		gap: 6px;
-		font-size: 12.5px;
-		letter-spacing: 0.04em;
-	}
-
-	.mag-pagination :global(.page-btn__icon) {
-		width: 14px;
-		height: 14px;
-		flex-shrink: 0;
-		transition: transform 0.25s ease;
-	}
-
-	.mag-pagination :global(.page-btn:hover:not(:disabled):not(.is-active)) {
+	.btn-articles-load-more:hover {
 		background: rgba(255, 255, 255, 0.14);
 		border-color: rgba(255, 255, 255, 0.35);
-		color: #ffffff;
-		transform: translateY(-1px);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 	}
 
-	.mag-pagination :global(.page-btn--nav:hover:not(:disabled) .page-btn__icon) {
-		transform: translateX(0);
+	.btn-articles-load-more__icon {
+		width: 15px;
+		height: 15px;
+		transition: transform 0.2s ease;
 	}
 
-	.mag-pagination :global(.page-btn--nav:first-child:hover:not(:disabled) .page-btn__icon) {
-		transform: translateX(-2px);
-	}
-
-	.mag-pagination :global(.page-btn--nav:last-child:hover:not(:disabled) .page-btn__icon) {
-		transform: translateX(2px);
-	}
-
-	.mag-pagination :global(.page-btn.is-active) {
-		background: #ffffff;
-		border-color: #ffffff;
-		color: #040507;
-		font-weight: 700;
-		box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
-		cursor: default;
-	}
-
-	.mag-pagination :global(.page-btn:disabled) {
-		opacity: 0.25;
-		cursor: not-allowed;
-		background: transparent;
-		border-color: rgba(255, 255, 255, 0.06);
-		color: rgba(255, 255, 255, 0.3);
+	.btn-articles-load-more:hover .btn-articles-load-more__icon {
+		transform: translateY(2px);
 	}
 
 	/* 検索該当なし状態 */
