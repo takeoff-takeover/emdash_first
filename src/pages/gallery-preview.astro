@@ -1,0 +1,1082 @@
+---
+// src/pages/gallery-preview.astro
+// ギャラリーデザイン候補 5パターン比較プレビューページ
+import NicoleLayout from "../layouts/NicoleLayout.astro";
+
+// サンプル写真データ（BMW iX4公式高解像度写真）
+const samplePhotos = [
+	{
+		src: "/uploads/ix4/ext-01.jpg",
+		title: "Iconic Glowキドニーグリル ＆ 一体型LEDライト",
+		caption: "ノイエ・クラッセの象徴である一体型発光キドニーグリルとスリムLEDヘッドライトシグネチャー。"
+	},
+	{
+		src: "/uploads/ix4/ext-02.jpg",
+		title: "ファストバック・クーペシルエット ＆ ホフマイスター・キンク",
+		caption: "流麗なルーフラインと力強いショルダーラインが融合した新世代スポーツ・アクティビティ・クーペの造形。"
+	},
+	{
+		src: "/uploads/ix4/ext-03.jpg",
+		title: "立体LEDリヤライトバー ＆ ダックテールスポイラー",
+		caption: "車幅いっぱいに広がる3次元リヤライトバーと、空力性能を高めるインテグレーテッド・ダックテール。"
+	},
+	{
+		src: "/uploads/ix4/ext-04.jpg",
+		title: "アルプス山岳ワインディングを駆けるiX4 M60 xDrive",
+		caption: "標高2,500mを超える過酷なワインディングで鍛え上げられたデュアルモーターxDrive。"
+	},
+	{
+		src: "/uploads/ix4/ext-05.jpg",
+		title: "低重心レイアウトがもたらす極上のコーナリングスタンス",
+		caption: "フロア下にフラット配置された第6世代バッテリーパックにより、従来のSACを圧倒する低重心を達成。"
+	},
+	{
+		src: "/uploads/ix4/int-01.jpg",
+		title: "フロントガラス全幅投影「BMW Panoramic Vision」",
+		caption: "ドライバーの視線移動を最小限に抑え、フロントガラス下端全幅に走行情報を高コントラスト投影。"
+	}
+];
+---
+
+<NicoleLayout
+	title="ギャラリーデザイン 5パターン比較プレビュー ｜ Nicole"
+	description="記事投稿用ギャラリーコンポーネントのデザイン候補5パターンを実際に操作・比較できるプレビューページです。"
+>
+	<main class="preview-page">
+		<header class="preview-header">
+			<div class="preview-container">
+				<span class="preview-eyebrow">DESIGN VARIATIONS</span>
+				<h1 class="preview-title">ギャラリー デザイン候補 5パターン比較</h1>
+				<p class="preview-lead">
+					記事投稿時に全サイトで統一適用するギャラリーの見た目・操作性の候補です。<br />
+					すべて「黒・白・グレーのモノトーン基調」「楕円ボタンの撤去」「不要ラベルの排除」に準拠しています。実際に操作して最適なパターンをお選びください。
+				</p>
+				
+				<nav class="pattern-nav">
+					<a href="#pattern-a" class="pattern-nav-link">パターンA: エディトリアル・ミニマル</a>
+					<a href="#pattern-b" class="pattern-nav-link">パターンB: フィルムストリップ（サムネイル連動）</a>
+					<a href="#pattern-c" class="pattern-nav-link">パターンC: 水平スナップ・カルーセル</a>
+					<a href="#pattern-d" class="pattern-nav-link">パターンD: 2カラム・スプリット</a>
+					<a href="#pattern-e" class="pattern-nav-link">パターンE: タイルグリッド ＆ モーダル</a>
+				</nav>
+			</div>
+		</header>
+
+		<div class="preview-container">
+			<!-- ============================================================== -->
+			<!-- パターンA: エディトリアル・ミニマル（大画面・端正なライン） -->
+			<!-- ============================================================== -->
+			<section class="pattern-card" id="pattern-a">
+				<div class="pattern-meta">
+					<span class="pattern-tag">PATTERN A</span>
+					<h2 class="pattern-name">エディトリアル・ミニマル（洗練された雑誌風スライダー）</h2>
+					<p class="pattern-desc">
+						大画面で写真の迫力を最大限に引き出す王道スタイル。左右矢印は背景なしのシャープなアイコン、下部に細いバーインジケーター、上部に等幅フォントのカウンター（<code>01 / 06</code>）のみをミニマルに配置。
+					</p>
+				</div>
+
+				<div class="pattern-demo">
+					<div class="gallery-a" id="galleryA">
+						<div class="gallery-a__top">
+							<span class="gallery-a__counter"><span class="a-cur">01</span> / 06</span>
+						</div>
+						<div class="gallery-a__viewport">
+							<div class="gallery-a__track" id="trackA">
+								{samplePhotos.map((p, idx) => (
+									<div class={`gallery-a__slide ${idx === 0 ? 'is-active' : ''}`} data-index={idx}>
+										<img src={p.src} alt={p.title} loading={idx === 0 ? 'eager' : 'lazy'} />
+									</div>
+								))}
+							</div>
+							<button type="button" class="gallery-a__btn gallery-a__btn--prev" id="prevA" aria-label="前へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+							</button>
+							<button type="button" class="gallery-a__btn gallery-a__btn--next" id="nextA" aria-label="次へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+							</button>
+						</div>
+						<div class="gallery-a__bottom">
+							<div class="gallery-a__info">
+								<h3 class="gallery-a__title" id="titleA">{samplePhotos[0].title}</h3>
+								<p class="gallery-a__caption" id="captionA">{samplePhotos[0].caption}</p>
+							</div>
+							<div class="gallery-a__bars" id="barsA">
+								{samplePhotos.map((_, idx) => (
+									<button type="button" class={`gallery-a__bar ${idx === 0 ? 'is-active' : ''}`} data-bar={idx} aria-label={`写真 ${idx + 1}`}></button>
+								))}
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ============================================================== -->
+			<!-- パターンB: フィルムストリップ（サムネイル連動型） -->
+			<!-- ============================================================== -->
+			<section class="pattern-card" id="pattern-b">
+				<div class="pattern-meta">
+					<span class="pattern-tag">PATTERN B</span>
+					<h2 class="pattern-name">フィルムストリップ（サムネイル連動型）</h2>
+					<p class="pattern-desc">
+						メイン写真の下に、横一列の角型サムネイルを配置。クリックで瞬時に任意の写真へジャンプでき、全体の写真点数や構成を一目で把握できる機能美あふれるレイアウト。
+					</p>
+				</div>
+
+				<div class="pattern-demo">
+					<div class="gallery-b" id="galleryB">
+						<div class="gallery-b__viewport">
+							<div class="gallery-b__track" id="trackB">
+								{samplePhotos.map((p, idx) => (
+									<div class={`gallery-b__slide ${idx === 0 ? 'is-active' : ''}`} data-index={idx}>
+										<img src={p.src} alt={p.title} loading={idx === 0 ? 'eager' : 'lazy'} />
+										<span class="gallery-b__badge">{idx + 1} / {samplePhotos.length}</span>
+									</div>
+								))}
+							</div>
+							<button type="button" class="gallery-b__nav gallery-b__nav--prev" id="prevB" aria-label="前へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+							</button>
+							<button type="button" class="gallery-b__nav gallery-b__nav--next" id="nextB" aria-label="次へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+							</button>
+						</div>
+						<div class="gallery-b__info">
+							<h3 class="gallery-b__title" id="titleB">{samplePhotos[0].title}</h3>
+							<p class="gallery-b__caption" id="captionB">{samplePhotos[0].caption}</p>
+						</div>
+						<!-- 角型サムネイルバー -->
+						<div class="gallery-b__thumbs">
+							{samplePhotos.map((p, idx) => (
+								<button type="button" class={`gallery-b__thumb ${idx === 0 ? 'is-active' : ''}`} data-b-thumb={idx} aria-label={`写真 ${idx + 1}`}>
+									<img src={p.src} alt="" />
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ============================================================== -->
+			<!-- パターンC: 水平スナップ・カルーセル（左右チラ見えスライド） -->
+			<!-- ============================================================== -->
+			<section class="pattern-card" id="pattern-c">
+				<div class="pattern-meta">
+					<span class="pattern-tag">PATTERN C</span>
+					<h2 class="pattern-name">水平スナップ・カルーセル（連続スクロール型）</h2>
+					<p class="pattern-desc">
+						次の写真が右端にチラ見えすることで、自然に横へスクロールしたくなる現代的なUI。スマホのスワイプ操作やトラックパッドとの相性が抜群で、直感的な閲覧が可能です。
+					</p>
+				</div>
+
+				<div class="pattern-demo">
+					<div class="gallery-c" id="galleryC">
+						<div class="gallery-c__header">
+							<span class="gallery-c__counter" id="counterC">01 / 06</span>
+							<div class="gallery-c__controls">
+								<button type="button" class="gallery-c__btn" id="prevC" aria-label="前へ">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+								</button>
+								<button type="button" class="gallery-c__btn" id="nextC" aria-label="次へ">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+								</button>
+							</div>
+						</div>
+						<div class="gallery-c__track-wrap" id="scrollWrapC">
+							<div class="gallery-c__track">
+								{samplePhotos.map((p, idx) => (
+									<article class="gallery-c__item" data-c-item={idx}>
+										<div class="gallery-c__media">
+											<img src={p.src} alt={p.title} loading="lazy" />
+										</div>
+										<div class="gallery-c__content">
+											<h3 class="gallery-c__item-title">{p.title}</h3>
+											<p class="gallery-c__item-caption">{p.caption}</p>
+										</div>
+									</article>
+								))}
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ============================================================== -->
+			<!-- パターンD: 2カラム・スプリット（左右解説連動型） -->
+			<!-- ============================================================== -->
+			<section class="pattern-card" id="pattern-d">
+				<div class="pattern-meta">
+					<span class="pattern-tag">PATTERN D</span>
+					<h2 class="pattern-name">2カラム・スプリット（写真＋解説の左右分割型）</h2>
+					<p class="pattern-desc">
+						左側に大きな写真、右側に端正な解説テキストとコントロールを配置。美術館の展示解説のような知的なレイアウトで、長めの車両解説文もしっかり読ませることができます。
+					</p>
+				</div>
+
+				<div class="pattern-demo">
+					<div class="gallery-d" id="galleryD">
+						<div class="gallery-d__media-col">
+							<div class="gallery-d__img-frame">
+								<img src={samplePhotos[0].src} alt="" id="imgD" />
+							</div>
+						</div>
+						<div class="gallery-d__text-col">
+							<div class="gallery-d__header">
+								<span class="gallery-d__count" id="countD">01 / 06</span>
+							</div>
+							<div class="gallery-d__body">
+								<h3 class="gallery-d__title" id="titleD">{samplePhotos[0].title}</h3>
+								<p class="gallery-d__caption" id="captionD">{samplePhotos[0].caption}</p>
+							</div>
+							<div class="gallery-d__footer">
+								<button type="button" class="gallery-d__action" id="prevD">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+									<span>PREV</span>
+								</button>
+								<button type="button" class="gallery-d__action" id="nextD">
+									<span>NEXT</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ============================================================== -->
+			<!-- パターンE: タイルグリッド ＆ フルスクリーン拡大モーダル -->
+			<!-- ============================================================== -->
+			<section class="pattern-card" id="pattern-e">
+				<div class="pattern-meta">
+					<span class="pattern-tag">PATTERN E</span>
+					<h2 class="pattern-name">タイルグリッド ＆ フルスクリーン拡大（一覧＋没入鑑賞型）</h2>
+					<p class="pattern-desc">
+						ページ上には建築写真のように端正なグリッド（1大＋4小タイル）で静的に美しく並べ、写真をクリックすると黒背景のフルスクリーン拡大モーダルで高解像度写真を鑑賞できます。
+					</p>
+				</div>
+
+				<div class="pattern-demo">
+					<div class="gallery-e">
+						<div class="gallery-e__grid">
+							<div class="gallery-e__item gallery-e__item--large" data-e-open="0">
+								<img src={samplePhotos[0].src} alt={samplePhotos[0].title} />
+								<div class="gallery-e__overlay"><span>CLICK TO EXPAND</span></div>
+							</div>
+							<div class="gallery-e__item" data-e-open="1">
+								<img src={samplePhotos[1].src} alt={samplePhotos[1].title} />
+								<div class="gallery-e__overlay"><span>CLICK TO EXPAND</span></div>
+							</div>
+							<div class="gallery-e__item" data-e-open="2">
+								<img src={samplePhotos[2].src} alt={samplePhotos[2].title} />
+								<div class="gallery-e__overlay"><span>CLICK TO EXPAND</span></div>
+							</div>
+							<div class="gallery-e__item" data-e-open="3">
+								<img src={samplePhotos[3].src} alt={samplePhotos[3].title} />
+								<div class="gallery-e__overlay"><span>CLICK TO EXPAND</span></div>
+							</div>
+							<div class="gallery-e__item" data-e-open="4">
+								<img src={samplePhotos[4].src} alt={samplePhotos[4].title} />
+								<div class="gallery-e__overlay"><span>CLICK TO EXPAND</span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- パターンE用 全画面モーダル -->
+		<div class="modal-e" id="modalE" aria-hidden="true">
+			<div class="modal-e__backdrop" id="modalBackdropE"></div>
+			<div class="modal-e__content">
+				<button type="button" class="modal-e__close" id="modalCloseE" aria-label="閉じる">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+				</button>
+				<button type="button" class="modal-e__nav modal-e__nav--prev" id="modalPrevE" aria-label="前へ">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+				</button>
+				<button type="button" class="modal-e__nav modal-e__nav--next" id="modalNextE" aria-label="次へ">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+				</button>
+				<div class="modal-e__figure">
+					<img src="" alt="" id="modalImgE" />
+					<div class="modal-e__caption">
+						<span class="modal-e__count" id="modalCountE">01 / 06</span>
+						<h3 class="modal-e__title" id="modalTitleE"></h3>
+						<p class="modal-e__desc" id="modalDescE"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</NicoleLayout>
+
+<style>
+	/* ============================================================== */
+	/* 共通レイアウト ＆ モノトーンスタイル */
+	/* ============================================================== */
+	.preview-page {
+		background: #000000;
+		color: #ffffff;
+		min-height: 100vh;
+		padding-bottom: 120px;
+	}
+	.preview-container {
+		max-width: 1080px;
+		margin: 0 auto;
+		padding: 0 24px;
+	}
+	.preview-header {
+		padding: 80px 0 50px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: 60px;
+	}
+	.preview-eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		letter-spacing: 0.2em;
+		color: #9ca3af;
+		margin-bottom: 16px;
+	}
+	.preview-title {
+		font-size: 2.2rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		margin: 0 0 16px 0;
+	}
+	.preview-lead {
+		font-size: 1rem;
+		line-height: 1.8;
+		color: #9ca3af;
+		max-width: 760px;
+		margin: 0 0 32px 0;
+	}
+	.pattern-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+	.pattern-nav-link {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.78rem;
+		padding: 6px 14px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 0;
+		color: #ffffff;
+		text-decoration: none;
+		transition: background 0.2s, border-color 0.2s;
+	}
+	.pattern-nav-link:hover {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+	}
+
+	/* パターンカード */
+	.pattern-card {
+		background: #0a0a0a;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 0;
+		padding: 40px;
+		margin-bottom: 60px;
+	}
+	.pattern-meta {
+		margin-bottom: 32px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		padding-bottom: 24px;
+	}
+	.pattern-tag {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.12);
+		padding: 3px 8px;
+		border-radius: 0;
+		display: inline-block;
+		margin-bottom: 12px;
+	}
+	.pattern-name {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 10px 0;
+		letter-spacing: -0.01em;
+	}
+	.pattern-desc {
+		font-size: 0.92rem;
+		line-height: 1.7;
+		color: #9ca3af;
+		margin: 0;
+	}
+
+	/* ============================================================== */
+	/* PATTERN A: エディトリアル・ミニマル */
+	/* ============================================================== */
+	.gallery-a {
+		width: 100%;
+	}
+	.gallery-a__top {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 12px;
+	}
+	.gallery-a__counter {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.85rem;
+		color: #9ca3af;
+		letter-spacing: 0.08em;
+	}
+	.gallery-a__counter .a-cur {
+		color: #ffffff;
+		font-weight: 700;
+	}
+	.gallery-a__viewport {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		background: #000;
+		overflow: hidden;
+	}
+	.gallery-a__track {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.gallery-a__slide {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.4s ease;
+	}
+	.gallery-a__slide.is-active {
+		opacity: 1;
+		visibility: visible;
+	}
+	.gallery-a__slide img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.gallery-a__btn {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: transparent;
+		border: none;
+		color: #ffffff;
+		padding: 16px;
+		cursor: pointer;
+		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
+		transition: transform 0.2s ease, opacity 0.2s;
+		z-index: 5;
+	}
+	.gallery-a__btn:hover {
+		transform: translateY(-50%) scale(1.15);
+	}
+	.gallery-a__btn svg {
+		width: 32px;
+		height: 32px;
+	}
+	.gallery-a__btn--prev { left: 8px; }
+	.gallery-a__btn--next { right: 8px; }
+	.gallery-a__bottom {
+		margin-top: 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 20px;
+	}
+	.gallery-a__info {
+		flex: 1;
+	}
+	.gallery-a__title {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 6px 0;
+	}
+	.gallery-a__caption {
+		font-size: 0.88rem;
+		color: #9ca3af;
+		line-height: 1.6;
+		margin: 0;
+	}
+	.gallery-a__bars {
+		display: flex;
+		gap: 6px;
+		padding-top: 8px;
+	}
+	.gallery-a__bar {
+		width: 24px;
+		height: 2px;
+		background: rgba(255, 255, 255, 0.2);
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		border-radius: 0;
+		transition: background 0.2s ease;
+	}
+	.gallery-a__bar.is-active {
+		background: #ffffff;
+	}
+
+	/* ============================================================== */
+	/* PATTERN B: フィルムストリップ（サムネイル連動） */
+	/* ============================================================== */
+	.gallery-b {
+		width: 100%;
+	}
+	.gallery-b__viewport {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		background: #000;
+		overflow: hidden;
+	}
+	.gallery-b__track {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.gallery-b__slide {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.35s ease;
+	}
+	.gallery-b__slide.is-active {
+		opacity: 1;
+		visibility: visible;
+	}
+	.gallery-b__slide img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.gallery-b__badge {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		background: rgba(0, 0, 0, 0.8);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		border-radius: 0;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 3px 8px;
+		color: #ffffff;
+	}
+	.gallery-b__nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: transparent;
+		border: none;
+		color: #ffffff;
+		padding: 12px;
+		cursor: pointer;
+		filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9));
+		z-index: 5;
+	}
+	.gallery-b__nav svg { width: 30px; height: 30px; }
+	.gallery-b__nav--prev { left: 8px; }
+	.gallery-b__nav--next { right: 8px; }
+	.gallery-b__info {
+		padding: 14px 0 10px;
+	}
+	.gallery-b__title {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 4px 0;
+	}
+	.gallery-b__caption {
+		font-size: 0.88rem;
+		color: #9ca3af;
+		line-height: 1.6;
+		margin: 0;
+	}
+	.gallery-b__thumbs {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+		overflow-x: auto;
+		padding-bottom: 4px;
+	}
+	.gallery-b__thumb {
+		width: 76px;
+		height: 48px;
+		border: 1px solid transparent;
+		background: #000;
+		border-radius: 0;
+		padding: 0;
+		cursor: pointer;
+		opacity: 0.45;
+		flex-shrink: 0;
+		transition: opacity 0.2s, border-color 0.2s;
+	}
+	.gallery-b__thumb.is-active {
+		opacity: 1;
+		border-color: #ffffff;
+	}
+	.gallery-b__thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* ============================================================== */
+	/* PATTERN C: 水平スナップ・カルーセル */
+	/* ============================================================== */
+	.gallery-c {
+		width: 100%;
+	}
+	.gallery-c__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 14px;
+	}
+	.gallery-c__counter {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.85rem;
+		color: #9ca3af;
+		letter-spacing: 0.08em;
+	}
+	.gallery-c__controls {
+		display: flex;
+		gap: 6px;
+	}
+	.gallery-c__btn {
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 0;
+		color: #ffffff;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: background 0.2s, border-color 0.2s;
+	}
+	.gallery-c__btn:hover {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+	}
+	.gallery-c__btn svg { width: 18px; height: 18px; }
+	.gallery-c__track-wrap {
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		-webkit-overflow-scrolling: touch;
+		padding-bottom: 12px;
+	}
+	.gallery-c__track {
+		display: flex;
+		gap: 16px;
+	}
+	.gallery-c__item {
+		flex: 0 0 78%;
+		scroll-snap-align: start;
+		background: #111;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 0;
+	}
+	.gallery-c__media {
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+	}
+	.gallery-c__media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.gallery-c__content {
+		padding: 16px 20px;
+	}
+	.gallery-c__item-title {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 4px 0;
+	}
+	.gallery-c__item-caption {
+		font-size: 0.82rem;
+		color: #9ca3af;
+		line-height: 1.5;
+		margin: 0;
+	}
+
+	/* ============================================================== */
+	/* PATTERN D: 2カラム・スプリット */
+	/* ============================================================== */
+	.gallery-d {
+		display: grid;
+		grid-template-columns: 1.6fr 1fr;
+		gap: 32px;
+		background: #050505;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 24px;
+	}
+	@media (max-width: 860px) {
+		.gallery-d {
+			grid-template-columns: 1fr;
+		}
+	}
+	.gallery-d__media-col {
+		width: 100%;
+	}
+	.gallery-d__img-frame {
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		background: #000;
+		overflow: hidden;
+	}
+	.gallery-d__img-frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: opacity 0.3s ease;
+	}
+	.gallery-d__text-col {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 12px 0;
+	}
+	.gallery-d__count {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.82rem;
+		color: #9ca3af;
+		letter-spacing: 0.1em;
+	}
+	.gallery-d__title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 16px 0 10px 0;
+		line-height: 1.4;
+	}
+	.gallery-d__caption {
+		font-size: 0.92rem;
+		line-height: 1.7;
+		color: #9ca3af;
+		margin: 0;
+	}
+	.gallery-d__footer {
+		display: flex;
+		gap: 12px;
+		margin-top: 32px;
+		padding-top: 20px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.gallery-d__action {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		padding: 8px 16px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 0;
+		color: #ffffff;
+		cursor: pointer;
+		transition: background 0.2s, color 0.2s, border-color 0.2s;
+	}
+	.gallery-d__action:hover {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+	}
+	.gallery-d__action svg { width: 14px; height: 14px; }
+
+	/* ============================================================== */
+	/* PATTERN E: タイルグリッド ＆ モーダル */
+	/* ============================================================== */
+	.gallery-e__grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+	}
+	.gallery-e__item {
+		position: relative;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: #000;
+		cursor: pointer;
+	}
+	.gallery-e__item--large {
+		grid-column: span 2;
+		grid-row: span 2;
+		aspect-ratio: auto;
+		min-height: 240px;
+	}
+	.gallery-e__item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.3s ease;
+	}
+	.gallery-e__item:hover img {
+		transform: scale(1.04);
+	}
+	.gallery-e__overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.45);
+		opacity: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: opacity 0.2s ease;
+	}
+	.gallery-e__overlay span {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.72rem;
+		letter-spacing: 0.15em;
+		color: #ffffff;
+		border: 1px solid #ffffff;
+		padding: 6px 12px;
+	}
+	.gallery-e__item:hover .gallery-e__overlay {
+		opacity: 1;
+	}
+
+	/* モーダル */
+	.modal-e {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.25s, visibility 0.25s;
+	}
+	.modal-e.is-open {
+		opacity: 1;
+		visibility: visible;
+	}
+	.modal-e__backdrop {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.92);
+		backdrop-filter: blur(8px);
+	}
+	.modal-e__content {
+		position: relative;
+		z-index: 10;
+		max-width: 900px;
+		width: 90%;
+		max-height: 90vh;
+		display: flex;
+		flex-direction: column;
+	}
+	.modal-e__close {
+		position: absolute;
+		top: -48px;
+		right: 0;
+		background: transparent;
+		border: none;
+		color: #ffffff;
+		cursor: pointer;
+		padding: 8px;
+	}
+	.modal-e__close svg { width: 28px; height: 28px; }
+	.modal-e__nav {
+		position: absolute;
+		top: 40%;
+		transform: translateY(-50%);
+		background: transparent;
+		border: none;
+		color: #ffffff;
+		padding: 16px;
+		cursor: pointer;
+		z-index: 20;
+	}
+	.modal-e__nav svg { width: 36px; height: 36px; }
+	.modal-e__nav--prev { left: -60px; }
+	.modal-e__nav--next { right: -60px; }
+	@media (max-width: 1024px) {
+		.modal-e__nav--prev { left: 8px; }
+		.modal-e__nav--next { right: 8px; }
+	}
+	.modal-e__figure {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+	.modal-e__figure img {
+		width: 100%;
+		max-height: 65vh;
+		object-fit: contain;
+		background: #000;
+	}
+	.modal-e__caption {
+		padding: 16px 0;
+	}
+	.modal-e__count {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.78rem;
+		color: #9ca3af;
+	}
+	.modal-e__title {
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 6px 0 4px 0;
+	}
+	.modal-e__desc {
+		font-size: 0.88rem;
+		color: #9ca3af;
+		margin: 0;
+	}
+</style>
+
+<script define:vars={{ samplePhotos }}>
+	// -------------------------------------------------------------
+	// PATTERN A: エディトリアル・ミニマル
+	// -------------------------------------------------------------
+	let curA = 0;
+	const slidesA = document.querySelectorAll('.gallery-a__slide');
+	const barsA = document.querySelectorAll('.gallery-a__bar');
+	const titleA = document.getElementById('titleA');
+	const captionA = document.getElementById('captionA');
+	const curNumA = document.querySelector('.gallery-a__counter .a-cur');
+
+	function updateA(index) {
+		curA = (index + samplePhotos.length) % samplePhotos.length;
+		slidesA.forEach((s, idx) => s.classList.toggle('is-active', idx === curA));
+		barsA.forEach((b, idx) => b.classList.toggle('is-active', idx === curA));
+		if (titleA) titleA.textContent = samplePhotos[curA].title;
+		if (captionA) captionA.textContent = samplePhotos[curA].caption;
+		if (curNumA) curNumA.textContent = String(curA + 1).padStart(2, '0');
+	}
+	document.getElementById('prevA')?.addEventListener('click', () => updateA(curA - 1));
+	document.getElementById('nextA')?.addEventListener('click', () => updateA(curA + 1));
+	barsA.forEach((bar, idx) => bar.addEventListener('click', () => updateA(idx)));
+
+	// -------------------------------------------------------------
+	// PATTERN B: フィルムストリップ
+	// -------------------------------------------------------------
+	let curB = 0;
+	const slidesB = document.querySelectorAll('.gallery-b__slide');
+	const thumbsB = document.querySelectorAll('.gallery-b__thumb');
+	const titleB = document.getElementById('titleB');
+	const captionB = document.getElementById('captionB');
+
+	function updateB(index) {
+		curB = (index + samplePhotos.length) % samplePhotos.length;
+		slidesB.forEach((s, idx) => s.classList.toggle('is-active', idx === curB));
+		thumbsB.forEach((t, idx) => t.classList.toggle('is-active', idx === curB));
+		if (titleB) titleB.textContent = samplePhotos[curB].title;
+		if (captionB) captionB.textContent = samplePhotos[curB].caption;
+	}
+	document.getElementById('prevB')?.addEventListener('click', () => updateB(curB - 1));
+	document.getElementById('nextB')?.addEventListener('click', () => updateB(curB + 1));
+	thumbsB.forEach((t, idx) => t.addEventListener('click', () => updateB(idx)));
+
+	// -------------------------------------------------------------
+	// PATTERN C: 水平スナップ
+	// -------------------------------------------------------------
+	const scrollWrapC = document.getElementById('scrollWrapC');
+	const itemsC = document.querySelectorAll('.gallery-c__item');
+	const counterC = document.getElementById('counterC');
+
+	function updateCounterC() {
+		if (!scrollWrapC) return;
+		const scrollLeft = scrollWrapC.scrollLeft;
+		const itemWidth = itemsC[0]?.offsetWidth || 300;
+		const idx = Math.round(scrollLeft / (itemWidth + 16));
+		if (counterC) counterC.textContent = `${String(idx + 1).padStart(2, '0')} / 06`;
+	}
+	scrollWrapC?.addEventListener('scroll', updateCounterC);
+	document.getElementById('prevC')?.addEventListener('click', () => {
+		const itemWidth = itemsC[0]?.offsetWidth || 300;
+		scrollWrapC?.scrollBy({ left: -(itemWidth + 16), behavior: 'smooth' });
+	});
+	document.getElementById('nextC')?.addEventListener('click', () => {
+		const itemWidth = itemsC[0]?.offsetWidth || 300;
+		scrollWrapC?.scrollBy({ left: itemWidth + 16, behavior: 'smooth' });
+	});
+
+	// -------------------------------------------------------------
+	// PATTERN D: 2カラム・スプリット
+	// -------------------------------------------------------------
+	let curD = 0;
+	const imgD = document.getElementById('imgD');
+	const countD = document.getElementById('countD');
+	const titleD = document.getElementById('titleD');
+	const captionD = document.getElementById('captionD');
+
+	function updateD(index) {
+		curD = (index + samplePhotos.length) % samplePhotos.length;
+		if (imgD) {
+			imgD.style.opacity = '0';
+			setTimeout(() => {
+				imgD.src = samplePhotos[curD].src;
+				imgD.style.opacity = '1';
+			}, 150);
+		}
+		if (countD) countD.textContent = `${String(curD + 1).padStart(2, '0')} / 06`;
+		if (titleD) titleD.textContent = samplePhotos[curD].title;
+		if (captionD) captionD.textContent = samplePhotos[curD].caption;
+	}
+	document.getElementById('prevD')?.addEventListener('click', () => updateD(curD - 1));
+	document.getElementById('nextD')?.addEventListener('click', () => updateD(curD + 1));
+
+	// -------------------------------------------------------------
+	// PATTERN E: タイルグリッド ＆ モーダル
+	// -------------------------------------------------------------
+	let curE = 0;
+	const modalE = document.getElementById('modalE');
+	const modalImgE = document.getElementById('modalImgE');
+	const modalCountE = document.getElementById('modalCountE');
+	const modalTitleE = document.getElementById('modalTitleE');
+	const modalDescE = document.getElementById('modalDescE');
+
+	function openModalE(index) {
+		curE = index;
+		updateModalE();
+		modalE?.classList.add('is-open');
+		modalE?.setAttribute('aria-hidden', 'false');
+	}
+	function closeModalE() {
+		modalE?.classList.remove('is-open');
+		modalE?.setAttribute('aria-hidden', 'true');
+	}
+	function updateModalE() {
+		if (modalImgE) modalImgE.src = samplePhotos[curE].src;
+		if (modalCountE) modalCountE.textContent = `${String(curE + 1).padStart(2, '0')} / 06`;
+		if (modalTitleE) modalTitleE.textContent = samplePhotos[curE].title;
+		if (modalDescE) modalDescE.textContent = samplePhotos[curE].caption;
+	}
+	document.querySelectorAll('[data-e-open]').forEach((item) => {
+		item.addEventListener('click', () => {
+			const idx = parseInt(item.getAttribute('data-e-open') || '0', 10);
+			openModalE(idx);
+		});
+	});
+	document.getElementById('modalCloseE')?.addEventListener('click', closeModalE);
+	document.getElementById('modalBackdropE')?.addEventListener('click', closeModalE);
+	document.getElementById('modalPrevE')?.addEventListener('click', () => {
+		curE = (curE - 1 + samplePhotos.length) % samplePhotos.length;
+		updateModalE();
+	});
+	document.getElementById('modalNextE')?.addEventListener('click', () => {
+		curE = (curE + 1) % samplePhotos.length;
+		updateModalE();
+	});
+</script>
