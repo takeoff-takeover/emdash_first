@@ -43,6 +43,10 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 - **Color policy rule**: デザインは徹底して「黒・白・グレー（モノトーン）」を基調とし、無駄な多色使いを禁ずる。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトなど「ここぞという時」にのみ限定して使用する。日常的なテキストや通常の装飾に赤色を乱用しない。
 - **Gallery format rule**: ギャラリーには「PHOTO GALLERY」「全○点」などの冗長な見出しや宣伝ラベル、キャプション先頭の「【エクステリア】」などの不要なテキストを入れない。写真、番号カウント、シンプルな説明文のみでミニマルに表示する。
+- **Handover & Wrap-up rule**: ユーザーから「引き継ぎ」「まとめて」などの指示があった際は、以下の3点を必ずワンストップで一括実行すること：
+  1. **引き継ぎ書の作成（アーティファクト）**: 当日完了した内容、積み残しタスクの背景・原因、次回の具体的作業手順を網羅した引き継ぎ書を作成する。
+  2. **GitHubへのアップロード**: 作業ツリーを整理し、最新の変更を `git commit & push origin main` する。
+  3. **Cloudflareへのアップロード**: `npx astro build && npx wrangler deploy` を実行し、本番環境を最新状態に更新する。
 
 ## This Template
 
