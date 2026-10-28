@@ -226,10 +226,26 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 	.filmstrip-thumbs {
 		display: flex;
 		gap: 8px;
-		margin-top: 8px;
+		margin-top: 10px;
 		overflow-x: auto;
-		padding-bottom: 4px;
+		overflow-y: hidden !important;
+		padding: 2px 0 6px 0;
 		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.filmstrip-thumbs::-webkit-scrollbar {
+		height: 4px;
+		display: block;
+	}
+
+	.filmstrip-thumbs::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.filmstrip-thumbs::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.25);
 	}
 
 	.filmstrip-thumb {

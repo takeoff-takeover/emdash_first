@@ -2,7 +2,10 @@
 /**
  * AccordionBlock.astro
  * EmDash Portable Text カスタムブロック：アコーディオン（ミニマル・ヘアライン型）
- * 背景なし・極細線ヘアライン・ミニマルな「＋ / −」アイコン・ゆったりとした余白
+ * - 背景なし・極細線ヘアライン・ミニマルな「＋ / −」アイコン
+ * - 連続配置時は上下の境界線を自動で1本に統合
+ * - FAQ（Q&A形式）は専用の大型文字＆洗練レイアウトでレンダリング（右端切れ完全解消）
+ * - スペック諸元表は右端が切れないレスポンシブ・セーフ設計
  */
 interface Props {
 	node: {
@@ -24,8 +27,61 @@ const lines = contentRaw
 	.map((l: string) => l.trim())
 	.filter((l: string) => l.length > 0);
 
-// 「：」「:」「|」で区切られたキー・バリュー形式が含まれているかを判定
-const isTableFormat = lines.length > 0 && lines.every((l: string) => l.includes(":") || l.includes("：") || l.includes("|"));
+// Q&A形式（Q1:, A1:, Q:, A: 等）が含まれているかを判定
+const isQAFormat = lines.some((l: string) => /^Q\d*[:：]/i.test(l));
+
+// QAアイテムのパース
+interface QAItem {
+	qNum: string;
+	question: string;
+	aNum: string;
+	answer: string;
+}
+
+const qaItems: QAItem[] = [];
+if (isQAFormat) {
+	let currentQ = { num: "", text: "" };
+	let currentA = { num: "", text: "" };
+
+	for (const line of lines) {
+		const qMatch = line.match(/^Q(\d*)[:：]\s*(.*)$/i);
+		const aMatch = line.match(/^A(\d*)[:：]\s*(.*)$/i);
+
+		if (qMatch) {
+			if (currentQ.text) {
+				qaItems.push({
+					qNum: currentQ.num ? `Q${currentQ.num}.` : "Q.",
+					question: currentQ.text,
+					aNum: currentA.num ? `A${currentA.num}.` : "A.",
+					answer: currentA.text
+				});
+				currentQ = { num: "", text: "" };
+				currentA = { num: "", text: "" };
+			}
+			currentQ = { num: qMatch[1], text: qMatch[2] };
+		} else if (aMatch) {
+			currentA = { num: aMatch[1], text: aMatch[2] };
+		} else {
+			// 複数行にわたる回答の追記
+			if (currentA.text) {
+				currentA.text += "\n" + line;
+			} else if (currentQ.text) {
+				currentQ.text += " " + line;
+			}
+		}
+	}
+	if (currentQ.text) {
+		qaItems.push({
+			qNum: currentQ.num ? `Q${currentQ.num}.` : "Q.",
+			question: currentQ.text,
+			aNum: currentA.num ? `A${currentA.num}.` : "A.",
+			answer: currentA.text
+		});
+	}
+}
+
+// キー・バリュー形式（諸元スペック表）の判定（※QA形式でない場合）
+const isTableFormat = !isQAFormat && lines.length > 0 && lines.every((l: string) => l.includes(":") || l.includes("：") || l.includes("|"));
 
 const tableRows = isTableFormat
 	? lines.map((l: string) => {
@@ -54,17 +110,38 @@ const tableRows = isTableFormat
 	</summary>
 
 	<div class="cms-acc-body">
-		{isTableFormat && tableRows.length > 0 ? (
-			<table class="cms-acc-table">
-				<tbody>
-					{tableRows.map((row) => (
-						<tr>
-							<th>{row.key}</th>
-							<td>{row.val}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+		{isQAFormat && qaItems.length > 0 ? (
+			<div class="cms-acc-qa-list">
+				{qaItems.map((item) => (
+					<div class="cms-qa-item">
+						<div class="cms-qa-question-row">
+							<span class="cms-qa-label cms-qa-label--q">{item.qNum}</span>
+							<h4 class="cms-qa-question-text">{item.question}</h4>
+						</div>
+						<div class="cms-qa-answer-row">
+							<span class="cms-qa-label cms-qa-label--a">{item.aNum}</span>
+							<div class="cms-qa-answer-text">
+								{item.answer.split("\n").map((p: string) => (
+									<p>{p}</p>
+								))}
+							</div>
+						</div>
+					</div>
+				))}
+			</div>
+		) : isTableFormat && tableRows.length > 0 ? (
+			<div class="cms-acc-table-scroll">
+				<table class="cms-acc-table">
+					<tbody>
+						{tableRows.map((row) => (
+							<tr>
+								<th>{row.key}</th>
+								<td>{row.val}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
 		) : (
 			<div class="cms-acc-text">
 				{lines.map((p: string) => (
@@ -77,7 +154,7 @@ const tableRows = isTableFormat
 
 <style>
 	.cms-accordion-block.acc-minimal-hairline {
-		margin: 2rem 0;
+		margin: 0;
 		background: transparent;
 		border: none;
 		border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -87,9 +164,27 @@ const tableRows = isTableFormat
 		transition: border-color 0.25s ease;
 	}
 
+	/* アコーディオンが連続する場合は、上下の境界線を1本にする（上ボーダーを相殺） */
+	.cms-accordion-block.acc-minimal-hairline + .cms-accordion-block.acc-minimal-hairline,
+	:global(.cms-accordion-block.acc-minimal-hairline + .cms-accordion-block.acc-minimal-hairline) {
+		border-top: none !important;
+		margin-top: 0 !important;
+	}
+
+	/* 単体または連続ブロック全体の上下余白 */
+	:global(.article-rich-text .cms-accordion-block.acc-minimal-hairline:first-of-type),
+	.cms-accordion-block.acc-minimal-hairline:first-of-type {
+		margin-top: 2.5rem;
+	}
+
+	:global(.article-rich-text .cms-accordion-block.acc-minimal-hairline:last-of-type),
+	.cms-accordion-block.acc-minimal-hairline:last-of-type {
+		margin-bottom: 3rem;
+	}
+
 	.cms-accordion-block.acc-minimal-hairline:hover {
-		border-top-color: rgba(255, 255, 255, 0.22);
-		border-bottom-color: rgba(255, 255, 255, 0.22);
+		border-top-color: rgba(255, 255, 255, 0.25);
+		border-bottom-color: rgba(255, 255, 255, 0.25);
 	}
 
 	.cms-accordion-block.acc-minimal-hairline[open] {
@@ -134,7 +229,7 @@ const tableRows = isTableFormat
 		width: 24px;
 		height: 24px;
 		flex-shrink: 0;
-		transition: color 0.2s ease, transform 0.2s ease;
+		transition: color 0.2s ease;
 	}
 
 	.acc-toggle-icon svg {
@@ -157,16 +252,126 @@ const tableRows = isTableFormat
 	}
 
 	.cms-acc-body {
-		padding: 0.5rem 0 1.75rem 0;
+		padding: 0.5rem 0 2rem 0;
 		background: transparent;
 	}
 
-	/* アコーディオン内テーブル：文字と線が近すぎないゆったりとした美しい余白 */
+	/* ==============================================================
+	   FAQ専用レイアウト（Q1, A1の大型強調 ＆ 右端切れの完全解消）
+	   ============================================================== */
+	.cms-acc-qa-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.cms-qa-item {
+		padding: 1.5rem 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+		box-sizing: border-box;
+		width: 100%;
+	}
+
+	.cms-qa-item:first-child {
+		padding-top: 0.75rem;
+	}
+
+	.cms-qa-item:last-child {
+		border-bottom: none;
+		padding-bottom: 0.5rem;
+	}
+
+	.cms-qa-question-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.cms-qa-answer-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	/* Q1. / A1. の大型強調ラベル */
+	.cms-qa-label {
+		font-family: var(--font-mono, monospace);
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		flex-shrink: 0;
+		display: inline-block;
+		line-height: 1.4;
+	}
+
+	.cms-qa-label--q {
+		font-size: 1.25rem; /* 大きな文字 */
+		color: #ffffff;
+		min-width: 42px;
+	}
+
+	.cms-qa-label--a {
+		font-size: 1.15rem; /* 大きな文字 */
+		color: #a1a1aa;
+		min-width: 42px;
+	}
+
+	/* 質問文 */
+	.cms-qa-question-text {
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #ffffff;
+		line-height: 1.5;
+		margin: 0;
+		letter-spacing: -0.01em;
+		flex-grow: 1;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	/* 回答文 */
+	.cms-qa-answer-text {
+		flex-grow: 1;
+		font-size: 0.9375rem;
+		color: #d4d4d8;
+		line-height: 1.8;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	.cms-qa-answer-text p {
+		margin: 0 0 0.85rem;
+	}
+
+	.cms-qa-answer-text p:last-child {
+		margin-bottom: 0;
+	}
+
+	/* ==============================================================
+	   スペック諸元表（テーブル）
+	   ============================================================== */
+	.cms-acc-table-scroll {
+		width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		box-sizing: border-box;
+	}
+
 	.cms-acc-table {
 		width: 100%;
 		border-collapse: collapse;
 		margin: 0.5rem 0 0;
 		font-size: 0.875rem;
+		table-layout: auto;
+		box-sizing: border-box;
 	}
 
 	.cms-acc-table tr {
@@ -178,7 +383,7 @@ const tableRows = isTableFormat
 	}
 
 	.cms-acc-table th {
-		width: 32%;
+		width: 28%;
 		padding: 1.1rem 1.5rem 1.1rem 0;
 		text-align: left;
 		font-weight: 600;
@@ -187,6 +392,7 @@ const tableRows = isTableFormat
 		vertical-align: top;
 		line-height: 1.6;
 		letter-spacing: 0.02em;
+		word-break: break-word;
 	}
 
 	.cms-acc-table td {
@@ -194,6 +400,7 @@ const tableRows = isTableFormat
 		color: #f4f4f5;
 		line-height: 1.65;
 		font-size: 0.9rem;
+		word-break: break-word;
 	}
 
 	.cms-acc-text p {
@@ -205,5 +412,26 @@ const tableRows = isTableFormat
 
 	.cms-acc-text p:last-child {
 		margin-bottom: 0;
+	}
+
+	@media (max-width: 640px) {
+		.cms-qa-label--q {
+			font-size: 1.15rem;
+			min-width: 36px;
+		}
+		.cms-qa-label--a {
+			font-size: 1.05rem;
+			min-width: 36px;
+		}
+		.cms-qa-question-text {
+			font-size: 0.98rem;
+		}
+		.cms-qa-answer-text {
+			font-size: 0.88rem;
+		}
+		.cms-acc-table th {
+			width: 36%;
+			padding-right: 1rem;
+		}
 	}
 </style>

@@ -346,3 +346,13 @@ table.cms-table {
 .prose table tbody tr:last-child td {
 	border-bottom: none !important;
 }
+
+/* ==============================================================
+   Nicole Group Accordion Connected Borders (連続時は境界線を1本に)
+   ============================================================== */
+.cms-accordion-block + .cms-accordion-block,
+.prose .cms-accordion-block + .cms-accordion-block,
+.article-rich-text .cms-accordion-block + .cms-accordion-block {
+	border-top: none !important;
+	margin-top: 0 !important;
+}
