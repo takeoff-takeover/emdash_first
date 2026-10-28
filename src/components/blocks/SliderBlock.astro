@@ -117,17 +117,18 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 	}
 	.slider-counter {
 		font-family: var(--font-mono, monospace);
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: #94a3b8;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		padding: 0.25rem 0.65rem;
-		border-radius: 9999px;
-		letter-spacing: 0.05em;
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: #9ca3af;
+		background: transparent;
+		border: none;
+		padding: 0;
+		border-radius: 0;
+		letter-spacing: 0.08em;
 	}
 	.counter-current {
-		color: #38bdf8;
+		color: #ffffff;
+		font-weight: 700;
 	}
 	.slider-badge {
 		display: inline-flex;
@@ -136,10 +137,10 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		font-family: var(--font-mono, monospace);
 		font-size: 0.72rem;
 		letter-spacing: 0.12em;
-		color: #3b82f6;
-		background: rgba(59, 130, 246, 0.12);
-		padding: 0.25rem 0.65rem;
-		border-radius: 9999px;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.08);
+		padding: 0.25rem 0.5rem;
+		border-radius: 0;
 		font-weight: 600;
 	}
 	.badge-icon {
@@ -242,17 +243,18 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		background: transparent;
 	}
 	.dot-btn {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.2);
+		width: 24px;
+		height: 2px;
+		border-radius: 0;
+		background: rgba(255, 255, 255, 0.25);
 		border: none;
 		cursor: pointer;
-		transition: all 0.2s;
+		padding: 0;
+		transition: background 0.2s ease;
 	}
 	.dot-btn.active {
-		background: #3b82f6;
-		transform: scale(1.3);
+		background: #ffffff;
+		transform: none;
 	}
 </style>
 
