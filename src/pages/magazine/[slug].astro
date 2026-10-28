@@ -1599,7 +1599,7 @@ const editUrl = postDbId
 
 	.article-header-container {
 		width: 100%;
-		max-width: 1400px;
+		max-width: 1440px;
 		margin: 0 auto;
 		padding: 0 40px;
 		box-sizing: border-box;
@@ -1852,7 +1852,7 @@ const editUrl = postDbId
 
 	.article-two-col-layout {
 		width: 100%;
-		max-width: 1400px;
+		max-width: 1440px;
 		margin: 0 auto;
 		padding: 0 40px;
 		display: grid;
@@ -1864,7 +1864,7 @@ const editUrl = postDbId
 
 	.article-main-col {
 		width: 100%;
-		max-width: 860px;
+		max-width: 100%;
 		min-width: 0;
 	}
 
@@ -2013,11 +2013,6 @@ const editUrl = postDbId
 	}
 
 	@media (max-width: 1080px) {
-		.article-header-container,
-		.article-two-col-layout {
-			padding: 0 24px;
-		}
-
 		.article-two-col-layout {
 			grid-template-columns: 1fr;
 			gap: 50px;
@@ -2029,6 +2024,13 @@ const editUrl = postDbId
 
 		.sidebar-sticky-panel {
 			position: static;
+		}
+	}
+
+	@media (max-width: 1024px) {
+		.article-header-container,
+		.article-two-col-layout {
+			padding: 0 24px;
 		}
 	}
 
