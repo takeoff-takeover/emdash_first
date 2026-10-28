@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <!-- Monotone Palette -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0c"/>
+      <stop offset="60%" stop-color="#141418"/>
+      <stop offset="100%" stop-color="#08080a"/>
+    </linearGradient>
+    <radialGradient id="meshGrad" cx="65%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.01"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="subtleLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="url(#bgGrad)"/>
+  <rect width="1600" height="900" fill="url(#meshGrad)"/>
+  <rect width="1600" height="900" fill="url(#grid)"/>
+
+  <!-- Minimal Frame Border -->
+  <rect x="30" y="30" width="1540" height="840" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Counter Indicator (Top Right) - Minimal format -->
+  <g transform="translate(1440, 70)">
+    <text x="0" y="0" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="600" letter-spacing="2">4 / 15</text>
+  </g>
+
+  <!-- Technical Wireframe Silhouette Graphic -->
+  <g transform="translate(680, 200)" opacity="0.75">
+    <!-- Fastback Silhouette (iX4 Coupe) -->
+    <path d="M 40 420 C 140 400, 240 370, 380 270 C 520 170, 680 180, 800 240 L 860 300 C 820 330, 780 370, 770 410 L 40 420 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+    <path d="M 180 390 C 280 330, 390 260, 500 240 C 620 220, 710 240, 780 290" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="6,4"/>
+    <!-- Iconic Glow Kidney contours -->
+    <rect x="50" y="375" width="120" height="35" rx="6" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.85"/>
+    <rect x="55" y="380" width="110" height="25" rx="4" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+    <!-- Wheels -->
+    <circle cx="200" cy="420" r="72" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <circle cx="200" cy="420" r="54" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="6,4"/>
+    <circle cx="700" cy="420" r="72" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+    <circle cx="700" cy="420" r="54" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="6,4"/>
+  </g>
+
+  <!-- Editorial Info & Typography -->
+  <g transform="translate(80, 110)">
+    <!-- Main Subject Title -->
+    <text x="0" y="80" fill="#FFFFFF" font-family="'Inter', -apple-system, sans-serif" font-size="44" font-weight="700" letter-spacing="-0.5">Aerodynamic Efficiency (Cd 0.23)</text>
+    
+    <!-- Subtitle / Caption -->
+    <text x="0" y="130" fill="#A0A0AA" font-family="'Inter', -apple-system, sans-serif" font-size="19" font-weight="400" letter-spacing="0.2">自動格納式フラッシュドアハンドルと整流エアカーテンによるクラストップの空力性能</text>
+
+    <!-- Hairline Separator -->
+    <line x1="0" y1="170" x2="300" y2="170" stroke="url(#subtleLine)" stroke-width="1.5"/>
+  </g>
+
+  <!-- Feature Details (Specs / Description) -->
+  
+    <g transform="translate(80, 520)">
+      <rect x="0" y="0" width="6" height="6" fill="#A0A0AA" rx="1"/>
+      <text x="20" y="7" fill="#D4D4D8" font-family="'JetBrains Mono', 'Inter', monospace" font-size="13" font-weight="500" letter-spacing="1.5">FLUSH AUTOMATIC DOOR HANDLES REDUCING TURBULENCE</text>
+    </g>
+  
+    <g transform="translate(80, 556)">
+      <rect x="0" y="0" width="6" height="6" fill="#A0A0AA" rx="1"/>
+      <text x="20" y="7" fill="#D4D4D8" font-family="'JetBrains Mono', 'Inter', monospace" font-size="13" font-weight="500" letter-spacing="1.5">ACTIVE AIR FLAPS AND UNDERBODY FLAT PANEL ENCLOSURE</text>
+    </g>
+  
+    <g transform="translate(80, 592)">
+      <rect x="0" y="0" width="6" height="6" fill="#A0A0AA" rx="1"/>
+      <text x="20" y="7" fill="#D4D4D8" font-family="'JetBrains Mono', 'Inter', monospace" font-size="13" font-weight="500" letter-spacing="1.5">Cd VALUE OF 0.23 OPTIMIZING LONG-DISTANCE HIGHWAY EFFICIENCY</text>
+    </g>
+  
+
+  <!-- Footer Branding (Minimal Monotone) -->
+  <g transform="translate(80, 835)">
+    <text x="0" y="0" fill="#52525B" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500" letter-spacing="2">BMW GROUP PRESSCLUB OFFICIAL RELEASE // NEUE KLASSE ARCHITECTURE</text>
+  </g>
+</svg>
