@@ -269,12 +269,41 @@ function extractLead(p: any): string {
 	return "";
 }
 
+// アイキャッチ画像のURL解決ヘルパー（EmDash R2ストレージ key, オブジェクト, JSON文字列, 外部URLのすべてに対応）
+function resolveMediaUrl(img: unknown, fallback: string = ""): string {
+	if (!img) return fallback;
+	let target: any = img;
+	if (typeof target === "string") {
+		const trimmed = target.trim();
+		if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+			try {
+				target = JSON.parse(trimmed);
+			} catch {
+				return trimmed;
+			}
+		} else {
+			return trimmed || fallback;
+		}
+	}
+	if (typeof target === "object" && target !== null) {
+		if (typeof target.src === "string" && target.src.trim()) {
+			return target.src.trim();
+		}
+		const storageKey = target.meta?.storageKey || target.storageKey || target.id;
+		if (storageKey) {
+			return `/_emdash/api/media/file/${storageKey}`;
+		}
+	}
+	return fallback;
+}
+
 // CMS記事がある場合は統合
 const cmsArticles = (cmsPosts || []).map((p: any) => {
 	const featImg = p.data.featured_image;
-	const imgUrl = typeof featImg === "object" && featImg !== null && "src" in featImg
-		? featImg.src
-		: (typeof featImg === "string" ? featImg : "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg");
+	const imgUrl = resolveMediaUrl(
+		featImg,
+		"https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
+	);
 
 	return {
 		id: p.id || p.data.id,
@@ -291,10 +320,10 @@ const cmsArticles = (cmsPosts || []).map((p: any) => {
 	};
 });
 
-// 全記事リスト（重複排除）
+// 全記事リスト（CMS記事を最優先し、CMSにない記事のみ静的フォールバックから補充）
 const allArticles = [
-	...cmsArticles.filter(ca => !staticArticles.some(sa => sa.slug === ca.slug)),
-	...staticArticles
+	...cmsArticles,
+	...staticArticles.filter(sa => !cmsArticles.some(ca => ca.slug === sa.slug || ca.id === sa.id))
 ];
 
 // ESG / SDGs 記事判定ヘルパー

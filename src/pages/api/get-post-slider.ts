@@ -47,8 +47,11 @@ export const GET: APIRoute = async ({ url }) => {
 			if (typeof feat === "string") {
 				try { feat = JSON.parse(feat); } catch (e) {}
 			}
-			if (feat && typeof feat === "object" && feat.src) {
-				photos.push({ image: feat.src, caption: row.title || "メイン写真" });
+			if (feat && typeof feat === "object") {
+				const src = feat.src || (feat.meta?.storageKey ? `/_emdash/api/media/file/${feat.meta.storageKey}` : (feat.id ? `/_emdash/api/media/file/${feat.id}` : ""));
+				if (src) {
+					photos.push({ image: src, caption: row.title || "メイン写真" });
+				}
 			}
 		}
 
