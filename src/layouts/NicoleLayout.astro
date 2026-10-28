@@ -56,21 +56,6 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<!-- Core scripts in head (Self-hosted) -->
 	<script is:inline src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
 	<script is:inline src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
-	<!-- Day/Night Mode Preload Script -->
-	<script is:inline>
-		(function() {
-			try {
-				const saved = localStorage.getItem('nicole-theme');
-				if (saved === 'light') {
-					document.documentElement.classList.add('theme-light');
-					document.documentElement.classList.remove('theme-dark');
-				} else {
-					document.documentElement.classList.add('theme-dark');
-					document.documentElement.classList.remove('theme-light');
-				}
-			} catch(e) {}
-		})();
-	</script>
 	<slot name="head" />
 </head>
 
