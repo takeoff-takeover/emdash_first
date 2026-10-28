@@ -369,25 +369,32 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 
 
 
-			<!-- 表紙コンテンツ（Apple風の大胆かつ洗練されたタイポグラフィ） -->
+			<!-- 表紙コンテンツ -->
 			<div class="apple-hero__content">
 				<div class="mag-container apple-hero__container">
-					<!-- センター：目玉記事の超巨大ヘッドライン ＆ コピー -->
-					<div class="apple-hero__center">
-						<h1 class="apple-hero__title">
+					<!-- 1. 左上固定：マガジンマストヘッド（どの記事でも固定） -->
+					<div class="hero-masthead">
+						<h1 class="hero-masthead__brand">Nicole Connect</h1>
+						<p class="hero-masthead__tagline">A web magazine curating the world of Nicole Group</p>
+					</div>
+
+					<!-- 2. 画面左側に並ぶ最新記事情報（文字サイズ縮小・エディトリアル左揃え） -->
+					<div class="hero-featured-story">
+						<span class="hero-story-eyebrow">COVER STORY / LATEST ISSUE</span>
+						<h2 class="hero-story-title">
 							{coverArticle.id === "2027_new_bmw_ix4_neue_klasse" || coverArticle.slug === "2027_new_bmw_ix4_neue_klasse" 
 								? "THE ALL-NEW BMW iX4." 
 								: coverArticle.title}
-						</h1>
+						</h2>
 
-						<p class="apple-hero__lead">
+						<p class="hero-story-lead">
 							{coverArticle.id === "2027_new_bmw_ix4_neue_klasse" || coverArticle.slug === "2027_new_bmw_ix4_neue_klasse"
 								? "【世界初公開】BMWノイエ・クラッセ初の完全電動スポーツ・アクティビティ・クーペ。流麗なファストバック造形、最高出力612馬力のM60 xDrive、そして航続828kmが切り拓く新時代。"
 								: coverArticle.lead}
 						</p>
 
-						<!-- Apple風の洗練されたアクションボタン群 -->
-						<div class="apple-hero__actions">
+						<!-- 左寄せのアクションボタン -->
+						<div class="hero-story-actions">
 							<a href={coverArticle.url} class="apple-cta-btn apple-cta-btn--secondary">
 								<span>記事を読む</span>
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -890,10 +897,10 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		height: 100%;
 		background: linear-gradient(
 			180deg, 
-			rgba(4, 5, 7, 0.82) 0%, 
-			rgba(4, 5, 7, 0.15) 30%, 
-			rgba(4, 5, 7, 0.25) 55%, 
-			rgba(4, 5, 7, 0.95) 100%
+			rgba(4, 5, 7, 0.88) 0%, 
+			rgba(4, 5, 7, 0.25) 35%, 
+			rgba(4, 5, 7, 0.4) 65%, 
+			rgba(4, 5, 7, 0.98) 100%
 		);
 	}
 
@@ -903,7 +910,12 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(4, 5, 7, 0.6) 100%);
+		background: linear-gradient(
+			90deg, 
+			rgba(4, 5, 7, 0.75) 0%, 
+			rgba(4, 5, 7, 0.35) 45%, 
+			transparent 100%
+		);
 	}
 
 
@@ -912,49 +924,94 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		position: relative;
 		z-index: 5;
 		width: 100%;
-		padding: 40px 0 60px 0;
+		padding: 50px 0 60px 0;
 	}
 
 	.apple-hero__container {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		min-height: 70vh;
+		justify-content: space-between;
+		min-height: calc(88vh - 110px);
 	}
 
-	/* センタータイトル＆コピー */
-	.apple-hero__center {
-		max-width: 960px;
-		margin: 40px 0;
+	/* 1. 左上固定：マガジンマストヘッド */
+	.hero-masthead {
+		text-align: left;
+		max-width: 720px;
+		margin-bottom: 40px;
 	}
 
-	.apple-hero__title {
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: clamp(48px, 7vw, 96px);
-		font-weight: 300;
-		letter-spacing: -0.015em;
-		line-height: 1.04;
+	.hero-masthead__brand {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+		font-size: clamp(38px, 4.8vw, 68px);
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
 		color: #ffffff;
-		margin: 0 0 20px 0;
+		margin: 0 0 10px 0;
 		text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
 	}
 
-	.apple-hero__lead {
-		font-size: clamp(16px, 1.6vw, 21px);
-		line-height: 1.55;
-		font-weight: 400;
-		color: rgba(255, 255, 255, 0.9);
-		max-width: 780px;
-		margin: 0 0 36px 0;
-		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+	.hero-masthead__tagline {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+		font-size: clamp(13px, 1.3vw, 16px);
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		color: rgba(255, 255, 255, 0.85);
+		margin: 0;
+		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
 	}
 
-	/* Apple風のアクションボタン */
-	.apple-hero__actions {
+	/* 2. 画面左側に並ぶ最新記事情報（文字サイズ縮小・左揃え） */
+	.hero-featured-story {
+		text-align: left;
+		max-width: 680px;
+		margin-top: auto;
+		padding-top: 30px;
+	}
+
+	.hero-story-eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		color: #a1a1aa;
+		text-transform: uppercase;
+		margin-bottom: 10px;
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+	}
+
+	.hero-story-title {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(24px, 2.8vw, 36px);
+		font-weight: 700;
+		letter-spacing: -0.015em;
+		line-height: 1.35;
+		color: #ffffff;
+		margin: 0 0 14px 0;
+		text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95);
+	}
+
+	.hero-story-lead {
+		font-size: clamp(14px, 1.2vw, 15.5px);
+		line-height: 1.65;
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.85);
+		max-width: 640px;
+		margin: 0 0 24px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+	}
+
+	.hero-story-actions {
 		display: flex;
 		align-items: center;
-		gap: 18px;
-		flex-wrap: wrap;
+		justify-content: flex-start;
+		gap: 16px;
 	}
 
 	.apple-cta-btn {
@@ -1725,20 +1782,28 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 			gap: 12px;
 		}
 
-		.apple-hero__masthead {
-			align-items: flex-start;
-			text-align: left;
+		.hero-masthead {
+			margin-bottom: 30px;
 		}
 
-		.apple-hero__title {
-			font-size: 42px;
+		.hero-masthead__brand {
+			font-size: 34px;
 		}
 
-		.apple-hero__lead {
-			font-size: 15px;
+		.hero-masthead__tagline {
+			font-size: 13px;
 		}
 
-		.apple-hero__actions {
+		.hero-story-title {
+			font-size: 22px;
+			line-height: 1.35;
+		}
+
+		.hero-story-lead {
+			font-size: 13.5px;
+		}
+
+		.hero-story-actions {
 			flex-direction: column;
 			align-items: stretch;
 		}
