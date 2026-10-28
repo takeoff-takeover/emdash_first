@@ -241,7 +241,7 @@
 
 /* ==============================================================
    Nicole Group Luxury Monotone Table Styles
-   ゆったりとした美しいパディング ＆ 文字と線の呼吸空間を確保
+   均等な線幅・全列が収まる最適パディング ＆ 白背景完全撤廃
    ============================================================== */
 .emdash-table-wrapper,
 .prose .emdash-table-wrapper,
@@ -251,7 +251,7 @@
 	overflow-x: auto !important;
 	-webkit-overflow-scrolling: touch !important;
 	background: #0b0b0e !important;
-	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
 	border-radius: 0 !important;
 	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
 }
@@ -260,10 +260,12 @@
 .prose table,
 table.cms-table {
 	width: 100% !important;
+	min-width: 100% !important;
+	table-layout: fixed !important;
 	border-collapse: collapse !important;
-	font-size: 0.9rem !important;
-	line-height: 1.7 !important;
-	background: transparent !important;
+	font-size: 0.8125rem !important;
+	line-height: 1.55 !important;
+	background: #0b0b0e !important;
 	color: #e4e4e7 !important;
 	margin: 0 !important;
 }
@@ -278,20 +280,19 @@ table.cms-table {
 	background: #141419 !important;
 	color: #ffffff !important;
 	font-weight: 600 !important;
-	padding: 18px 24px !important;
-	border: none !important;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-	border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-	text-align: left !important;
-	white-space: nowrap !important;
-	font-size: 0.8125rem !important;
-	letter-spacing: 0.05em !important;
-	text-transform: uppercase !important;
+	padding: 14px 10px !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	text-align: center !important;
+	white-space: normal !important;
+	word-break: break-word !important;
+	font-size: 0.775rem !important;
+	letter-spacing: 0.03em !important;
 }
 
-.emdash-table th:last-child,
-.prose table th:last-child {
-	border-right: none !important;
+.emdash-table th:first-child,
+.prose table th:first-child {
+	text-align: left !important;
+	padding-left: 14px !important;
 }
 
 .emdash-table th p,
@@ -299,52 +300,65 @@ table.cms-table {
 	color: #ffffff !important;
 	margin: 0 !important;
 	font-weight: 600 !important;
-	line-height: 1.6 !important;
+	line-height: 1.4 !important;
+}
+
+/* tr自体の白背景を完全に防ぐ */
+.emdash-table tr,
+.emdash-table tbody tr,
+.prose table tr,
+.prose table tbody tr {
+	background: #0b0b0e !important;
+	border: none !important;
 }
 
 .emdash-table td,
 .prose table td {
 	background: transparent !important;
 	color: #d4d4d8 !important;
-	padding: 18px 24px !important;
-	border: none !important;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-	border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+	padding: 14px 10px !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
 	vertical-align: middle !important;
-	line-height: 1.7 !important;
+	text-align: center !important;
+	line-height: 1.55 !important;
+	white-space: normal !important;
+	word-break: break-word !important;
+	font-size: 0.8125rem !important;
 }
 
-.emdash-table td:last-child,
-.prose table td:last-child {
-	border-right: none !important;
+.emdash-table td:first-child,
+.prose table td:first-child {
+	text-align: left !important;
+	font-weight: 600 !important;
+	color: #ffffff !important;
+	padding-left: 14px !important;
 }
 
 .emdash-table td p,
 .prose table td p {
 	color: #d4d4d8 !important;
 	margin: 0 !important;
-	line-height: 1.7 !important;
+	line-height: 1.55 !important;
 }
 
-.emdash-table tbody tr:nth-child(even) td,
-.prose table tbody tr:nth-child(even) td {
-	background: rgba(255, 255, 255, 0.018) !important;
+.emdash-table tbody tr:nth-child(even),
+.prose table tbody tr:nth-child(even) {
+	background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.emdash-table tbody tr:hover,
+.prose table tbody tr:hover {
+	background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .emdash-table tbody tr:hover td,
 .prose table tbody tr:hover td {
-	background: rgba(255, 255, 255, 0.045) !important;
 	color: #ffffff !important;
 }
 
 .emdash-table tbody tr:hover td p,
 .prose table tbody tr:hover td p {
 	color: #ffffff !important;
-}
-
-.emdash-table tbody tr:last-child td,
-.prose table tbody tr:last-child td {
-	border-bottom: none !important;
 }
 
 /* ==============================================================

@@ -7,18 +7,23 @@
  * - FAQ（Q&A形式）は専用の大型文字＆洗練レイアウトでレンダリング（右端切れ完全解消）
  * - スペック諸元表は右端が切れないレスポンシブ・セーフ設計
  */
+import FAQBlock from "./FAQBlock.astro";
+
 interface Props {
 	node: {
 		_type: string;
 		_key?: string;
 		id?: string;
+		title?: string;
 		content?: string;
 		[key: string]: any;
 	};
 }
 
 const { node } = Astro.props;
-const title = node.id || "詳細情報を開く";
+const rawTitle = (node.title || node.id || "詳細情報を開く").trim();
+// 見出し先頭の数字や記号を除去
+const title = rawTitle.replace(/^\d+[\.．\s]+/, "");
 const contentRaw = node.content || "";
 
 // テキストを行ごとに分解
@@ -28,7 +33,7 @@ const lines = contentRaw
 	.filter((l: string) => l.length > 0);
 
 // Q&A形式（Q1:, A1:, Q:, A: 等）が含まれているかを判定
-const isQAFormat = lines.some((l: string) => /^Q\d*[:：]/i.test(l));
+const isQAFormat = lines.some((l: string) => /^(?:Q\d*[:：]|質問\d*[:：])/i.test(l));
 
 // QAアイテムのパース
 interface QAItem {
@@ -95,62 +100,47 @@ const tableRows = isTableFormat
 	: [];
 ---
 
-<details class="cms-accordion-block acc-minimal-hairline">
-	<summary class="cms-acc-summary">
-		<span class="summary-title">{title}</span>
-		<span class="acc-toggle-icon">
-			<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-				<line x1="12" y1="5" x2="12" y2="19"></line>
-				<line x1="5" y1="12" x2="19" y2="12"></line>
-			</svg>
-			<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-				<line x1="5" y1="12" x2="19" y2="12"></line>
-			</svg>
-		</span>
-	</summary>
+{isQAFormat ? (
+	<FAQBlock node={{ ...node, title }} />
+) : (
+	<details class="cms-accordion-block acc-minimal-hairline">
+		<summary class="cms-acc-summary">
+			<span class="summary-title">{title}</span>
+			<span class="acc-toggle-icon">
+				<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+					<line x1="12" y1="5" x2="12" y2="19"></line>
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+				</svg>
+				<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+				</svg>
+			</span>
+		</summary>
 
-	<div class="cms-acc-body">
-		{isQAFormat && qaItems.length > 0 ? (
-			<div class="cms-acc-qa-list">
-				{qaItems.map((item) => (
-					<div class="cms-qa-item">
-						<div class="cms-qa-question-row">
-							<span class="cms-qa-label cms-qa-label--q">{item.qNum}</span>
-							<h4 class="cms-qa-question-text">{item.question}</h4>
-						</div>
-						<div class="cms-qa-answer-row">
-							<span class="cms-qa-label cms-qa-label--a">{item.aNum}</span>
-							<div class="cms-qa-answer-text">
-								{item.answer.split("\n").map((p: string) => (
-									<p>{p}</p>
-								))}
-							</div>
-						</div>
-					</div>
-				))}
-			</div>
-		) : isTableFormat && tableRows.length > 0 ? (
-			<div class="cms-acc-table-scroll">
-				<table class="cms-acc-table">
-					<tbody>
-						{tableRows.map((row) => (
-							<tr>
-								<th>{row.key}</th>
-								<td>{row.val}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
-		) : (
-			<div class="cms-acc-text">
-				{lines.map((p: string) => (
-					<p>{p}</p>
-				))}
-			</div>
-		)}
-	</div>
-</details>
+		<div class="cms-acc-body">
+			{isTableFormat && tableRows.length > 0 ? (
+				<div class="cms-acc-table-scroll">
+					<table class="cms-acc-table">
+						<tbody>
+							{tableRows.map((row) => (
+								<tr>
+									<th>{row.key}</th>
+									<td>{row.val}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			) : (
+				<div class="cms-acc-text">
+					{lines.map((p: string) => (
+						<p>{p}</p>
+					))}
+				</div>
+			)}
+		</div>
+	</details>
+)}
 
 <style>
 	.cms-accordion-block.acc-minimal-hairline {

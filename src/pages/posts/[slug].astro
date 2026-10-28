@@ -6,12 +6,15 @@ import { PortableText } from "emdash/ui";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
 import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
+import FAQBlock from "../../components/blocks/FAQBlock.astro";
 import "../../styles/prose.css";
 
 const portableTextComponents = {
 	type: {
 		slider: SliderBlock,
 		accordion: AccordionBlock,
+		faq: FAQBlock,
+		accordion_faq: FAQBlock,
 	},
 };
 
@@ -412,7 +415,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s04",
-            "text": "1. Cd値0.23を達成した空力美学：研ぎ澄まされたファストバック・シルエット"
+            "text": "Cd値0.23を達成した空力美学：研ぎ澄まされたファストバック・シルエット"
          }
       ]
    },
@@ -460,7 +463,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s08",
-            "text": "2. 革新のコックピット思想「BMW パノラミック・ビジョン」と「OS X」"
+            "text": "革新のコックピット思想「BMW パノラミック・ビジョン」と「OS X」"
          }
       ]
    },
@@ -508,7 +511,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s12",
-            "text": "3. 第6世代BMW eDriveテクノロジー：最大828kmの航続距離と800V超急速充電"
+            "text": "第6世代BMW eDriveテクノロジー：最大828kmの航続距離と800V超急速充電"
          }
       ]
    },
@@ -551,7 +554,7 @@ const staticArticlesCatalog: Record<string, any> = {
    {
       "_type": "accordion",
       "_key": "acc_specs",
-      "id": "1. 【主要諸元・技術スペック】第6世代eDrive & 800Vシステム詳細",
+      "id": "主要諸元・技術スペック：第6世代eDrive & 800Vシステム詳細",
       "content": "プラットフォーム：BMW Neue Klasse 専用BEVアーキテクチャ\nパワートレイン：第6世代（Gen6）BMW eDrive 高効率電気モーター（前後アクスル搭載デュアルモーターAWD）\n高電圧システム：800V超高電圧アーキテクチャ（最大400kW DC超急速充電対応）\nバッテリー技術：新世代大径円筒形リチウムイオンセル（正味容量：40 xDrive 82.6kWh / 50 xDrive & M60 108.7kWh）\n急速充電性能：10分間の充電で最大300〜400km分を急速回復（10%→80%充電時間：約21分）\n空気抵抗係数：Cd値 0.23（自動格納フラッシュドアハンドル、床下フルカバー、エアロホイール装着時）\n車両寸法（欧州参考値）：全長 4,785mm × 全幅 1,910mm × 全高 1,605mm、ホイールベース 2,950mm\n荷室容量：通常時 515L / リヤシート格納時 最大 1,560L（フロントフランク容量：45L）"
    },
    {
@@ -562,7 +565,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s16",
-            "text": "4. 最強モデル「BMW iX4 M60 xDrive」：最高出力612馬力・0-100km/h加速3.4秒"
+            "text": "最強モデル「BMW iX4 M60 xDrive」：最高出力612馬力・0-100km/h加速3.4秒"
          }
       ]
    },
@@ -603,15 +606,15 @@ const staticArticlesCatalog: Record<string, any> = {
       ]
    },
    {
-      "_type": "accordion",
-      "_key": "acc_faq",
-      "id": "2. 【よくあるご質問】新型BMW iX4に関するFAQ（充電・航続距離・サイズ感）",
+      "_type": "faq",
+      "_key": "faq_ix4",
+      "title": "よくあるご質問（FAQ）",
       "content": "Q1: 新型BMW iX4の日本国内での充電インフラ対応はどうなりますか？\nA1: 日本国内で普及が進む急速充電規格（CHAdeMO 150kW器以上）および最新の高出力充電スタンドに完全対応します。自宅充電用のAC普通充電器（最大9.6kW / 200V）にも対応し、夜間のタイマー充電により毎朝満充電で出発いただけます。\n\nQ2: 一充電で実際にどれくらいの距離を走れますか？\nA2: 「iX4 50 xDrive」の欧州WLTPモード値は最大828kmを誇ります。日本の高速道路や市街地を組み合わせた実用走行（エアコン稼働時）でも、600km〜700km前後の無充電走行が可能と見込まれており、東京〜大阪間（約500km）を途中充電なしで快適に走破できるポテンシャルを持っています。\n\nQ3: クーペフォルムですが、後席の居住性やトランクの使い勝手はどうですか？\nA3: EV専用のノイエ・クラッセ・アーキテクチャにより、エンジンやセンタートンネルが存在しない完全フラットフロアを実現。2,950mmのロングホイールベースの恩恵で、大人4名が足を伸ばしてゆったりとくつろげる足元スペースを確保しています。トランク容量も通常時515L、ゴルフバッグ3セットの積載が可能です。\n\nQ4: 日本での国の補助金（CEV補助金）や税制優遇は対象になりますか？\nA4: はい。完全ゼロエミッション電気自動車（BEV）であるため、経済産業省のCEV補助金（クリーンエネルギー自動車導入促進補助金）の交付対象となる予定です。また、自動車税の環境性能割（非課税）および重量税の免税措置など、手厚い税制優遇を受けられます。\n\nQ5: 日本市場への導入時期と先行予約のスケジュールは？\nA5: 2026年後半より順次欧州での生産が立ち上がり、日本市場への正式導入およびデリバリーは2027年春頃を予定しております。Nicole BMW各ショールームでは、最新情報の先行ご案内と優先購入相談の受付を開始しております。"
    },
    {
       "_type": "accordion",
       "_key": "acc_lineup",
-      "id": "3. 【モデルバリエーション】iX4 40 / 50 / M60 xDrive 主要装備比較",
+      "id": "モデルバリエーション：iX4 40 / 50 / M60 xDrive 主要装備比較",
       "content": "■ BMW iX4 40 xDrive：\n日常の快適性と洗練された効率性を追求したエントリーAWD。システム出力275kW（374hp）、82.6kWhバッテリー、航続最大638km。19インチエアロホイール、BMW Panoramic Vision標準装備。\n\n■ BMW iX4 50 xDrive：\n最大828kmの圧倒的航続距離を誇るグランドツーリング・マスター。システム出力345kW（469hp）、108.7kWhバッテリー、0-100km/h加速4.9秒。20インチホイール、スカイラウンジパノラマルーフ、Harman Kardonサラウンドサウンドシステム標準装備。\n\n■ BMW iX4 M60 xDrive：\nサーキット直系のダイナミクスを宿すMハイパフォーマンスモデル。システム出力450kW（612hp）、最大トルク875Nm、0-100km/h加速3.4秒。M専用エクステリア、21インチ鍛造ホイール、アダプティブMサスペンションプロ、アクティブスタビライザー、Bowers & Wilkinsダイヤモンドサラウンドシステム標準装備。"
    },
    {
@@ -622,7 +625,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s20",
-            "text": "5. ハンガリー・デブレツェン新工場で紡がれる「iFACTORY」の環境哲学"
+            "text": "ハンガリー・デブレツェン新工場で紡がれる「iFACTORY」の環境哲学"
          }
       ]
    },
@@ -658,7 +661,7 @@ const staticArticlesCatalog: Record<string, any> = {
          {
             "_type": "span",
             "_key": "s23",
-            "text": "6. Nicole BMW 本社ショールーム（川崎）にて最新情報・先行優先相談を受付中"
+            "text": "Nicole BMW 本社ショールーム（川崎）にて最新情報・先行優先相談を受付中"
          }
       ]
    },
@@ -764,12 +767,13 @@ function getImageUrl(img: unknown): string {
 	return "";
 }
 
+const isIX4 = slug.includes("ix4");
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
-const isDemoArticle = isNeueKlasse || slug === "202608_bmw_kids_mechanic";
+const isDemoArticle = isIX4 || isNeueKlasse || slug === "202608_bmw_kids_mechanic";
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
 
-const heroImageUrl = getImageUrl(featuredImage) || (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg");
+const heroImageUrl = getImageUrl(featuredImage) || (isIX4 ? "/uploads/ix4/key-visual.jpg" : (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg"));
 const heroImageUrlSp = getImageUrl(featuredImageSp);
 const hasShowroom = Boolean((post.data as any).related_location) || isDemoArticle;
 
@@ -822,10 +826,44 @@ const kidsGallery = [
 
 const currentGallery = isNeueKlasse ? neueKlasseGallery : kidsGallery;
 
-// 本文内に既にスライダー／アコーディオンブロックが存在するか判定
+// 本文内に既にスライダー／アコーディオン／FAQブロックが存在するか判定
 const contentArray = Array.isArray(post.data.content) ? post.data.content : [];
 const hasSliderBlock = contentArray.some((b: any) => b && b._type === "slider");
-const hasAccordionBlock = contentArray.some((b: any) => b && b._type === "accordion");
+const hasAccordionBlock = contentArray.some((b: any) => b && (b._type === "accordion" || b._type === "faq" || b._type === "accordion_faq"));
+
+// 本文の数字付き見出し・タイトルを自動サニタイズ（「1. 」「2. 」等の連番を完全撤廃）
+function sanitizeContent(content: any) {
+	if (!Array.isArray(content)) return content;
+	return content.map((node: any) => {
+		if (!node || typeof node !== "object") return node;
+		if (node._type === "accordion" || node._type === "faq" || node._type === "accordion_faq") {
+			const newNode = { ...node };
+			if (newNode.id) newNode.id = newNode.id.replace(/^\d+[\.．\s]+/, "");
+			if (newNode.title) newNode.title = newNode.title.replace(/^\d+[\.．\s]+/, "");
+			return newNode;
+		}
+		if (node._type === "block" && (node.style === "h2" || node.style === "h3" || node.style === "h4")) {
+			const children = Array.isArray(node.children)
+				? node.children.map((child: any, idx: number) => {
+						if (idx === 0 && child && typeof child.text === "string") {
+							return {
+								...child,
+								text: child.text.replace(/^\d+[\.．\s]+/, "")
+							};
+						}
+						return child;
+				  })
+				: node.children;
+			return {
+				...node,
+				children
+			};
+		}
+		return node;
+	});
+}
+
+const articleContent = sanitizeContent(post.data.content);
 
 // 関連記事データ（サイドバー用）
 const relatedStories = [
@@ -989,13 +1027,13 @@ const editUrl = postDbId
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
-						{isNeueKlasse ? "BMW" : "ALL BRANDS"}
+						{isIX4 || isNeueKlasse ? "BMW" : "ALL BRANDS"}
 					</span>
 					<span class="meta-category-pill">
-						{isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE"}
+						{isIX4 ? "WORLD PREMIERE" : (isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE")}
 					</span>
 					<time class="meta-date">
-						{isNeueKlasse ? "2026.10.22" : "2026.08.20"}
+						{isIX4 ? "2026.10.28" : (isNeueKlasse ? "2026.10.22" : "2026.08.20")}
 					</time>
 					<span class="meta-reading-time">READING TIME: 4 MIN</span>
 
@@ -1020,7 +1058,7 @@ const editUrl = postDbId
 				<div class="article-main-col">
 					<!-- 本文（Portable Text） -->
 				<div class="article-rich-text prose prose-invert">
-					<PortableText value={post.data.content} components={portableTextComponents} />
+					<PortableText value={articleContent} components={portableTextComponents} />
 				</div>
 
 				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->
@@ -1079,7 +1117,7 @@ const editUrl = postDbId
 						<div class="modern-accordion-list">
 							<details class="accordion-item" open>
 								<summary class="accordion-summary">
-									<span>1. Neue Klasse（ノイエ・クラッセ）アーキテクチャの革新性</span>
+									<span>Neue Klasse（ノイエ・クラッセ）アーキテクチャの革新性</span>
 									<span class="accordion-icon">+</span>
 								</summary>
 								<div class="accordion-content">
@@ -1089,7 +1127,7 @@ const editUrl = postDbId
 
 							<details class="accordion-item">
 								<summary class="accordion-summary">
-									<span>2. 『BMW パノラミック・ビジョン』と新世代デジタル・キャビン</span>
+									<span>『BMW パノラミック・ビジョン』と新世代デジタル・キャビン</span>
 									<span class="accordion-icon">+</span>
 								</summary>
 								<div class="accordion-content">
@@ -1099,7 +1137,7 @@ const editUrl = postDbId
 
 							<details class="accordion-item">
 								<summary class="accordion-summary">
-									<span>3. 日本市場における導入スケジュールと展示ショールーム</span>
+									<span>日本市場における導入スケジュールと展示ショールーム</span>
 									<span class="accordion-icon">+</span>
 								</summary>
 								<div class="accordion-content">
@@ -1782,6 +1820,20 @@ const editUrl = postDbId
 		border-radius: 12px;
 		margin: 36px 0;
 		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+	}
+
+	/* ギャラリー内の全画像（スライド＆サムネイル）はリッチテキストのimg装飾を完全除外 */
+	.article-rich-text :global(.cms-filmstrip-gallery img),
+	.article-rich-text :global(.filmstrip-slide img),
+	.article-rich-text :global(.filmstrip-thumb img) {
+		width: 100% !important;
+		height: 100% !important;
+		object-fit: cover !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		display: block !important;
 	}
 
 	.article-rich-text :global(blockquote) {
@@ -2628,7 +2680,7 @@ const editUrl = postDbId
 	}
 
 
-	/* Monotone Luxury Table Styling - ゆったりパディング＆美文字空間 */
+	/* Monotone Luxury Table Styling - 均等な線幅・全列が収まる最適パディング ＆ 白背景完全撤廃 */
 	:global(.emdash-table-wrapper),
 	:global(.article-rich-text .emdash-table-wrapper),
 	:global(.prose .emdash-table-wrapper) {
@@ -2637,7 +2689,7 @@ const editUrl = postDbId
 		overflow-x: auto !important;
 		-webkit-overflow-scrolling: touch !important;
 		background: #0b0b0e !important;
-		border: 1px solid rgba(255, 255, 255, 0.1) !important;
+		border: 1px solid rgba(255, 255, 255, 0.12) !important;
 		border-radius: 0 !important;
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
 	}
@@ -2645,9 +2697,11 @@ const editUrl = postDbId
 	:global(.article-rich-text table),
 	:global(.prose table) {
 		width: 100% !important;
+		min-width: 100% !important;
+		table-layout: fixed !important;
 		border-collapse: collapse !important;
-		font-size: 0.9rem !important;
-		line-height: 1.7 !important;
+		font-size: 0.8125rem !important;
+		line-height: 1.55 !important;
 		background: #0b0b0e !important;
 		color: #e4e4e7 !important;
 		margin: 0 !important;
@@ -2663,20 +2717,19 @@ const editUrl = postDbId
 		background: #141419 !important;
 		color: #ffffff !important;
 		font-weight: 600 !important;
-		padding: 18px 24px !important;
-		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-		border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-		text-align: left !important;
-		white-space: nowrap !important;
-		font-size: 0.8125rem !important;
-		letter-spacing: 0.05em !important;
-		text-transform: uppercase !important;
+		padding: 14px 10px !important;
+		border: 1px solid rgba(255, 255, 255, 0.12) !important;
+		text-align: center !important;
+		white-space: normal !important;
+		word-break: break-word !important;
+		font-size: 0.775rem !important;
+		letter-spacing: 0.03em !important;
 	}
-	:global(.emdash-table th:last-child),
-	:global(.article-rich-text table th:last-child),
-	:global(.prose table th:last-child) {
-		border-right: none !important;
+	:global(.emdash-table th:first-child),
+	:global(.article-rich-text table th:first-child),
+	:global(.prose table th:first-child) {
+		text-align: left !important;
+		padding-left: 14px !important;
 	}
 	:global(.emdash-table th p),
 	:global(.article-rich-text table th p),
@@ -2684,36 +2737,65 @@ const editUrl = postDbId
 		color: #ffffff !important;
 		margin: 0 !important;
 		font-weight: 600 !important;
-		line-height: 1.6 !important;
+		line-height: 1.4 !important;
+	}
+	:global(.emdash-table tr),
+	:global(.emdash-table tbody tr),
+	:global(.article-rich-text table tr),
+	:global(.article-rich-text table tbody tr),
+	:global(.prose table tr),
+	:global(.prose table tbody tr) {
+		background: #0b0b0e !important;
+		border: none !important;
 	}
 	:global(.emdash-table td),
 	:global(.article-rich-text table td),
 	:global(.prose table td) {
 		background: transparent !important;
 		color: #d4d4d8 !important;
-		padding: 18px 24px !important;
-		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-		border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+		padding: 14px 10px !important;
+		border: 1px solid rgba(255, 255, 255, 0.12) !important;
 		vertical-align: middle !important;
-		line-height: 1.7 !important;
+		text-align: center !important;
+		line-height: 1.55 !important;
+		white-space: normal !important;
+		word-break: break-word !important;
+		font-size: 0.8125rem !important;
 	}
-	:global(.emdash-table td:last-child),
-	:global(.article-rich-text table td:last-child),
-	:global(.prose table td:last-child) {
-		border-right: none !important;
+	:global(.emdash-table td:first-child),
+	:global(.article-rich-text table td:first-child),
+	:global(.prose table td:first-child) {
+		text-align: left !important;
+		font-weight: 600 !important;
+		color: #ffffff !important;
+		padding-left: 14px !important;
 	}
 	:global(.emdash-table td p),
 	:global(.article-rich-text table td p),
 	:global(.prose table td p) {
 		color: #d4d4d8 !important;
 		margin: 0 !important;
-		line-height: 1.7 !important;
+		line-height: 1.55 !important;
 	}
-	:global(.emdash-table tbody tr:nth-child(even) td),
-	:global(.article-rich-text table tbody tr:nth-child(even) td),
-	:global(.prose table tbody tr:nth-child(even) td) {
-		background: rgba(255, 255, 255, 0.018) !important;
+	:global(.emdash-table tbody tr:nth-child(even)),
+	:global(.article-rich-text table tbody tr:nth-child(even)),
+	:global(.prose table tbody tr:nth-child(even)) {
+		background: rgba(255, 255, 255, 0.02) !important;
+	}
+	:global(.emdash-table tbody tr:hover),
+	:global(.article-rich-text table tbody tr:hover),
+	:global(.prose table tbody tr:hover) {
+		background: rgba(255, 255, 255, 0.05) !important;
+	}
+	:global(.emdash-table tbody tr:hover td),
+	:global(.article-rich-text table tbody tr:hover td),
+	:global(.prose table tbody tr:hover td) {
+		color: #ffffff !important;
+	}
+	:global(.emdash-table tbody tr:hover td p),
+	:global(.article-rich-text table tbody tr:hover td p),
+	:global(.prose table tbody tr:hover td p) {
+		color: #ffffff !important;
 	}
 	:global(.emdash-table tbody tr:hover td),
 	:global(.article-rich-text table tbody tr:hover td),

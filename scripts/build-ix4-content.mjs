@@ -180,7 +180,7 @@ export const ix4PortableText = [
     _type: 'block',
     _key: 'h2_design',
     style: 'h2',
-    children: [{ _type: 'span', _key: 's04', text: '1. Cd値0.23を達成した空力美学：研ぎ澄まされたファストバック・シルエット' }]
+    children: [{ _type: 'span', _key: 's04', text: 'Cd値0.23を達成した空力美学：研ぎ澄まされたファストバック・シルエット' }]
   },
   {
     _type: 'block',
@@ -204,7 +204,7 @@ export const ix4PortableText = [
     _type: 'block',
     _key: 'h2_interior',
     style: 'h2',
-    children: [{ _type: 'span', _key: 's08', text: '2. 革新のコックピット思想「BMW パノラミック・ビジョン」と「OS X」' }]
+    children: [{ _type: 'span', _key: 's08', text: '革新のコックピット思想「BMW パノラミック・ビジョン」と「OS X」' }]
   },
   {
     _type: 'block',
@@ -228,7 +228,7 @@ export const ix4PortableText = [
     _type: 'block',
     _key: 'h2_edrive',
     style: 'h2',
-    children: [{ _type: 'span', _key: 's12', text: '3. 第6世代BMW eDriveテクノロジー：最大828kmの航続距離と800V超急速充電' }]
+    children: [{ _type: 'span', _key: 's12', text: '第6世代BMW eDriveテクノロジー：最大828kmの航続距離と800V超急速充電' }]
   },
   {
     _type: 'block',
@@ -251,7 +251,7 @@ export const ix4PortableText = [
   {
     _type: 'accordion',
     _key: 'acc_specs',
-    id: '1. 【主要諸元・技術スペック】第6世代eDrive & 800Vシステム詳細',
+    id: '主要諸元・技術スペック：第6世代eDrive & 800Vシステム詳細',
     content: `プラットフォーム：BMW Neue Klasse 専用BEVアーキテクチャ
 パワートレイン：第6世代（Gen6）BMW eDrive 高効率電気モーター（前後アクスル搭載デュアルモーターAWD）
 高電圧システム：800V超高電圧アーキテクチャ（最大400kW DC超急速充電対応）
@@ -265,7 +265,7 @@ export const ix4PortableText = [
     _type: 'block',
     _key: 'h2_m60',
     style: 'h2',
-    children: [{ _type: 'span', _key: 's16', text: '4. 最強モデル「BMW iX4 M60 xDrive」：最高出力612馬力・0-100km/h加速3.4秒' }]
+    children: [{ _type: 'span', _key: 's16', text: '最強モデル「BMW iX4 M60 xDrive」：最高出力612馬力・0-100km/h加速3.4秒' }]
   },
   {
     _type: 'block',
@@ -287,8 +287,39 @@ export const ix4PortableText = [
   },
   {
     _type: 'accordion',
-    _key: 'acc_faq',
-    id: '2. 【よくあるご質問】新型BMW iX4に関するFAQ（充電・航続距離・サイズ感）',
+    _key: 'acc_lineup',
+    id: 'モデルバリエーション：iX4 40 / 50 / M60 xDrive 主要装備比較',
+    content: `■ BMW iX4 40 xDrive：
+日常の快適性と洗練された効率性を追求したエントリーAWD。システム出力275kW（374hp）、82.6kWhバッテリー、航続最大638km。19インチエアロホイール、BMW Panoramic Vision標準装備。
+
+■ BMW iX4 50 xDrive：
+最大828kmの圧倒的航続距離を誇るグランドツーリング・マスター。システム出力345kW（469hp）、108.7kWhバッテリー、0-100km/h加速4.9秒。20インチホイール、スカイラウンジパノラマルーフ、Harman Kardonサラウンドサウンドシステム標準装備。
+
+■ BMW iX4 M60 xDrive：
+サーキット直系のダイナミクスを宿すMハイパフォーマンスモデル。システム出力450kW（612hp）、最大トルク875Nm、0-100km/h加速3.4秒。M専用エクステリア、21インチ鍛造ホイール、アダプティブMサスペンションプロ、アクティブスタビライザー、Bowers & Wilkinsダイヤモンドサラウンドシステム標準装備。`
+  },
+  {
+    _type: 'block',
+    _key: 'h2_factory',
+    style: 'h2',
+    children: [{ _type: 'span', _key: 's20', text: 'ハンガリー・デブレツェン新工場で紡がれる「iFACTORY」の環境哲学' }]
+  },
+  {
+    _type: 'block',
+    _key: 'p_factory_1',
+    style: 'normal',
+    children: [{ _type: 'span', _key: 's21', text: '新型BMW iX4は、BMWグループが20億ユーロ以上を投じて建設した最先端の製造拠点「ハンガリー・デブレツェン工場（BMW Group Plant Debrecen）」にて量産されます。この工場は、自動車業界初となる「化石燃料を一切使用しない完全ゼロエミッション自動車製造プラント」として設計されました。' }]
+  },
+  {
+    _type: 'block',
+    _key: 'p_factory_2',
+    style: 'normal',
+    children: [{ _type: 'span', _key: 's22', text: '工場内で消費される電力は100%再生可能エネルギー（太陽光・地熱等）によって賄われ、サプライチェーン全体においても二酸化炭素排出を極限まで削減。製造工程で使用されるアルミニウムの50%以上、プラスチックの30%以上に二次（リサイクル）原料が用いられており、走行時だけでなく「生まれる瞬間から廃車・リサイクルに至る全ライフサイクル」において真の持続可能性を体現しています。' }]
+  },
+  {
+    _type: 'faq',
+    _key: 'faq_ix4',
+    title: 'よくあるご質問（FAQ）',
     content: `Q1: 新型BMW iX4の日本国内での充電インフラ対応はどうなりますか？
 A1: 日本国内で普及が進む急速充電規格（CHAdeMO 150kW器以上）および最新の高出力充電スタンドに完全対応します。自宅充電用のAC普通充電器（最大9.6kW / 200V）にも対応し、夜間のタイマー充電により毎朝満充電で出発いただけます。
 
@@ -305,41 +336,10 @@ Q5: 日本市場への導入時期と先行予約のスケジュールは？
 A5: 2026年後半より順次欧州での生産が立ち上がり、日本市場への正式導入およびデリバリーは2027年春頃を予定しております。Nicole BMW各ショールームでは、最新情報の先行ご案内と優先購入相談の受付を開始しております。`
   },
   {
-    _type: 'accordion',
-    _key: 'acc_lineup',
-    id: '3. 【モデルバリエーション】iX4 40 / 50 / M60 xDrive 主要装備比較',
-    content: `■ BMW iX4 40 xDrive：
-日常の快適性と洗練された効率性を追求したエントリーAWD。システム出力275kW（374hp）、82.6kWhバッテリー、航続最大638km。19インチエアロホイール、BMW Panoramic Vision標準装備。
-
-■ BMW iX4 50 xDrive：
-最大828kmの圧倒的航続距離を誇るグランドツーリング・マスター。システム出力345kW（469hp）、108.7kWhバッテリー、0-100km/h加速4.9秒。20インチホイール、スカイラウンジパノラマルーフ、Harman Kardonサラウンドサウンドシステム標準装備。
-
-■ BMW iX4 M60 xDrive：
-サーキット直系のダイナミクスを宿すMハイパフォーマンスモデル。システム出力450kW（612hp）、最大トルク875Nm、0-100km/h加速3.4秒。M専用エクステリア、21インチ鍛造ホイール、アダプティブMサスペンションプロ、アクティブスタビライザー、Bowers & Wilkinsダイヤモンドサラウンドシステム標準装備。`
-  },
-  {
-    _type: 'block',
-    _key: 'h2_factory',
-    style: 'h2',
-    children: [{ _type: 'span', _key: 's20', text: '5. ハンガリー・デブレツェン新工場で紡がれる「iFACTORY」の環境哲学' }]
-  },
-  {
-    _type: 'block',
-    _key: 'p_factory_1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's21', text: '新型BMW iX4は、BMWグループが20億ユーロ以上を投じて建設した最先端の製造拠点「ハンガリー・デブレツェン工場（BMW Group Plant Debrecen）」にて量産されます。この工場は、自動車業界初となる「化石燃料を一切使用しない完全ゼロエミッション自動車製造プラント」として設計されました。' }]
-  },
-  {
-    _type: 'block',
-    _key: 'p_factory_2',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's22', text: '工場内で消費される電力は100%再生可能エネルギー（太陽光・地熱等）によって賄われ、サプライチェーン全体においても二酸化炭素排出を極限まで削減。製造工程で使用されるアルミニウムの50%以上、プラスチックの30%以上に二次（リサイクル）原料が用いられており、走行時だけでなく「生まれる瞬間から廃車・リサイクルに至る全ライフサイクル」において真の持続可能性を体現しています。' }]
-  },
-  {
     _type: 'block',
     _key: 'h2_dealer',
     style: 'h2',
-    children: [{ _type: 'span', _key: 's23', text: '6. Nicole BMW 本社ショールーム（川崎）にて最新情報・先行優先相談を受付中' }]
+    children: [{ _type: 'span', _key: 's23', text: 'Nicole BMW 本社ショールーム（川崎）にて最新情報・先行優先相談を受付中' }]
   },
   {
     _type: 'block',

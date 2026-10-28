@@ -1,0 +1,333 @@
+---
+/**
+ * FAQBlock.astro
+ * EmDash Portable Text カスタムブロック：アコーディオン（FAQ）
+ * 
+ * 要件：
+ * 1. 「よくある質問」を一つの大きな見出しとして表示
+ * 2. 質問（Q）を常時一覧表示
+ * 3. 回答（A）をクリックで開閉するアコーディオン
+ * 4. モノトーン基調（黒・白・グレー）の洗練されたミニマル・ヘアラインデザイン
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		id?: string;
+		title?: string;
+		content?: string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+
+// 大見出し（titleまたはid、未指定時は「よくある質問」）
+const rawTitle = (node.title || node.id || "よくある質問").trim();
+// 見出し先頭の数字や記号（"1. ", "2. ", "【FAQ】"等）を除去してスマートに表示
+const mainTitle = rawTitle.replace(/^\d+[\.．\s]+/, "").replace(/^[【\[].*?[】\]]\s*/, "");
+const headingText = mainTitle || "よくある質問";
+
+const contentRaw = node.content || "";
+const lines = contentRaw
+	.split("\n")
+	.map((l: string) => l.trim())
+	.filter((l: string) => l.length > 0);
+
+interface FAQItem {
+	qNum: string;
+	question: string;
+	aNum: string;
+	answer: string;
+}
+
+const items: FAQItem[] = [];
+let currentQ = { num: "", text: "" };
+let currentA = { num: "", text: "" };
+
+for (const line of lines) {
+	// Q1: / Q: / 質問1: 等のマッチング
+	const qMatch = line.match(/^(?:Q(\d*)[:：]|質問(\d*)[:：])\s*(.*)$/i);
+	const aMatch = line.match(/^(?:A(\d*)[:：]|回答(\d*)[:：])\s*(.*)$/i);
+
+	if (qMatch) {
+		if (currentQ.text) {
+			items.push({
+				qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
+				question: currentQ.text,
+				aNum: currentA.num ? `A${currentA.num}` : "A",
+				answer: currentA.text
+			});
+			currentQ = { num: "", text: "" };
+			currentA = { num: "", text: "" };
+		}
+		const num = qMatch[1] || qMatch[2] || "";
+		currentQ = { num, text: qMatch[3].trim() };
+	} else if (aMatch) {
+		const num = aMatch[1] || aMatch[2] || "";
+		currentA = { num, text: aMatch[3].trim() };
+	} else {
+		if (currentA.text) {
+			currentA.text += "\n" + line;
+		} else if (currentQ.text) {
+			currentQ.text += " " + line;
+		}
+	}
+}
+
+if (currentQ.text) {
+	items.push({
+		qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
+		question: currentQ.text,
+		aNum: currentA.num ? `A${currentA.num}` : "A",
+		answer: currentA.text
+	});
+}
+
+// Q&Aのパースが取れなかった場合のフォールバック（行を2分割または全体表示）
+if (items.length === 0 && lines.length > 0) {
+	items.push({
+		qNum: "Q",
+		question: lines[0],
+		aNum: "A",
+		answer: lines.slice(1).join("\n") || lines[0]
+	});
+}
+
+const blockId = `faq-${node._key || Math.random().toString(36).slice(2, 9)}`;
+---
+
+<section class="cms-faq-widget" id={blockId}>
+	<!-- 1. 一つの大きな見出し -->
+	<h2 class="faq-widget-heading">{headingText}</h2>
+
+	<!-- 2. Qを常時表示し、Aをアコーディオンとするリスト -->
+	<div class="faq-accordion-list">
+		{items.map((item, idx) => (
+			<details class="faq-item" id={`${blockId}-item-${idx}`}>
+				<summary class="faq-item-summary">
+					<div class="faq-q-line">
+						<span class="faq-q-badge">{item.qNum}</span>
+						<span class="faq-q-text">{item.question}</span>
+					</div>
+					<span class="faq-toggle-icon" aria-hidden="true">
+						<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+						<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</span>
+				</summary>
+
+				<div class="faq-item-body">
+					<div class="faq-a-line">
+						<span class="faq-a-badge">{item.aNum}</span>
+						<div class="faq-a-content">
+							{item.answer.split("\n").map((para) => (
+								<p>{para}</p>
+							))}
+						</div>
+					</div>
+				</div>
+			</details>
+		))}
+	</div>
+</section>
+
+<style>
+	.cms-faq-widget {
+		margin: 3.5rem 0 3rem 0;
+		width: 100%;
+	}
+
+	/* 大きな見出し（数字なし・クリーンタイポグラフィ） */
+	.faq-widget-heading {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(24px, 2.4vw, 30px);
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 1.75rem 0;
+		padding: 0;
+		border: none;
+		line-height: 1.35;
+		letter-spacing: -0.01em;
+	}
+
+	.faq-accordion-list {
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.faq-item {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		background: transparent;
+		transition: background-color 0.2s ease;
+	}
+
+	.faq-item:last-child {
+		border-bottom: none;
+	}
+
+	.faq-item:hover {
+		background: rgba(255, 255, 255, 0.015);
+	}
+
+	.faq-item-summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.35rem 0.5rem;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		gap: 1.25rem;
+	}
+
+	.faq-item-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.faq-q-line {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.faq-q-badge {
+		font-family: var(--font-mono, monospace);
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #ffffff;
+		flex-shrink: 0;
+		letter-spacing: 0.05em;
+	}
+
+	.faq-q-text {
+		font-size: 1.025rem;
+		font-weight: 600;
+		color: #ffffff;
+		line-height: 1.6;
+		letter-spacing: 0.01em;
+	}
+
+	/* 開閉アイコン（ミニマルな＋ / −） */
+	.faq-toggle-icon {
+		position: relative;
+		width: 22px;
+		height: 22px;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #9ca3af;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.faq-item:hover .faq-toggle-icon {
+		color: #ffffff;
+	}
+
+	.faq-toggle-icon svg {
+		position: absolute;
+		width: 18px;
+		height: 18px;
+		transition: opacity 0.2s ease, transform 0.2s ease;
+	}
+
+	.icon-plus {
+		opacity: 1;
+		transform: rotate(0deg);
+	}
+
+	.icon-minus {
+		opacity: 0;
+		transform: rotate(-90deg);
+	}
+
+	.faq-item[open] .icon-plus {
+		opacity: 0;
+		transform: rotate(90deg);
+	}
+
+	.faq-item[open] .icon-minus {
+		opacity: 1;
+		transform: rotate(0deg);
+	}
+
+	.faq-item[open] .faq-toggle-icon {
+		color: #ffffff;
+	}
+
+	/* アコーディオン本文（回答A） */
+	.faq-item-body {
+		padding: 0 0.5rem 1.75rem 0.5rem;
+		animation: faqSlideDown 0.25s ease-out;
+	}
+
+	@keyframes faqSlideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.faq-a-line {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+	}
+
+	.faq-a-badge {
+		font-family: var(--font-mono, monospace);
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #71717a;
+		flex-shrink: 0;
+		letter-spacing: 0.05em;
+	}
+
+	.faq-a-content {
+		flex: 1;
+		font-size: 0.95rem;
+		line-height: 1.8;
+		color: #d4d4d8;
+	}
+
+	.faq-a-content p {
+		margin: 0 0 0.75rem 0;
+	}
+
+	.faq-a-content p:last-child {
+		margin-bottom: 0;
+	}
+
+	@media (max-width: 640px) {
+		.faq-item-summary {
+			padding: 1.15rem 0;
+			gap: 0.75rem;
+		}
+		.faq-q-line {
+			gap: 0.65rem;
+		}
+		.faq-q-text {
+			font-size: 0.95rem;
+		}
+		.faq-item-body {
+			padding: 0 0 1.25rem 0;
+		}
+		.faq-a-line {
+			gap: 0.65rem;
+		}
+		.faq-a-content {
+			font-size: 0.88rem;
+		}
+	}
+</style>
