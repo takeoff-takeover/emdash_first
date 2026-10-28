@@ -598,9 +598,9 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 				</div>
 
 				{esgArticles.length > 4 && (
-					<div class="esg-more-wrap">
+					<div class="esg-more-wrap" id="esg-more-wrap">
 						<button type="button" id="btn-toggle-esg-more" class="btn-esg-more" data-total={esgArticles.length}>
-							<span class="btn-esg-more__text">もっと見る（全{esgArticles.length}件）</span>
+							<span class="btn-esg-more__text">もっと見る（残り{esgArticles.length - 4}件）</span>
 							<svg class="btn-esg-more__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
 						</button>
 					</div>
@@ -787,39 +787,41 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		}
 
 		// ==============================================================
-		// 3. ESG / SDGs 「もっと見る」展開・格納トグル制御
+		// 3. ESG / SDGs 「もっと見る」段階的ロード制御（初期4件、+4件ずつ段階展開）
 		// ==============================================================
 		const toggleEsgBtn = document.getElementById('btn-toggle-esg-more');
+		const esgMoreWrap = document.getElementById('esg-more-wrap');
 		if (toggleEsgBtn) {
-			const collapsedCards = document.querySelectorAll('.esg-card.is-collapsed');
-			let isExpanded = false;
-			const totalCount = toggleEsgBtn.getAttribute('data-total') || '0';
+			const esgCards = Array.from(document.querySelectorAll('.esg-card'));
+			const ESG_INITIAL = 4;
+			const ESG_STEP = 4;
+			let visibleEsgCount = ESG_INITIAL;
+			const totalEsgCount = esgCards.length;
 			const btnText = toggleEsgBtn.querySelector('.btn-esg-more__text');
-			const btnIcon = toggleEsgBtn.querySelector('.btn-esg-more__icon');
 
-			toggleEsgBtn.addEventListener('click', () => {
-				isExpanded = !isExpanded;
-				collapsedCards.forEach(card => {
-					if (isExpanded) {
+			function updateEsgDisplay() {
+				esgCards.forEach((card, idx) => {
+					if (idx < visibleEsgCount) {
 						card.classList.remove('is-collapsed');
-						card.classList.add('is-expanded');
 					} else {
 						card.classList.add('is-collapsed');
-						card.classList.remove('is-expanded');
 					}
 				});
 
-				if (isExpanded) {
-					if (btnText) btnText.textContent = '閉じる';
-					if (btnIcon) btnIcon.style.transform = 'rotate(180deg)';
-				} else {
-					if (btnText) btnText.textContent = `もっと見る（全${totalCount}件）`;
-					if (btnIcon) btnIcon.style.transform = 'rotate(0deg)';
-					const esgSec = document.getElementById('esg-section');
-					if (esgSec) {
-						esgSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				if (visibleEsgCount < totalEsgCount) {
+					if (esgMoreWrap) esgMoreWrap.style.display = 'flex';
+					const remaining = totalEsgCount - visibleEsgCount;
+					if (btnText) {
+						btnText.textContent = `もっと見る（残り${remaining}件）`;
 					}
+				} else {
+					if (esgMoreWrap) esgMoreWrap.style.display = 'none';
 				}
+			}
+
+			toggleEsgBtn.addEventListener('click', () => {
+				visibleEsgCount += ESG_STEP;
+				updateEsgDisplay();
 			});
 		}
 	});
