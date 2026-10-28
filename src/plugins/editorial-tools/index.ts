@@ -130,6 +130,22 @@ export function editorialToolsPlugin() {
 						placeholder: "開いたときに表示するスペックや説明文を入力..."
 					}
 				]
+			},
+			{
+				type: "notes",
+				label: "注釈エリア（文字小・デフォルト空）",
+				icon: "align-left",
+				description: "記事末尾に小さなフォントサイズで掲載する注釈・免責事項・補足情報（空欄時は非表示）",
+				category: "テキスト",
+				placeholder: "注釈テキストを入力（空欄時は非表示）",
+				fields: [
+					{
+						type: "text_input",
+						action_id: "content",
+						label: "注釈・免責テキスト（複数行入力対応）",
+						placeholder: "※掲載の諸元や数値は欧州仕様参考値です。日本仕様とは一部異なる場合があります。\n※記載の情報は予告なく変更される場合があります。"
+					}
+				]
 			}
 		]
 	};

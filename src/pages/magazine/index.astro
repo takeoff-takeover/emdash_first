@@ -250,6 +250,25 @@ const staticArticles = [
 	}
 ];
 
+// 本文からリード文（2〜3行の冒頭テキスト）を自動抽出するヘルパー
+function extractLead(p: any): string {
+	if (p.data?.excerpt && p.data.excerpt.trim()) {
+		return p.data.excerpt.trim();
+	}
+	const content = p.data?.content;
+	if (Array.isArray(content)) {
+		for (const block of content) {
+			if (block._type === 'block' && block.style === 'normal' && Array.isArray(block.children)) {
+				const text = block.children.map((c: any) => c.text || '').join('').trim();
+				if (text.length > 20) {
+					return text.length > 140 ? text.slice(0, 137) + '...' : text;
+				}
+			}
+		}
+	}
+	return "";
+}
+
 // CMS記事がある場合は統合
 const cmsArticles = (cmsPosts || []).map((p: any) => {
 	const featImg = p.data.featured_image;
@@ -266,7 +285,7 @@ const cmsArticles = (cmsPosts || []).map((p: any) => {
 		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25",
 		views: "NEW",
 		image: imgUrl,
-		lead: p.data.excerpt || "",
+		lead: extractLead(p),
 		url: `/magazine/${p.id}/`,
 		isFeatured: false
 	};
@@ -1438,9 +1457,13 @@ const topicsList = ["ALL", "Feature", "Guide", "People", "ESG / SDGs"];
 
 	.article-item__lead {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.6);
-		line-height: 1.55;
+		color: rgba(255, 255, 255, 0.65);
+		line-height: 1.6;
 		margin: 0 0 18px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 		flex-grow: 1;
 		transition: color 0.3s ease;
 	}

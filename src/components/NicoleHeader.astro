@@ -158,6 +158,17 @@ const corporateLinks = [
 						<span>CONTACT</span>
 					</a>
 				</li>
+
+				<!-- 7. ADMIN (管理画面) -->
+				<li class="nav-item nav-item--admin">
+					<a href="/admin" class="nav-admin-btn" title="EmDash CMS 管理画面">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" aria-hidden="true">
+							<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+							<circle cx="12" cy="12" r="3"></circle>
+						</svg>
+						<span>ADMIN</span>
+					</a>
+				</li>
 			</ul>
 		</nav>
 
@@ -238,6 +249,13 @@ const corporateLinks = [
 			<div class="mobile-drawer__footer">
 				<a href="/contact" class="mobile-contact-btn">
 					お問い合わせフォーム
+				</a>
+				<a href="/admin" class="mobile-admin-btn">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" width="16" height="16" aria-hidden="true">
+						<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+						<circle cx="12" cy="12" r="3"></circle>
+					</svg>
+					<span>管理画面（ADMIN）</span>
 				</a>
 				<p class="mobile-copyright">© Nicole Group. All rights reserved.</p>
 			</div>
@@ -383,7 +401,7 @@ const corporateLinks = [
 		});
 
 		// ドロップダウンを持たない他のメニュー項目に移動したら即座に閉じる
-		const directLinks = document.querySelectorAll('.desktop-nav .nav-link:not(.nav-link--btn), .nav-cta-btn');
+		const directLinks = document.querySelectorAll('.desktop-nav .nav-link:not(.nav-link--btn), .nav-cta-btn, .nav-admin-btn');
 		directLinks.forEach(link => {
 			link.addEventListener('mouseenter', () => {
 				dropdownItems.forEach(item => {
@@ -587,6 +605,39 @@ const corporateLinks = [
 		color: #000000;
 		box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
 		transform: translateY(-1px);
+	}
+
+	/* 管理画面ボタン（ADMIN） */
+	.nav-admin-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 16px;
+		background: rgba(0, 0, 0, 0.5);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		border-radius: 999px;
+		font-family: 'Inter', -apple-system, sans-serif;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		color: rgba(255, 255, 255, 0.85);
+		text-decoration: none;
+		backdrop-filter: blur(8px);
+		transition: all 0.25s ease;
+	}
+
+	.nav-admin-btn:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: #ffffff;
+		color: #ffffff;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+		transform: translateY(-1px);
+	}
+
+	.admin-icon {
+		width: 13px;
+		height: 13px;
+		opacity: 0.85;
 	}
 
 	/* ============================================================== */
@@ -994,14 +1045,44 @@ const corporateLinks = [
 		display: block;
 		text-align: center;
 		padding: 15px;
-		background: linear-gradient(135deg, #c5a059 0%, #a8833e 100%);
+		background: #ffffff;
 		border-radius: 8px;
 		color: #000000;
 		font-weight: 700;
 		font-size: 14px;
 		letter-spacing: 0.1em;
 		text-decoration: none;
-		margin-bottom: 16px;
+		margin-bottom: 12px;
+		transition: background 0.2s ease, opacity 0.2s ease;
+	}
+
+	.mobile-contact-btn:hover {
+		background: #f0f0f0;
+	}
+
+	.mobile-admin-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		text-align: center;
+		padding: 13px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		color: rgba(255, 255, 255, 0.9);
+		font-weight: 600;
+		font-size: 13px;
+		letter-spacing: 0.12em;
+		text-decoration: none;
+		margin-bottom: 20px;
+		transition: all 0.2s ease;
+	}
+
+	.mobile-admin-btn:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: #ffffff;
+		color: #ffffff;
 	}
 
 	.mobile-copyright {

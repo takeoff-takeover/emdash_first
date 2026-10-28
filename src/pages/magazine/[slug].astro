@@ -7,6 +7,7 @@ import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
 import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
 import FAQBlock from "../../components/blocks/FAQBlock.astro";
+import NotesBlock from "../../components/blocks/NotesBlock.astro";
 import "../../styles/prose.css";
 
 const portableTextComponents = {
@@ -15,6 +16,8 @@ const portableTextComponents = {
 		accordion: AccordionBlock,
 		faq: FAQBlock,
 		accordion_faq: FAQBlock,
+		notes: NotesBlock,
+		annotation: NotesBlock,
 	},
 };
 
@@ -1173,12 +1176,7 @@ const editUrl = postDbId
 					))}
 				</h1>
 
-				<!-- リード文（サブタイトル・抜粋） -->
-				{post.data.excerpt && (
-					<p class="article-lead-text">{post.data.excerpt}</p>
-				)}
-
-				<!-- メタ情報バッジ群（サブタイトルの下に配置） -->
+				<!-- メタ情報バッジ群 -->
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
@@ -1428,6 +1426,17 @@ const editUrl = postDbId
 						</div>
 					</div>
 				</section>
+				)}
+
+				<!-- 記事末尾の注釈・備考エリア（設定されている場合のみ表示・中身は空がデフォルト） -->
+				{(post.data as any).notes && (post.data as any).notes.trim() && (
+					<aside class="article-notes-block" aria-label="注釈・備考">
+						<div class="notes-inner">
+							{(post.data as any).notes.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0).map((line: string) => (
+								<p class="notes-line">{line}</p>
+							))}
+						</div>
+					</aside>
 				)}
 
 				<!-- SNSシェアボタン -->
@@ -2492,6 +2501,30 @@ const editUrl = postDbId
 
 	.btn-showroom-map:hover {
 		color: var(--color-nicole-red, #E60012);
+	}
+
+	/* ============================================================== */
+	/* 記事末尾の注釈・備考エリア（文字小・デフォルト空） */
+	/* ============================================================== */
+	.article-notes-block {
+		margin: 48px 0 24px 0;
+		padding: 24px 0 0 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.notes-inner {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.notes-line {
+		font-family: 'Inter', -apple-system, sans-serif;
+		font-size: 12.5px;
+		line-height: 1.75;
+		color: rgba(255, 255, 255, 0.5);
+		margin: 0;
+		letter-spacing: 0.02em;
 	}
 
 	/* ============================================================== */

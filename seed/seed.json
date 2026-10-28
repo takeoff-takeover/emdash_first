@@ -96,6 +96,11 @@
 							"value": "alpina-setagaya"
 						}
 					]
+				},
+				{
+					"slug": "notes",
+					"label": "注釈・備考（文字小・デフォルト空）",
+					"type": "text"
 				}
 			]
 		},
