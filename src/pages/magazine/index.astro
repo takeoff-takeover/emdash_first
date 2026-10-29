@@ -322,9 +322,10 @@ function resolveMediaUrl(img: unknown, fallback: string = ""): string {
 function determineArticleCategory(p: any): string {
 	const slug = (p.slug || p.id || "").toLowerCase();
 	const title = (p.title || p.data?.title || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
 
 	// Buyer's Guide 判定
-	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入")) {
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
 		return "Buyer's Guide";
 	}
 
@@ -332,16 +333,19 @@ function determineArticleCategory(p: any): string {
 	const esgKeywords = [
 		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
 		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
-		"work-experience", "junior_high", "fire-department", "international-employee",
-		"mochitsuki", "norimonofes", "sdgs", "summerconference", "esg"
+		"norimonofes", "sdgs", "summerconference", "esg", "美化活動", "クリーンアップ", "交通安全", "防災", "寄付"
 	];
-	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic.includes("esg") || topic.includes("sdgs")) {
 		return "ESG";
 	}
 
 	// People 判定
-	const peopleKeywords = ["people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー", "ストーリー", "story"];
-	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+	const peopleKeywords = [
+		"people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー",
+		"ストーリー", "story", "マイスター", "junior_high", "work-experience", "international-employee",
+		"fire-department", "mochitsuki", "餅つき", "交流会", "感謝状", "職場体験", "alpina-heritage", "rolls-royce-bespoke"
+	];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic === "people") {
 		return "People";
 	}
 
@@ -349,36 +353,7 @@ function determineArticleCategory(p: any): string {
 	return "Cars";
 }
 
-// 記事カテゴリー判定ヘルパー (Cars / People / ESG / Buyer's Guide)
-function determineArticleCategory(p: any): string {
-	const slug = (p.slug || p.id || "").toLowerCase();
-	const title = (p.title || p.data?.title || "").toLowerCase();
 
-	// Buyer's Guide 判定
-	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入")) {
-		return "Buyer's Guide";
-	}
-
-	// ESG 判定
-	const esgKeywords = [
-		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
-		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
-		"work-experience", "junior_high", "fire-department", "international-employee",
-		"mochitsuki", "norimonofes", "sdgs", "summerconference", "esg"
-	];
-	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
-		return "ESG";
-	}
-
-	// People 判定
-	const peopleKeywords = ["people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー", "ストーリー", "story"];
-	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
-		return "People";
-	}
-
-	// デフォルトは Cars
-	return "Cars";
-}
 
 // CMS記事がある場合は統合
 // magazineコレクションおよびpostsコレクションの記事を統合
@@ -780,12 +755,14 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 		let visibleCount = INITIAL_COUNT;
 		let currentBrand = 'ALL';
 		let currentTopic = 'ALL';
+		let currentSort = 'latest';
 		let searchQuery = '';
 
 		const brandPills = document.querySelectorAll('#brand-filters .filter-pill');
 		const topicPills = document.querySelectorAll('#topic-filters .filter-pill');
-		const topicSelect = document.getElementById('topic-select');
+		const sortSelect = document.getElementById('article-sort-select');
 		const searchInput = document.getElementById('article-search-input');
+		const gridContainer = document.getElementById('articles-grid');
 		const articles = Array.from(document.querySelectorAll('.article-item'));
 		const countDisplay = document.getElementById('current-article-count');
 		const noArticles = document.getElementById('no-articles');
@@ -798,8 +775,8 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 				visibleCount = INITIAL_COUNT;
 			}
 
-			// 絞り込み（ブランド/カテゴリー）または検索が行われているか
-			const isFiltered = (currentBrand !== 'ALL') || (currentTopic !== 'ALL') || (searchQuery.length > 0);
+			// 絞り込み（ブランド/カテゴリー/検索/ソート）が行われているか
+			const isFiltered = (currentBrand !== 'ALL') || (currentTopic !== 'ALL') || (searchQuery.length > 0) || (currentSort !== 'latest');
 
 			const matchedArticles = [];
 
@@ -810,11 +787,12 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 				const title = article.getAttribute('data-title') || '';
 				const lead = article.getAttribute('data-lead') || '';
 
-				// 初期状態（絞り込みなし）では最新3記事を除外。
-				// ブランドやカテゴリーの絞り込み、またはキーワード検索時は最新3記事も含めてマッチ判定
-				if (!isFiltered && isTop3) {
-					article.style.display = 'none';
-					return;
+				// 初期状態（絞り込みなし）では最新3記事を除外。また「ALL」時はESGは下部専用セクションにあるためグリッドからは除外
+				if (!isFiltered) {
+					if (isTop3 || topic === 'ESG') {
+						article.style.display = 'none';
+						return;
+					}
 				}
 
 				const matchBrand = (currentBrand === 'ALL') || (brand === currentBrand);
@@ -827,6 +805,34 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 					article.style.display = 'none';
 				}
 			});
+
+			// ソート順の適用
+			if (currentSort === 'latest') {
+				matchedArticles.sort((a, b) => {
+					const dateA = a.getAttribute('data-date') || '';
+					const dateB = b.getAttribute('data-date') || '';
+					return dateB.localeCompare(dateA);
+				});
+			} else if (currentSort === 'popular') {
+				matchedArticles.sort((a, b) => {
+					const viewsA = parseInt(a.getAttribute('data-views-count') || '0', 10);
+					const viewsB = parseInt(b.getAttribute('data-views-count') || '0', 10);
+					return viewsB - viewsA;
+				});
+			} else if (currentSort === 'title') {
+				matchedArticles.sort((a, b) => {
+					const titleA = a.getAttribute('data-title') || '';
+					const titleB = b.getAttribute('data-title') || '';
+					return titleA.localeCompare(titleB, 'ja');
+				});
+			}
+
+			// DOM要素の並び順を反映
+			if (gridContainer) {
+				matchedArticles.forEach(item => {
+					gridContainer.appendChild(item);
+				});
+			}
 
 			const totalCount = matchedArticles.length;
 
@@ -875,7 +881,7 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 
 		// ブランドピルクリック切り替え
 		brandPills.forEach(pill => {
-			pill.addEventListener('click', (e) => {
+			pill.addEventListener('click', () => {
 				brandPills.forEach(p => p.classList.remove('is-active'));
 				pill.classList.add('is-active');
 				currentBrand = pill.getAttribute('data-value') || 'ALL';
@@ -883,10 +889,20 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 			});
 		});
 
-		// カテゴリーセレクト切り替え
-		if (topicSelect) {
-			topicSelect.addEventListener('change', (e) => {
-				currentTopic = e.target.value;
+		// カテゴリーピルクリック切り替え
+		topicPills.forEach(pill => {
+			pill.addEventListener('click', () => {
+				topicPills.forEach(p => p.classList.remove('is-active'));
+				pill.classList.add('is-active');
+				currentTopic = pill.getAttribute('data-value') || 'ALL';
+				applyFilters(true);
+			});
+		});
+
+		// ソート切り替え
+		if (sortSelect) {
+			sortSelect.addEventListener('change', (e) => {
+				currentSort = e.target.value;
 				applyFilters(true);
 			});
 		}
@@ -904,6 +920,7 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 			resetBtn.addEventListener('click', () => {
 				currentBrand = 'ALL';
 				currentTopic = 'ALL';
+				currentSort = 'latest';
 				searchQuery = '';
 
 				brandPills.forEach(p => {
@@ -911,7 +928,12 @@ const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 					else p.classList.remove('is-active');
 				});
 
-				if (topicSelect) topicSelect.value = 'ALL';
+				topicPills.forEach(p => {
+					if (p.getAttribute('data-value') === 'ALL') p.classList.add('is-active');
+					else p.classList.remove('is-active');
+				});
+
+				if (sortSelect) sortSelect.value = 'latest';
 				if (searchInput) searchInput.value = '';
 
 				applyFilters(true);
