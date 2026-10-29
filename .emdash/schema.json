@@ -1,0 +1,243 @@
+{
+  "collections": [
+    {
+      "slug": "magazine",
+      "label": "マガジン",
+      "labelSingular": "マガジン記事",
+      "description": "Nicole Connect Webマガジン専用特集記事コレクション",
+      "icon": "book-open",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "scheduling",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "sortOrder": 1,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "タイトル",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "featured_image",
+          "label": "アイキャッチ写真 (PC用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "featured_image_sp",
+          "label": "アイキャッチ写真 (スマホ用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "本文",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "excerpt",
+          "label": "抜粋 / リード文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_location",
+          "label": "関連拠点 (Related Showroom)",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "なし（設定しない）",
+              "value": ""
+            },
+            {
+              "label": "Nicole BMW 本社ショールーム（川崎）",
+              "value": "nicole-bmw-kawasaki"
+            },
+            {
+              "label": "Nicole BMW 大田支店",
+              "value": "nicole-bmw-ota"
+            },
+            {
+              "label": "Nicole BMW 青葉宮前支店",
+              "value": "nicole-bmw-aobamiyamae"
+            },
+            {
+              "label": "Nicole BMW 横浜港北支店",
+              "value": "nicole-bmw-yokohama-kohoku"
+            },
+            {
+              "label": "Nicole BMW 新百合ヶ丘支店",
+              "value": "nicole-bmw-shin-yurigaoka"
+            },
+            {
+              "label": "ロールス・ロイス・モーター・カーズ横浜",
+              "value": "rolls-royce-yokohama"
+            },
+            {
+              "label": "Nicole Competizione 青山（Ferrari）",
+              "value": "ferrari-aoyama"
+            },
+            {
+              "label": "ニコル世田谷ショールーム（ALPINA）",
+              "value": "alpina-setagaya"
+            }
+          ]
+        },
+        {
+          "slug": "notes",
+          "label": "注釈・免責事項（文字小・デフォルト空）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
+      "slug": "posts",
+      "label": "Posts",
+      "labelSingular": "Post",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "scheduling",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "featured_image",
+          "label": "Featured Image (PC用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "featured_image_sp",
+          "label": "Featured Image (スマホ用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "excerpt",
+          "label": "Excerpt",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_location",
+          "label": "関連拠点 (Related Showroom)",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "なし（設定しない）",
+              "value": ""
+            },
+            {
+              "label": "Nicole BMW 本社ショールーム（川崎）",
+              "value": "nicole-bmw-kawasaki"
+            },
+            {
+              "label": "Nicole BMW 大田支店",
+              "value": "nicole-bmw-ota"
+            },
+            {
+              "label": "Nicole BMW 青葉宮前支店",
+              "value": "nicole-bmw-aobamiyamae"
+            },
+            {
+              "label": "Nicole BMW 横浜港北支店",
+              "value": "nicole-bmw-yokohama-kohoku"
+            },
+            {
+              "label": "Nicole BMW 新百合ヶ丘支店",
+              "value": "nicole-bmw-shin-yurigaoka"
+            },
+            {
+              "label": "ロールス・ロイス・モーター・カーズ横浜",
+              "value": "rolls-royce-yokohama"
+            },
+            {
+              "label": "Nicole Competizione 青山（Ferrari）",
+              "value": "ferrari-aoyama"
+            },
+            {
+              "label": "ニコル世田谷ショールーム（ALPINA）",
+              "value": "alpina-setagaya"
+            }
+          ]
+        },
+        {
+          "slug": "notes",
+          "label": "注釈・備考（文字小・デフォルト空）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "version": "0005cc61b9cd74fb"
+}
