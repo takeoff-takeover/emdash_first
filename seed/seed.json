@@ -131,6 +131,105 @@
 					"searchable": true
 				}
 			]
+		},
+		{
+			"slug": "magazine",
+			"label": "マガジン",
+			"labelSingular": "マガジン記事",
+			"description": "Nicole Connect Webマガジン専用特集記事コレクション",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"commentsEnabled": false,
+			"fields": [
+				{
+					"slug": "title",
+					"label": "タイトル",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "アイキャッチ写真 (PC用)",
+					"type": "image",
+					"required": false
+				},
+				{
+					"slug": "featured_image_sp",
+					"label": "アイキャッチ写真 (スマホ用)",
+					"type": "image",
+					"required": false
+				},
+				{
+					"slug": "content",
+					"label": "本文",
+					"type": "portableText",
+					"required": false,
+					"searchable": true
+				},
+				{
+					"slug": "excerpt",
+					"label": "抜粋 / リード文",
+					"type": "text",
+					"required": false,
+					"searchable": true
+				},
+				{
+					"slug": "related_location",
+					"label": "関連拠点 (Related Showroom)",
+					"type": "select",
+					"options": [
+						{
+							"label": "なし（設定しない）",
+							"value": ""
+						},
+						{
+							"label": "Nicole BMW 本社ショールーム（川崎）",
+							"value": "nicole-bmw-kawasaki"
+						},
+						{
+							"label": "Nicole BMW 大田支店",
+							"value": "nicole-bmw-ota"
+						},
+						{
+							"label": "Nicole BMW 青葉宮前支店",
+							"value": "nicole-bmw-aobamiyamae"
+						},
+						{
+							"label": "Nicole BMW 横浜港北支店",
+							"value": "nicole-bmw-yokohama-kohoku"
+						},
+						{
+							"label": "Nicole BMW 新百合ヶ丘支店",
+							"value": "nicole-bmw-shin-yurigaoka"
+						},
+						{
+							"label": "ロールス・ロイス・モーター・カーズ横浜",
+							"value": "rolls-royce-yokohama"
+						},
+						{
+							"label": "Nicole Competizione 青山（Ferrari）",
+							"value": "ferrari-aoyama"
+						},
+						{
+							"label": "ニコル世田谷ショールーム（ALPINA）",
+							"value": "alpina-setagaya"
+						}
+					]
+				},
+				{
+					"slug": "notes",
+					"label": "注釈・免責事項（文字小・デフォルト空）",
+					"type": "text",
+					"required": false
+				}
+			]
 		}
 	],
 	"taxonomies": [
@@ -261,6 +360,33 @@
 				{
 					"slug": "餅つき",
 					"label": "餅つき"
+				}
+			]
+		},
+		{
+			"name": "magazine_category",
+			"label": "マガジンカテゴリー",
+			"labelSingular": "マガジンカテゴリー",
+			"hierarchical": true,
+			"collections": [
+				"magazine"
+			],
+			"terms": [
+				{
+					"slug": "cars",
+					"label": "Cars"
+				},
+				{
+					"slug": "people",
+					"label": "People"
+				},
+				{
+					"slug": "esg",
+					"label": "ESG"
+				},
+				{
+					"slug": "buyers-guide",
+					"label": "Buyer's Guide"
 				}
 			]
 		}

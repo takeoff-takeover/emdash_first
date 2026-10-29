@@ -27,7 +27,28 @@ if (!slug) {
 	return Astro.rewrite("/404");
 }
 
-const { entry: cmsPost, cacheHint } = await getEmDashEntry("posts", slug);
+let cmsPost: any = null;
+let cacheHint: any = null;
+
+// 1. 新設された 'magazine' コレクションから優先取得
+try {
+	const magResult = await getEmDashEntry("magazine" as any, slug);
+	if (magResult?.entry) {
+		cmsPost = magResult.entry;
+		cacheHint = magResult.cacheHint;
+	}
+} catch (e) {}
+
+// 2. なければ従来の 'posts' コレクションをフォールバック検索
+if (!cmsPost) {
+	try {
+		const postResult = await getEmDashEntry("posts", slug);
+		if (postResult?.entry) {
+			cmsPost = postResult.entry;
+			cacheHint = postResult.cacheHint;
+		}
+	} catch (e) {}
+}
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 

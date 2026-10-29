@@ -4,11 +4,32 @@
 import { getEmDashCollection } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 
-// CMS（postsコレクション）から記事を取得
-const { entries: cmsPosts, cacheHint } = await getEmDashCollection("posts", {
-	orderBy: { published_at: "desc" },
-	limit: 50,
-});
+// CMS（magazineコレクション および postsコレクション）から記事を取得
+let cmsMagazines: any[] = [];
+let cacheHint: any = null;
+
+try {
+	const magResult = await getEmDashCollection("magazine" as any, {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (magResult?.entries) {
+		cmsMagazines = magResult.entries;
+		cacheHint = magResult.cacheHint;
+	}
+} catch (e) {}
+
+let cmsPosts: any[] = [];
+try {
+	const postResult = await getEmDashCollection("posts", {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (postResult?.entries) {
+		cmsPosts = postResult.entries;
+		if (!cacheHint) cacheHint = postResult.cacheHint;
+	}
+} catch (e) {}
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 
@@ -297,20 +318,87 @@ function resolveMediaUrl(img: unknown, fallback: string = ""): string {
 	return fallback;
 }
 
+// 記事カテゴリー判定ヘルパー (Cars / People / ESG / Buyer's Guide)
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+
+	// Buyer's Guide 判定
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入")) {
+		return "Buyer's Guide";
+	}
+
+	// ESG 判定
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"work-experience", "junior_high", "fire-department", "international-employee",
+		"mochitsuki", "norimonofes", "sdgs", "summerconference", "esg"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+		return "ESG";
+	}
+
+	// People 判定
+	const peopleKeywords = ["people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー", "ストーリー", "story"];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+		return "People";
+	}
+
+	// デフォルトは Cars
+	return "Cars";
+}
+
+// 記事カテゴリー判定ヘルパー (Cars / People / ESG / Buyer's Guide)
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+
+	// Buyer's Guide 判定
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入")) {
+		return "Buyer's Guide";
+	}
+
+	// ESG 判定
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"work-experience", "junior_high", "fire-department", "international-employee",
+		"mochitsuki", "norimonofes", "sdgs", "summerconference", "esg"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+		return "ESG";
+	}
+
+	// People 判定
+	const peopleKeywords = ["people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー", "ストーリー", "story"];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw))) {
+		return "People";
+	}
+
+	// デフォルトは Cars
+	return "Cars";
+}
+
 // CMS記事がある場合は統合
-const cmsArticles = (cmsPosts || []).map((p: any) => {
+// magazineコレクションおよびpostsコレクションの記事を統合
+const allCmsEntries = [...cmsMagazines, ...cmsPosts.filter(p => !cmsMagazines.some(m => m.id === p.id))];
+
+const cmsArticles = allCmsEntries.map((p: any) => {
 	const featImg = p.data.featured_image;
 	const imgUrl = resolveMediaUrl(
 		featImg,
 		"https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
 	);
+	const cat = determineArticleCategory(p);
 
 	return {
 		id: p.id || p.data.id,
 		slug: p.id,
 		title: p.data.title,
 		brand: p.data.related_location ? "BMW" : "ALL",
-		topic: "Feature",
+		topic: cat,
+		category: cat,
 		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25",
 		views: "NEW",
 		image: imgUrl,
@@ -369,7 +457,7 @@ const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.
 const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).length;
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
-const topicsList = ["ALL", "Feature", "Guide", "People"];
+const topicsList = ["ALL", "Cars", "People", "ESG", "Buyer's Guide"];
 ---
 
 <NicoleLayout 
@@ -506,11 +594,18 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 					<div class="filter-controls-right">
 						<div class="filter-group filter-group--topic">
 							<span class="filter-group__label">CATEGORY:</span>
-							<select id="topic-select" class="topic-dropdown" aria-label="カテゴリーを選択">
+							<div class="filter-pills" id="topic-filters">
 								{topicsList.map((t) => (
-									<option value={t}>{t === 'ALL' ? 'すべてのカテゴリー' : t}</option>
+									<button 
+										type="button" 
+										class={`filter-pill ${t === 'ALL' ? 'is-active' : ''}`} 
+										data-filter-type="topic" 
+										data-value={t}
+									>
+										{t}
+									</button>
 								))}
-							</select>
+							</div>
 						</div>
 
 						<!-- キーワード検索 -->
@@ -688,6 +783,7 @@ const topicsList = ["ALL", "Feature", "Guide", "People"];
 		let searchQuery = '';
 
 		const brandPills = document.querySelectorAll('#brand-filters .filter-pill');
+		const topicPills = document.querySelectorAll('#topic-filters .filter-pill');
 		const topicSelect = document.getElementById('topic-select');
 		const searchInput = document.getElementById('article-search-input');
 		const articles = Array.from(document.querySelectorAll('.article-item'));
