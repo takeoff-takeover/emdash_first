@@ -58,6 +58,116 @@ const elementorHtml = "<div data-elementor-type=\"wp-page\" data-elementor-id=\"
         --justify-content: initial;
         --align-items: initial;
       }
+
+      /* ============================================================== */
+      /* グローバルヘッダーの左右端（max-width: 1440px / padding: 0 40px）に揃えるスタイル */
+      /* ============================================================== */
+
+      /* ① 企業理念 ヒーローバナー */
+      .elementor-433 .elementor-element.elementor-element-8e9842a {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner {
+        max-width: 1440px !important;
+        margin: 0 auto !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* ② リード文コンテナ (中央配置・テキスト完全センタリング) */
+      .elementor-433 .elementor-element.elementor-element-50780bf {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-50780bf > .e-con-inner {
+        max-width: 820px !important;
+        margin: 0 auto !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        box-sizing: border-box !important;
+        text-align: center !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-59e02ee,
+      .elementor-433 .elementor-element.elementor-element-59e02ee .elementor-heading-title {
+        text-align: center !important;
+      }
+
+      /* ③ 3つの核心（MISSION / VISION / VALUES図）コンテナ */
+      .elementor-433 .elementor-element.elementor-element-3b1fe38 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner {
+        max-width: 1440px !important;
+        margin: 0 auto !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* ④ VALUES 6大項目グリッドセクション (各項目が間延びせず引き締まるよう1040px幅に調整) */
+      .elementor-433 .elementor-element.elementor-element-33ef6ff {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-e087a61 {
+        width: 100% !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
+        max-width: 1040px !important;
+        margin: 0 auto !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* 見出しの改行最適化（単語分断・孤立文字防止） */
+      .elementor-433 .elementor-heading-title,
+      .elementor-433 h1, .elementor-433 h2, .elementor-433 h3, .elementor-433 h4 {
+        text-wrap: balance !important;
+        word-break: auto-phrase !important;
+        overflow-wrap: break-word !important;
+      }
+
+      /* ⑤ 結びのメッセージ文コンテナ (読みやすい800px幅で中央配置) */
+      .elementor-433 .elementor-element.elementor-element-3b4a995 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+      }
+      .elementor-433 .elementor-element.elementor-element-3b4a995 > .e-con-inner {
+        max-width: 800px !important;
+        margin: 0 auto !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* レスポンシブ対応 (グローバルヘッダーと同一のパディング推移) */
+      @media (max-width: 1024px) {
+        .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner,
+        .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner,
+        .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner,
+        .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner,
+        .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
+          padding-left: 16px !important;
+          padding-right: 16px !important;
+        }
+      }
     </style>
   </slot>
 

@@ -53,6 +53,29 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<!-- Extracted Site Styles (Kit-8, Header 6801, Home 2030, Footer 12887, etc.) -->
 	<link rel="stylesheet" href="/css/nicole-core.css" />
 
+	<style is:global>
+		/* 全体的な見出しの不自然な改行・単語分断・孤立文字防止 */
+		h1, h2, h3, h4, h5, h6,
+		.elementor-heading-title,
+		.elementor-icon-box-title {
+			text-wrap: balance;
+			overflow-wrap: break-word;
+			word-break: auto-phrase;
+		}
+
+		/* 意図的な改行（<br>）の後の文節・単語が1文字だけ改行されるのを防ぐインラインフレーズ */
+		.heading-phrase {
+			display: inline-block;
+			white-space: nowrap;
+		}
+		@media (max-width: 480px) {
+			.heading-phrase {
+				white-space: normal;
+				word-break: auto-phrase;
+			}
+		}
+	</style>
+
 	<!-- Core scripts in head (Self-hosted) -->
 	<script is:inline src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
 	<script is:inline src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>

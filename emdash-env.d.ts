@@ -29,6 +29,7 @@ export interface Post {
   content?: PortableTextBlock[];
   excerpt?: string;
   related_location?: string;
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

@@ -1,85 +1,90 @@
 ---
 import NicoleLayout from "../../../layouts/NicoleLayout.astro";
 
-// ショールーム基本データ
+// ショールーム＆サービス統合拠点データ
 const showroom = {
 	id: "nicole-bmw-kawasaki",
-	name: "Nicole BMW 本社ショールーム（川崎）",
-	subName: "Nicole BMW Kawasaki Headquarters Showroom",
+	name: "Nicole BMW 本社（川崎）",
+	subName: "Nicole BMW Kawasaki Headquarters & Service Center",
 	brand: "BMW",
-	facilityType: "正規ディーラー・ショールーム",
+	serviceBrands: ["BMW", "MINI"],
+	facilityType: "BMW正規ディーラー（ショールーム・サービス工場併設）",
 	postal: "〒212-0005",
 	address: "神奈川県川崎市幸区戸手2-5-7",
 	tel: "044-511-2000",
 	telDirect: "044-543-5400",
+	serviceTel: "044-522-1500",
 	fax: "044-543-5410",
-	businessHours: "10:00～18:00",
-	closedDays: "水曜日（祝日の場合は営業・翌火曜または木曜休）",
+	businessHours: "10:00～18:00（ショールーム） / 9:00～18:00（サービス）",
+	closedDays: "水曜日（祝日の場合は営業）",
 	parking: "完備（敷地内 屋根付き来客用パーキング 15台・ハイルーフ車可）",
 	lat: 35.5459772,
 	lng: 139.6897264,
 	googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7",
 	image: "/uploads/2026/01/Nicole-BMW-本社.jpg",
-	services: ["新車販売", "試乗車常備", "M認定ディーラー", "BMW i (EV) 充電スポット", "ファイナンシャルサービス", "自動車保険", "下取り査定"],
+	services: ["BMW 新車販売", "最新試乗車常備", "BMW M認定ディーラー", "BMW i (EV) 急速充電", "BMW/MINI 正規車検・点検", "ファイナンシャルサービス", "自動車保険", "下取り査定"],
+
+	// 部門別データ
+	departments: {
+		sales: {
+			name: "ショールーム（新車・試乗・ご商談）",
+			brandBadge: "BMW",
+			tel: "044-511-2000",
+			telDirect: "044-543-5400",
+			fax: "044-543-5410",
+			hours: "10:00 〜 18:00",
+			closed: "水曜日（祝日の場合は営業）",
+			features: [
+				"BMW 最新全モデルの新車展示・ご試乗",
+				"BMW M 認定ディーラー（専任コンサルタント常駐）",
+				"BMW i 超急速EV充電スタンド（150kW）完備",
+				"オートローン・リース・自動車保険のご相談",
+				"愛車査定・下取りのご相談"
+			]
+		},
+		service: {
+			name: "本社サービスセンター（車検・点検・整備工場）",
+			brandBadges: ["BMW", "MINI"],
+			tel: "044-522-1500",
+			telDirect: "044-522-1500",
+			hours: "09:00 〜 18:00",
+			closed: "水曜日（祝日を除く）",
+			note: "※BMWに加え、MINIの正規車検・点検・整備もワンストップで受け付けております。"
+		}
+	}
 };
 
-// 展示車・試乗車モデル
-const featuredVehicles = [
+// ショールーム写真ギャラリー（6点）
+const galleryPhotos = [
 	{
-		model: "BMW i7 xDrive60 Excellence",
-		type: "BEV (完全電動フラッグシップセダン)",
-		specs: "最高出力 544ps | 一充電走行距離 650km | シアタースクリーン完備",
-		image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80",
-		status: "展示中 / 試乗可能",
-		tag: "FLAGSHIP BEV"
+		src: "/uploads/2026/01/Nicole-BMW-本社.jpg",
+		alt: "Nicole BMW 本社 外観",
+		caption: "国道1号線（第二京浜）沿いに面したNicole BMW 本社外観"
 	},
 	{
-		model: "BMW X7 M60i xDrive",
-		type: "3列ラグジュアリーSAV (4.4L V8 ツインターボ)",
-		specs: "最高出力 530ps | 48Vマイルドハイブリッド | 6名乗りコンフォートシート",
-		image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80",
-		status: "展示中 / 試乗可能",
-		tag: "M PERFORMANCE"
+		src: "/uploads/2026/01/Nicole-BMW-本社-1.jpg",
+		alt: "ショールーム内観",
+		caption: "最新モデルを展示する開放的なメインショールーム"
 	},
 	{
-		model: "BMW M4 Competition Coupé M xDrive",
-		type: "ハイパフォーマンスクーペ (直列6気筒 Mツインタボ)",
-		specs: "最高出力 530ps | 0-100km/h 3.5秒 | カーボンルーフ",
-		image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80",
-		status: "ショールーム展示中",
-		tag: "M HIGH PERFORMANCE"
+		src: "/uploads/2026/02/BMWサービスセンター.jpg",
+		alt: "本社サービス工場",
+		caption: "BMW & MINIの車検・点検に対応する最新整備ベイ"
 	},
 	{
-		model: "BMW 320i M Sport",
-		type: "スポーツセダン (2.0L 直列4気筒ツインパワー・ターボ)",
-		specs: "俊敏なハンドリング | 最新BMWカーブド・ディスプレイ | ドライブレコーダー内蔵",
-		image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80",
-		status: "試乗可能",
-		tag: "SPORTS SEDAN"
-	}
-];
-
-// 施設・設備の特長
-const amenities = [
-	{
-		title: "BMW M 認定正規ディーラー",
-		desc: "Mハイパフォーマンスモデルの専門知識と走行テストを重ねた「M専任コンサルタント」が常駐。特別な個別コンフィギュレーションをご案内します。",
-		icon: "m-badge"
+		src: "/uploads/2026/02/NicoleBMW青葉宮前2025.jpg",
+		alt: "展示フロア",
+		caption: "最新CIに基づいた洗練された車両展示エリア"
 	},
 	{
-		title: "BMW i 150kW 超急速EV充電器",
-		desc: "次世代電気自動車「BMW i」のための最新急速充電スタンドを2基完備。快適な充電待ち時間をお過ごしいただけます。",
-		icon: "charging"
+		src: "/uploads/2026/02/NicoleBMW大田支店2025.jpg",
+		alt: "オーナーズラウンジ",
+		caption: "点検や商談の際にご利用いただける静謐なラウンジスペース"
 	},
 	{
-		title: "プライベート・オーナーズラウンジ",
-		desc: "バリスタによる挽きたてのエスプレッソや厳選ドリンク、高速Wi-Fi、電源を完備した静謐で洗練されたラウンジ空間です。",
-		icon: "lounge"
-	},
-	{
-		title: "併設 本社サービスファクトリー",
-		desc: "隣接する敷地に10ベイ以上の最新テスター完備リフトを備え、BMWマイスター整備士による迅速なクイック点検・車検が可能です。",
-		icon: "workshop"
+		src: "/uploads/2026/02/Nicole-BMW-横浜港北支店.jpg",
+		alt: "デリバリーエリア",
+		caption: "ご納車やお車の引き渡しを行う専用エリア"
 	}
 ];
 ---
@@ -89,18 +94,7 @@ const amenities = [
 	description="Nicole BMW 本社（川崎）は、神奈川県川崎市幸区戸手にあるBMW正規ディーラーです。最新BMW全モデルの新車展示・試乗、Mハイパフォーマンス、EV充電スポット完備。併設サービス工場と連携し最高峰のサポートを提供します。"
 >
 	<div class="showroom-page">
-		<!-- パンくずナビゲーション -->
-		<nav class="breadcrumb-bar" aria-label="Breadcrumb">
-			<div class="breadcrumb-inner">
-				<a href="/" class="bc-link">ホーム</a>
-				<span class="bc-sep">/</span>
-				<a href="/location/" class="bc-link">店舗・拠点一覧</a>
-				<span class="bc-sep">/</span>
-				<span class="bc-current">Nicole BMW 本社（川崎）</span>
-			</div>
-		</nav>
-
-		<!-- ヒーローヘッダー -->
+		<!-- ヒーローヘッダー（シンプル＆ゆとりのある構成） -->
 		<header class="sr-hero">
 			<div class="sr-hero__media">
 				<img src={showroom.image} alt={showroom.name} class="sr-hero__img" />
@@ -108,145 +102,229 @@ const amenities = [
 			</div>
 
 			<div class="sr-hero__content">
-				<div class="sr-hero__badges">
-					<!-- BMW公式ロゴバッジ -->
-					<div class="bmw-pill">
-						<svg class="bmw-emblem-svg" viewBox="0 0 100 100" width="28" height="28">
-							<circle cx="50" cy="50" r="48" fill="#111111" stroke="#ffffff" stroke-width="2.5"/>
-							<circle cx="50" cy="50" r="37" fill="#ffffff"/>
-							<path d="M50 13 A37 37 0 0 1 87 50 L50 50 Z" fill="#0066b1"/>
-							<path d="M50 50 L13 50 A37 37 0 0 1 50 13 Z" fill="#ffffff"/>
-							<path d="M50 50 L50 87 A37 37 0 0 1 13 50 Z" fill="#0066b1"/>
-							<path d="M50 50 L87 50 A37 37 0 0 1 50 87 Z" fill="#ffffff"/>
-							<circle cx="50" cy="50" r="37" fill="none" stroke="#000000" stroke-width="1.2"/>
-							<text x="50" y="21" font-family="'Inter', sans-serif" font-weight="900" font-size="9.5" fill="#ffffff" text-anchor="middle">B</text>
-							<text x="76" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="9.5" fill="#ffffff" text-anchor="middle">M</text>
-							<text x="24" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="9.5" fill="#ffffff" text-anchor="middle">W</text>
-						</svg>
-						<span>BMW AUTHORIZED DEALER</span>
-					</div>
-					<div class="status-live-badge">
-						<span class="live-dot"></span>
-						本日営業中 10:00 - 18:00
-					</div>
-				</div>
-
+				<span class="sr-hero__eyebrow">BMW AUTHORIZED DEALER</span>
 				<h1 class="sr-hero__title">
-					Nicole BMW 本社
-					<span class="sr-hero__title-sub">川崎・幸区 ショールーム</span>
+					Nicole BMW 本社（川崎）
+					<span class="sr-hero__title-sub">ショールーム ＆ 本社サービス工場</span>
 				</h1>
-				<p class="sr-hero__lead">
-					1988年の創業以来、首都圏のBMWファンに選ばれ続けてきたニコル・グループの中核旗艦拠点。<br />
-					国道1号線（第二京浜）沿いに広がる洗練の空間で、駆けぬける歓びのすべてをお届けいたします。
-				</p>
 
-				<!-- クイックアクションバー -->
-				<div class="sr-quick-actions">
-					<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-action btn-action--primary">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-						Googleマップでルート案内
+				<div class="sr-hero__actions">
+					<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--primary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+						ルート案内
 					</a>
-					<a href="#test-drive" class="btn-action btn-action--secondary">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-						試乗・商談予約
-					</a>
-					<a href={`tel:${showroom.telDirect}`} class="btn-action btn-action--outline">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-						電話する：{showroom.telDirect}
+					<a href="#departments" class="btn-hero btn-hero--secondary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+						電話・窓口情報
 					</a>
 				</div>
 			</div>
 		</header>
+
+		<!-- 拠点提供サービス・機能ステータスバー（ヒーロー直下：スマホでも崩壊しないクリーンな横スクロール対応） -->
+		<section class="facility-feature-bar" aria-label="店舗機能・取扱サービス">
+			<div class="facility-feature-container">
+				<div class="facility-feature-list">
+					<div class="feat-pill">
+						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+						<span>新車取扱（BMW）</span>
+					</div>
+					<div class="feat-pill">
+						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+						<span>本社サービス工場</span>
+					</div>
+					<div class="feat-pill feat-pill--highlight">
+						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+						<span>MINI 正規入庫対応</span>
+					</div>
+					<div class="feat-pill">
+						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+						<span>EV 急速充電</span>
+					</div>
+				</div>
+			</div>
+		</section>
 
 		<!-- メインコンテンツグリッド -->
 		<div class="sr-content-wrap">
 			<div class="sr-layout-grid">
 				<!-- 左側：メイン詳細コンテンツ -->
 				<div class="sr-main-col">
-					<!-- ショールームコンセプト -->
-					<section class="sr-section">
+					<!-- ショールームコンセプト（デスクトップで表示、スマホでは非表示にしてギャラリーへ直結） -->
+					<section class="sr-section sr-section--concept">
 						<div class="section-tag">CONCEPT &amp; PHILOSOPHY</div>
 						<h2 class="section-title">首都圏随一のスケールを誇る、BMWの美学が息づく空間</h2>
 						<div class="prose-content">
 							<p>
 								Nicole BMW 本社ショールームは、東京都心と横浜を結ぶ大動脈・国道1号線（第二京浜）に面し、多摩川を越えてすぐの川崎市幸区戸手に位置します。
-								最新のBMWコーポレートアイデンティティ（CI）に基づいたガラス張りの開放的な空間には、最新モデルからフラッグシップの7シリーズ、Mハイパフォーマンスモデルまで常時多彩なラインナップを展示。
+								最新のBMWコーポレートアイデンティティ（CI）に基づいた開放的な空間には、最新モデルからフラッグシップの7シリーズ、Mモデルまで常時多彩なラインナップを展示。
 							</p>
 							<p>
-								専門のトレーニングを積んだプロダクト・ジーニアスおよびセールス・コンサルタントが、お客様のライフスタイルに最適な一台をご提案。
-								敷地内には広々とした来客用パーキング、急速充電器、そして熟練のBMWマイスターが待機する「Nicole BMW 本社サービス工場」を併設し、購入からアフターメンテナンスまでワンストップで最高峰の安心をお約束します。
+								敷地内にはEV急速充電スタンド、そして熟練のBMWマイスターが待機する「Nicole BMW 本社サービス工場」を併設し、BMWおよびMINIの購入からアフターメンテナンスまでワンストップでお迎えいたします。
 							</p>
 						</div>
+					</section>
 
-						<!-- 提供サービス一覧 -->
-						<div class="services-block">
-							<h3 class="services-subheading">取扱サービス・対応内容</h3>
-							<div class="services-grid">
-								{showroom.services.map((srv) => (
-									<div class="srv-chip">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="srv-check"><polyline points="20 6 9 17 4 12"/></svg>
-										<span>{srv}</span>
-									</div>
+					<!-- ショールーム写真ギャラリー（大写真1点 + 6点サムネイル） -->
+					<section class="sr-section sr-section--gallery">
+						<div class="gallery-container">
+							<div class="gallery-main-frame">
+								<img
+									id="gallery-main-img"
+									src={galleryPhotos[0].src}
+									alt={galleryPhotos[0].alt}
+									class="gallery-main-img"
+								/>
+								<div class="gallery-info-bar">
+									<span id="gallery-counter" class="gallery-counter">01 / 06</span>
+									<span id="gallery-caption" class="gallery-caption">{galleryPhotos[0].caption}</span>
+								</div>
+							</div>
+							<div class="gallery-thumbs-grid" role="tablist" aria-label="ショールーム写真サムネイル">
+								{galleryPhotos.map((photo, idx) => (
+									<button
+										type="button"
+										class={`gallery-thumb-btn ${idx === 0 ? 'is-active' : ''}`}
+										data-src={photo.src}
+										data-alt={photo.alt}
+										data-caption={photo.caption}
+										data-idx={idx}
+										aria-label={`写真 ${idx + 1}`}
+									>
+										<img src={photo.src} alt={photo.alt} class="gallery-thumb-img" loading="lazy" />
+									</button>
 								))}
 							</div>
 						</div>
 					</section>
 
-					<!-- 展示車・試乗車ラインナップ -->
-					<section class="sr-section" id="test-drive">
-						<div class="section-tag">FEATURED VEHICLES</div>
-						<div class="section-header-flex">
-							<div>
-								<h2 class="section-title">展示車・試乗可能モデル</h2>
-								<p class="section-desc">Nicole BMW 本社にて実際にご体感いただける最新モデルの一部をご紹介します。</p>
-							</div>
-							<a href={`tel:${showroom.telDirect}`} class="btn-reserve-all">
-								試乗のお問い合わせ →
-							</a>
-						</div>
+					<!-- 店舗・窓口情報（基本情報 ＋ 各部門窓口タブ） -->
+					<section class="sr-section sr-section--depts" id="departments">
+						<div class="section-tag">DEALER INFORMATION</div>
+						<h2 class="section-title">店舗・窓口情報</h2>
+						<p class="section-desc">Nicole BMW 本社ショールームおよび併設サービス工場の詳細情報です。</p>
 
-						<div class="car-cards-grid">
-							{featuredVehicles.map((car) => (
-								<div class="car-card">
-									<div class="car-card__media">
-										<img src={car.image} alt={car.model} class="car-card__img" loading="lazy" />
-										<span class="car-tag">{car.tag}</span>
-										<span class="car-status-badge">{car.status}</span>
+						<div class="dealer-info-card">
+							<!-- 拠点共通・基本情報 -->
+							<div class="dealer-common-info">
+								<div class="common-info-grid">
+									<div class="c-info-item">
+										<span class="c-info-label">施設名称</span>
+										<span class="c-info-val c-info-val--bold">{showroom.name}</span>
 									</div>
-									<div class="car-card__body">
-										<h3 class="car-model">{car.model}</h3>
-										<p class="car-type">{car.type}</p>
-										<p class="car-specs">{car.specs}</p>
-										<div class="car-card__actions">
-											<a href={`tel:${showroom.telDirect}`} class="btn-car-testdrive">
-												試乗を申し込む
-											</a>
-											<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-car-detail">
-												店舗で見る ↗
+									<div class="c-info-item">
+										<span class="c-info-label">所在地</span>
+										<div class="c-info-val">
+											<span class="postal">{showroom.postal}</span>
+											<span>{showroom.address}</span>
+											<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
+												Googleマップで開く ↗
 											</a>
 										</div>
 									</div>
-								</div>
-							))}
-						</div>
-					</section>
-
-					<!-- 施設・設備の特長 -->
-					<section class="sr-section">
-						<div class="section-tag">FACILITIES &amp; AMENITIES</div>
-						<h2 class="section-title">洗練されたおもてなしと充実の設備</h2>
-						<div class="amenities-grid">
-							{amenities.map((am) => (
-								<div class="amenity-card">
-									<div class="amenity-icon-wrap">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="amenity-svg">
-											<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-										</svg>
+									<div class="c-info-item">
+										<span class="c-info-label">運営法人</span>
+										<span class="c-info-val">ニコル・カーズ合同会社</span>
 									</div>
-									<h3 class="amenity-title">{am.title}</h3>
-									<p class="amenity-desc">{am.desc}</p>
 								</div>
-							))}
+							</div>
+
+							<!-- 各部門（ショールーム／サービス工場）アコーディオン -->
+							<div class="dept-accordion-list" role="region" aria-label="店舗窓口一覧">
+								<!-- 1. ショールーム アコーディオン（デフォルト開） -->
+								<details class="dept-acc-item" open>
+									<summary class="dept-acc-header">
+										<div class="dept-acc-title-group">
+											<span class="dept-acc-badge">新車販売</span>
+											<h3 class="dept-acc-name">ショールーム（新車）</h3>
+										</div>
+										<div class="dept-acc-meta-preview">
+											<span class="preview-hours">10:00 〜 18:00</span>
+											<svg class="dept-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+										</div>
+									</summary>
+									<div class="dept-acc-body">
+										<div class="dept-compact-table">
+											<div class="dept-table-row">
+												<span class="d-label">取扱ブランド</span>
+												<span class="d-val d-val--bold">BMW（新車販売）</span>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">代表電話</span>
+												<div class="d-val">
+													<a href={`tel:${showroom.departments.sales.tel}`} class="d-tel">{showroom.departments.sales.tel}</a>
+													<span class="d-sub-tel">（直通: {showroom.departments.sales.telDirect} / FAX: {showroom.departments.sales.fax}）</span>
+												</div>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">営業時間</span>
+												<span class="d-val">{showroom.departments.sales.hours}</span>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">定休日</span>
+												<span class="d-val">{showroom.departments.sales.closed}</span>
+											</div>
+										</div>
+
+										<div class="dept-card__action">
+											<a href={`tel:${showroom.departments.sales.tel}`} class="btn-dept-call">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+												ショールームへ電話：{showroom.departments.sales.tel}
+											</a>
+										</div>
+									</div>
+								</details>
+
+								<!-- 2. サービス工場 アコーディオン -->
+								<details class="dept-acc-item">
+									<summary class="dept-acc-header">
+										<div class="dept-acc-title-group">
+											<span class="dept-acc-badge dept-acc-badge--service">BMW / MINI 正規整備</span>
+											<h3 class="dept-acc-name">サービス工場（車検・点検・整備）</h3>
+										</div>
+										<div class="dept-acc-meta-preview">
+											<span class="preview-hours">09:00 〜 18:00</span>
+											<svg class="dept-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+										</div>
+									</summary>
+									<div class="dept-acc-body">
+										<div class="dept-compact-table">
+											<div class="dept-table-row">
+												<span class="d-label">取扱ブランド</span>
+												<span class="d-val d-val--bold">BMW ／ MINI（正規認定工場）</span>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">直通電話</span>
+												<div class="d-val">
+													<a href={`tel:${showroom.departments.service.tel}`} class="d-tel d-tel--service">{showroom.departments.service.tel}</a>
+													<span class="d-sub-tel">（サービス工場直通）</span>
+												</div>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">営業時間</span>
+												<span class="d-val">{showroom.departments.service.hours}</span>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">定休日</span>
+												<span class="d-val">{showroom.departments.service.closed}</span>
+											</div>
+										</div>
+
+										<!-- MINI入庫歓迎コールアウト -->
+										<div class="mini-service-alert">
+											<span class="mini-alert-badge">入庫対応</span>
+											<p>当サービス工場は、BMWに加え<strong>MINIの車検・点検・整備</strong>も受け付けております。</p>
+										</div>
+
+										<div class="dept-card__action">
+											<a href={`tel:${showroom.departments.service.tel}`} class="btn-dept-call btn-dept-call--service">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+												サービス工場へ電話：{showroom.departments.service.tel}
+											</a>
+										</div>
+									</div>
+								</details>
+							</div>
 						</div>
 					</section>
 
@@ -285,45 +363,53 @@ const amenities = [
 							</div>
 						</div>
 
-						<!-- アクセスルート詳細 -->
-						<div class="access-routes-grid">
-							<!-- お車 -->
-							<div class="route-card">
-								<div class="route-header">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="route-icon"><rect width="16" height="10" x="4" y="5" rx="2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>
-									<h3>お車でお越しの方</h3>
+						<!-- アクセスルート詳細（アコーディオン） -->
+						<div class="access-accordion-list" role="region" aria-label="アクセス方法一覧">
+							<!-- 1. お車でお越しの方 -->
+							<details class="access-acc-item" open>
+								<summary class="access-acc-header">
+									<div class="access-acc-title-group">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="access-acc-icon"><rect width="16" height="10" x="4" y="5" rx="2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>
+										<h3 class="access-acc-title">お車でお越しの方（東京・横浜方面より）</h3>
+									</div>
+									<svg class="access-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+								</summary>
+								<div class="access-acc-body">
+									<div class="route-item">
+										<span class="route-tag">東京方面より</span>
+										<p>国道1号線（第二京浜）を横浜方面へ直進。多摩川にかかる「多摩川大橋」を渡り、約800メートル先左側にございます。</p>
+									</div>
+									<div class="route-item">
+										<span class="route-tag">横浜方面より</span>
+										<p>国道1号線（第二京浜）を東京方面へ直進。信号「遠藤町」交差点を通過し、約200メートル先の右側にございます。（中央分離帯がございますので店舗前でのUターンにご注意ください）</p>
+									</div>
 								</div>
-								<div class="route-item">
-									<span class="route-tag">東京方面より</span>
-									<p>国道1号線（第二京浜）を横浜方面へ直進。多摩川にかかる「多摩川大橋」を渡り、約800メートル先左側にございます。</p>
-								</div>
-								<div class="route-item">
-									<span class="route-tag">横浜方面より</span>
-									<p>国道1号線（第二京浜）を東京方面へ直進。信号「遠藤町」交差点を通過し、約200メートル先の右側にございます。（中央分離帯がございますので店舗前でのUターンにご注意ください）</p>
-								</div>
-								<div class="parking-note">
-									<strong>駐車場のご案内：</strong> 敷地内に屋根付きのお客様専用パーキング（15台収容）を完備しております。雨天時でも濡れずにショールームへお入りいただけます。
-								</div>
-							</div>
+							</details>
 
-							<!-- 電車・バス -->
-							<div class="route-card">
-								<div class="route-header">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="route-icon"><rect width="18" height="14" x="3" y="4" rx="2"/><line x1="3" x2="21" y1="10" y2="10"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/></svg>
-									<h3>電車・バスでお越しの方</h3>
+							<!-- 2. 電車・バスでお越しの方 -->
+							<details class="access-acc-item">
+								<summary class="access-acc-header">
+									<div class="access-acc-title-group">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="access-acc-icon"><rect width="18" height="14" x="3" y="4" rx="2"/><line x1="3" x2="21" y1="10" y2="10"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/></svg>
+										<h3 class="access-acc-title">電車・バスでお越しの方</h3>
+									</div>
+									<svg class="access-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+								</summary>
+								<div class="access-acc-body">
+									<div class="route-item">
+										<span class="route-tag">JR川崎駅より（東海道線・京浜東北線・南武線）</span>
+										<p>西口北バスターミナル（ラゾーナ川崎プラザ側）より、反01系統 81番 東急バス「五反田駅行」に乗車。「戸手一丁目」バス停にて下車すぐ（所要時間：約10分）。</p>
+									</div>
+									<div class="route-item">
+										<span class="route-tag">JR五反田駅より（山手線・都営浅草線）</span>
+										<p>東急バス「川崎駅行」に乗車。「戸手1丁目」バス停にて下車すぐ。</p>
+									</div>
+									<div class="route-item">
+										<span class="route-tag">タクシーをご利用の場合</span>
+										<p>JR川崎駅西口タクシー乗り場より約7分。「第二京浜の戸手のNicole BMW本社ショールーム」とお伝えください。</p>
+									</div>
 								</div>
-								<div class="route-item">
-									<span class="route-tag">JR川崎駅より（東海道線・京浜東北線・南武線）</span>
-									<p>西口北バスターミナル（ラゾーナ川崎プラザ側）より、反01系統 81番 東急バス「五反田駅行」に乗車。「戸手一丁目」バス停にて下車すぐ（所要時間：約10分）。</p>
-								</div>
-								<div class="route-item">
-									<span class="route-tag">JR五反田駅より（山手線・都営浅草線）</span>
-									<p>東急バス「川崎駅行」に乗車。「戸手1丁目」バス停にて下車すぐ。</p>
-								</div>
-								<div class="parking-note">
-									<strong>タクシーをご利用の場合：</strong> JR川崎駅西口タクシー乗り場より約7分。「第二京浜の戸手のNicole BMW本社ショールーム」とお伝えください。
-								</div>
-							</div>
+							</details>
 						</div>
 					</section>
 				</div>
@@ -332,60 +418,21 @@ const amenities = [
 				<aside class="sr-sidebar">
 					<div class="sidebar-card">
 						<div class="sidebar-header">
-							<span class="sidebar-label">DEALER INFORMATION</span>
-							<h3 class="sidebar-title">店舗基本情報</h3>
+							<span class="sidebar-label">DIRECT CONTACT</span>
+							<h3 class="sidebar-title">直通窓口・ご案内</h3>
 						</div>
 
-						<div class="sidebar-info-list">
-							<div class="sb-item">
-								<span class="sb-key">店舗名称</span>
-								<span class="sb-val sb-val--bold">{showroom.name}</span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">所在地</span>
-								<div class="sb-val">
-									<span class="postal">{showroom.postal}</span>
-									<span>{showroom.address}</span>
-									<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
-										Googleマップで開く ↗
-									</a>
-								</div>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">電話番号（代表）</span>
-								<span class="sb-val"><a href={`tel:${showroom.tel}`} class="tel-link">{showroom.tel}</a></span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">ショールーム直通</span>
-								<span class="sb-val"><a href={`tel:${showroom.telDirect}`} class="tel-link tel-link--highlight">{showroom.telDirect}</a></span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">FAX</span>
-								<span class="sb-val">{showroom.fax}</span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">営業時間</span>
-								<span class="sb-val">{showroom.businessHours}</span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">定休日</span>
-								<span class="sb-val">{showroom.closedDays}</span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">駐車場</span>
-								<span class="sb-val">{showroom.parking}</span>
-							</div>
-							<div class="sb-item">
-								<span class="sb-key">運営法人</span>
-								<span class="sb-val">ニコル・カーズ合同会社</span>
-							</div>
-						</div>
+						<p class="sidebar-desc">ご商談予約や試乗、車検・点検のご相談は直通窓口にて承ります。</p>
 
-						<!-- コンタクトボタン -->
+						<!-- コンタクトボタン（用途別） -->
 						<div class="sidebar-cta">
-							<a href={`tel:${showroom.telDirect}`} class="btn-sidebar-tel">
+							<a href={`tel:${showroom.departments.sales.tel}`} class="btn-sidebar-tel">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-								お電話でのお問い合わせ
+								新車・商談：{showroom.departments.sales.tel}
+							</a>
+							<a href={`tel:${showroom.departments.service.tel}`} class="btn-sidebar-tel btn-sidebar-tel--service">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+								車検・サービス工場：{showroom.departments.service.tel}
 							</a>
 							<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-sidebar-route">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
@@ -394,38 +441,46 @@ const amenities = [
 						</div>
 					</div>
 
-					<!-- 併設・近隣拠点カード -->
-					<div class="sidebar-card sidebar-card--related">
-						<span class="sidebar-label">AFFILIATED NETWORK</span>
-						<h4 class="sidebar-related-title">併設・近隣の拠点</h4>
-						
-						<div class="related-list">
-							<div class="related-item">
-								<span class="related-badge">併設サービス</span>
-								<h5>Nicole BMW 本社 サービス（川崎）</h5>
-								<p>最新リフト10ベイ完備。車検・点検・整備</p>
-								<span class="related-tel">TEL: 044-543-5400</span>
-							</div>
-							<div class="related-item">
-								<span class="related-badge">併設本社</span>
-								<h5>ニコル・グループ 川崎本社</h5>
-								<p>ニコル・レーシング・ジャパン合同会社</p>
-							</div>
-							<div class="related-item">
-								<span class="related-badge">近隣ショールーム</span>
-								<h5>Nicole BMW 大田支店（東京都大田区）</h5>
-								<p>多摩川を渡って車で約10分。都内エリアの正規拠点</p>
-							</div>
-						</div>
-
-						<a href="/location/" class="btn-view-all-loc">
-							← 全25拠点一覧に戻る
-						</a>
-					</div>
+					<a href="/location/" class="btn-view-all-loc">
+						← 全25拠点一覧に戻る
+					</a>
 				</aside>
 			</div>
 		</div>
 	</div>
+
+	<!-- ギャラリー スクリプト -->
+	<script is:inline>
+		document.addEventListener('DOMContentLoaded', () => {
+			// ギャラリーサムネイル切り替え
+			const thumbBtns = document.querySelectorAll('.gallery-thumb-btn');
+			const mainImg = document.getElementById('gallery-main-img');
+			const counterEl = document.getElementById('gallery-counter');
+			const captionEl = document.getElementById('gallery-caption');
+
+			thumbBtns.forEach((btn, index) => {
+				btn.addEventListener('click', () => {
+					thumbBtns.forEach((b) => b.classList.remove('is-active'));
+					btn.classList.add('is-active');
+
+					const src = btn.getAttribute('data-src');
+					const alt = btn.getAttribute('data-alt');
+					const caption = btn.getAttribute('data-caption');
+
+					if (mainImg && src) {
+						mainImg.setAttribute('src', src);
+						mainImg.setAttribute('alt', alt || '');
+					}
+					if (counterEl) {
+						counterEl.textContent = `0${index + 1} / 06`;
+					}
+					if (captionEl && caption) {
+						captionEl.textContent = caption;
+					}
+				});
+			});
+		});
+	</script>
 </NicoleLayout>
 
 <style>
@@ -435,51 +490,15 @@ const amenities = [
 		min-height: 100vh;
 	}
 
-	/* パンくず */
-	.breadcrumb-bar {
-		background: #0d0f12;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		padding: 12px 24px;
-		font-size: 0.8125rem;
-	}
-
-	.breadcrumb-inner {
-		max-width: 1280px;
-		margin: 0 auto;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		color: #888888;
-	}
-
-	.bc-link {
-		color: #aaaaaa;
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.bc-link:hover {
-		color: #ffffff;
-	}
-
-	.bc-sep {
-		color: #555555;
-	}
-
-	.bc-current {
-		color: #ffffff;
-		font-weight: 500;
-	}
-
-	/* ヒーローセクション */
+	/* ヒーローセクション（シンプルで開放感のあるレイアウト） */
 	.sr-hero {
 		position: relative;
-		min-height: 520px;
+		min-height: 440px;
 		display: flex;
 		align-items: flex-end;
-		padding: 60px 24px;
+		padding: 70px 0;
 		overflow: hidden;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		background: #08090a;
 	}
 
 	.sr-hero__media {
@@ -492,74 +511,34 @@ const amenities = [
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		filter: brightness(0.7);
+		filter: brightness(0.65);
 		transform: scale(1.02);
 	}
 
 	.sr-hero__overlay {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(180deg, rgba(8, 9, 10, 0.3) 0%, rgba(8, 9, 10, 0.85) 65%, #08090a 100%);
+		background: linear-gradient(180deg, rgba(8, 9, 10, 0.2) 0%, rgba(8, 9, 10, 0.7) 60%, #08090a 100%);
 	}
 
 	.sr-hero__content {
 		position: relative;
 		z-index: 1;
-		max-width: 1280px;
 		width: 100%;
+		max-width: 1440px;
 		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
 	}
 
-	.sr-hero__badges {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 12px;
-		margin-bottom: 18px;
-	}
-
-	.bmw-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 10px;
-		padding: 6px 14px 6px 8px;
-		background: rgba(0, 102, 177, 0.25);
-		border: 1px solid rgba(0, 102, 177, 0.6);
-		border-radius: 9999px;
+	.sr-hero__eyebrow {
+		display: inline-block;
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		color: #ffffff;
-		backdrop-filter: blur(8px);
-	}
-
-	.status-live-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 6px 14px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		border-radius: 9999px;
-		font-size: 0.75rem;
-		color: #4ade80;
 		font-weight: 600;
-		backdrop-filter: blur(8px);
-	}
-
-	.live-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: #22c55e;
-		box-shadow: 0 0 10px #22c55e;
-		animation: pulse-live 2s infinite ease-in-out;
-	}
-
-	@keyframes pulse-live {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.5; transform: scale(0.85); }
+		color: #a0a5ad;
+		letter-spacing: 0.14em;
+		margin-bottom: 12px;
 	}
 
 	.sr-hero__title {
@@ -568,7 +547,7 @@ const amenities = [
 		color: #ffffff;
 		letter-spacing: -0.02em;
 		line-height: 1.15;
-		margin: 0 0 16px;
+		margin: 0;
 	}
 
 	.sr-hero__title-sub {
@@ -576,26 +555,18 @@ const amenities = [
 		font-size: clamp(1.125rem, 2vw, 1.5rem);
 		font-weight: 400;
 		color: #c0c4cc;
-		margin-top: 6px;
-		letter-spacing: 0.04em;
+		margin-top: 8px;
+		letter-spacing: 0.03em;
 	}
 
-	.sr-hero__lead {
-		font-size: 1.0625rem;
-		line-height: 1.7;
-		color: #cccccc;
-		max-width: 780px;
-		margin: 0 0 28px;
-	}
-
-	/* クイックアクションボタン群 */
-	.sr-quick-actions {
+	.sr-hero__actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 14px;
+		gap: 12px;
+		margin-top: 24px;
 	}
 
-	.btn-action {
+	.btn-hero {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
@@ -604,55 +575,108 @@ const amenities = [
 		font-size: 0.9375rem;
 		font-weight: 600;
 		text-decoration: none;
-		transition: all 0.25s ease;
+		transition: all 0.2s ease;
 	}
 
-	.btn-action--primary {
-		background: #0066b1;
-		color: #ffffff;
-		box-shadow: 0 4px 18px rgba(0, 102, 177, 0.4);
+	.btn-hero--primary {
+		background: #ffffff;
+		color: #08090a;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 	}
 
-	.btn-action--primary:hover {
-		background: #0077cf;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 22px rgba(0, 102, 177, 0.55);
+	.btn-hero--primary:hover {
+		background: #e5e7eb;
+		transform: translateY(-1px);
 	}
 
-	.btn-action--secondary {
-		background: rgba(255, 255, 255, 0.12);
+	.btn-hero--secondary {
+		background: rgba(255, 255, 255, 0.08);
 		color: #ffffff;
 		border: 1px solid rgba(255, 255, 255, 0.25);
 		backdrop-filter: blur(8px);
 	}
 
-	.btn-action--secondary:hover {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: #ffffff;
-		transform: translateY(-2px);
+	.btn-hero--secondary:hover {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: rgba(255, 255, 255, 0.45);
+		transform: translateY(-1px);
 	}
 
-	.btn-action--outline {
-		background: transparent;
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+	.btn-hero-icon {
+		width: 17px;
+		height: 17px;
 	}
 
-	.btn-action--outline:hover {
+	/* 拠点提供サービス・機能ステータスバー（ヒーロー直下） */
+	.facility-feature-bar {
+		background: #0d0f12;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 16px 0;
+	}
+
+	.facility-feature-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
+
+	.facility-feature-list {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 10px;
+		overflow-x: auto;
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.facility-feature-list::-webkit-scrollbar {
+		display: none;
+	}
+
+	.feat-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 14px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 6px;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: #d1d5db;
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition: all 0.2s ease;
+	}
+
+	.feat-pill:hover {
 		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.4);
+		color: #ffffff;
 	}
 
-	.act-icon {
-		width: 18px;
-		height: 18px;
+	.feat-pill--highlight {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.24);
+		color: #ffffff;
+		font-weight: 600;
+	}
+
+	.feat-icon {
+		width: 15px;
+		height: 15px;
+		color: #ffffff;
+		flex-shrink: 0;
 	}
 
 	/* メインレイアウト */
 	.sr-content-wrap {
-		max-width: 1280px;
+		max-width: 1440px;
 		margin: 0 auto;
-		padding: 56px 24px 80px;
+		padding: 56px 40px 80px;
 	}
 
 	.sr-layout-grid {
@@ -698,26 +722,530 @@ const amenities = [
 		margin: 0 0 28px;
 	}
 
-	.section-header-flex {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		margin-bottom: 24px;
+	/* 店舗・窓口情報 統合カード（ゆったりとした開放的なレイアウト） */
+	.sr-section--depts {
+		margin-bottom: 64px;
+		padding-bottom: 56px;
 	}
 
-	.btn-reserve-all {
-		color: #0066b1;
-		font-size: 0.875rem;
+	.dealer-info-card {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 36px 36px 32px;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+	}
+
+	/* 拠点共通・基本情報 */
+	.dealer-common-info {
+		margin-bottom: 32px;
+		padding-bottom: 28px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.common-info-grid {
+		display: grid;
+		grid-template-columns: 1.2fr 1.8fr 1fr;
+		gap: 24px 32px;
+		align-items: start;
+	}
+
+	.c-info-item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.c-info-label {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.75rem;
 		font-weight: 600;
-		text-decoration: none;
-		border-bottom: 1px solid rgba(0, 102, 177, 0.5);
-		padding-bottom: 2px;
+		color: #888888;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.c-info-val {
+		font-size: 0.9375rem;
+		color: #e2e8f0;
+		line-height: 1.6;
+	}
+
+	.c-info-val--bold {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.c-info-val .postal {
+		display: block;
+		font-size: 0.8125rem;
+		color: #94a3b8;
+	}
+
+	.c-info-val .link-inline-gmap {
+		display: inline-flex;
+		align-items: center;
+		margin-top: 4px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		transition: opacity 0.2s ease;
+	}
+
+	.c-info-val .link-inline-gmap:hover {
+		opacity: 0.75;
+	}
+
+	/* 窓口アコーディオンリスト */
+	.dept-accordion-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		margin-top: 6px;
+	}
+
+	.dept-acc-item {
+		background: #0d0f12;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		overflow: hidden;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.dept-acc-item[open] {
+		background: #14161b;
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	.dept-acc-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 18px 22px;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s ease;
+	}
+
+	.dept-acc-header::-webkit-details-marker {
+		display: none;
+	}
+
+	.dept-acc-header:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.dept-acc-title-group {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.dept-acc-badge {
+		display: inline-block;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		padding: 3px 8px;
+		border-radius: 4px;
+		background: #ffffff;
+		color: #08090a;
+	}
+
+	.dept-acc-badge--service {
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.dept-acc-name {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.dept-acc-meta-preview {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.preview-hours {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.8125rem;
+		color: #888888;
+	}
+
+	.dept-acc-chevron {
+		width: 18px;
+		height: 18px;
+		color: #888888;
+		transition: transform 0.25s ease, color 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.dept-acc-item[open] .dept-acc-chevron {
+		transform: rotate(180deg);
+		color: #ffffff;
+	}
+
+	.dept-acc-body {
+		padding: 0 22px 22px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		margin-top: 4px;
+		padding-top: 20px;
+		animation: accFadeIn 0.2s ease;
+	}
+
+	@keyframes accFadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	/* 写真ギャラリー（大写真1点 + 6点サムネイル） */
+	.sr-section--gallery {
+		margin-bottom: 48px;
+		padding-bottom: 40px;
+	}
+
+	.gallery-container {
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0;
+	}
+
+	.gallery-main-frame {
+		position: relative;
+		height: 420px;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #08090a;
+		border: none;
+		margin-bottom: 12px;
+	}
+
+	.gallery-main-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: opacity 0.3s ease;
+	}
+
+	.gallery-info-bar {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 14px 20px;
+		background: linear-gradient(180deg, transparent 0%, rgba(8, 9, 10, 0.85) 40%, rgba(8, 9, 10, 0.96) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.gallery-counter {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: 0.1em;
+		flex-shrink: 0;
+	}
+
+	.gallery-caption {
+		margin: 0;
+		font-size: 0.875rem;
+		color: #cccccc;
+		line-height: 1.4;
+		text-align: right;
+	}
+
+	.gallery-thumbs-grid {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 10px;
+	}
+
+	.gallery-thumb-btn {
+		appearance: none;
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+		padding: 0;
+		overflow: hidden;
+		height: 68px;
+		cursor: pointer;
+		opacity: 0.55;
 		transition: all 0.2s ease;
 	}
 
-	.btn-reserve-all:hover {
-		color: #3399ff;
-		border-bottom-color: #3399ff;
+	.gallery-thumb-btn:hover {
+		opacity: 0.85;
+		border-color: rgba(255, 255, 255, 0.4);
+	}
+
+	.gallery-thumb-btn.is-active {
+		opacity: 1;
+		border: 2px solid #ffffff;
+		box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+	}
+
+	.gallery-thumb-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.dept-compact-table {
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 8px;
+		padding: 14px 18px;
+		margin-bottom: 20px;
+	}
+
+	.dept-table-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		padding: 10px 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		font-size: 0.875rem;
+	}
+
+	.dept-table-row:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.dept-table-row:first-child {
+		padding-top: 0;
+	}
+
+	.d-label {
+		color: #777777;
+		font-weight: 500;
+		width: 100px;
+		flex-shrink: 0;
+	}
+
+	.d-val {
+		color: #e0e0e0;
+		text-align: right;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 2px;
+	}
+
+	.d-val--bold {
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.d-tel {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.d-tel:hover {
+		text-decoration: underline;
+	}
+
+	.d-sub-tel {
+		font-size: 0.75rem;
+		color: #888888;
+	}
+
+	/* MINI入庫歓迎コールアウト */
+	.mini-service-alert {
+		margin: 0 0 20px;
+		padding: 12px 14px;
+		background: rgba(255, 255, 255, 0.04);
+		border-left: 3px solid #ffffff;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.mini-alert-badge {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		background: #ffffff;
+		color: #08090a;
+		padding: 2px 6px;
+		border-radius: 3px;
+		white-space: nowrap;
+	}
+
+	.mini-service-alert p {
+		margin: 0;
+		font-size: 0.8125rem;
+		color: #dddddd;
+		line-height: 1.45;
+	}
+
+	.mini-service-alert strong {
+		color: #ffffff;
+	}
+
+	/* 部門ダイヤルボタン */
+	.btn-dept-call {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		width: 100%;
+		padding: 13px 18px;
+		background: #ffffff;
+		color: #08090a;
+		border-radius: 6px;
+		font-weight: 700;
+		font-size: 0.9375rem;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.btn-dept-call:hover {
+		background: #e0e0e0;
+		transform: translateY(-1px);
+	}
+
+	.btn-dept-call .act-icon,
+	.act-icon {
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		min-height: 18px;
+		flex-shrink: 0;
+		display: inline-block;
+	}
+
+	.btn-dept-call--service {
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+	}
+
+	.btn-dept-call--service:hover {
+		background: rgba(255, 255, 255, 0.2);
+		border-color: #ffffff;
+	}
+
+	/* サイドバー部門タイル */
+	.sb-depts {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 20px;
+		padding-top: 14px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.sb-dept-tile {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 8px;
+		padding: 12px 14px;
+	}
+
+	.sb-dept-tile--service {
+		background: rgba(255, 255, 255, 0.02);
+		border-color: rgba(255, 255, 255, 0.12);
+	}
+
+	.sb-dept-tile__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 8px;
+		padding-bottom: 6px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	.sb-dept-pill {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.625rem;
+		font-weight: 700;
+		background: rgba(255, 255, 255, 0.1);
+		padding: 2px 6px;
+		border-radius: 3px;
+		color: #ffffff;
+	}
+
+	.sb-dept-pill--mini {
+		background: rgba(255, 255, 255, 0.16);
+		color: #ffffff;
+	}
+
+	.sb-dept-name {
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.sb-dept-tile__row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		font-size: 0.75rem;
+		color: #aaaaaa;
+		padding: 2px 0;
+	}
+
+	.sb-dept-k {
+		color: #666666;
+	}
+
+	.sb-dept-tel {
+		font-family: 'JetBrains Mono', monospace;
+		font-weight: 700;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.sb-dept-tel:hover {
+		text-decoration: underline;
+	}
+
+	.sb-dept-tile__note {
+		font-size: 0.6875rem;
+		color: #888888;
+		margin-top: 6px;
+		padding-top: 4px;
+		border-top: 1px dashed rgba(255, 255, 255, 0.06);
+	}
+
+	.btn-sidebar-tel--service {
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: none;
+	}
+
+	.btn-sidebar-tel--service:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: #ffffff;
 	}
 
 	.prose-content p {
@@ -725,228 +1253,6 @@ const amenities = [
 		line-height: 1.85;
 		color: #cccccc;
 		margin: 0 0 20px;
-	}
-
-	/* 取扱サービスピル */
-	.services-block {
-		margin-top: 32px;
-		padding: 24px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
-	}
-
-	.services-subheading {
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: #ffffff;
-		margin: 0 0 14px;
-	}
-
-	.services-grid {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-	}
-
-	.srv-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 6px 12px;
-		background: rgba(0, 102, 177, 0.15);
-		border: 1px solid rgba(0, 102, 177, 0.35);
-		border-radius: 6px;
-		font-size: 0.8125rem;
-		color: #e0f2fe;
-		font-weight: 500;
-	}
-
-	.srv-check {
-		width: 14px;
-		height: 14px;
-		color: #38bdf8;
-	}
-
-	/* 車両カードグリッド */
-	.car-cards-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 24px;
-	}
-
-	.car-card {
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		overflow: hidden;
-		transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-	}
-
-	.car-card:hover {
-		transform: translateY(-4px);
-		border-color: rgba(0, 102, 177, 0.6);
-		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-	}
-
-	.car-card__media {
-		position: relative;
-		height: 180px;
-		overflow: hidden;
-		background: #000000;
-	}
-
-	.car-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.5s ease;
-	}
-
-	.car-card:hover .car-card__img {
-		transform: scale(1.05);
-	}
-
-	.car-tag {
-		position: absolute;
-		top: 12px;
-		left: 12px;
-		padding: 3px 8px;
-		background: rgba(0, 0, 0, 0.75);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: 0.06em;
-	}
-
-	.car-status-badge {
-		position: absolute;
-		bottom: 12px;
-		right: 12px;
-		padding: 4px 10px;
-		background: rgba(0, 102, 177, 0.85);
-		border-radius: 4px;
-		font-size: 0.6875rem;
-		font-weight: 600;
-		color: #ffffff;
-	}
-
-	.car-card__body {
-		padding: 20px;
-	}
-
-	.car-model {
-		font-size: 1.125rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 6px;
-	}
-
-	.car-type {
-		font-size: 0.8125rem;
-		color: #888888;
-		margin: 0 0 10px;
-	}
-
-	.car-specs {
-		font-size: 0.8125rem;
-		color: #bbbbbb;
-		line-height: 1.5;
-		margin: 0 0 18px;
-		padding: 8px 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border-radius: 6px;
-	}
-
-	.car-card__actions {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		gap: 8px;
-	}
-
-	.btn-car-testdrive {
-		padding: 9px 12px;
-		background: #0066b1;
-		color: #ffffff;
-		border-radius: 6px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		text-align: center;
-		text-decoration: none;
-		transition: background 0.2s ease;
-	}
-
-	.btn-car-testdrive:hover {
-		background: #0077cf;
-	}
-
-	.btn-car-detail {
-		padding: 9px 12px;
-		background: rgba(255, 255, 255, 0.08);
-		color: #cccccc;
-		border-radius: 6px;
-		font-size: 0.8125rem;
-		text-decoration: none;
-		transition: all 0.2s ease;
-	}
-
-	.btn-car-detail:hover {
-		background: rgba(255, 255, 255, 0.16);
-		color: #ffffff;
-	}
-
-	/* 設備・アメニティ */
-	.amenities-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-		gap: 20px;
-	}
-
-	.amenity-card {
-		padding: 24px;
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
-		transition: border-color 0.2s ease;
-	}
-
-	.amenity-card:hover {
-		border-color: rgba(255, 255, 255, 0.2);
-	}
-
-	.amenity-icon-wrap {
-		width: 42px;
-		height: 42px;
-		border-radius: 8px;
-		background: rgba(0, 102, 177, 0.2);
-		border: 1px solid rgba(0, 102, 177, 0.4);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 16px;
-	}
-
-	.amenity-svg {
-		width: 22px;
-		height: 22px;
-		color: #38bdf8;
-	}
-
-	.amenity-title {
-		font-size: 1rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 8px;
-	}
-
-	.amenity-desc {
-		font-size: 0.875rem;
-		line-height: 1.6;
-		color: #999999;
-		margin: 0;
 	}
 
 	/* マップコンテナボックス */
@@ -1016,44 +1322,93 @@ const amenities = [
 		height: 16px;
 	}
 
-	/* アクセスルートカード */
-	.access-routes-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 24px;
+	/* アクセスアコーディオン */
+	.access-accordion-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
 	}
 
-	.route-card {
+	.access-acc-item {
 		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 10px;
-		padding: 24px;
+		overflow: hidden;
+		transition: border-color 0.2s ease, background 0.2s ease;
 	}
 
-	.route-header {
+	.access-acc-item[open] {
+		background: #14161b;
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	.access-acc-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 18px 24px;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s ease;
+	}
+
+	.access-acc-header::-webkit-details-marker {
+		display: none;
+	}
+
+	.access-acc-header:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.access-acc-title-group {
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		margin-bottom: 20px;
-		padding-bottom: 14px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.route-icon {
-		width: 22px;
-		height: 22px;
-		color: #0066b1;
+	.access-acc-icon {
+		width: 20px;
+		height: 20px;
+		color: #ffffff;
+		flex-shrink: 0;
 	}
 
-	.route-header h3 {
+	.access-acc-title {
 		font-size: 1.0625rem;
 		font-weight: 700;
 		color: #ffffff;
 		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.access-acc-chevron {
+		width: 18px;
+		height: 18px;
+		color: #888888;
+		transition: transform 0.25s ease, color 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.access-acc-item[open] .access-acc-chevron {
+		transform: rotate(180deg);
+		color: #ffffff;
+	}
+
+	.access-acc-body {
+		padding: 0 24px 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		margin-top: 4px;
+		padding-top: 20px;
+		animation: accFadeIn 0.2s ease;
 	}
 
 	.route-item {
 		margin-bottom: 18px;
+	}
+
+	.route-item:last-child {
+		margin-bottom: 0;
 	}
 
 	.route-tag {
@@ -1072,20 +1427,6 @@ const amenities = [
 		line-height: 1.65;
 		color: #bbbbbb;
 		margin: 0;
-	}
-
-	.parking-note {
-		margin-top: 16px;
-		padding: 12px 14px;
-		background: rgba(255, 255, 255, 0.03);
-		border-radius: 6px;
-		font-size: 0.8125rem;
-		color: #999999;
-		line-height: 1.55;
-	}
-
-	.parking-note strong {
-		color: #ffffff;
 	}
 
 	/* サイドバー */
@@ -1113,7 +1454,7 @@ const amenities = [
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.6875rem;
 		font-weight: 700;
-		color: #0066b1;
+		color: #888888;
 		letter-spacing: 0.12em;
 		display: block;
 		margin-bottom: 4px;
@@ -1126,72 +1467,17 @@ const amenities = [
 		margin: 0;
 	}
 
-	.sidebar-info-list {
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-		margin-bottom: 24px;
-	}
-
-	.sb-item {
-		display: grid;
-		grid-template-columns: 100px 1fr;
-		gap: 12px;
+	.sidebar-desc {
 		font-size: 0.875rem;
-		line-height: 1.5;
-	}
-
-	.sb-key {
-		color: #888888;
-	}
-
-	.sb-val {
-		color: #dddddd;
-	}
-
-	.sb-val--bold {
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.sb-val .postal {
-		display: block;
-		font-size: 0.8125rem;
-		color: #888888;
-	}
-
-	.link-inline-gmap {
-		display: inline-block;
-		margin-top: 4px;
-		font-size: 0.75rem;
-		color: #38bdf8;
-		text-decoration: none;
-	}
-
-	.link-inline-gmap:hover {
-		text-decoration: underline;
-	}
-
-	.tel-link {
-		color: #ffffff;
-		text-decoration: none;
-		font-weight: 600;
-	}
-
-	.tel-link--highlight {
-		color: #38bdf8;
-		font-size: 1.0625rem;
-		font-weight: 700;
-	}
-
-	.tel-link:hover {
-		text-decoration: underline;
+		color: #9ca3af;
+		line-height: 1.6;
+		margin: 0 0 20px;
 	}
 
 	.sidebar-cta {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 	}
 
 	.btn-sidebar-tel {
@@ -1199,19 +1485,30 @@ const amenities = [
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		padding: 13px;
-		background: #0066b1;
-		color: #ffffff;
+		padding: 14px 18px;
+		background: #ffffff;
+		color: #08090a;
 		border-radius: 6px;
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(0, 102, 177, 0.4);
-		transition: background 0.2s ease;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+		transition: all 0.2s ease;
 	}
 
 	.btn-sidebar-tel:hover {
-		background: #0077cf;
+		background: #e5e7eb;
+	}
+
+	.btn-sidebar-tel--service {
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+	}
+
+	.btn-sidebar-tel--service:hover {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: rgba(255, 255, 255, 0.35);
 	}
 
 	.btn-sidebar-route {
@@ -1219,10 +1516,10 @@ const amenities = [
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		padding: 12px;
-		background: rgba(255, 255, 255, 0.08);
+		padding: 13px 18px;
+		background: transparent;
 		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		border: 1px dashed rgba(255, 255, 255, 0.25);
 		border-radius: 6px;
 		font-weight: 600;
 		font-size: 0.875rem;
@@ -1231,8 +1528,8 @@ const amenities = [
 	}
 
 	.btn-sidebar-route:hover {
-		background: rgba(255, 255, 255, 0.16);
-		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.06);
+		border-color: rgba(255, 255, 255, 0.5);
 	}
 
 	.btn-icon {
@@ -1292,7 +1589,7 @@ const amenities = [
 
 	.related-tel {
 		font-size: 0.75rem;
-		color: #38bdf8;
+		color: #9ca3af;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
@@ -1325,23 +1622,169 @@ const amenities = [
 			position: static;
 		}
 
-		.access-routes-grid {
+		.sr-hero {
+			padding: 60px 0;
+		}
+
+		.sr-hero__content {
+			padding: 0 24px;
+		}
+
+		.facility-feature-bar {
+			padding: 14px 0;
+		}
+
+		.facility-feature-container {
+			padding: 0 24px;
+		}
+
+		.sr-content-wrap {
+			padding: 44px 24px 70px;
+		}
+
+		.common-info-grid {
 			grid-template-columns: 1fr;
+			gap: 20px;
 		}
 	}
 
 	@media (max-width: 768px) {
+		.sr-section--concept {
+			display: none;
+		}
+
 		.sr-hero {
-			min-height: 440px;
-			padding: 40px 16px;
+			min-height: 360px;
+			padding: 48px 0 40px;
+		}
+
+		.sr-hero__content {
+			padding: 0 20px;
+		}
+
+		.sr-hero__actions {
+			flex-direction: column;
+			gap: 10px;
+			width: 100%;
+		}
+
+		.btn-hero {
+			width: 100%;
+			justify-content: center;
+			padding: 12px 20px;
+		}
+
+		.facility-feature-bar {
+			padding: 12px 0;
+		}
+
+		.facility-feature-container {
+			padding: 0 20px;
+		}
+
+		.facility-feature-list {
+			justify-content: flex-start;
+			gap: 8px;
+		}
+
+		.feat-pill {
+			padding: 7px 12px;
+			font-size: 0.75rem;
 		}
 
 		.sr-content-wrap {
-			padding: 36px 16px 60px;
+			padding: 36px 20px 60px;
 		}
 
-		.car-cards-grid {
+		.dealer-info-card {
+			padding: 22px 16px;
+			border-radius: 10px;
+		}
+
+		.common-info-grid {
 			grid-template-columns: 1fr;
+			gap: 16px;
+		}
+
+		.dealer-common-info {
+			margin-bottom: 22px;
+			padding-bottom: 18px;
+		}
+
+		.dept-acc-header {
+			padding: 14px 16px;
+		}
+
+		.dept-acc-name {
+			font-size: 0.9375rem;
+		}
+
+		.preview-hours {
+			display: none;
+		}
+
+		.dept-acc-body {
+			padding: 0 16px 18px;
+			padding-top: 14px;
+		}
+
+		.access-acc-header {
+			padding: 14px 16px;
+		}
+
+		.access-acc-title {
+			font-size: 0.9375rem;
+		}
+
+		.access-acc-body {
+			padding: 0 16px 18px;
+			padding-top: 14px;
+		}
+
+		.dept-compact-table {
+			padding: 14px 14px;
+			margin-bottom: 16px;
+		}
+
+		.dept-table-row {
+			flex-direction: column;
+			gap: 4px;
+			align-items: flex-start;
+			padding: 8px 0;
+		}
+
+		.d-label {
+			width: auto;
+			font-size: 0.8125rem;
+		}
+
+		.d-val {
+			align-items: flex-start;
+			text-align: left;
+		}
+
+		.gallery-main-frame {
+			height: 240px;
+		}
+
+		.gallery-info-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 4px;
+		}
+
+		.gallery-caption {
+			text-align: left;
+			font-size: 0.75rem;
+		}
+
+		.gallery-thumbs-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
+		}
+
+		.gallery-thumb-btn {
+			height: 52px;
 		}
 
 		.map-floating-bar {
@@ -1351,6 +1794,20 @@ const amenities = [
 
 		.btn-gmap-direct {
 			justify-content: center;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.sr-hero__content {
+			padding: 0 16px;
+		}
+
+		.facility-feature-container {
+			padding: 0 16px;
+		}
+
+		.sr-content-wrap {
+			padding: 32px 16px 56px;
 		}
 	}
 </style>
