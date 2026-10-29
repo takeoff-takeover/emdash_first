@@ -37,7 +37,7 @@ const staticArticlesCatalog: Record<string, any> = {
 		data: {
 			title: "【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代",
 			excerpt: "BMW公式プレスリリースより完全電動スポーツ・アクティビティ・クーペ『BMW iX4』が世界初公開。Cd値0.23の流麗なファストバック、最大出力612馬力のM60 xDrive、そして最大828kmの航続性能を誇る新世代SAC。",
-			featured_image: "/uploads/ix4/key-visual.jpg",
+			featured_image: "/uploads/ix4/key-visual-v2.jpg",
 			published_at: "2026-10-28T10:00:00.000Z",
 			content: [
    {
@@ -744,7 +744,7 @@ const isDemoArticle = isIX4 || isNeueKlasse || slug === "202608_bmw_kids_mechani
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
 
-const heroImageUrl = getImageUrl(featuredImage) || (isIX4 ? "/uploads/ix4/key-visual.jpg" : (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg"));
+const heroImageUrl = getImageUrl(featuredImage) || (isIX4 ? "/uploads/ix4/key-visual-v2.jpg" : (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg"));
 const heroImageUrlSp = getImageUrl(featuredImageSp);
 const hasShowroom = Boolean((post.data as any).related_location);
 

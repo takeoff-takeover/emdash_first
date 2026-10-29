@@ -1,6 +1,13 @@
-# EmDash Blog Template (Cloudflare)
+# Nicole Connect - Web Magazine (EmDash on Cloudflare)
 
-A clean, minimal blog built with [EmDash](https://github.com/emdash-cms/emdash) and deployed on Cloudflare Workers with D1 and R2.
+> **📌 管理画面・クイックアクセス**
+> - **ローカル管理画面（自動ログイン）**: [http://localhost:4321/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin)
+> - **ローカル管理画面（通常）**: [http://localhost:4321/_emdash/admin](http://localhost:4321/_emdash/admin)
+> - **ローカルサイト**: [http://localhost:4321/](http://localhost:4321/)
+> - **本番管理画面**: [https://my-emdash-site.kaz130.workers.dev/_emdash/admin](https://my-emdash-site.kaz130.workers.dev/_emdash/admin)
+> - **本番サイト**: [https://my-emdash-site.kaz130.workers.dev/](https://my-emdash-site.kaz130.workers.dev/)
+
+A clean, editorial web magazine built with [EmDash](https://github.com/emdash-cms/emdash) and deployed on Cloudflare Workers with D1 and R2.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/emdash-cms/templates/tree/main/blog-cloudflare)
 
@@ -28,13 +35,6 @@ A clean, minimal blog built with [EmDash](https://github.com/emdash-cms/emdash) 
 | Search | `/search` |
 | Static pages | `/pages/:slug` |
 | 404 | fallback |
-
-## Screenshots
-
-| | Desktop | Mobile |
-|---|---|---|
-| Light | ![homepage light desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-desktop.jpg) | ![homepage light mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-mobile.jpg) |
-| Dark | ![homepage dark desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-desktop.jpg) | ![homepage dark mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-mobile.jpg) |
 
 ## Infrastructure
 
