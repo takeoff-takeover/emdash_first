@@ -46,6 +46,7 @@ const kawasakiData = {
 	// 新車部門（Sales）
 	sales_enabled: '1',
 	sales_title: 'ショールーム（新車・試乗・ご商談）',
+	sales_subtitle: 'Nicole BMW 本社',
 	sales_tel: '044-511-2000',
 	sales_hours: '10:00 〜 18:00',
 	sales_closed: '水曜日（祝日の場合は営業）',
@@ -56,6 +57,7 @@ const kawasakiData = {
 	// 中古車部門（川崎本社は新車・サービスメイン）
 	used_enabled: '0',
 	used_title: '',
+	used_subtitle: '',
 	used_tel: '',
 	used_hours: '',
 	used_closed: '',
@@ -66,6 +68,7 @@ const kawasakiData = {
 	// サービス部門（Service: BMW/ALPINA/MINI）
 	service_enabled: '1',
 	service_title: '本社サービスセンター（車検・点検・整備工場）',
+	service_subtitle: 'Nicole BMW サービスセンター',
 	service_tel: '044-522-1500',
 	service_hours: '09:00 〜 18:00',
 	service_closed: '水曜日（祝日を除く）',
@@ -111,6 +114,7 @@ const miniShinyurigaokaData = {
 	// 新車部門（Sales）
 	sales_enabled: '1',
 	sales_title: 'MINI 新車ショールーム',
+	sales_subtitle: 'MINI 新百合ヶ丘',
 	sales_tel: '044-959-3032',
 	sales_hours: '10:00 〜 18:00',
 	sales_closed: '火曜日・水曜日（祝日を除く）',
@@ -121,6 +125,7 @@ const miniShinyurigaokaData = {
 	// 中古車部門（Used）
 	used_enabled: '1',
 	used_title: 'MINI 認定中古車（MINI NEXT 新百合ヶ丘）',
+	used_subtitle: 'MINI NEXT 新百合ヶ丘',
 	used_tel: '044-396-0180',
 	used_hours: '10:00 〜 18:00',
 	used_closed: '火曜日・水曜日（祝日を除く）',
@@ -131,6 +136,7 @@ const miniShinyurigaokaData = {
 	// サービス部門（Service）
 	service_enabled: '1',
 	service_title: 'MINI サービス・車検点検ファクトリー',
+	service_subtitle: 'Nicole BMW 新百合ヶ丘支店',
 	service_tel: '044-959-3032',
 	service_hours: '10:00 〜 18:00（サービス受付 17:30まで）',
 	service_closed: '火曜日・水曜日（祝日を除く）',
@@ -181,6 +187,7 @@ const bmwShinyurigaokaData = {
 	// 新車部門（Sales）
 	sales_enabled: '1',
 	sales_title: 'BMW 新車ショールーム',
+	sales_subtitle: 'Nicole BMW 新百合ヶ丘支店',
 	sales_tel: '044-959-1400',
 	sales_hours: '10:00 〜 18:00',
 	sales_closed: '火曜日・水曜日（祝日を除く）',
@@ -191,6 +198,7 @@ const bmwShinyurigaokaData = {
 	// 中古車部門（Used）
 	used_enabled: '1',
 	used_title: 'BMW Premium Selection 新百合ヶ丘（認定中古車）',
+	used_subtitle: 'BMW Premium Selection 新百合ヶ丘',
 	used_tel: '044-396-0180',
 	used_hours: '10:00 〜 18:00',
 	used_closed: '火曜日・水曜日（祝日を除く）',
@@ -201,6 +209,7 @@ const bmwShinyurigaokaData = {
 	// サービス部門（Service: BMW/ALPINA/MINI）
 	service_enabled: '1',
 	service_title: 'BMW / MINI サービスファクトリー',
+	service_subtitle: 'Nicole BMW 新百合ヶ丘支店',
 	service_tel: '044-959-1400',
 	service_hours: '10:00 〜 18:00（サービス受付 17:30まで）',
 	service_closed: '火曜日・水曜日（祝日を除く）',

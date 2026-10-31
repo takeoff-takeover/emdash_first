@@ -99,12 +99,18 @@ const customDepartments: Array<{
 
 // 新車部門
 if (d.sales_title || (d.sales_enabled !== '0' && (d.sales_tel || d.tel))) {
+	let autoSubtitle = d.sales_subtitle;
+	if (!autoSubtitle) {
+		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI 新百合ヶ丘';
+		else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW 本社';
+		else autoSubtitle = d.title;
+	}
 	customDepartments.push({
 		id: 'dept-sales',
 		brand: d.brand || 'BMW',
 		type: 'sales',
 		title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
-		subtitle: d.title,
+		subtitle: autoSubtitle,
 		tel: d.sales_tel || d.tel || '',
 		fax: d.sales_fax || d.fax || '',
 		hours: d.sales_hours || '10:00 〜 18:00',
@@ -117,12 +123,18 @@ if (d.sales_title || (d.sales_enabled !== '0' && (d.sales_tel || d.tel))) {
 
 // 認定中古車部門
 if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
+	let autoSubtitle = d.used_subtitle;
+	if (!autoSubtitle) {
+		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI NEXT 新百合ヶ丘';
+		else if (d.title?.includes('新百合')) autoSubtitle = 'BMW Premium Selection 新百合ヶ丘';
+		else autoSubtitle = d.title;
+	}
 	customDepartments.push({
 		id: 'dept-used',
 		brand: d.brand || 'BMW',
 		type: 'used',
 		title: d.used_title,
-		subtitle: d.title,
+		subtitle: autoSubtitle,
 		tel: d.used_tel || d.tel || '',
 		fax: d.used_fax || d.fax || '',
 		hours: d.used_hours || '10:00 〜 18:00',
@@ -135,12 +147,18 @@ if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
 
 // サービス整備部門
 if (d.service_title || (d.service_enabled !== '0' && (d.service_tel || d.tel))) {
+	let autoSubtitle = d.service_subtitle;
+	if (!autoSubtitle) {
+		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'Nicole BMW 新百合ヶ丘支店';
+		else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW サービスセンター';
+		else autoSubtitle = d.title;
+	}
 	customDepartments.push({
 		id: 'dept-service',
 		brand: d.brand || 'BMW',
 		type: 'service',
 		title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
-		subtitle: d.title,
+		subtitle: autoSubtitle,
 		tel: d.service_tel || d.tel || '',
 		fax: d.service_fax || d.fax || '',
 		hours: d.service_hours || '09:00 〜 18:00',
@@ -350,11 +368,21 @@ if (relatedCombined.includes('mini')) {
 								{departmentsList.map((dept, idx) => {
 									const deptId = dept.id || `dept-${idx}`;
 									const isDefaultOpen = idx === 0;
+									let tabTitle = dept.title;
+									const t = (dept.type || '').toLowerCase();
+									const title = dept.title || '';
+									if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
+										tabTitle = '新車（試乗・商談）';
+									} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
+										tabTitle = '認定中古車（試乗・商談）';
+									} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
+										tabTitle = 'サービス（整備・点検）';
+									}
 									return (
 										<details class="dept-acc-item" id={deptId} open={isDefaultOpen}>
 											<summary class="dept-acc-header">
 												<div class="dept-acc-title-group">
-													<h3 class="dept-acc-name">{dept.title}</h3>
+													<h3 class="dept-acc-name">{tabTitle}</h3>
 												</div>
 												<div class="dept-acc-meta-preview">
 													{dept.hours && <span class="preview-hours">{dept.hours}</span>}
