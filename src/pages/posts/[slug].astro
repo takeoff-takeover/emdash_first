@@ -3,6 +3,8 @@
 // Nicole Connect - マガジン記事詳細（上部に大迫力アイキャッチ写真・現代的エディトリアルレイアウト）
 import { getEmDashEntry, decodeSlug } from "emdash";
 import { PortableText } from "emdash/ui";
+import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import SliderBlock from "../../components/blocks/SliderBlock.astro";
 import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
@@ -836,29 +838,41 @@ function sanitizeContent(content: any) {
 
 const articleContent = sanitizeContent(post.data.content);
 
-// 関連記事データ（サイドバー用）
-const relatedStories = [
+// 関連記事データ（作成日・公開日の新しい順に動的取得）
+const staticRelatedPool = [
+	{
+		slug: "2027_new_bmw_ix4_neue_klasse",
+		title: "【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代",
+		brand: "BMW",
+		date: "2026.10.28",
+		sortDate: "2026-10-28T10:00:00.000Z",
+		image: "/uploads/ix4/key-visual-v2.jpg",
+		url: "/magazine/2027_new_bmw_ix4_neue_klasse/"
+	},
+	{
+		slug: "202610_neue_klasse_buyers_guide",
+		title: "【購入ガイド】BMW ノイエ・クラッセ完全ガイド。EV補助金・自宅充電器設置・グレード選びの要点",
+		brand: "BMW",
+		date: "2026.10.25",
+		sortDate: "2026-10-25T10:00:00.000Z",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
+		url: "/magazine/202610_neue_klasse_buyers_guide/"
+	},
 	{
 		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
 		brand: "BMW",
 		date: "2026.10.22",
+		sortDate: "2026-10-22T10:00:00.000Z",
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
 		url: "/magazine/2027_new_bmw_3series_neue_klasse/"
-	},
-	{
-		slug: "202608_bmw_kids_mechanic",
-		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
-		brand: "BMW",
-		date: "2026.08.20",
-		image: "/uploads/2026/08/DSC5134.jpg",
-		url: "/magazine/202608_bmw_kids_mechanic/"
 	},
 	{
 		slug: "202610_mini_united-japan-2026",
 		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
 		brand: "MINI",
 		date: "2026.10.15",
+		sortDate: "2026-10-15T10:00:00.000Z",
 		image: "/uploads/2026/10/DSC6593-1-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
 	},
@@ -867,14 +881,25 @@ const relatedStories = [
 		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
 		brand: "Ferrari",
 		date: "2026.08.17",
+		sortDate: "2026-08-17T10:00:00.000Z",
 		image: "/uploads/2026/08/DSC4983-3.jpg",
 		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
+	},
+	{
+		slug: "202607_new_bmw_x5",
+		title: "【公式発表】新型BMW X5誕生。Neue Klasseの革新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代",
+		brand: "BMW",
+		date: "2026.07.01",
+		sortDate: "2026-07-01T10:00:00.000Z",
+		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg",
+		url: "/magazine/202607_new_bmw_x5/"
 	},
 	{
 		slug: "20260714_mini_jcw_track_style_edition",
 		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
 		brand: "MINI",
 		date: "2026.07.14",
+		sortDate: "2026-07-14T10:00:00.000Z",
 		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
 		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/"
 	},
@@ -883,10 +908,85 @@ const relatedStories = [
 		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
 		brand: "ALPINA",
 		date: "2026.05.15",
+		sortDate: "2026-05-15T10:00:00.000Z",
 		image: "/uploads/2026/07/DSC7756.jpg",
 		url: "https://nicole-automobiles.com/"
 	}
-].filter(s => s.slug !== slug);
+];
+
+let dynamicRelatedStories: any[] = [];
+try {
+	const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
+	if (fs.existsSync(DB_PATH)) {
+		const db = new DatabaseSync(DB_PATH);
+		const dbRows = db.prepare(`
+			SELECT id, slug, title, featured_image, published_at, created_at,
+			       COALESCE(published_at, created_at) as sort_date
+			FROM ec_magazine
+			WHERE (status = 'published' OR status IS NULL)
+			  AND slug != ?
+			UNION ALL
+			SELECT id, slug, title, featured_image, published_at, created_at,
+			       COALESCE(published_at, created_at) as sort_date
+			FROM ec_posts
+			WHERE (status = 'published' OR status IS NULL)
+			  AND slug != ?
+			  AND slug NOT IN (SELECT slug FROM ec_magazine)
+			  AND title NOT LIKE '%休業%' AND title NOT LIKE '%定休日%' AND title NOT LIKE '%ドメイン%' AND title NOT LIKE '%SNS%' AND title NOT LIKE '%アカウント%'
+			ORDER BY sort_date DESC
+			LIMIT 12
+		`).all(slug, slug) as any[];
+
+		dynamicRelatedStories = dbRows.map(r => {
+			let imgSrc = "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg";
+			if (r.featured_image) {
+				try {
+					const parsed = JSON.parse(r.featured_image);
+					imgSrc = parsed.src || parsed.previewUrl || imgSrc;
+				} catch {
+					if (typeof r.featured_image === 'string' && r.featured_image.startsWith('/')) {
+						imgSrc = r.featured_image;
+					}
+				}
+			}
+			let brand = "BMW";
+			const t = (r.title || "").toLowerCase();
+			if (t.includes("mini")) brand = "MINI";
+			else if (t.includes("ferrari") || t.includes("フェラーリ")) brand = "Ferrari";
+			else if (t.includes("alpina") || t.includes("アルピナ")) brand = "ALPINA";
+			else if (t.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
+
+			const rawDate = r.sort_date || r.published_at || r.created_at;
+			const dateStr = rawDate ? new Date(rawDate).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25";
+
+			return {
+				slug: r.slug,
+				title: r.title,
+				brand,
+				date: dateStr,
+				sortDate: rawDate,
+				image: imgSrc,
+				url: `/magazine/${r.slug}/`
+			};
+		});
+	}
+} catch (e) {
+	console.error("Failed to query dynamic related stories:", e);
+}
+
+// 静的記事と動的記事を統合し、作成日・公開日の新しい順にソートして最大5件抽出
+const combinedRelated = [
+	...dynamicRelatedStories,
+	...staticRelatedPool.filter(sp => !dynamicRelatedStories.some(ds => ds.slug === sp.slug))
+]
+	.filter(s => s.slug !== slug)
+	.sort((a, b) => {
+		const dateA = a.sortDate || a.date?.replace(/\./g, '-') || "";
+		const dateB = b.sortDate || b.date?.replace(/\./g, '-') || "";
+		return dateB.localeCompare(dateA);
+	});
+
+const relatedStories = combinedRelated.slice(0, 5);
 
 // タイトルを自然な文節で改行・表示するためのセグメント分割
 function getTitleSegments(rawTitle: string) {

@@ -363,33 +363,50 @@ if (relatedCombined.includes('mini')) {
 								</div>
 							</div>
 
-							<!-- 各部門アコーディオン -->
-							<div class="dept-accordion-list" role="region" aria-label="店舗窓口一覧">
-								{departmentsList.map((dept, idx) => {
-									const deptId = dept.id || `dept-${idx}`;
-									const isDefaultOpen = idx === 0;
-									let tabTitle = dept.title;
-									const t = (dept.type || '').toLowerCase();
-									const title = dept.title || '';
-									if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
-										tabTitle = '新車（試乗・商談）';
-									} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
-										tabTitle = '認定中古車（試乗・商談）';
-									} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
-										tabTitle = 'サービス（整備・点検）';
-									}
-									return (
-										<details class="dept-acc-item" id={deptId} open={isDefaultOpen}>
-											<summary class="dept-acc-header">
-												<div class="dept-acc-title-group">
-													<h3 class="dept-acc-name">{tabTitle}</h3>
-												</div>
-												<div class="dept-acc-meta-preview">
-													{dept.hours && <span class="preview-hours">{dept.hours}</span>}
-													<svg class="dept-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-												</div>
-											</summary>
-											<div class="dept-acc-body">
+							<!-- 各部門タブ切り替えUI -->
+							<div class="dept-tabs-container" id="departments-tab-container">
+								<!-- タブヘッダーボタン一覧 -->
+								<div class="dept-tabs-nav" role="tablist" aria-label="店舗窓口タブ">
+									{departmentsList.map((dept, idx) => {
+										const deptId = dept.id || `dept-${idx}`;
+										let tabTitle = dept.title;
+										const t = (dept.type || '').toLowerCase();
+										const title = dept.title || '';
+										if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
+											tabTitle = '新車（試乗・商談）';
+										} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
+											tabTitle = '認定中古車（試乗・商談）';
+										} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
+											tabTitle = 'サービス（整備・点検）';
+										}
+										return (
+											<button
+												type="button"
+												role="tab"
+												class={`dept-tab-btn ${idx === 0 ? 'is-active' : ''}`}
+												id={`tab-btn-${deptId}`}
+												aria-controls={`tab-panel-${deptId}`}
+												aria-selected={idx === 0 ? 'true' : 'false'}
+												data-target-dept={deptId}
+											>
+												<span class="dept-tab-btn__title">{tabTitle}</span>
+											</button>
+										);
+									})}
+								</div>
+
+								<!-- 各部門タブパネル -->
+								<div class="dept-panels-wrap">
+									{departmentsList.map((dept, idx) => {
+										const deptId = dept.id || `dept-${idx}`;
+										const isFirst = idx === 0;
+										return (
+											<div
+												class={`dept-tab-panel ${isFirst ? 'is-active' : ''}`}
+												id={`tab-panel-${deptId}`}
+												role="tabpanel"
+												aria-labelledby={`tab-btn-${deptId}`}
+											>
 												<div class="dept-compact-table">
 													{dept.subtitle && (
 														<div class="dept-table-row">
@@ -445,9 +462,9 @@ if (relatedCombined.includes('mini')) {
 													)}
 												</div>
 											</div>
-										</details>
-									);
-								})}
+										);
+									})}
+								</div>
 							</div>
 						</div>
 
@@ -681,19 +698,46 @@ if (relatedCombined.includes('mini')) {
 				});
 			});
 
-			// 上部ステータスバー クリック連動（該当アコーディオンを開いてスクロール）
+			// 店舗・窓口情報 タブ切り替えロジック
+			const tabBtns = document.querySelectorAll('.dept-tab-btn');
+			const tabPanels = document.querySelectorAll('.dept-tab-panel');
+			const tabContainer = document.getElementById('departments-tab-container');
+
+			function switchTab(deptId, shouldScroll = false) {
+				if (!deptId) return;
+
+				tabBtns.forEach((btn) => {
+					const isActive = btn.getAttribute('data-target-dept') === deptId;
+					btn.classList.toggle('is-active', isActive);
+					btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				});
+
+				tabPanels.forEach((panel) => {
+					const isTarget = panel.id === `tab-panel-${deptId}`;
+					panel.classList.toggle('is-active', isTarget);
+				});
+
+				if (shouldScroll && tabContainer) {
+					tabContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					flashHighlight(tabContainer);
+				}
+			}
+
+			tabBtns.forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const deptId = btn.getAttribute('data-target-dept');
+					switchTab(deptId, false);
+				});
+			});
+
+			// 上部ステータスバー クリック連動（該当タブを開いてスクロール）
 			const deptPills = document.querySelectorAll('[data-dept-target]');
 			deptPills.forEach((pill) => {
 				pill.addEventListener('click', (e) => {
 					e.preventDefault();
 					const targetId = pill.getAttribute('data-dept-target');
-					if (!targetId) return;
-
-					const targetAcc = document.getElementById(targetId);
-					if (targetAcc) {
-						targetAcc.open = true;
-						targetAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
-						flashHighlight(targetAcc);
+					if (targetId) {
+						switchTab(targetId, true);
 					}
 				});
 			});
@@ -1208,113 +1252,91 @@ if (relatedCombined.includes('mini')) {
 		border-color: rgba(16, 185, 129, 0.45);
 	}
 
-	/* 窓口アコーディオンリスト */
-	.dept-accordion-list {
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-		margin-top: 6px;
-	}
-
-	.dept-acc-item {
+	/* 窓口タブ切り替えUI */
+	.dept-tabs-container {
 		background: #0d0f12;
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 8px;
 		overflow: hidden;
+		margin-top: 6px;
 		scroll-margin-top: 110px;
-		transition: border-color 0.2s ease, background 0.2s ease;
+		transition: border-color 0.2s ease;
 	}
 
-	.dept-acc-item.is-targeted {
+	.dept-tabs-container.is-targeted {
 		animation: targetGlow 1.4s ease-out;
 	}
 
-	@keyframes targetGlow {
-		0% {
-			outline: 2px solid rgba(255, 255, 255, 0.9);
-			outline-offset: 4px;
-		}
-		100% {
-			outline: 2px solid transparent;
-			outline-offset: 8px;
-		}
-	}
-
-	.dept-acc-item[open] {
-		background: #14161b;
-		border-color: rgba(255, 255, 255, 0.22);
-	}
-
-	.dept-acc-header {
+	.dept-tabs-nav {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 18px 22px;
-		cursor: pointer;
-		user-select: none;
-		list-style: none;
-		transition: background 0.2s ease;
+		align-items: stretch;
+		background: rgba(255, 255, 255, 0.03);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		overflow-x: auto;
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
 	}
 
-	.dept-acc-header::-webkit-details-marker {
+	.dept-tabs-nav::-webkit-scrollbar {
 		display: none;
 	}
 
-	.dept-acc-header:hover {
-		background: rgba(255, 255, 255, 0.03);
-	}
-
-	.dept-acc-title-group {
-		display: flex;
+	.dept-tab-btn {
+		flex: 1;
+		min-width: 140px;
+		appearance: none;
+		background: transparent;
+		border: none;
+		border-right: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 3px solid transparent;
+		padding: 16px 20px;
+		color: #94a3b8;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		cursor: pointer;
+		text-align: center;
+		white-space: nowrap;
+		transition: all 0.2s ease;
+		display: inline-flex;
 		align-items: center;
-		gap: 12px;
+		justify-content: center;
+		gap: 8px;
 	}
 
-	.dept-acc-name {
-		font-size: 1.0625rem;
+	.dept-tab-btn:last-child {
+		border-right: none;
+	}
+
+	.dept-tab-btn:hover {
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.dept-tab-btn.is-active {
+		color: #ffffff;
+		background: #14161b;
+		border-bottom-color: #ffffff;
 		font-weight: 700;
-		color: #ffffff;
-		margin: 0;
-		letter-spacing: -0.01em;
 	}
 
-	.dept-acc-meta-preview {
-		display: flex;
-		align-items: center;
-		gap: 12px;
+	.dept-panels-wrap {
+		background: #14161b;
+		padding: 24px 24px 28px;
 	}
 
-	.preview-hours {
-		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-		font-size: 0.8125rem;
-		color: #888888;
+	.dept-tab-panel {
+		display: none;
 	}
 
-	.dept-acc-chevron {
-		width: 18px;
-		height: 18px;
-		color: #888888;
-		transition: transform 0.25s ease, color 0.2s ease;
-		flex-shrink: 0;
+	.dept-tab-panel.is-active {
+		display: block;
+		animation: tabFadeIn 0.25s ease;
 	}
 
-	.dept-acc-item[open] .dept-acc-chevron {
-		transform: rotate(180deg);
-		color: #ffffff;
-	}
-
-	.dept-acc-body {
-		padding: 0 22px 22px;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-		margin-top: 4px;
-		padding-top: 20px;
-		animation: accFadeIn 0.2s ease;
-	}
-
-	@keyframes accFadeIn {
+	@keyframes tabFadeIn {
 		from {
 			opacity: 0;
-			transform: translateY(-4px);
+			transform: translateY(4px);
 		}
 		to {
 			opacity: 1;
@@ -2055,13 +2077,14 @@ if (relatedCombined.includes('mini')) {
 			font-size: 0.9375rem;
 		}
 
-		.preview-hours {
-			display: none;
+		.dept-tab-btn {
+			min-width: 110px;
+			padding: 13px 12px;
+			font-size: 0.84375rem;
 		}
 
-		.dept-acc-body {
-			padding: 0 16px 18px;
-			padding-top: 14px;
+		.dept-panels-wrap {
+			padding: 18px 14px 22px;
 		}
 
 		.access-acc-header {
