@@ -87,9 +87,8 @@ const fieldDefs = [
 	{ slug: 'facility_type', label: '【基本情報】拠点区分（例: ショールーム・認定中古車）', type: 'string', col: 'TEXT', order: 12 },
 	{ slug: 'postal', label: '【基本情報】郵便番号', type: 'string', col: 'TEXT', order: 13 },
 	{ slug: 'address', label: '【基本情報】所在地住所', type: 'string', col: 'TEXT', order: 14 },
-	{ slug: 'tel', label: '【基本情報】代表電話番号', type: 'string', col: 'TEXT', order: 15 },
-	{ slug: 'fax', label: '【基本情報】FAX番号（※空欄時は非表示）', type: 'string', col: 'TEXT', order: 16 },
-	{ slug: 'office_notice', label: '【基本情報】管理オフィス注記（※空欄時は非表示）', type: 'text', col: 'TEXT', order: 17 },
+	{ slug: 'fax', label: '【基本情報】FAX番号（※空欄時は非表示）', type: 'string', col: 'TEXT', order: 15 },
+	{ slug: 'office_notice', label: '【基本情報】管理オフィス注記（※空欄時は非表示）', type: 'text', col: 'TEXT', order: 16 },
 
 	// ─── 【写真ギャラリー】 ───
 	{ slug: 'featured_image', label: '【写真ギャラリー】メイン外観写真（アイキャッチ）', type: 'image', col: 'TEXT', order: 20 },

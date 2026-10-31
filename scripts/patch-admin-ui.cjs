@@ -39,7 +39,7 @@ const injectedCode = `
 						id: 'sec-basic',
 						prefix: '【基本情報】',
 						name: '基本情報',
-						desc: '拠点名称、主要ブランド、住所、代表電話番号、FAX番号、管理オフィス注記'
+						desc: '拠点名称、主要ブランド、住所、FAX番号、管理オフィス注記'
 					},
 					{
 						id: 'sec-gallery',
