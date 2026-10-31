@@ -711,7 +711,10 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 				<div class="esg-section__header">
 					<div class="esg-section__titles">
 						<span class="esg-section__eyebrow">SUSTAINABILITY & COMMUNITY</span>
-						<h2 class="esg-section__heading">ESG / SDGs — 持続可能な未来への取り組み</h2>
+						<h2 class="esg-section__heading">
+							ESG / SDGs
+							<span class="esg-section__heading-sub">持続可能な未来への取り組み</span>
+						</h2>
 						<p class="esg-section__desc">地域社会への貢献、環境保全、そして未来を担う次世代育成。<br class="pc-only" />ニコル・グループが取り組む活動の歩みを<span class="u-nowrap">お届けします。</span></p>
 					</div>
 					<a href="/esg_sdgs" class="esg-section__portal-link">
@@ -1326,11 +1329,12 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 
 	.toc-heading {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: clamp(28px, 3vw, 42px);
+		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
 		letter-spacing: -0.01em;
 		color: #ffffff;
-		margin: 0 0 10px 0;
+		line-height: 1.2;
+		margin: 0 0 12px 0;
 	}
 
 	.toc-sub {
@@ -1521,11 +1525,21 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 	}
 
 	.filter-group__label {
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-		font-size: 11px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: flex-start;
+		width: 78px;
+		box-sizing: border-box;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Kaku Gothic ProN", sans-serif;
+		font-size: 13px;
 		font-weight: 700;
-		letter-spacing: 0.18em;
-		color: rgba(255, 255, 255, 0.5);
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.85);
+		background: none;
+		border: none;
+		flex-shrink: 0;
+		text-align: left;
+		white-space: nowrap;
 	}
 
 	.filter-pills {
@@ -1665,11 +1679,12 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 
 	.section-heading {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: 26px;
+		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
 		color: #ffffff;
 		margin: 0;
 		letter-spacing: -0.01em;
+		line-height: 1.2;
 	}
 
 	.count-display {
@@ -2021,19 +2036,90 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		.filter-wrap {
 			flex-direction: column;
 			align-items: stretch;
+			gap: 12px;
+		}
+
+		.filter-group {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			width: 100%;
+			overflow: hidden;
+		}
+
+		.filter-group__label {
+			width: 70px;
+			font-size: 12.5px;
+			letter-spacing: 0.04em;
+			flex-shrink: 0;
+			background: none;
+			border: none;
+			white-space: nowrap;
+		}
+
+		.filter-pills {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: none;
+			padding-bottom: 2px;
+			width: 100%;
+		}
+
+		.filter-pills::-webkit-scrollbar {
+			display: none;
+		}
+
+		.filter-pill {
+			flex-shrink: 0;
+			padding: 5px 12px;
+			font-size: 11px;
 		}
 
 		.filter-controls-right {
 			flex-direction: column;
+			align-items: stretch;
 			width: 100%;
+			gap: 12px;
 		}
 
 		.filter-search-box {
 			width: 100%;
+			height: 38px;
 		}
 
 		.filter-search-box:focus-within {
 			width: 100%;
+		}
+
+		.section-title-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 28px;
+		}
+
+		.toc-heading,
+		.section-heading,
+		.esg-section__heading {
+			font-size: 26px;
+			letter-spacing: -0.01em;
+			line-height: 1.25;
+		}
+
+		.esg-section__heading {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 4px;
+		}
+
+		.esg-section__heading-sub {
+			font-size: 13px;
+			font-weight: 500;
+			color: rgba(255, 255, 255, 0.6);
 		}
 
 		.articles-grid {
@@ -2044,9 +2130,19 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 			padding: 60px 0 80px;
 		}
 
-		.esg-section__heading {
-			font-size: 21px;
+		.esg-section__header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 16px;
 		}
+
+		.esg-section__portal-link {
+			width: 100%;
+			justify-content: center;
+			box-sizing: border-box;
+		}
+
+
 
 		.esg-cards-grid {
 			grid-template-columns: repeat(2, 1fr);
@@ -2096,12 +2192,24 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 	}
 
 	.esg-section__heading {
-		font-size: 26px;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.01em;
 		color: #ffffff;
-		margin: 0 0 10px;
-		line-height: 1.35;
+		margin: 0 0 12px;
+		line-height: 1.2;
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.esg-section__heading-sub {
+		font-size: 15px;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.6);
+		letter-spacing: 0.02em;
 	}
 
 	.esg-section__desc {

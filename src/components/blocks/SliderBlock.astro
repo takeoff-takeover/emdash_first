@@ -138,6 +138,9 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		background: #000000;
 		overflow: hidden;
 		border: 1px solid rgba(255, 255, 255, 0.08);
+		touch-action: pan-y;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 
 	.filmstrip-track {
@@ -328,6 +331,47 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
 			if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
 			thumbs.forEach((t, i) => t.addEventListener('click', () => goTo(i)));
+
+			// 指でのフリック（スワイプ）操作対応
+			if (viewport) {
+				let startX = 0;
+				let startY = 0;
+				let endX = 0;
+				let endY = 0;
+				let isTouching = false;
+
+				viewport.addEventListener('touchstart', (e) => {
+					if (e.touches.length === 1) {
+						isTouching = true;
+						startX = e.touches[0].clientX;
+						startY = e.touches[0].clientY;
+						endX = startX;
+						endY = startY;
+					}
+				}, { passive: true });
+
+				viewport.addEventListener('touchmove', (e) => {
+					if (!isTouching) return;
+					endX = e.touches[0].clientX;
+					endY = e.touches[0].clientY;
+				}, { passive: true });
+
+				viewport.addEventListener('touchend', () => {
+					if (!isTouching) return;
+					isTouching = false;
+					const deltaX = endX - startX;
+					const deltaY = endY - startY;
+
+					// 横方向の移動量が35px以上、かつ縦移動より優位な場合にフリック実行
+					if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+						if (deltaX < 0) {
+							goTo(current + 1); // 左フリック → 次の写真
+						} else {
+							goTo(current - 1); // 右フリック → 前の写真
+						}
+					}
+				}, { passive: true });
+			}
 		}
 	}
 </script>

@@ -1,10 +1,239 @@
 ---
 // src/pages/locations.astro
-// ニコル・グループ 拠点一覧ページ（最上部マップ・統合拠点ポップアップ・新車/中古車/サービス整備フィルター・超薄型リスト）
+// ニコル・グループ 拠点一覧ページ（最上部マップ・統合拠点ポップアップ・完全DB連携一本化）
 import NicoleLayout from "../layouts/NicoleLayout.astro";
-import locationsData from "../data/locations.json";
+import { getEmDashCollection } from "emdash";
+import { geocodeAddress } from "../utils/geocode";
 
-// 拠点ごとのロゴ判定（青山・世田谷は文字なしNマークを使用）
+// 1. EmDash 公式APIから全拠点データを直接取得（一本化）
+let emdashEntries: any[] = [];
+try {
+	const res = await getEmDashCollection("locations" as any, {
+		limit: 100,
+	});
+	if (res?.entries) {
+		emdashEntries = res.entries;
+	}
+} catch (e) {
+	console.error("[locations] Failed to query getEmDashCollection:", e);
+}
+
+// 2. データベースから取得したデータをlocations形式に正規化（複合拠点は一覧で新車/中古車を別行表示し、詳細は同一総合ハブへ連携）
+const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry) => {
+	const row = entry.data || entry;
+	let lat = typeof row.lat === 'number' ? row.lat : (row.lat ? parseFloat(row.lat) : null);
+	let lng = typeof row.lng === 'number' ? row.lng : (row.lng ? parseFloat(row.lng) : null);
+
+	// 緯度経度が未設定の場合は住所から国土地理院APIで自動取得
+	if ((!lat || !lng) && row.address) {
+		const coords = await geocodeAddress(row.address);
+		if (coords) {
+			lat = coords.lat;
+			lng = coords.lng;
+		}
+	}
+
+	const addr = row.address || "";
+	const areaGroup = addr.includes("東京都") || addr.includes("東京") ? "東京" : "神奈川";
+	const isOffice = (row.badges || "").includes("本社・オフィス") || row.brand === "Nicole";
+	const servicesList = (row.badges || "")
+		.split(",")
+		.map((s: string) => s.trim())
+		.filter(Boolean);
+
+	// 見本用のサンプルGoogle評価（将来はAPIまたは管理画面から取得）
+	const sampleRatingMap: Record<string, { rating: number; count: number }> = {
+		'nicole-bmw-kawasaki': { rating: 4.1, count: 186 },
+		'nicole-bmw-kohoku': { rating: 4.3, count: 215 },
+		'nicole-bmw-aoba-miyamae': { rating: 4.2, count: 98 },
+		'nicole-bmw-shinyurigaoka': { rating: 4.2, count: 142 },
+		'nicole-bmw-ota': { rating: 4.0, count: 76 },
+		'bps-kohoku': { rating: 4.4, count: 64 },
+		'bps-shinyurigaoka': { rating: 4.2, count: 142 },
+		'nicole-bmw-service-centre': { rating: 4.1, count: 52 },
+		'mini-kohoku': { rating: 4.3, count: 122 },
+		'mini-tsuzuki': { rating: 4.2, count: 88 },
+		'mini-shinyurigaoka': { rating: 4.3, count: 105 },
+		'mini-next-shinyurigaoka': { rating: 4.3, count: 105 },
+		'mini-next-kohoku': { rating: 4.2, count: 48 },
+		'rolls-royce-motor-cars-yokohama': { rating: 4.6, count: 34 },
+		'nicole-competizione-showroom': { rating: 4.5, count: 68 },
+		'nicole-setagaya': { rating: 4.4, count: 42 },
+		'nicole-aoyama': { rating: 4.3, count: 38 }
+	};
+
+	const currentSample = sampleRatingMap[row.slug] || null;
+	const finalRating = row.google_rating_override ? parseFloat(row.google_rating_override) : (currentSample?.rating || null);
+	const finalCount = row.google_reviews_count_override ? parseInt(row.google_reviews_count_override, 10) : (currentSample?.count || null);
+
+	// 新百合ヶ丘（BMW）複合拠点：一覧では「新車窓口」と「認定中古車窓口」を別々の独立行として一覧表示し、詳細URLは共通の総合ハブ（/location/nicole-bmw-shinyurigaoka）へ接続
+	if (row.slug === 'nicole-bmw-shinyurigaoka') {
+		return [
+			{
+				id: 'nicole-bmw-shinyurigaoka',
+				name: 'Nicole BMW 新百合ヶ丘支店',
+				brand: 'BMW',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['BMW 新車', 'BMW（ALPINA）サービス', 'MINI サービス'],
+				postal: row.postal || "〒215-0023",
+				address: addr,
+				tel: row.sales_tel || row.tel || "044-959-1400",
+				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				lat: lat || 35.6025,
+				lng: lng || 139.4975,
+				detailUrl: '/location/nicole-bmw-shinyurigaoka',
+				mapQuery: encodeURIComponent(`Nicole BMW 新百合ヶ丘支店 ${addr}`),
+				rating: 4.2,
+				reviewCount: 142
+			},
+			{
+				id: 'bps-shinyurigaoka',
+				name: 'BMW Premium Selection 新百合ヶ丘',
+				brand: 'BMW',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['BMW 認定中古車'],
+				postal: row.postal || "〒215-0023",
+				address: addr,
+				tel: row.used_tel || "044-396-0180",
+				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				lat: lat || 35.6025,
+				lng: lng || 139.4975,
+				detailUrl: '/location/nicole-bmw-shinyurigaoka', // 詳細は共通の総合ページへ！
+				mapQuery: encodeURIComponent(`BMW Premium Selection 新百合ヶ丘 ${addr}`),
+				rating: 4.2,
+				reviewCount: 142
+			}
+		];
+	}
+
+	// 新百合ヶ丘（MINI）複合拠点：一覧では「新車窓口」と「認定中古車窓口」を別々の独立行として一覧表示し、詳細URLは共通の総合ハブ（/location/mini-shinyurigaoka）へ接続
+	if (row.slug === 'mini-shinyurigaoka') {
+		return [
+			{
+				id: 'mini-shinyurigaoka',
+				name: 'MINI 新百合ヶ丘',
+				brand: 'MINI',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['MINI 新車', 'MINI サービス'],
+				postal: row.postal || "〒215-0023",
+				address: addr,
+				tel: row.sales_tel || row.tel || "044-959-3032",
+				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				lat: lat || 35.6025,
+				lng: lng || 139.4975,
+				detailUrl: '/location/mini-shinyurigaoka',
+				mapQuery: encodeURIComponent(`MINI 新百合ヶ丘 ${addr}`),
+				rating: 4.3,
+				reviewCount: 105
+			},
+			{
+				id: 'mini-next-shinyurigaoka',
+				name: 'MINI NEXT 新百合ヶ丘',
+				brand: 'MINI',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['MINI 認定中古車'],
+				postal: row.postal || "〒215-0023",
+				address: addr,
+				tel: row.used_tel || "044-396-0180",
+				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				lat: lat || 35.6025,
+				lng: lng || 139.4975,
+				detailUrl: '/location/mini-shinyurigaoka', // 詳細は共通の総合ページへ！
+				mapQuery: encodeURIComponent(`MINI NEXT 新百合ヶ丘 ${addr}`),
+				rating: 4.3,
+				reviewCount: 105
+			}
+		];
+	}
+
+	return [{
+		id: entry.id || row.slug || row.id,
+		name: protectPhrases(row.title),
+		brand: row.brand || "Nicole",
+		facilityType: isOffice ? "本社・オフィス" : "ショールーム",
+		areaGroup,
+		services: servicesList,
+		postal: row.postal || "",
+		address: addr,
+		tel: row.tel || row.sales_tel || "",
+		image: row.featured_image || "/uploads/2026/01/Nicole-BMW-本社.jpg",
+		lat: lat || 35.54589,
+		lng: lng || 139.69708,
+		detailUrl: isOffice ? "" : `/location/${entry.id || row.slug}`,
+		mapQuery: encodeURIComponent(`${row.title} ${addr}`),
+		rating: finalRating,
+		reviewCount: finalCount
+	}];
+}));
+
+const locationsData = rawLocationsDataNested.flat();
+
+// 3. ユーザー指定のブランド優先順位（BMW ➔ MINI ➔ ロールス・ロイス ➔ フェラーリ ➔ ニコル/アルピナ/オフィス）による完全固定ソート
+const BRAND_PRIORITY_ORDER: Record<string, number> = {
+	'BMW': 1,
+	'MINI': 2,
+	'Rolls-Royce': 3,
+	'Ferrari': 4,
+	'ALPINA': 5,
+	'Nicole': 6
+};
+
+// スラグごとの個別表示優先順位（ユーザーご指定順）
+const SPECIFIC_SLUG_ORDER: Record<string, number> = {
+	// ─── 1. BMW（新車系） ───
+	'nicole-bmw-kawasaki': 101,      // Nicole BMW 本社（川崎）
+	'nicole-bmw-kohoku': 102,        // Nicole BMW 横浜港北支店
+	'nicole-bmw-aoba-miyamae': 103,  // Nicole BMW 青葉宮前支店
+	'nicole-bmw-shinyurigaoka': 104, // Nicole BMW 新百合ヶ丘支店
+	'nicole-bmw-ota': 105,           // Nicole BMW 大田支店
+
+	// ─── 2. BMW（BPS・サービス系） ───
+	'bps-kohoku': 106,               // BMW Premium Selection 横浜港北（BMW認定中古車）
+	'bps-shinyurigaoka': 107,        // BMW Premium Selection 新百合ヶ丘
+	'nicole-bmw-service-centre': 108,// Nicole BMW Service Centre
+
+	// ─── 3. MINI ───
+	'mini-kohoku': 201,              // MINI 港北
+	'mini-tsuzuki': 202,             // MINI 都筑
+	'mini-shinyurigaoka': 203,       // MINI 新百合ヶ丘
+	'mini-next-kohoku': 204,         // MINI NEXT 横浜港北（MINI 認定中古車）
+	'mini-next-shinyurigaoka': 205,  // MINI NEXT 新百合ヶ丘
+
+	// ─── 4. ロールス・ロイス ───
+	'rolls-royce-motor-cars-yokohama': 301, // ロールス・ロイス・モーター・カーズ横浜
+
+	// ─── 5. フェラーリ ───
+	'nicole-competizione-showroom': 401,        // Nicole Competizione ショールーム
+	'nicole-competizione-pre-owned': 402,       // Nicole Competizione プレオウンド ショールーム
+	'nicole-competizione-service-centre': 403,  // Nicole Competizione サービスセンター
+
+	// ─── 6. ニコル（アルピナ） ───
+	'nicole-setagaya': 501,          // ニコル世田谷ショールーム
+	'nicole-aoyama': 502,            // ニコル青山ショールーム
+
+	// ─── 7. 管理オフィス（別枠ブロック） ───
+	'office-kawasaki': 601,          // 川崎本社オフィス
+	'office-yokohama': 602           // 横浜本社オフィス
+};
+
+locationsData.sort((a, b) => {
+	const orderA = SPECIFIC_SLUG_ORDER[a.id] ?? (BRAND_PRIORITY_ORDER[a.brand] ? BRAND_PRIORITY_ORDER[a.brand] * 100 : 999);
+	const orderB = SPECIFIC_SLUG_ORDER[b.id] ?? (BRAND_PRIORITY_ORDER[b.brand] ? BRAND_PRIORITY_ORDER[b.brand] * 100 : 999);
+	return orderA - orderB;
+});
+
+function protectPhrases(str: string): string {
+	if (!str) return '';
+	return str
+		.replace(/BMW Premium Selection/g, 'BMW\u00A0Premium\u00A0Selection')
+		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT');
+}
+
+// 拠点ごとのロゴ判定
 function getLocationLogo(loc: any): string {
 	if (loc.name.includes("青山") || loc.name.includes("世田谷") || loc.brand === "Nicole" || loc.brand === "ALPINA") {
 		return "/brands/nicole-n-mark.svg";
@@ -16,7 +245,7 @@ function getLocationLogo(loc: any): string {
 	return "/brands/nicole-n-mark.svg";
 }
 
-// サービスバッジ・タグ型定義（アイコン付き・所属ブランド対応）
+// サービスバッジ・タグ型定義
 interface ServiceBadge {
 	type: "sales" | "used" | "service" | "office";
 	label: string;
@@ -24,103 +253,46 @@ interface ServiceBadge {
 	brands: string[];
 }
 
-// 拠点ごとの個別サービスバッジ定義（港北、青葉宮前、新百合ヶ丘、Nicole BMW Service Centre 等）
-const locationCustomBadges: Record<string, ServiceBadge[]> = {
-	// Nicole BMW 本社（川崎）
-	"loc-1": [
-		{ type: "sales", label: "BMW 新車販売", icon: "car", brands: ["BMW"] },
-		{ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-	],
-	// Nicole BMW 横浜港北支店（BMWサービス、MINIサービス追加）
-	"loc-2": [
-		{ type: "sales", label: "BMW 新車販売", icon: "car", brands: ["BMW"] },
-		{ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-	],
-	// Nicole BMW 青葉宮前支店（BMWサービス追加）
-	"loc-3": [
-		{ type: "sales", label: "BMW 新車販売", icon: "car", brands: ["BMW"] },
-		{ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] },
-	],
-	// Nicole BMW 新百合ヶ丘支店（BMW新車販売、BMWサービス、MINIサービス追加）
-	"loc-4": [
-		{ type: "sales", label: "BMW 新車販売", icon: "car", brands: ["BMW"] },
-		{ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-	],
-	// MINI 新百合ヶ丘（MINIサービス追加）
-	"loc-8": [
-		{ type: "sales", label: "MINI 新車販売", icon: "car", brands: ["MINI"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-	],
-	// MINI NEXT 新百合ヶ丘（MINIサービス追加）
-	"loc-16": [
-		{ type: "used", label: "MINI 認定中古車", icon: "shield", brands: ["MINI"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-	],
-	// Nicole BMW Service Centre（都筑：ロールスロイス、BMW/ALPINA、MINIサービス）
-	"loc-22": [
-		{ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] },
-		{ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] },
-		{ type: "service", label: "Rolls-Royce サービス", icon: "wrench", brands: ["Rolls-Royce"] },
-	],
-};
-
+// データベースの取扱サービス（badges）からバッジを完全自動生成
 function getFacilityBadges(loc: any): ServiceBadge[] {
-	if (locationCustomBadges[loc.id]) {
-		return locationCustomBadges[loc.id];
+	if (loc.services && loc.services.length > 0) {
+		return loc.services.map((label: string) => {
+			let type: "sales" | "used" | "service" | "office" = "sales";
+			let icon: "car" | "shield" | "wrench" | "building" = "car";
+			let brands = [loc.brand];
+
+			if (label.includes("Rolls-Royce") || label.includes("ロールスロイス")) brands = ["Rolls-Royce"];
+			else if (label.includes("Ferrari") || label.includes("フェラーリ")) brands = ["Ferrari"];
+			else if (label.includes("MINI") || label.includes("ミニ")) brands = ["MINI"];
+			else if (label.includes("ALPINA") || label.includes("アルピナ")) brands = ["ALPINA"];
+			else if (label.includes("BMW")) brands = ["BMW"];
+
+			if (label.includes("新車") || label.includes("車両")) {
+				type = "sales";
+				icon = "car";
+			} else if (label.includes("認定中古車") || label.includes("中古車")) {
+				type = "used";
+				icon = "shield";
+			} else if (label.includes("サービス") || label.includes("点検") || label.includes("車検") || label.includes("修理")) {
+				type = "service";
+				icon = "wrench";
+				if (label.includes("BMW（ALPINA）")) {
+					brands = ["BMW", "ALPINA"];
+				}
+			} else if (label.includes("本社・オフィス")) {
+				type = "office";
+				icon = "building";
+				brands = loc.id === "loc-24" ? ["Rolls-Royce", "Ferrari"] : ["BMW", "MINI", "ALPINA"];
+			}
+
+			return { type, label, icon, brands };
+		});
 	}
 
-	const badges: ServiceBadge[] = [];
-	const text = `${(loc.services || []).join(" ")} ${loc.facilityType || ""} ${loc.name || ""}`;
-	const brand = loc.brand;
-
-	// 新車販売
-	if (text.includes("新車") || loc.facilityType === "ショールーム" || text.includes("車両販売")) {
-		let label = `${brand} 新車販売`;
-		let brands = [brand];
-		if (brand === "ALPINA" || loc.name.includes("青山") || loc.name.includes("世田谷")) {
-			label = "ALPINA 車両販売";
-			brands = ["ALPINA"];
-		}
-		badges.push({ type: "sales", label, icon: "car", brands });
-	}
-
-	// 認定中古車
-	if (text.includes("認定中古車") || text.includes("中古車") || text.includes("BPS") || text.includes("プレオウンド") || text.includes("NEXT")) {
-		let label = `${brand} 認定中古車`;
-		badges.push({ type: "used", label, icon: "shield", brands: [brand] });
-	}
-
-	// サービス（整備・点検）
-	if (text.includes("サービス") || text.includes("車検") || text.includes("点検") || text.includes("修理")) {
-		if (text.includes("Rolls-Royce") || text.includes("ロールスロイス")) {
-			badges.push({ type: "service", label: "Rolls-Royce サービス", icon: "wrench", brands: ["Rolls-Royce"] });
-		}
-		if (text.includes("BMW") || brand === "BMW") {
-			badges.push({ type: "service", label: "BMW（ALPINA）サービス", icon: "wrench", brands: ["BMW", "ALPINA"] });
-		}
-		if (text.includes("MINI") || brand === "MINI") {
-			badges.push({ type: "service", label: "MINI サービス", icon: "wrench", brands: ["MINI"] });
-		}
-		if (text.includes("Ferrari") || brand === "Ferrari") {
-			badges.push({ type: "service", label: "Ferrari サービス", icon: "wrench", brands: ["Ferrari"] });
-		}
-		if (badges.filter(b => b.type === "service").length === 0) {
-			badges.push({ type: "service", label: `${brand} サービス`, icon: "wrench", brands: [brand] });
-		}
-	}
-
-	// 本社・オフィス
-	if (loc.facilityType === "本社・オフィス" || text.includes("本社・オフィス")) {
-		badges.push({ type: "office", label: "本社・オフィス", icon: "building", brands: ["BMW", "MINI", "Rolls-Royce", "Ferrari", "ALPINA"] });
-	}
-
-	return badges;
+	return [];
 }
 
-// 拠点ごとの対応ブランド取得（BMW拠点でMINI/ALPINA/Rolls-Royceサービスを取り扱う拠点を連動）
+// 拠点ごとの対応ブランド取得
 function getLocationBrands(loc: any): string[] {
 	const brands = new Set<string>();
 	if (loc.brand === "ALPINA" || loc.brand === "Nicole" || loc.name.includes("青山") || loc.name.includes("世田谷")) {
@@ -132,27 +304,13 @@ function getLocationBrands(loc: any): string[] {
 
 	const badges = getFacilityBadges(loc);
 	badges.forEach(b => {
-		if (b.label.includes("BMW")) {
-			brands.add("BMW");
-		}
-		if (b.label.includes("MINI")) {
-			brands.add("MINI");
-		}
-		if (b.label.includes("Rolls-Royce") || b.label.includes("ロールスロイス")) {
-			brands.add("Rolls-Royce");
-		}
-		if (b.label.includes("ALPINA")) {
-			brands.add("ALPINA");
-		}
-		if (b.label.includes("Ferrari")) {
-			brands.add("Ferrari");
-		}
+		b.brands.forEach(br => brands.add(br));
 	});
 
 	return Array.from(brands);
 }
 
-// サービスバッジ判定（新車販売、中古車販売、サービス整備）
+// サービスバッジ判定（新車、中古車、サービス整備）
 function getFacilityCategory(loc: any) {
 	const badges = getFacilityBadges(loc);
 	return {
@@ -163,7 +321,7 @@ function getFacilityCategory(loc: any) {
 	};
 }
 
-// ブランド一覧と拠点件数（取り扱いブランド基準）
+// ブランド一覧と拠点件数
 const brandCounts = {
 	ALL: locationsData.length,
 	BMW: locationsData.filter(l => getLocationBrands(l).includes("BMW")).length,
@@ -348,7 +506,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 									</p>
 								</div>
 
-								<!-- 3. 提供サービス・機能バッジ群（現在空白だった中央〜右のスペースに左端を揃えて配置） -->
+								<!-- 3. 提供サービス・機能バッジ群 -->
 								<div class="loc-slim-row__services">
 									{badges.map((b) => (
 										<span 
@@ -387,7 +545,26 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 									))}
 								</div>
 
-								<!-- 4. アクションボタン（詳細 ＆ MAP） -->
+								<!-- 4. Google評価（サービスバッジの後ろに独立配置し、縦1列に綺麗に整列） -->
+								<div class="loc-slim-row__rating">
+									{loc.rating ? (
+										<span class="loc-service-rating" title={`Googleマップ評価: ${loc.rating} (${loc.reviewCount || 0}件のクチコミ)`}>
+											<svg viewBox="0 0 24 24" width="13" height="13" class="gmap-mini-g" aria-hidden="true">
+												<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+												<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+												<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+												<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+											</svg>
+											<span class="rating-star">★</span>
+											<strong class="rating-val">{loc.rating}</strong>
+											{loc.reviewCount && <span class="rating-cnt">({loc.reviewCount})</span>}
+										</span>
+									) : (
+										<span class="loc-rating-empty"></span>
+									)}
+								</div>
+
+								<!-- 5. アクションボタン（詳細） -->
 								<div class="loc-slim-row__actions">
 									{loc.detailUrl ? (
 										<a 
@@ -405,15 +582,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 											詳細
 										</span>
 									)}
-									<a 
-										href={`https://maps.google.com/?q=${loc.mapQuery}`} 
-										target="_blank" 
-										rel="noopener noreferrer" 
-										class="loc-btn loc-btn--map"
-										title="Google Mapsで地図を確認"
-									>
-										MAP
-									</a>
 								</div>
 							</article>
 						);
@@ -478,6 +646,10 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 										))}
 									</div>
 
+									<div class="loc-slim-row__rating">
+										<span class="loc-rating-empty"></span>
+									</div>
+
 									<div class="loc-slim-row__actions">
 										{loc.detailUrl ? (
 											<a 
@@ -495,15 +667,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 												詳細
 											</span>
 										)}
-										<a 
-											href={`https://maps.google.com/?q=${loc.mapQuery}`} 
-											target="_blank" 
-											rel="noopener noreferrer" 
-											class="loc-btn loc-btn--map"
-											title="Google Mapsで地図を確認"
-										>
-											MAP
-										</a>
 									</div>
 								</article>
 							);
@@ -582,86 +745,48 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		const defaultCenter = [35.56, 139.63];
 		const defaultZoom = 11;
 
-		const clientCustomBadges = {
-			"loc-1": [
-				{ type: "sales", brands: ["BMW"] },
-				{ type: "service", brands: ["BMW", "ALPINA"] },
-				{ type: "service", brands: ["MINI"] },
-			],
-			"loc-2": [
-				{ type: "sales", brands: ["BMW"] },
-				{ type: "service", brands: ["BMW", "ALPINA"] },
-				{ type: "service", brands: ["MINI"] },
-			],
-			"loc-3": [
-				{ type: "sales", brands: ["BMW"] },
-				{ type: "service", brands: ["BMW", "ALPINA"] },
-			],
-			"loc-4": [
-				{ type: "sales", brands: ["BMW"] },
-				{ type: "service", brands: ["BMW", "ALPINA"] },
-				{ type: "service", brands: ["MINI"] },
-			],
-			"loc-8": [
-				{ type: "sales", brands: ["MINI"] },
-				{ type: "service", brands: ["MINI"] },
-			],
-			"loc-16": [
-				{ type: "used", brands: ["MINI"] },
-				{ type: "service", brands: ["MINI"] },
-			],
-			"loc-22": [
-				{ type: "service", brands: ["BMW", "ALPINA"] },
-				{ type: "service", brands: ["MINI"] },
-				{ type: "service", brands: ["Rolls-Royce"] },
-			],
-		};
-
+		// データベースの取扱サービスからバッジ情報を完全自動取得
 		function getClientLocBadges(loc) {
-			if (clientCustomBadges[loc.id]) {
-				return clientCustomBadges[loc.id];
-			}
-			const badges = [];
-			const text = `${(loc.services || []).join(" ")} ${loc.facilityType || ""} ${loc.name || ""}`;
-			const brand = loc.brand;
+			if (loc.services && loc.services.length > 0) {
+				return loc.services.map(label => {
+					let type = "sales";
+					let brands = [loc.brand];
 
-			if (text.includes("新車") || loc.facilityType === "ショールーム" || text.includes("車両販売")) {
-				let brands = [brand];
-				if (brand === "ALPINA" || loc.name.includes("青山") || loc.name.includes("世田谷")) {
-					brands = ["ALPINA"];
-				}
-				badges.push({ type: "sales", brands });
+					if (label.includes("Rolls-Royce") || label.includes("ロールスロイス")) brands = ["Rolls-Royce"];
+					else if (label.includes("Ferrari") || label.includes("フェラーリ")) brands = ["Ferrari"];
+					else if (label.includes("MINI") || label.includes("ミニ")) brands = ["MINI"];
+					else if (label.includes("ALPINA") || label.includes("アルピナ")) brands = ["ALPINA"];
+					else if (label.includes("BMW")) brands = ["BMW"];
+
+					if (label.includes("新車") || label.includes("車両")) {
+						type = "sales";
+					} else if (label.includes("認定中古車") || label.includes("中古車")) {
+						type = "used";
+					} else if (label.includes("サービス") || label.includes("点検") || label.includes("車検")) {
+						type = "service";
+						if (label.includes("BMW（ALPINA）")) {
+							brands = ["BMW", "ALPINA"];
+						}
+					} else if (label.includes("本社・オフィス")) {
+						type = "office";
+						brands = loc.id === "office-yokohama" ? ["Rolls-Royce", "Ferrari"] : ["BMW", "MINI", "ALPINA"];
+					}
+
+					return { type, label, brands };
+				});
 			}
-			if (text.includes("認定中古車") || text.includes("中古車") || text.includes("BPS") || text.includes("プレオウンド") || text.includes("NEXT")) {
-				badges.push({ type: "used", brands: [brand] });
-			}
-			if (text.includes("サービス") || text.includes("車検") || text.includes("点検") || text.includes("修理")) {
-				if (text.includes("Rolls-Royce") || text.includes("ロールスロイス")) {
-					badges.push({ type: "service", brands: ["Rolls-Royce"] });
-				}
-				if (text.includes("BMW") || brand === "BMW") {
-					badges.push({ type: "service", brands: ["BMW", "ALPINA"] });
-				}
-				if (text.includes("MINI") || brand === "MINI") {
-					badges.push({ type: "service", brands: ["MINI"] });
-				}
-				if (text.includes("Ferrari") || brand === "Ferrari") {
-					badges.push({ type: "service", brands: ["Ferrari"] });
-				}
-				if (badges.filter(b => b.type === "service").length === 0) {
-					badges.push({ type: "service", brands: [brand] });
-				}
-			}
-			if (loc.facilityType === "本社・オフィス" || text.includes("本社・オフィス")) {
-				badges.push({ type: "office", brands: ["BMW", "MINI", "Rolls-Royce", "Ferrari", "ALPINA"] });
-			}
-			return badges;
+			return [];
 		}
 
+		// 地図ピン用マッチ判定（オフィスではなく一般顧客向けショールーム・サービス拠点の機能が存在するかで判定）
 		function locMatchesFilter(loc, targetBrand, targetService, targetArea) {
 			if (targetArea !== 'all' && loc.areaGroup !== targetArea) return false;
+			// 地図ピンはお客様が訪れる店舗・サービス拠点のみを対象とし、オフィス単体機能ではピンを立てない
+			if (loc.facilityType === "本社・オフィス") return false;
+
 			const badges = getClientLocBadges(loc);
 			return badges.some(b => {
+				if (b.type === "office") return false;
 				const brandMatch = (targetBrand === 'all') || b.brands.includes(targetBrand);
 				const serviceMatch = (targetService === 'all') || (b.type === targetService);
 				return brandMatch && serviceMatch;
@@ -724,21 +849,46 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						return bList;
 					}))];
 					
-					// 代表ロゴの選定
-					let brandLogo = '/brands/bmw.svg';
-					if (brands.includes('Ferrari')) {
-						brandLogo = '/brands/ferrari.svg';
-					} else if (brands.includes('Rolls-Royce') && !brands.includes('BMW')) {
-						brandLogo = '/brands/rolls-royce.svg';
-					} else if (brands.includes('BMW') && brands.includes('MINI')) {
-						brandLogo = '/brands/bmw.svg'; // 複合店
-					} else if (brands.includes('MINI')) {
-						brandLogo = '/brands/mini.svg';
-					} else if (brands.includes('BMW')) {
-						brandLogo = '/brands/bmw.svg';
-					} else if (brands.includes('ALPINA') || brands.includes('Nicole')) {
-						brandLogo = '/brands/nicole-n-mark.svg';
+					// 代表ロゴの選定（選択ブランドに応じてピンのロゴを動的決定）
+					function getMarkerLogo(targetBrand) {
+						if (targetBrand !== 'all') {
+							// 1. 対象ブランド直営・専売の拠点（例: l.brand === 'MINI'）がグループ内に存在するか判定
+							const hasDirectBrandLoc = groupLocs.some(l => {
+								if (targetBrand === 'ALPINA') {
+									return l.brand === 'ALPINA' || l.brand === 'Nicole' || l.name.includes('青山') || l.name.includes('世田谷');
+								}
+								return l.brand === targetBrand;
+							});
+
+							// 対象ブランドの実店舗（ショールーム・認定中古車等）がある場合はそのブランドロゴを表示
+							if (hasDirectBrandLoc) {
+								if (targetBrand === 'MINI') return '/brands/mini.svg';
+								if (targetBrand === 'BMW') return '/brands/bmw.svg';
+								if (targetBrand === 'Rolls-Royce') return '/brands/rolls-royce.svg';
+								if (targetBrand === 'Ferrari') return '/brands/ferrari.svg';
+								if (targetBrand === 'ALPINA') return '/brands/nicole-n-mark.svg';
+							}
+
+							// 2. MINIサービスのみを提供しているBMW拠点などの場合：
+							// ユーザーの誤認を防ぐため、拠点の母体ブランド（BMW等）のロゴマークを表示
+							const primaryBrand = groupLocs[0].brand;
+							if (primaryBrand === 'BMW') return '/brands/bmw.svg';
+							if (primaryBrand === 'Ferrari') return '/brands/ferrari.svg';
+							if (primaryBrand === 'Rolls-Royce') return '/brands/rolls-royce.svg';
+							if (primaryBrand === 'ALPINA' || primaryBrand === 'Nicole') return '/brands/nicole-n-mark.svg';
+							if (primaryBrand === 'MINI') return '/brands/mini.svg';
+						}
+
+						// all選択時のデフォルト代表ロゴ
+						if (brands.includes('Ferrari')) return '/brands/ferrari.svg';
+						if (brands.includes('Rolls-Royce') && !brands.includes('BMW')) return '/brands/rolls-royce.svg';
+						if (brands.includes('BMW')) return '/brands/bmw.svg';
+						if (brands.includes('MINI')) return '/brands/mini.svg';
+						if (brands.includes('ALPINA') || brands.includes('Nicole')) return '/brands/nicole-n-mark.svg';
+						return '/brands/bmw.svg';
 					}
+
+					let brandLogo = getMarkerLogo(currentBrand);
 
 					// 複数拠点合体バッジ表示（新百合ヶ丘など同一敷地合体の場合はカウントバッジを付与）
 					const badgeHtml = groupLocs.length > 1 
@@ -762,6 +912,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 					});
 
 					const marker = L.marker([group.lat, group.lng], { icon: icon });
+					marker.getMarkerLogo = getMarkerLogo;
 
 					// ポップアップHTML生成関数（選択ブランドに応じて施設順を動的ソート）
 					function buildPopupContent(activeBrand) {
@@ -802,16 +953,32 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 							}
 						}
 
+						// 施設ごとのバッジHTMLをブランドに応じて生成（MINI選択時はBMW新車販売等は非表示）
+						function getPopupBadgeHtml(targetLoc) {
+							const badges = getClientLocBadges(targetLoc);
+							const filtered = (activeBrand === 'all')
+								? badges.filter(b => b.type !== 'office')
+								: badges.filter(b => b.type !== 'office' && b.brands.includes(activeBrand));
+							
+							const listToUse = filtered.length > 0 ? filtered : badges.filter(b => b.type !== 'office');
+							return listToUse.map(b => `<span class="popup-tag popup-tag--${b.type}">${b.label}</span>`).join(' ');
+						}
+
 						let facilitiesHtml = '';
 						if (isMulti) {
-							sortedLocs.forEach(l => {
-								const cat = getLocCategory(l);
-								let badgeText = '';
-								if (cat.isSales) badgeText += '<span class="popup-tag popup-tag--sales">新車</span>';
-								if (cat.isUsed) badgeText += '<span class="popup-tag popup-tag--used">中古車</span>';
-								if (cat.isService) badgeText += '<span class="popup-tag popup-tag--service">サービス</span>';
-								if (cat.isOffice) badgeText += '<span class="popup-tag">オフィス</span>';
+							let itemsToRender = sortedLocs;
+							if (activeBrand !== 'all') {
+								const brandMatches = sortedLocs.filter(l => {
+									const bList = getClientLocBadges(l);
+									return bList.some(b => b.type !== 'office' && b.brands.includes(activeBrand));
+								});
+								if (brandMatches.length > 0) {
+									itemsToRender = brandMatches;
+								}
+							}
 
+							itemsToRender.forEach(l => {
+								const badgeText = getPopupBadgeHtml(l);
 								const isKawasakiBmw = (l.id === 'loc-1' || (l.name.includes('Nicole BMW 本社') && !l.name.includes('オフィス')));
 
 								facilitiesHtml += `
@@ -826,13 +993,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 							});
 						} else {
 							const singleLoc = sortedLocs[0];
-							const cat = getLocCategory(singleLoc);
-							let badgeText = '';
-							if (cat.isSales) badgeText += '<span class="popup-tag popup-tag--sales">新車</span>';
-							if (cat.isUsed) badgeText += '<span class="popup-tag popup-tag--used">中古車</span>';
-							if (cat.isService) badgeText += '<span class="popup-tag popup-tag--service">サービス</span>';
-							if (cat.isOffice) badgeText += '<span class="popup-tag">オフィス</span>';
-
+							const badgeText = getPopupBadgeHtml(singleLoc);
 							const isKawasakiBmw = (singleLoc.id === 'loc-1' || (singleLoc.name.includes('Nicole BMW 本社') && !singleLoc.name.includes('オフィス')));
 
 							facilitiesHtml += `
@@ -880,6 +1041,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 					});
 
 					marker.groupData = group;
+					marker.buildPopupContent = buildPopupContent;
 					markers.push(marker);
 					marker.addTo(map);
 				});
@@ -1063,6 +1225,28 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 				if (matchingLocs.length > 0) {
 					if (!map.hasLayer(marker)) map.addLayer(marker);
 					visibleLatLngs.push([group.lat, group.lng]);
+
+					// ピンのロゴマークを選択ブランドに合わせて動的更新（MINI選択時はBMW複合拠点もMINIロゴに切り替え）
+					if (marker.getMarkerLogo) {
+						const targetLogo = marker.getMarkerLogo(currentBrand);
+						const updateLogo = () => {
+							const markerEl = marker.getElement();
+							if (markerEl) {
+								const img = markerEl.querySelector('.map-pin__logo');
+								if (img && img.getAttribute('src') !== targetLogo) {
+									img.src = targetLogo;
+								}
+							}
+						};
+						updateLogo();
+						// レイヤー追加直後でDOMが非同期生成されるケースにも対応
+						setTimeout(updateLogo, 20);
+					}
+
+					// 吹き出しが開いている場合は選択ブランドに合わせて最新のタグ内容に動的更新
+					if (marker.isPopupOpen && marker.isPopupOpen() && marker.buildPopupContent) {
+						marker.setPopupContent(marker.buildPopupContent(currentBrand));
+					}
 				} else {
 					if (map.hasLayer(marker)) map.removeLayer(marker);
 				}
@@ -1737,9 +1921,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 	/* 2. 拠点情報（拠点名 ＋ 住所）：幅を一定にして次カラムの左端を縦一列に揃える */
 	.loc-slim-row__info {
-		flex: 0 0 380px;
-		max-width: 400px;
-		min-width: 280px;
+		flex: 0 0 340px;
+		max-width: 360px;
+		min-width: 260px;
 		display: flex;
 		flex-direction: column;
 		gap: 5px;
@@ -1751,6 +1935,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		margin: 0;
 		line-height: 1.35;
 		letter-spacing: -0.01em;
+		word-break: normal;
+		overflow-wrap: break-word;
 	}
 	.loc-slim-row__addr {
 		color: rgba(255, 255, 255, 0.55);
@@ -1764,7 +1950,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		margin-right: 4px;
 	}
 
-	/* 3. 提供サービス・機能バッジ群（以前空白だったエリアにピシッと縦一列に揃えて配置） */
+	/* 3. 提供サービス・機能バッジ群 */
 	.loc-slim-row__services {
 		flex: 1 1 auto;
 		display: flex;
@@ -1821,11 +2007,59 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		color: rgba(255, 255, 255, 0.5);
 	}
 
-	/* 4. アクションボタン（詳細 ＆ MAP） */
+	/* 4. Google評価カラム（サービスバッジの後ろに独立配置し、縦1列にビシッと整列） */
+	.loc-slim-row__rating {
+		flex: 0 0 115px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		flex-shrink: 0;
+	}
+	.loc-rating-empty {
+		display: block;
+		width: 1px;
+		height: 1px;
+	}
+
+	/* Google評価（サービスバッジと同サイズ・四角い枠なしで配置） */
+	.loc-service-rating {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 5px 0;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		white-space: nowrap;
+		background: transparent;
+		border: none;
+		color: rgba(255, 255, 255, 0.9);
+		line-height: 1;
+	}
+	.loc-service-rating .gmap-mini-g {
+		flex-shrink: 0;
+	}
+	.loc-service-rating .rating-star {
+		color: #fbbf24;
+		font-size: 12px;
+		line-height: 1;
+	}
+	.loc-service-rating .rating-val {
+		color: #ffffff;
+		font-weight: 700;
+		font-family: var(--font-mono, monospace);
+		font-size: 11px;
+		letter-spacing: 0;
+	}
+	.loc-service-rating .rating-cnt {
+		color: rgba(255, 255, 255, 0.45);
+		font-size: 11px;
+	}
+
+	/* 5. アクションボタン（詳細ボタン：横長にリファイン） */
 	.loc-slim-row__actions {
 		display: flex;
 		align-items: center;
-		gap: 10px;
 		flex-shrink: 0;
 		margin-left: auto;
 	}
@@ -1833,15 +2067,16 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 7px 16px;
+		padding: 8px 30px;
 		font-size: 11px;
 		font-weight: 600;
+		letter-spacing: 0.06em;
 		text-decoration: none;
 		border-radius: 2px;
 		white-space: nowrap;
 		transition: all 0.2s ease;
 		box-sizing: border-box;
-		min-width: 60px;
+		min-width: 96px;
 		text-align: center;
 	}
 	.loc-btn--detail {
@@ -1860,16 +2095,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		pointer-events: none;
 		user-select: none;
 	}
-	.loc-btn--map {
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: rgba(255, 255, 255, 0.85);
-		background: transparent;
-	}
-	.loc-btn--map:hover {
-		border-color: #ffffff;
-		color: #ffffff;
-		background: rgba(255, 255, 255, 0.08);
-	}
 
 	/* レスポンシブ対応 */
 	@media (max-width: 1080px) {
@@ -1877,13 +2102,20 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			gap: 16px;
 		}
 		.loc-slim-row__info {
-			flex: 0 0 300px;
+			flex: 0 0 280px;
+		}
+		.loc-slim-row__rating {
+			flex: 0 0 110px;
+		}
+		.loc-btn {
+			padding: 8px 24px;
+			min-width: 80px;
 		}
 	}
 	@media (max-width: 900px) {
 		.loc-slim-row {
 			flex-wrap: wrap;
-			gap: 14px;
+			gap: 12px 14px;
 			padding: 16px 20px;
 		}
 		.loc-slim-row__info {
@@ -1894,6 +2126,15 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			width: 100%;
 			padding-left: 68px;
 			flex: none;
+		}
+		.loc-slim-row__rating {
+			width: 100%;
+			padding-left: 68px;
+			flex: none;
+			margin-top: -2px;
+		}
+		.loc-slim-row__rating:has(.loc-rating-empty) {
+			display: none;
 		}
 		.loc-slim-row__actions {
 			width: 100%;
@@ -1914,6 +2155,14 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		.loc-slim-row__services {
 			padding-left: 0;
 		}
+		.loc-slim-row__rating {
+			padding-left: 0;
+			width: 100%;
+			margin-top: -2px;
+		}
+		.loc-slim-row__rating:has(.loc-rating-empty) {
+			display: none;
+		}
 		.loc-slim-row__actions {
 			padding-left: 0;
 			width: 100%;
@@ -1921,7 +2170,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			border-top: 1px solid rgba(255, 255, 255, 0.08);
 		}
 		.loc-btn {
-			flex: 1;
+			width: 100%;
 		}
 		.locs-map-frame {
 			height: 480px;

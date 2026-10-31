@@ -30,7 +30,7 @@ export interface Location {
   status: string;
   title?: string;
   brand?: string;
-  facility_type?: string;
+  badges?: string;
   postal?: string;
   address?: string;
   office_notice?: string;

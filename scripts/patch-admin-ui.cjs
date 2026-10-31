@@ -1,5 +1,5 @@
 // scripts/patch-admin-ui.cjs
-// EmDash 管理画面に拠点（locations）の「アコーディオンUI（Accordion Interface）」を動的注入するパッチ
+// EmDash 管理画面に拠点（locations）の「アコーディオンUI」および「取扱サービス機能セレクター」を動的注入するパッチ
 const fs = require('fs');
 const path = require('path');
 
@@ -38,7 +38,7 @@ const injectedCode = `
 						id: 'sec-basic',
 						prefix: '【基本情報】',
 						title: '基本情報',
-						desc: '拠点名称、主要ブランド、住所、管理オフィス注記'
+						desc: '拠点名称、主要ブランド、取扱サービス機能、住所、管理オフィス注記'
 					},
 					{
 						id: 'sec-gallery',
@@ -69,6 +69,12 @@ const injectedCode = `
 						prefix: '【併設・アクセス】',
 						title: '併設・アクセス',
 						desc: '同一敷地併設拠点への相互リンク、お車・電車バスでのアクセス方法、GoogleマップURL'
+					},
+					{
+						id: 'sec-google',
+						prefix: '【Google連携】',
+						title: 'Googleマップ連携・クチコミ設定',
+						desc: 'Google Places API用のプレイスID、評価スコア・クチコミ件数（手動設定・フォールバック用）'
 					}
 				];
 
@@ -79,8 +85,162 @@ const injectedCode = `
 					'sec-sales': false,
 					'sec-used': false,
 					'sec-service': false,
-					'sec-access': false
+					'sec-access': false,
+					'sec-google': false
 				};
+
+				// 取扱サービス・機能の選択肢一覧
+				const BADGE_GROUPS = [
+					{
+						group: 'BMW',
+						options: ['BMW 新車', 'BMW 認定中古車', 'BMW（ALPINA）サービス']
+					},
+					{
+						group: 'MINI',
+						options: ['MINI 新車', 'MINI 認定中古車', 'MINI サービス']
+					},
+					{
+						group: 'Rolls-Royce',
+						options: ['Rolls-Royce 新車', 'Rolls-Royce 認定中古車', 'Rolls-Royce サービス']
+					},
+					{
+						group: 'Ferrari',
+						options: ['Ferrari 新車', 'Ferrari 認定中古車', 'Ferrari サービス']
+					},
+					{
+						group: 'ALPINA / 本社',
+						options: ['ALPINA 車両', '本社・オフィス']
+					}
+				];
+
+				// 取扱サービス機能のトグルピルUIを生成
+				function applyBadgesSelectorUI() {
+					// 既にセレクターが配置済みで正常動作中なら再生成しない
+					const existingSelector = document.getElementById('emdash-badges-selector-wrap');
+
+					const allLabels = Array.from(document.querySelectorAll('label, p, span, div'));
+					const badgesLabelEl = allLabels.find(el =>
+						el.textContent && (
+							el.textContent.includes('取扱サービス') ||
+							el.textContent.includes('badges')
+						)
+					);
+					if (!badgesLabelEl) return;
+
+					let container = badgesLabelEl.parentElement;
+					while (container && container.parentElement) {
+						if (container.parentElement.classList.contains('space-y-6') || container.parentElement.tagName === 'FIELDSET') {
+							break;
+						}
+						container = container.parentElement;
+					}
+					if (!container) return;
+
+					let input = container.querySelector('input, textarea');
+					if (!input) {
+						input = document.querySelector('input[name="badges"], textarea[name="badges"], input[id*="badges"]');
+					}
+					if (!input) return;
+
+					let selectorWrap = document.getElementById('emdash-badges-selector-wrap');
+					if (!selectorWrap) {
+						selectorWrap = document.createElement('div');
+						selectorWrap.id = 'emdash-badges-selector-wrap';
+						selectorWrap.style.cssText = \`
+							margin-top: 10px;
+							padding: 14px 16px;
+							background: #141517;
+							border: 1px solid #27272a;
+							border-radius: 8px;
+							display: flex;
+							flex-direction: column;
+							gap: 12px;
+						\`;
+
+						input.style.display = 'none'; // テキストボックスは隠してセレクターで操作
+
+						const guideText = document.createElement('div');
+						guideText.style.cssText = 'font-size: 12px; color: #a1a1aa; margin-bottom: 2px;';
+						guideText.textContent = '※該当する項目をクリックしてください（複数選択可。白背景が選択中）';
+						selectorWrap.appendChild(guideText);
+
+						// グループごとにピルを描画
+						BADGE_GROUPS.forEach(grp => {
+							const groupRow = document.createElement('div');
+							groupRow.style.cssText = 'display: flex; flex-direction: column; gap: 6px;';
+
+							const groupTitle = document.createElement('div');
+							groupTitle.textContent = grp.group;
+							groupTitle.style.cssText = 'font-size: 11px; font-weight: 700; color: #71717a; letter-spacing: 0.05em; text-transform: uppercase;';
+							groupRow.appendChild(groupTitle);
+
+							const pillsWrap = document.createElement('div');
+							pillsWrap.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px;';
+
+							grp.options.forEach(optLabel => {
+								const pill = document.createElement('button');
+								pill.type = 'button';
+								pill.textContent = optLabel;
+								pill.setAttribute('data-badge-option', optLabel);
+								pill.style.cssText = \`
+									padding: 5px 12px;
+									font-size: 12px;
+									font-weight: 500;
+									border-radius: 4px;
+									cursor: pointer;
+									transition: all 0.15s ease;
+									border: 1px solid #3f3f46;
+									background: #18181b;
+									color: #a1a1aa;
+								\`;
+
+								pill.onclick = (e) => {
+									e.preventDefault();
+									const curValues = (input.value || '').split(',').map(s => s.trim()).filter(Boolean);
+									const exists = curValues.includes(optLabel);
+									let newValues;
+									if (exists) {
+										newValues = curValues.filter(v => v !== optLabel);
+									} else {
+										newValues = [...curValues, optLabel];
+									}
+									input.value = newValues.join(', ');
+									input.dispatchEvent(new Event('input', { bubbles: true }));
+									input.dispatchEvent(new Event('change', { bubbles: true }));
+									syncPillStyles(input.value);
+								};
+
+								pillsWrap.appendChild(pill);
+							});
+
+							groupRow.appendChild(pillsWrap);
+							selectorWrap.appendChild(groupRow);
+						});
+
+						container.appendChild(selectorWrap);
+					}
+
+					syncPillStyles(input.value);
+				}
+
+				function syncPillStyles(currentVal) {
+					const values = (currentVal || '').split(',').map(s => s.trim()).filter(Boolean);
+					document.querySelectorAll('[data-badge-option]').forEach(btn => {
+						const label = btn.getAttribute('data-badge-option');
+						const isSelected = values.includes(label);
+						if (isSelected) {
+							btn.style.background = '#ffffff';
+							btn.style.borderColor = '#ffffff';
+							btn.style.color = '#000000';
+							btn.style.fontWeight = '700';
+						} else {
+							btn.style.background = '#18181b';
+							btn.style.borderColor = '#3f3f46';
+							btn.style.color = '#a1a1aa';
+							btn.style.fontWeight = '500';
+						}
+					});
+				}
 
 				function applyAccordion() {
 					// 画面内にプレフィックスが存在するか判定
@@ -98,8 +258,13 @@ const injectedCode = `
 						document.querySelectorAll('[data-accordion-header]').forEach(el => el.remove());
 						const existingToolbar = document.getElementById('emdash-accordion-toolbar');
 						if (existingToolbar) existingToolbar.remove();
+						const existingSelector = document.getElementById('emdash-badges-selector-wrap');
+						if (existingSelector) existingSelector.remove();
 						return;
 					}
+
+					// 取扱サービスセレクターの生成
+					applyBadgesSelectorUI();
 
 					// 各プレフィックスに該当するフィールドラッパー要素をグループ化
 					const sectionElements = {};
@@ -212,13 +377,13 @@ const injectedCode = `
 						toolbar.appendChild(infoText);
 						toolbar.appendChild(btnGroup);
 
-						parentContainer.insertBefore(toolbar, parentContainer.firstChild);
+						parentContainer.insertBefore(toolbar, firstField);
 					}
 
-					// 各セクションのアコーディオンヘッダーを作成または配置
+					// 各セクションのヘッダーバーを生成
 					for (const sec of SECTION_CONFIG) {
-						const fields = sectionElements[sec.id] || [];
-						if (fields.length === 0) continue;
+						const fields = sectionElements[sec.id];
+						if (!fields || fields.length === 0) continue;
 
 						const firstFieldOfSec = fields[0];
 						let header = document.querySelector(\`[data-accordion-header="\${sec.id}"]\`);
@@ -227,9 +392,9 @@ const injectedCode = `
 							header = document.createElement('div');
 							header.setAttribute('data-accordion-header', sec.id);
 							header.style.cssText = \`
-								margin-top: 24px;
-								margin-bottom: 14px;
-								padding: 14px 18px;
+								margin-top: 18px;
+								margin-bottom: 12px;
+								padding: 12px 18px;
 								background: #18181b;
 								border: 1px solid #27272a;
 								border-left: 4px solid #ffffff;
@@ -332,7 +497,7 @@ const bodyCloseIdx = content.lastIndexOf('</body>');
 if (bodyCloseIdx !== -1) {
   content = content.slice(0, bodyCloseIdx) + injectedCode + '\n' + content.slice(bodyCloseIdx);
   fs.writeFileSync(adminAstroPath, content, 'utf8');
-  console.log('[patch-admin-ui] Successfully injected clean Accordion UI into admin.astro.');
+  console.log('[patch-admin-ui] Successfully injected clean Accordion UI + Badges Selector into admin.astro.');
 } else {
   console.error('[patch-admin-ui] Could not find </body> in admin.astro.');
 }

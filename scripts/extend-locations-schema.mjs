@@ -68,6 +68,11 @@ const newColumns = [
 	{ name: 'service_desc', type: 'text' },
 	{ name: 'service_cta_label', type: 'text' },
 	{ name: 'service_cta_url', type: 'text' },
+
+	// GoogleプレイスAPI・クチコミ連携
+	{ name: 'google_place_id', type: 'text' },
+	{ name: 'google_rating_override', type: 'text' },
+	{ name: 'google_reviews_count_override', type: 'text' },
 ];
 
 for (const col of newColumns) {
@@ -87,7 +92,7 @@ const fieldDefs = [
 	// ─── 【基本情報】 ───
 	{ slug: 'title', label: '【基本情報】拠点名称', type: 'string', col: 'TEXT', order: 10 },
 	{ slug: 'brand', label: '【基本情報】主要ブランド', type: 'select', col: 'TEXT', order: 11, options: '[{"label":"BMW","value":"BMW"},{"label":"MINI","value":"MINI"},{"label":"Rolls-Royce","value":"Rolls-Royce"},{"label":"Ferrari","value":"Ferrari"},{"label":"ALPINA","value":"ALPINA"},{"label":"Nicole (グループ本社)","value":"Nicole"}]' },
-	{ slug: 'facility_type', label: '【基本情報】拠点区分（例: ショールーム・認定中古車）', type: 'string', col: 'TEXT', order: 12 },
+	{ slug: 'badges', label: '【基本情報】取扱サービス', type: 'string', col: 'TEXT', order: 12 },
 	{ slug: 'postal', label: '【基本情報】郵便番号', type: 'string', col: 'TEXT', order: 13 },
 	{ slug: 'address', label: '【基本情報】所在地住所', type: 'string', col: 'TEXT', order: 14 },
 	{ slug: 'office_notice', label: '【基本情報】管理オフィス注記（※空欄時は非表示）', type: 'text', col: 'TEXT', order: 15 },
@@ -147,6 +152,11 @@ const fieldDefs = [
 	{ slug: 'access_car', label: '【併設・アクセス】お車でのアクセス', type: 'text', col: 'TEXT', order: 73 },
 	{ slug: 'access_train', label: '【併設・アクセス】電車・バスでのアクセス', type: 'text', col: 'TEXT', order: 74 },
 	{ slug: 'google_maps_url', label: '【併設・アクセス】Googleマップ案内URL', type: 'string', col: 'TEXT', order: 75 },
+
+	// ─── 【Google連携】 ───
+	{ slug: 'google_place_id', label: '【Google連携】GoogleプレイスID（API自動取得用）', type: 'string', col: 'TEXT', order: 80 },
+	{ slug: 'google_rating_override', label: '【Google連携】評価スコア（手動設定時・空欄可）', type: 'string', col: 'TEXT', order: 81 },
+	{ slug: 'google_reviews_count_override', label: '【Google連携】クチコミ件数（手動設定時・空欄可）', type: 'string', col: 'TEXT', order: 82 },
 ];
 
 // 既存の fields をクリアして再登録

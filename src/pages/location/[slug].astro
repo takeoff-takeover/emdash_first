@@ -5,8 +5,17 @@ import { getEmDashEntry, decodeSlug } from "emdash";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import { getGooglePlaceReviews } from "../../utils/google-places";
 
 const slug = decodeSlug(Astro.params.slug);
+
+// 旧URLからの安全な301転送（新百合ヶ丘の統合に伴う恒久リダイレクト）
+if (slug === 'bps-shinyurigaoka') {
+	return Astro.redirect('/location/nicole-bmw-shinyurigaoka', 301);
+}
+if (slug === 'mini-next-shinyurigaoka') {
+	return Astro.redirect('/location/mini-shinyurigaoka', 301);
+}
 
 if (!slug) {
 	return Astro.rewrite("/404");
@@ -196,21 +205,70 @@ const departmentsList: Array<{
 	}
 ]);
 
-// 3. 上部ステータスピルバッジ
-const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = customDepartments.length > 0
-	? customDepartments.map(dept => {
-		let label = '新車販売';
-		if (dept.type === 'used') label = '認定中古車';
-		if (dept.type === 'service') label = '車検・整備工場';
-		return {
-			brand: dept.brand,
-			label: `${dept.brand} ${label}`,
-			targetId: dept.id
-		};
-	})
-	: parseJson(d.badges, [
-		{ brand: d.brand || 'BMW', label: `${d.brand || 'BMW'} 新車`, targetId: 'dept-0' }
-	]);
+// 3. 上部ステータスピルバッジ（基本情報 badges のチェック項目を最優先し、地図と表記統一）
+function resolveBadgeItem(item: any): { brand: string; label: string; targetId: string } {
+	const rawLabel = typeof item === 'string' ? item : (item.label || '');
+	let brand = typeof item === 'object' && item.brand ? item.brand : 'BMW';
+	let targetId = typeof item === 'object' && item.targetId ? item.targetId : 'departments';
+
+	if (rawLabel.startsWith('BMW') || rawLabel.includes('BMW（ALPINA）')) {
+		brand = 'BMW';
+	} else if (rawLabel.includes('Rolls-Royce') || rawLabel.includes('ロールス・ロイス')) {
+		brand = 'Rolls-Royce';
+	} else if (rawLabel.includes('Ferrari') || rawLabel.includes('フェラーリ')) {
+		brand = 'Ferrari';
+	} else if (rawLabel.includes('MINI') || rawLabel.includes('ミニ')) {
+		brand = 'MINI';
+	} else if (rawLabel.includes('ALPINA') || rawLabel.includes('アルピナ')) {
+		brand = 'ALPINA';
+	}
+
+	if (rawLabel.includes('新車') || rawLabel.includes('車両')) {
+		targetId = 'dept-newcar';
+	} else if (rawLabel.includes('認定中古車') || rawLabel.includes('中古車')) {
+		targetId = 'dept-usedcar';
+	} else if (rawLabel.includes('サービス') || rawLabel.includes('点検') || rawLabel.includes('車検')) {
+		targetId = 'dept-service';
+	}
+
+	return { brand, label: rawLabel, targetId };
+}
+
+let parsedBadges: Array<{ brand: string; label: string; targetId: string }> = [];
+if (d.badges) {
+	if (typeof d.badges === 'string') {
+		const trimmed = d.badges.trim();
+		if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+			try {
+				const arr = JSON.parse(trimmed);
+				if (Array.isArray(arr)) parsedBadges = arr.map(resolveBadgeItem);
+			} catch (e) {
+				parsedBadges = trimmed.split(',').map(s => s.trim()).filter(Boolean).map(resolveBadgeItem);
+			}
+		} else {
+			parsedBadges = trimmed.split(',').map(s => s.trim()).filter(Boolean).map(resolveBadgeItem);
+		}
+	} else if (Array.isArray(d.badges)) {
+		parsedBadges = d.badges.map(resolveBadgeItem);
+	}
+}
+
+const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = parsedBadges.length > 0
+	? parsedBadges
+	: (customDepartments.length > 0
+		? customDepartments.map(dept => {
+			let label = '新車';
+			if (dept.type === 'used') label = '認定中古車';
+			if (dept.type === 'service') label = 'サービス';
+			return {
+				brand: dept.brand,
+				label: `${dept.brand} ${label}`,
+				targetId: dept.id
+			};
+		})
+		: [
+			{ brand: d.brand || 'BMW', label: `${d.brand || 'BMW'} 新車`, targetId: 'dept-0' }
+		]);
 
 const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`;
 
@@ -234,6 +292,85 @@ if (relatedCombined.includes('mini')) {
 	relatedHubBrandLogo = '/brands/bmw.svg';
 	relatedHubBrandAlt = 'BMW';
 }
+// ブランド情報取得ヘルパー
+function getBrandInfo(brandName?: string, fallbackText?: string): { src: string; alt: string; isMini: boolean } {
+	const bName = (brandName || '').toLowerCase();
+	const fb = (fallbackText || '').toLowerCase();
+	const combined = `${bName} ${fb}`;
+
+	if (bName.includes('mini') || (!bName && (fb.includes('mini') || fb.includes('ミニ')))) {
+		return { src: '/brands/mini.svg', alt: 'MINI', isMini: true };
+	}
+	if (combined.includes('rolls') || combined.includes('ロールス')) {
+		return { src: '/brands/rolls-royce.svg', alt: 'Rolls-Royce', isMini: false };
+	}
+	if (combined.includes('ferrari') || combined.includes('フェラーリ')) {
+		return { src: '/brands/ferrari.svg', alt: 'Ferrari', isMini: false };
+	}
+	if (bName.includes('alpina') || (!bName && (fb.includes('alpina') || fb.includes('アルピナ')))) {
+		return { src: '/brands/alpina-nicole.svg', alt: 'ALPINA', isMini: false };
+	}
+	if (combined.includes('bmw')) {
+		return { src: '/brands/bmw.svg', alt: 'BMW', isMini: false };
+	}
+	if (combined.includes('nicole')) {
+		return { src: '/brands/nicole-n-mark.svg', alt: 'Nicole', isMini: false };
+	}
+	return { src: '/brands/bmw.svg', alt: 'BMW', isMini: false };
+}
+
+const mainBrandInfo = getBrandInfo(d.brand, d.title);
+
+// 営業中ステータス初期判定ヘルパー（JST日本標準時）
+function getOpenStatus(hoursStr?: string, closedStr?: string): { isOpen: boolean; statusText: string; statusClass: string } {
+	if (!hoursStr) return { isOpen: false, statusText: '営業時間外', statusClass: 'status--closed' };
+
+	const now = new Date();
+	const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+	const jst = new Date(utc + (3600000 * 9));
+	const dayOfWeek = jst.getDay();
+	const currentMins = jst.getHours() * 60 + jst.getMinutes();
+	const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+	const todayName = dayNames[dayOfWeek];
+
+	const closed = closedStr || '';
+	const targetDayStr = `${todayName}曜日`;
+	if (closed.includes(targetDayStr)) {
+		return { isOpen: false, statusText: '本日定休日', statusClass: 'status--holiday' };
+	}
+
+	const match = hoursStr.match(/(\d{1,2}):(\d{2})\s*[～〜\-–]\s*(\d{1,2}):(\d{2})/);
+	if (match) {
+		const startMins = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+		const endMins = parseInt(match[3], 10) * 60 + parseInt(match[4], 10);
+
+		if (currentMins >= startMins && currentMins < endMins) {
+			return { isOpen: true, statusText: '現在営業中', statusClass: 'status--open' };
+		}
+	}
+
+	return { isOpen: false, statusText: '営業時間外', statusClass: 'status--closed' };
+}
+
+// 英名ブランドフレーズが途中で不自然に改行されないようノーブレークスペース（\u00A0）で保護
+function protectPhrases(str: string): string {
+	if (!str) return '';
+	return str
+		.replace(/BMW Premium Selection/g, 'BMW\u00A0Premium\u00A0Selection')
+		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT')
+		.replace(/Rolls-Royce Motor Cars/g, 'Rolls-Royce\u00A0Motor\u00A0Cars');
+}
+
+const displayTitle = protectPhrases(d.title);
+const displayRelatedHubTitle = protectPhrases(cleanRelatedHubTitle);
+
+// Google Places API またはフォールバックモックから評価・レビューを取得
+const placeData = await getGooglePlaceReviews({
+	placeId: d.google_place_id,
+	locationTitle: d.title,
+	ratingOverride: d.google_rating_override,
+	countOverride: d.google_reviews_count_override
+});
 ---
 
 <NicoleLayout
@@ -250,17 +387,17 @@ if (relatedCombined.includes('mini')) {
 
 			<div class="sr-hero__content">
 				<h1 class="sr-hero__title">
-					{d.title}
+					{displayTitle}
 				</h1>
 
 				<div class="sr-hero__actions">
-					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--route">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-						ルート案内
-					</a>
 					<a href="#departments" class="btn-hero btn-hero--tel">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
 						電話・窓口情報
+					</a>
+					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--route">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+						ルート案内
 					</a>
 				</div>
 			</div>
@@ -273,12 +410,29 @@ if (relatedCombined.includes('mini')) {
 					<div class="facility-feature-list">
 						{badgesList.map((badge, idx) => {
 							const brandLower = (badge.brand || 'bmw').toLowerCase();
-							const logoSrc = brandLower === 'mini' ? '/brands/mini.svg' : '/brands/bmw.svg';
-							const isMini = brandLower === 'mini';
+							let logoSrc = '/brands/bmw.svg';
+							let logoClass = 'feat-brand-logo--bmw';
+							if (brandLower.includes('mini')) {
+								logoSrc = '/brands/mini.svg';
+								logoClass = 'feat-brand-logo--mini';
+							} else if (brandLower.includes('rolls')) {
+								logoSrc = '/brands/rolls-royce.svg';
+								logoClass = 'feat-brand-logo--rolls';
+							} else if (brandLower.includes('ferrari')) {
+								logoSrc = '/brands/ferrari.svg';
+								logoClass = 'feat-brand-logo--ferrari';
+							} else if (brandLower.includes('alpina')) {
+								logoSrc = '/brands/alpina-nicole.svg';
+								logoClass = 'feat-brand-logo--alpina';
+							} else if (brandLower.includes('nicole')) {
+								logoSrc = '/brands/nicole-n-mark.svg';
+								logoClass = 'feat-brand-logo--nicole';
+							}
+							const isMini = brandLower.includes('mini');
 							const targetAccId = badge.targetId || (departmentsList[idx]?.id || `dept-${idx}`);
 							return (
 								<a href={`#${targetAccId}`} class={`feat-pill ${isMini ? 'feat-pill--mini' : ''}`} data-dept-target={targetAccId}>
-									<img src={logoSrc} alt={badge.brand || 'Brand'} class={`feat-brand-logo feat-brand-logo--${isMini ? 'mini' : 'bmw'}`} />
+									<img src={logoSrc} alt={badge.brand || 'Brand'} class={`feat-brand-logo ${logoClass}`} />
 									<span class="feat-label">{badge.label}</span>
 								</a>
 							);
@@ -352,8 +506,11 @@ if (relatedCombined.includes('mini')) {
 						<div class="dealer-info-card">
 							<!-- 拠点共通・基本情報バー -->
 							<div class="dealer-summary-bar">
-								<div class="dealer-summary-name">
-									{d.title}
+								<div class="dealer-summary-title-wrap">
+									<div class="dealer-summary-icon">
+										<img src={mainBrandInfo.src} alt={mainBrandInfo.alt} class={`dealer-brand-logo ${mainBrandInfo.isMini ? 'dealer-brand-logo--mini' : ''}`} />
+									</div>
+									<h3 class="dealer-summary-name">{displayTitle}</h3>
 								</div>
 								<div class="dealer-summary-address">
 									<span class="dealer-address-text">{d.postal} {d.address}</span>
@@ -371,21 +528,54 @@ if (relatedCombined.includes('mini')) {
 									let tabTitle = dept.title;
 									const t = (dept.type || '').toLowerCase();
 									const title = dept.title || '';
+									let isSalesDept = false;
+									let isUsedDept = false;
+									let isServiceDept = false;
 									if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
 										tabTitle = '新車（試乗・商談）';
+										isSalesDept = true;
 									} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
 										tabTitle = '認定中古車（試乗・商談）';
+										isUsedDept = true;
 									} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
 										tabTitle = 'サービス（整備・点検）';
+										isServiceDept = true;
 									}
+
+									const openStatus = getOpenStatus(dept.hours, dept.closed);
+
 									return (
 										<details class="dept-acc-item" id={deptId} open={isDefaultOpen}>
 											<summary class="dept-acc-header">
 												<div class="dept-acc-title-group">
+													{isSalesDept && (
+														<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dept-acc-icon" style="transform: scaleX(-1);" aria-label="新車"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+													)}
+													{isUsedDept && (
+														<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dept-acc-icon" aria-label="認定中古車">
+															<path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.64 5H8.36a2 2 0 0 0-1.86 1.3L5 10 3 8"/>
+															<rect width="18" height="8" x="3" y="10" rx="2"/>
+															<path d="M5 18v2"/>
+															<path d="M19 18v2"/>
+															<path d="M6.5 14h.01"/>
+															<path d="M17.5 14h.01"/>
+															<path d="m9.5 13.5 1.8 1.8 3.5-3.5" stroke-width="2.2"/>
+														</svg>
+													)}
+													{isServiceDept && (
+														<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dept-acc-icon" aria-label="サービス・点検"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+													)}
 													<h3 class="dept-acc-name">{tabTitle}</h3>
 												</div>
 												<div class="dept-acc-meta-preview">
-													{dept.hours && <span class="preview-hours">{dept.hours}</span>}
+													<span
+														class={`dept-status-badge ${openStatus.statusClass}`}
+														data-hours={dept.hours || ''}
+														data-closed={dept.closed || ''}
+													>
+														<span class="status-pulse-dot" aria-hidden="true"></span>
+														<span class="status-label">{openStatus.statusText}</span>
+													</span>
 													<svg class="dept-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
 												</div>
 											</summary>
@@ -393,7 +583,7 @@ if (relatedCombined.includes('mini')) {
 												<div class="dept-compact-table">
 													{dept.subtitle && (
 														<div class="dept-table-row">
-															<span class="d-label">名称</span>
+															<span class="d-label">拠点名</span>
 															<span class="d-val d-val--bold">{dept.subtitle}</span>
 														</div>
 													)}
@@ -449,6 +639,11 @@ if (relatedCombined.includes('mini')) {
 									);
 								})}
 							</div>
+
+							<!-- 営業状況に関するご案内・注記 -->
+							<p class="dealer-info-notice">
+								※ 臨時時短営業や季節休業を実施する場合がございます。ご来場の際は、各窓口までお電話にてお問い合わせください。
+							</p>
 						</div>
 
 						<!-- 同一敷地内 併設拠点案内（店舗・窓口情報カードに近接配置） -->
@@ -459,7 +654,7 @@ if (relatedCombined.includes('mini')) {
 								</div>
 								<div class="related-hub-banner__body">
 									<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
-									<h3 class="related-hub-banner__title">{cleanRelatedHubTitle}</h3>
+									<h3 class="related-hub-banner__title">{displayRelatedHubTitle}</h3>
 									{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
 								</div>
 								<div class="related-hub-banner__action">
@@ -489,20 +684,6 @@ if (relatedCombined.includes('mini')) {
 								title={`${d.title} Googleマップ`}
 								class="embedded-gmap"
 							></iframe>
-
-							<!-- 地図下フローティング連携バー -->
-							<div class="map-floating-bar">
-								<div class="map-floating-bar__info">
-									<strong>{d.title}</strong>
-									<span>{d.postal} {d.address}</span>
-								</div>
-								<div class="map-floating-bar__btns">
-									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-gmap-direct">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-svg"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-										Google Maps で経路案内を開く
-									</a>
-								</div>
-							</div>
 						</div>
 
 						<!-- アクセスルート詳細（アコーディオン） -->
@@ -575,6 +756,78 @@ if (relatedCombined.includes('mini')) {
 							)}
 						</div>
 					</section>
+
+					<!-- Googleマップ評価・お客様のクチコミ -->
+					<section class="sr-section sr-section--reviews" id="reviews">
+						<div class="reviews-header-wrap">
+							<div>
+								<h2 class="section-title">Googleマップの評価・クチコミ</h2>
+								<p class="section-desc">実際にご来場・ご利用いただいたお客様からの声をご紹介いたします。</p>
+							</div>
+							<a
+								href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-all-reviews"
+							>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+								Googleマップで全クチコミを見る
+							</a>
+						</div>
+
+						<!-- 総合評価バナー -->
+						<div class="gmap-rating-hero">
+							<div class="gmap-rating-main">
+								<div class="gmap-rating-score-box">
+									<span class="gmap-rating-num">{placeData.rating.toFixed(1)}</span>
+									<div class="gmap-rating-stars-wrap">
+										<div class="gmap-stars" aria-label={`評価${placeData.rating.toFixed(1)}（5つ星中）`}>
+											{Array.from({ length: 5 }).map((_, i) => {
+												const fillLevel = placeData.rating - i;
+												if (fillLevel >= 0.8) return <span class="star-full">★</span>;
+												if (fillLevel >= 0.3) return <span class="star-half">★</span>;
+												return <span class="star-empty">☆</span>;
+											})}
+										</div>
+										<span class="gmap-review-count">{placeData.user_ratings_total}件のGoogleクチコミ</span>
+									</div>
+								</div>
+								<div class="gmap-rating-badge">
+									<svg viewBox="0 0 24 24" width="18" height="18" class="gmap-g-icon" aria-hidden="true">
+										<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+										<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+										<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+										<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+									</svg>
+									<span>Google 評価{placeData.is_live_api ? '（公式連携）' : ''}</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- クチコミカードグリッド -->
+						<div class="reviews-grid">
+							{placeData.reviews.map((rev) => (
+								<article class="review-card">
+									<div class="review-card__header">
+										<div class="review-card__author">
+											<div class="review-author-avatar">{rev.author_avatar || rev.author_name.slice(0, 1)}</div>
+											<div class="review-author-meta">
+												<strong class="review-author-name">{rev.author_name}</strong>
+												<span class="review-date">
+													{rev.relative_time_description}
+													{rev.category_tag ? `（${rev.category_tag}）` : ''}
+												</span>
+											</div>
+										</div>
+										<div class="review-stars" aria-label={`${rev.rating}つ星`}>
+											{'★'.repeat(rev.rating)}
+										</div>
+									</div>
+									<p class="review-card__text">{rev.text}</p>
+								</article>
+							))}
+						</div>
+					</section>
 				</div>
 
 				<!-- 右側：スティッキー店舗情報サイドバー -->
@@ -612,7 +865,7 @@ if (relatedCombined.includes('mini')) {
 							})}
 							<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-sidebar-route">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-								Googleマップでナビ開始
+								ルート案内
 							</a>
 						</div>
 
@@ -633,7 +886,7 @@ if (relatedCombined.includes('mini')) {
 									<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`sidebar-related-hub__logo ${relatedHubBrandAlt === 'MINI' ? 'sidebar-related-hub__logo--mini' : ''}`} />
 									<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
 								</div>
-								<h4 class="sidebar-related-hub__title">{cleanRelatedHubTitle}</h4>
+								<h4 class="sidebar-related-hub__title">{displayRelatedHubTitle}</h4>
 								<a href={d.related_hub_url} class="sidebar-related-hub__link">
 									詳細を見る
 								</a>
@@ -706,6 +959,61 @@ if (relatedCombined.includes('mini')) {
 					el.classList.remove('is-targeted');
 				}, 1600);
 			}
+
+			// 営業中ステータス判定・更新（クライアント側リアルタイム同期）
+			function updateBusinessHoursStatus() {
+				const badges = document.querySelectorAll('.dept-status-badge');
+				if (!badges || badges.length === 0) return;
+
+				const now = new Date();
+				const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+				const jst = new Date(utc + (3600000 * 9));
+				const dayOfWeek = jst.getDay();
+				const currentMins = jst.getHours() * 60 + jst.getMinutes();
+				const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+				const todayName = dayNames[dayOfWeek];
+
+				badges.forEach((badge) => {
+					const hoursStr = badge.getAttribute('data-hours') || '';
+					const closedStr = badge.getAttribute('data-closed') || '';
+					const labelEl = badge.querySelector('.status-label');
+
+					if (!hoursStr) {
+						badge.className = 'dept-status-badge status--closed';
+						if (labelEl) labelEl.textContent = '営業時間外';
+						return;
+					}
+
+					// 定休日判定
+					const targetDayStr = todayName + '曜日';
+					if (closedStr.includes(targetDayStr)) {
+						badge.className = 'dept-status-badge status--holiday';
+						if (labelEl) labelEl.textContent = '本日定休日';
+						return;
+					}
+
+					// 営業時間判定 (例: 10:00～18:00)
+					const match = hoursStr.match(/(\d{1,2}):(\d{2})\s*[～〜\-–]\s*(\d{1,2}):(\d{2})/);
+					if (match) {
+						const startMins = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+						const endMins = parseInt(match[3], 10) * 60 + parseInt(match[4], 10);
+
+						if (currentMins >= startMins && currentMins < endMins) {
+							badge.className = 'dept-status-badge status--open';
+							if (labelEl) labelEl.textContent = '現在営業中';
+						} else {
+							badge.className = 'dept-status-badge status--closed';
+							if (labelEl) labelEl.textContent = '営業時間外';
+						}
+					} else {
+						badge.className = 'dept-status-badge status--closed';
+						if (labelEl) labelEl.textContent = '営業時間外';
+					}
+				});
+			}
+
+			updateBusinessHoursStatus();
+			setInterval(updateBusinessHoursStatus, 60000);
 		});
 	</script>
 </NicoleLayout>
@@ -721,10 +1029,10 @@ if (relatedCombined.includes('mini')) {
 	/* ヒーローセクション */
 	.sr-hero {
 		position: relative;
-		min-height: 440px;
+		min-height: 540px;
 		display: flex;
 		align-items: flex-end;
-		padding: 70px 0;
+		padding: 100px 0 36px;
 		overflow: hidden;
 		background: #08090a;
 	}
@@ -766,6 +1074,8 @@ if (relatedCombined.includes('mini')) {
 		letter-spacing: -0.02em;
 		line-height: 1.15;
 		margin: 0;
+		word-break: normal;
+		overflow-wrap: break-word;
 	}
 
 	.sr-hero__actions {
@@ -788,26 +1098,32 @@ if (relatedCombined.includes('mini')) {
 	}
 
 	.btn-hero--route {
-		background: #0f9d58;
-		color: #ffffff;
-		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.35);
+		background: rgba(16, 185, 129, 0.1);
+		color: #34d399;
+		border: 1px solid rgba(16, 185, 129, 0.35);
+		box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
 	}
 
 	.btn-hero--route:hover {
-		background: #0b8043;
-		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
+		background: rgba(16, 185, 129, 0.2);
+		color: #6ee7b7;
+		border-color: rgba(16, 185, 129, 0.55);
+		box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
 		transform: translateY(-1px);
 	}
 
 	.btn-hero--tel {
-		background: #1c69d4;
-		color: #ffffff;
-		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
+		background: rgba(59, 130, 246, 0.1);
+		color: #60a5fa;
+		border: 1px solid rgba(59, 130, 246, 0.35);
+		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
 	}
 
 	.btn-hero--tel:hover {
-		background: #1557b0;
-		box-shadow: 0 6px 20px rgba(28, 105, 212, 0.5);
+		background: rgba(59, 130, 246, 0.2);
+		color: #93c5fd;
+		border-color: rgba(59, 130, 246, 0.55);
+		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
 		transform: translateY(-1px);
 	}
 
@@ -888,6 +1204,26 @@ if (relatedCombined.includes('mini')) {
 
 	.feat-brand-logo--mini {
 		height: 12px;
+		width: auto;
+	}
+
+	.feat-brand-logo--rolls {
+		height: 18px;
+		width: auto;
+	}
+
+	.feat-brand-logo--ferrari {
+		height: 18px;
+		width: auto;
+	}
+
+	.feat-brand-logo--alpina {
+		height: 16px;
+		width: auto;
+	}
+
+	.feat-brand-logo--nicole {
+		height: 16px;
 		width: auto;
 	}
 
@@ -1132,7 +1468,7 @@ if (relatedCombined.includes('mini')) {
 		background: #111317;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
-		padding: 36px 36px 32px;
+		padding: 36px 36px 20px;
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 	}
 
@@ -1147,11 +1483,38 @@ if (relatedCombined.includes('mini')) {
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
+	.dealer-summary-title-wrap {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.dealer-summary-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.dealer-brand-logo {
+		width: 36px;
+		height: 36px;
+		object-fit: contain;
+	}
+
+	.dealer-brand-logo--mini {
+		width: 44px;
+		height: 22px;
+	}
+
 	.dealer-summary-name {
-		font-size: 1.1875rem;
+		font-size: 1.25rem;
 		font-weight: 700;
 		color: #ffffff;
+		margin: 0;
 		letter-spacing: -0.01em;
+		word-break: normal;
+		overflow-wrap: break-word;
 	}
 
 	.dealer-summary-address {
@@ -1206,6 +1569,16 @@ if (relatedCombined.includes('mini')) {
 		background: rgba(16, 185, 129, 0.18);
 		color: #6ee7b7;
 		border-color: rgba(16, 185, 129, 0.45);
+	}
+
+	/* 営業状況に関する注記 */
+	.dealer-info-notice {
+		margin-top: 14px;
+		margin-bottom: 0;
+		font-size: 0.8125rem;
+		line-height: 1.6;
+		color: #888888;
+		letter-spacing: -0.01em;
 	}
 
 	/* 窓口アコーディオンリスト */
@@ -1268,6 +1641,15 @@ if (relatedCombined.includes('mini')) {
 		display: flex;
 		align-items: center;
 		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.dept-acc-icon {
+		width: 22px;
+		height: 22px;
+		color: #ffffff;
+		flex-shrink: 0;
+		opacity: 0.95;
 	}
 
 	.dept-acc-name {
@@ -1282,6 +1664,73 @@ if (relatedCombined.includes('mini')) {
 		display: flex;
 		align-items: center;
 		gap: 12px;
+	}
+
+	.dept-status-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 10px;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		transition: all 0.25s ease;
+		user-select: none;
+	}
+
+	/* 営業中：上品で鮮明なエメラルドグリーン */
+	.dept-status-badge.status--open {
+		background: rgba(16, 185, 129, 0.12);
+		border: 1px solid rgba(16, 185, 129, 0.4);
+		color: #34d399;
+	}
+
+	.status-pulse-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.dept-status-badge.status--open .status-pulse-dot {
+		background: #10b981;
+		box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+		animation: statusPulse 2s infinite ease-out;
+	}
+
+	@keyframes statusPulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+		}
+		70% {
+			box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+		}
+	}
+
+	/* 営業時間外：上品なグレーアウト */
+	.dept-status-badge.status--closed {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #71717a;
+	}
+
+	.dept-status-badge.status--closed .status-pulse-dot {
+		background: #52525b;
+	}
+
+	/* 本日定休日：上品なグレーアウト */
+	.dept-status-badge.status--holiday {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #71717a;
+	}
+
+	.dept-status-badge.status--holiday .status-pulse-dot {
+		background: #52525b;
 	}
 
 	.preview-hours {
@@ -1413,19 +1862,22 @@ if (relatedCombined.includes('mini')) {
 		flex: 1;
 		min-width: 200px;
 		padding: 13px 18px;
-		background: #1c69d4;
-		color: #ffffff;
+		background: rgba(59, 130, 246, 0.08);
+		color: #60a5fa;
+		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 6px;
 		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(28, 105, 212, 0.3);
+		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
 		transition: all 0.2s ease;
 	}
 
 	.btn-dept-call:hover {
-		background: #1557b0;
-		box-shadow: 0 6px 18px rgba(28, 105, 212, 0.45);
+		background: rgba(59, 130, 246, 0.18);
+		border-color: rgba(59, 130, 246, 0.55);
+		color: #93c5fd;
+		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.22);
 		transform: translateY(-1px);
 	}
 
@@ -1467,60 +1919,6 @@ if (relatedCombined.includes('mini')) {
 
 	.embedded-gmap {
 		display: block;
-	}
-
-	.map-floating-bar {
-		position: absolute;
-		bottom: 16px;
-		left: 16px;
-		right: 16px;
-		background: rgba(13, 15, 18, 0.92);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		border-radius: 8px;
-		padding: 14px 20px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 16px;
-	}
-
-	.map-floating-bar__info strong {
-		display: block;
-		font-size: 0.9375rem;
-		color: #ffffff;
-	}
-
-	.map-floating-bar__info span {
-		font-size: 0.8125rem;
-		color: #999999;
-	}
-
-	.btn-gmap-direct {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 10px 18px;
-		background: #0f9d58;
-		color: #ffffff;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-decoration: none;
-		white-space: nowrap;
-		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.35);
-		transition: all 0.2s ease;
-	}
-
-	.btn-gmap-direct:hover {
-		background: #0b8043;
-		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
-		transform: translateY(-1px);
-	}
-
-	.btn-svg {
-		width: 16px;
-		height: 16px;
 	}
 
 	/* アクセスアコーディオン */
@@ -1631,6 +2029,197 @@ if (relatedCombined.includes('mini')) {
 		margin: 0;
 	}
 
+	/* Googleマップ評価・レビューセクション */
+	.sr-section--reviews {
+		margin-top: 56px;
+		padding-top: 48px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.reviews-header-wrap {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 24px;
+		gap: 20px;
+		flex-wrap: wrap;
+	}
+
+	.btn-all-reviews {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 9px 16px;
+		background: rgba(16, 185, 129, 0.08);
+		color: #34d399;
+		border: 1px solid rgba(16, 185, 129, 0.3);
+		border-radius: 6px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.btn-all-reviews:hover {
+		background: rgba(16, 185, 129, 0.18);
+		color: #6ee7b7;
+		border-color: rgba(16, 185, 129, 0.5);
+		transform: translateY(-1px);
+	}
+
+	.btn-all-reviews .btn-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	.gmap-rating-hero {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+		padding: 24px 28px;
+		margin-bottom: 24px;
+	}
+
+	.gmap-rating-main {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.gmap-rating-score-box {
+		display: flex;
+		align-items: center;
+		gap: 18px;
+		flex-wrap: wrap;
+	}
+
+	.gmap-rating-num {
+		font-size: 2.75rem;
+		font-weight: 800;
+		color: #ffffff;
+		line-height: 1;
+		font-family: var(--font-mono, monospace);
+		letter-spacing: -0.02em;
+	}
+
+	.gmap-rating-stars-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.gmap-stars {
+		color: #fbbf24;
+		font-size: 1.25rem;
+		letter-spacing: 2px;
+		line-height: 1;
+	}
+
+	.star-half {
+		opacity: 0.7;
+	}
+
+	.gmap-review-count {
+		font-size: 0.8125rem;
+		color: #9ca3af;
+	}
+
+	.gmap-rating-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 14px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 20px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: #e5e7eb;
+	}
+
+	.reviews-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
+	}
+
+	.review-card {
+		background: #0d0f12;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 10px;
+		padding: 22px 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		transition: transform 0.2s ease, border-color 0.2s ease;
+	}
+
+	.review-card:hover {
+		border-color: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
+
+	.review-card__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 10px;
+		margin-bottom: 14px;
+	}
+
+	.review-card__author {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.review-author-avatar {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		font-weight: 700;
+		font-size: 0.875rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.review-author-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.review-author-name {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.review-date {
+		font-size: 0.6875rem;
+		color: #9ca3af;
+	}
+
+	.review-stars {
+		color: #fbbf24;
+		font-size: 0.875rem;
+		letter-spacing: 1px;
+	}
+
+	.review-card__text {
+		font-size: 0.84375rem;
+		line-height: 1.65;
+		color: #d1d5db;
+		margin: 0;
+	}
+
 	/* サイドバー */
 	.sr-sidebar {
 		position: sticky;
@@ -1689,18 +2278,20 @@ if (relatedCombined.includes('mini')) {
 		justify-content: center;
 		gap: 3px;
 		padding: 12px 14px;
-		background: #1c69d4;
-		color: #ffffff;
+		background: rgba(59, 130, 246, 0.08);
+		color: #60a5fa;
+		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 6px;
 		text-decoration: none;
-		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
+		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
 		transition: all 0.2s ease;
 		text-align: center;
 	}
 
 	.btn-sidebar-tel:hover {
-		background: #1557b0;
-		box-shadow: 0 6px 20px rgba(28, 105, 212, 0.5);
+		background: rgba(59, 130, 246, 0.18);
+		border-color: rgba(59, 130, 246, 0.55);
+		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.22);
 		transform: translateY(-1px);
 	}
 
@@ -1715,14 +2306,14 @@ if (relatedCombined.includes('mini')) {
 	.btn-sidebar-tel__header .btn-icon {
 		width: 13px;
 		height: 13px;
-		color: rgba(255, 255, 255, 0.85);
+		color: #60a5fa;
 		flex-shrink: 0;
 	}
 
 	.btn-sidebar-tel__name {
 		font-size: 0.78125rem;
 		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
+		color: #93c5fd;
 		line-height: 1.3;
 		white-space: nowrap;
 		overflow: hidden;
@@ -1746,20 +2337,22 @@ if (relatedCombined.includes('mini')) {
 		justify-content: center;
 		gap: 8px;
 		padding: 13px 18px;
-		background: #0f9d58;
-		color: #ffffff;
-		border: none;
+		background: rgba(16, 185, 129, 0.1);
+		color: #34d399;
+		border: 1px solid rgba(16, 185, 129, 0.35);
 		border-radius: 6px;
 		font-weight: 700;
 		font-size: 0.875rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.3);
+		box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
 		transition: all 0.2s ease;
 	}
 
 	.btn-sidebar-route:hover {
-		background: #0b8043;
-		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
+		background: rgba(16, 185, 129, 0.2);
+		color: #6ee7b7;
+		border-color: rgba(16, 185, 129, 0.55);
+		box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
 		transform: translateY(-1px);
 	}
 
@@ -1900,8 +2493,8 @@ if (relatedCombined.includes('mini')) {
 		}
 
 		.sr-hero {
-			min-height: 380px;
-			padding: 56px 0 44px;
+			min-height: 420px;
+			padding: 64px 0 20px;
 		}
 
 		.sr-hero__content {
@@ -1911,7 +2504,8 @@ if (relatedCombined.includes('mini')) {
 		.sr-hero__title {
 			font-size: clamp(1.625rem, 5.5vw, 2.25rem);
 			line-height: 1.25;
-			word-break: auto-phrase;
+			word-break: normal;
+			overflow-wrap: break-word;
 		}
 
 		.sr-hero__actions {
@@ -1937,8 +2531,10 @@ if (relatedCombined.includes('mini')) {
 		}
 
 		.facility-feature-list {
+			flex-wrap: wrap;
+			overflow-x: visible;
 			justify-content: flex-start;
-			gap: 6px;
+			gap: 8px 6px;
 		}
 
 		.feat-pill {
@@ -1954,6 +2550,22 @@ if (relatedCombined.includes('mini')) {
 
 		.feat-brand-logo--mini {
 			height: 10px;
+		}
+
+		.feat-brand-logo--rolls {
+			height: 14px;
+		}
+
+		.feat-brand-logo--ferrari {
+			height: 14px;
+		}
+
+		.feat-brand-logo--alpina {
+			height: 13px;
+		}
+
+		.feat-brand-logo--nicole {
+			height: 13px;
 		}
 
 		.related-hub-banner {
@@ -1986,7 +2598,7 @@ if (relatedCombined.includes('mini')) {
 		}
 
 		.dealer-info-card {
-			padding: 18px 14px;
+			padding: 18px 14px 12px;
 			border-radius: 8px;
 			margin-bottom: 24px;
 		}
@@ -1999,9 +2611,47 @@ if (relatedCombined.includes('mini')) {
 			padding-bottom: 12px;
 		}
 
+		.dealer-summary-title-wrap {
+			gap: 12px;
+		}
+
+		.dealer-brand-logo {
+			width: 30px;
+			height: 30px;
+		}
+
+		.dealer-brand-logo--mini {
+			width: 38px;
+			height: 19px;
+		}
+
 		.dealer-summary-name {
 			font-size: 1.125rem;
-			word-break: auto-phrase;
+			word-break: normal;
+			overflow-wrap: break-word;
+		}
+
+		.dept-acc-icon {
+			width: 20px;
+			height: 20px;
+		}
+
+		.dept-status-badge {
+			padding: 3px 8px;
+			font-size: 0.6875rem;
+			gap: 4px;
+		}
+
+		.status-pulse-dot {
+			width: 6px;
+			height: 6px;
+		}
+
+		.dealer-info-notice {
+			margin-top: 10px;
+			margin-bottom: 0;
+			font-size: 0.75rem;
+			line-height: 1.5;
 		}
 
 		.dealer-summary-address {
@@ -2126,13 +2776,17 @@ if (relatedCombined.includes('mini')) {
 			height: 52px;
 		}
 
-		.map-floating-bar {
-			flex-direction: column;
-			align-items: stretch;
+		.reviews-grid {
+			grid-template-columns: 1fr;
+			gap: 12px;
 		}
 
-		.btn-gmap-direct {
-			justify-content: center;
+		.gmap-rating-hero {
+			padding: 18px 20px;
+		}
+
+		.gmap-rating-num {
+			font-size: 2.25rem;
 		}
 	}
 
