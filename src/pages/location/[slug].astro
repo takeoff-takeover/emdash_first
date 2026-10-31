@@ -191,6 +191,26 @@ const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = 
 	]);
 
 const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`;
+
+// 4. 同一敷地内 併設拠点案内のブランドロゴ判定
+const relatedHubTitle = d.related_hub_title || '';
+const relatedHubUrl = d.related_hub_url || '';
+let relatedHubBrandLogo = '/brands/bmw.svg';
+let relatedHubBrandAlt = 'BMW';
+const relatedCombined = `${relatedHubTitle} ${relatedHubUrl}`.toLowerCase();
+if (relatedCombined.includes('mini')) {
+	relatedHubBrandLogo = '/brands/mini.svg';
+	relatedHubBrandAlt = 'MINI';
+} else if (relatedCombined.includes('rolls')) {
+	relatedHubBrandLogo = '/brands/rolls-royce.svg';
+	relatedHubBrandAlt = 'Rolls-Royce';
+} else if (relatedCombined.includes('alpina')) {
+	relatedHubBrandLogo = '/brands/alpina-nicole.svg';
+	relatedHubBrandAlt = 'ALPINA';
+} else if (relatedCombined.includes('bmw')) {
+	relatedHubBrandLogo = '/brands/bmw.svg';
+	relatedHubBrandAlt = 'BMW';
+}
 ---
 
 <NicoleLayout
@@ -211,11 +231,11 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 				</h1>
 
 				<div class="sr-hero__actions">
-					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--primary">
+					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--route">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
 						ルート案内
 					</a>
-					<a href="#departments" class="btn-hero btn-hero--secondary">
+					<a href="#departments" class="btn-hero btn-hero--tel">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
 						電話・窓口情報
 					</a>
@@ -254,7 +274,7 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 					{d.related_hub_url && (
 						<div class="related-hub-banner">
 							<div class="related-hub-banner__icon">
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hub-icon"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+								<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`hub-brand-logo ${relatedHubBrandAlt === 'MINI' ? 'hub-brand-logo--mini' : ''}`} />
 							</div>
 							<div class="related-hub-banner__body">
 								<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
@@ -528,7 +548,6 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 				<aside class="sr-sidebar">
 					<div class="sidebar-card">
 						<div class="sidebar-header">
-							<span class="sidebar-label">DIRECT CONTACT</span>
 							<h3 class="sidebar-title">直通窓口・ご案内</h3>
 						</div>
 
@@ -540,8 +559,11 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 								if (!dept.tel) return null;
 								return (
 									<a href={`tel:${dept.tel}`} class="btn-sidebar-tel">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-										{dept.title}：{dept.tel}
+										<div class="btn-sidebar-tel__header">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+											<span class="btn-sidebar-tel__name">{dept.title}</span>
+										</div>
+										<span class="btn-sidebar-tel__number">{dept.tel}</span>
 									</a>
 								);
 							})}
@@ -564,7 +586,10 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 						<!-- 同一敷地内 併設拠点へのサイドバー案内（存在する場合） -->
 						{d.related_hub_url && (
 							<div class="sidebar-related-hub">
-								<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
+								<div class="sidebar-related-hub__header">
+									<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`sidebar-related-hub__logo ${relatedHubBrandAlt === 'MINI' ? 'sidebar-related-hub__logo--mini' : ''}`} />
+									<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
+								</div>
 								<h4 class="sidebar-related-hub__title">{d.related_hub_title}</h4>
 								<a href={d.related_hub_url} class="sidebar-related-hub__link">
 									併設拠点の詳細を見る ↗
@@ -719,27 +744,27 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 		transition: all 0.2s ease;
 	}
 
-	.btn-hero--primary {
-		background: #ffffff;
-		color: #08090a;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	.btn-hero--route {
+		background: #0f9d58;
+		color: #ffffff;
+		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.35);
 	}
 
-	.btn-hero--primary:hover {
-		background: #e5e7eb;
+	.btn-hero--route:hover {
+		background: #0b8043;
+		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
 		transform: translateY(-1px);
 	}
 
-	.btn-hero--secondary {
-		background: rgba(255, 255, 255, 0.08);
+	.btn-hero--tel {
+		background: #1c69d4;
 		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.25);
-		backdrop-filter: blur(8px);
+		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
 	}
 
-	.btn-hero--secondary:hover {
-		background: rgba(255, 255, 255, 0.16);
-		border-color: rgba(255, 255, 255, 0.45);
+	.btn-hero--tel:hover {
+		background: #1557b0;
+		box-shadow: 0 6px 20px rgba(28, 105, 212, 0.5);
 		transform: translateY(-1px);
 	}
 
@@ -850,20 +875,27 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 	}
 
 	.related-hub-banner__icon {
-		width: 44px;
-		height: 44px;
+		width: 48px;
+		height: 48px;
 		border-radius: 50%;
 		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+		padding: 8px;
 	}
 
-	.hub-icon {
-		width: 22px;
-		height: 22px;
-		color: #ffffff;
+	.hub-brand-logo {
+		width: 32px;
+		height: 32px;
+		object-fit: contain;
+	}
+
+	.hub-brand-logo--mini {
+		width: 34px;
+		height: 20px;
 	}
 
 	.related-hub-banner__body {
@@ -1589,18 +1621,18 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 
 	.btn-sidebar-tel {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
-		padding: 14px 18px;
+		gap: 3px;
+		padding: 12px 14px;
 		background: #1c69d4;
 		color: #ffffff;
 		border-radius: 6px;
-		font-weight: 700;
-		font-size: 0.9375rem;
 		text-decoration: none;
 		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
 		transition: all 0.2s ease;
+		text-align: center;
 	}
 
 	.btn-sidebar-tel:hover {
@@ -1609,8 +1641,40 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 		transform: translateY(-1px);
 	}
 
-	.btn-sidebar-tel .btn-icon {
+	.btn-sidebar-tel__header {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		width: 100%;
+	}
+
+	.btn-sidebar-tel__header .btn-icon {
+		width: 13px;
+		height: 13px;
+		color: rgba(255, 255, 255, 0.85);
+		flex-shrink: 0;
+	}
+
+	.btn-sidebar-tel__name {
+		font-size: 0.78125rem;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.9);
+		line-height: 1.3;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.btn-sidebar-tel__number {
+		display: block;
+		font-size: 1.25rem;
+		font-weight: 800;
+		letter-spacing: 0.04em;
+		font-family: var(--font-mono, monospace);
 		color: #ffffff;
+		line-height: 1.15;
+		white-space: nowrap;
 	}
 
 	.btn-sidebar-route {
@@ -1673,13 +1737,30 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 		border-radius: 6px;
 	}
 
+	.sidebar-related-hub__header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 6px;
+	}
+
+	.sidebar-related-hub__logo {
+		width: 18px;
+		height: 18px;
+		object-fit: contain;
+		flex-shrink: 0;
+	}
+
+	.sidebar-related-hub__logo--mini {
+		width: 22px;
+		height: 12px;
+	}
+
 	.sidebar-related-hub__tag {
-		display: block;
 		font-size: 10px;
 		font-weight: 700;
 		letter-spacing: 0.05em;
 		color: rgba(255, 255, 255, 0.6);
-		margin-bottom: 4px;
 	}
 
 	.sidebar-related-hub__title {
@@ -1756,87 +1837,146 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 		}
 
 		.sr-hero {
-			min-height: 360px;
-			padding: 48px 0 40px;
+			min-height: 280px;
+			padding: 36px 0 28px;
 		}
 
 		.sr-hero__content {
-			padding: 0 20px;
+			padding: 0 16px;
+		}
+
+		.sr-hero__title {
+			font-size: clamp(1.625rem, 5.5vw, 2.25rem);
+			line-height: 1.25;
+			word-break: auto-phrase;
 		}
 
 		.sr-hero__actions {
 			flex-direction: column;
-			gap: 10px;
+			gap: 8px;
 			width: 100%;
+			margin-top: 18px;
 		}
 
 		.btn-hero {
 			width: 100%;
 			justify-content: center;
-			padding: 12px 20px;
+			padding: 11px 18px;
+			font-size: 0.875rem;
 		}
 
 		.facility-feature-bar {
-			padding: 12px 0;
+			padding: 10px 0;
 		}
 
 		.facility-feature-container {
-			padding: 0 20px;
+			padding: 0 16px;
 		}
 
 		.facility-feature-list {
 			justify-content: flex-start;
-			gap: 8px;
+			gap: 6px;
 		}
 
 		.feat-pill {
-			padding: 6px 11px;
-			font-size: 0.75rem;
-			gap: 7px;
+			padding: 5px 10px;
+			font-size: 0.6875rem;
+			gap: 6px;
 		}
 
 		.feat-brand-logo--bmw {
-			width: 16px;
-			height: 16px;
+			width: 14px;
+			height: 14px;
 		}
 
 		.feat-brand-logo--mini {
-			height: 11px;
+			height: 10px;
 		}
 
 		.related-hub-banner {
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 14px;
-			padding: 16px;
+			gap: 12px;
+			padding: 14px;
+			margin-bottom: 24px;
+		}
+
+		.related-hub-banner__title {
+			font-size: 1rem;
+			line-height: 1.35;
 		}
 
 		.btn-hub-link {
 			width: 100%;
 			justify-content: center;
+			padding: 9px 14px;
+			font-size: 0.8125rem;
 		}
 
 		.sr-content-wrap {
-			padding: 36px 20px 60px;
+			padding: 24px 16px 48px;
+		}
+
+		.sr-layout-grid {
+			gap: 28px;
 		}
 
 		.dealer-info-card {
-			padding: 22px 16px;
-			border-radius: 10px;
+			padding: 18px 14px;
+			border-radius: 8px;
+			margin-bottom: 24px;
 		}
 
 		.dealer-summary-bar {
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 8px;
-			margin-bottom: 18px;
-			padding-bottom: 14px;
+			gap: 6px;
+			margin-bottom: 14px;
+			padding-bottom: 12px;
+		}
+
+		.dealer-summary-name {
+			font-size: 1.125rem;
+			word-break: auto-phrase;
 		}
 
 		.dealer-summary-address {
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 8px;
+			gap: 4px;
+			font-size: 0.8125rem;
+			word-break: auto-phrase;
+		}
+
+		.sidebar-card {
+			padding: 18px 14px;
+		}
+
+		.sidebar-title {
+			font-size: 1.125rem;
+		}
+
+		.sidebar-desc {
+			font-size: 0.8125rem;
+			margin-bottom: 14px;
+		}
+
+		.btn-sidebar-tel {
+			padding: 11px 12px;
+		}
+
+		.btn-sidebar-tel__name {
+			font-size: 0.75rem;
+		}
+
+		.btn-sidebar-tel__number {
+			font-size: 1.1875rem;
+		}
+
+		.btn-sidebar-route {
+			padding: 11px 14px;
+			font-size: 0.8125rem;
+		}
 		}
 
 		.dept-acc-header {
@@ -1927,15 +2067,15 @@ const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeU
 
 	@media (max-width: 480px) {
 		.sr-hero__content {
-			padding: 0 16px;
+			padding: 0 14px;
 		}
 
 		.facility-feature-container {
-			padding: 0 16px;
+			padding: 0 14px;
 		}
 
 		.sr-content-wrap {
-			padding: 32px 16px 56px;
+			padding: 20px 14px 40px;
 		}
 	}
 </style>
