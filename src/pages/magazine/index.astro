@@ -383,11 +383,46 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	};
 });
 
+// お知らせ（News / Corporate Notices / 休業日・アカウント案内等）判定ヘルパー
+// マガジン（Stories & Essays）ではなく、店舗・コーポレートの「お知らせ」に該当するものを除外
+const isNoticeArticle = (p: any): boolean => {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+	
+	const specificNoticeSlugs = [
+		"202512_web_sns_account_change",
+		"202512_setagaya_aoyama_closedday",
+		"202609_nicole_sns-announcement",
+		"202610_nicole_used-car_url-information",
+		"gw-holiday-2026",
+		"holiday",
+		"closedday"
+	];
+	if (specificNoticeSlugs.some(s => slug.includes(s))) return true;
+
+	if (
+		title.includes("休業") ||
+		title.includes("定休日") ||
+		title.includes("ドメイン") ||
+		title.includes("snsアカウント") ||
+		title.includes("アカウント名変更") ||
+		title.includes("lineアカウント") ||
+		title.includes("夏季休業") ||
+		title.includes("年末年始") ||
+		title.includes("営業時間")
+	) {
+		return true;
+	}
+
+	return false;
+};
+
 // 全記事リスト（CMS記事を最優先し、CMSにない記事のみ静的フォールバックから補充）
+// お知らせ（休業日案内・ドメインSNS変更等）はマガジンから除外
 const allArticles = [
 	...cmsArticles,
 	...staticArticles.filter(sa => !cmsArticles.some(ca => ca.slug === sa.slug || ca.id === sa.id))
-];
+].filter(a => !isNoticeArticle(a));
 
 // ESG / SDGs 記事判定ヘルパー
 const isESGArticle = (p: any): boolean => {
