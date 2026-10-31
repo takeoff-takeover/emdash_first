@@ -35,11 +35,12 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 
 	const addr = row.address || "";
 	const areaGroup = addr.includes("東京都") || addr.includes("東京") ? "東京" : "神奈川";
-	const isOffice = (row.badges || "").includes("本社・オフィス") || row.brand === "Nicole";
-	const servicesList = (row.badges || "")
-		.split(",")
-		.map((s: string) => s.trim())
-		.filter(Boolean);
+	const rawBadges = row.badges;
+	const badgesStr = Array.isArray(rawBadges) ? rawBadges.join(",") : (typeof rawBadges === "string" ? rawBadges : "");
+	const isOffice = badgesStr.includes("本社・オフィス") || row.brand === "Nicole";
+	const servicesList = Array.isArray(rawBadges)
+		? rawBadges.map((s: any) => String(s).trim()).filter(Boolean)
+		: badgesStr.split(",").map((s: string) => s.trim()).filter(Boolean);
 
 	// 見本用のサンプルGoogle評価（将来はAPIまたは管理画面から取得）
 	const sampleRatingMap: Record<string, { rating: number; count: number }> = {
