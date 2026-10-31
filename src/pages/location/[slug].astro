@@ -89,6 +89,7 @@ const customDepartments: Array<{
 	title: string;
 	subtitle?: string;
 	tel?: string;
+	fax?: string;
 	hours?: string;
 	closed?: string;
 	desc?: string;
@@ -105,6 +106,7 @@ if (d.sales_title || (d.sales_enabled !== '0' && (d.sales_tel || d.tel))) {
 		title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
 		subtitle: d.title,
 		tel: d.sales_tel || d.tel || '',
+		fax: d.sales_fax || d.fax || '',
 		hours: d.sales_hours || '10:00 〜 18:00',
 		closed: d.sales_closed || '水曜日（祝日を除く）',
 		desc: d.sales_desc || '',
@@ -122,6 +124,7 @@ if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
 		title: d.used_title,
 		subtitle: d.title,
 		tel: d.used_tel || d.tel || '',
+		fax: d.used_fax || d.fax || '',
 		hours: d.used_hours || '10:00 〜 18:00',
 		closed: d.used_closed || '水曜日（祝日を除く）',
 		desc: d.used_desc || '',
@@ -139,6 +142,7 @@ if (d.service_title || (d.service_enabled !== '0' && (d.service_tel || d.tel))) 
 		title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
 		subtitle: d.title,
 		tel: d.service_tel || d.tel || '',
+		fax: d.service_fax || d.fax || '',
 		hours: d.service_hours || '09:00 〜 18:00',
 		closed: d.service_closed || '水曜日（祝日を除く）',
 		desc: d.service_desc || '',
@@ -339,12 +343,6 @@ if (relatedCombined.includes('mini')) {
 										Googleマップ
 									</a>
 								</div>
-								{d.fax && (
-									<div class="dealer-summary-fax">
-										<span class="d-label">FAX</span>
-										<span class="d-val">{d.fax}</span>
-									</div>
-								)}
 							</div>
 
 							<!-- 各部門アコーディオン -->
@@ -379,10 +377,10 @@ if (relatedCombined.includes('mini')) {
 															</div>
 														</div>
 													)}
-													{dept.fax && (
+													{(dept.fax || d.fax) && (
 														<div class="dept-table-row">
 															<span class="d-label">FAX</span>
-															<span class="d-val d-fax">{dept.fax}</span>
+															<span class="d-val d-fax">{dept.fax || d.fax}</span>
 														</div>
 													)}
 													{dept.hours && (
@@ -424,26 +422,26 @@ if (relatedCombined.includes('mini')) {
 								})}
 							</div>
 						</div>
-					</section>
 
-					<!-- 同一敷地内 併設拠点案内（店舗・窓口情報の直後に配置） -->
-					{d.related_hub_url && (
-						<div class="related-hub-banner">
-							<div class="related-hub-banner__icon">
-								<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`hub-brand-logo ${relatedHubBrandAlt === 'MINI' ? 'hub-brand-logo--mini' : ''}`} />
+						<!-- 同一敷地内 併設拠点案内（店舗・窓口情報カードに近接配置） -->
+						{d.related_hub_url && (
+							<div class="related-hub-banner">
+								<div class="related-hub-banner__icon">
+									<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`hub-brand-logo ${relatedHubBrandAlt === 'MINI' ? 'hub-brand-logo--mini' : ''}`} />
+								</div>
+								<div class="related-hub-banner__body">
+									<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
+									<h3 class="related-hub-banner__title">{cleanRelatedHubTitle}</h3>
+									{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
+								</div>
+								<div class="related-hub-banner__action">
+									<a href={d.related_hub_url} class="btn-hub-link">
+										詳細を見る
+									</a>
+								</div>
 							</div>
-							<div class="related-hub-banner__body">
-								<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
-								<h3 class="related-hub-banner__title">{cleanRelatedHubTitle}</h3>
-								{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
-							</div>
-							<div class="related-hub-banner__action">
-								<a href={d.related_hub_url} class="btn-hub-link">
-									詳細を見る
-								</a>
-							</div>
-						</div>
-					)}
+						)}
+					</section>
 
 					<!-- アクセス案内セクション -->
 					<section class="sr-section" id="access">
@@ -564,11 +562,21 @@ if (relatedCombined.includes('mini')) {
 						<div class="sidebar-cta">
 							{departmentsList.map((dept) => {
 								if (!dept.tel) return null;
+								let unifiedName = dept.title;
+								const t = (dept.type || '').toLowerCase();
+								const title = dept.title || '';
+								if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
+									unifiedName = '新車（試乗・商談）';
+								} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
+									unifiedName = '認定中古車（試乗・商談）';
+								} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
+									unifiedName = 'サービス（整備・点検）';
+								}
 								return (
 									<a href={`tel:${dept.tel}`} class="btn-sidebar-tel">
 										<div class="btn-sidebar-tel__header">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-											<span class="btn-sidebar-tel__name">{dept.title}</span>
+											<span class="btn-sidebar-tel__name">{unifiedName}</span>
 										</div>
 										<span class="btn-sidebar-tel__number">{dept.tel}</span>
 									</a>
@@ -874,35 +882,31 @@ if (relatedCombined.includes('mini')) {
 		display: flex;
 		align-items: center;
 		gap: 20px;
-		padding: 20px 24px;
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 10px;
-		margin-bottom: 40px;
+		padding: 18px 24px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		margin-top: 16px;
+		margin-bottom: 0;
 	}
 
 	.related-hub-banner__icon {
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.12);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-		padding: 8px;
+		padding: 0;
 	}
 
 	.hub-brand-logo {
-		width: 32px;
-		height: 32px;
+		width: 36px;
+		height: 36px;
 		object-fit: contain;
 	}
 
 	.hub-brand-logo--mini {
-		width: 34px;
-		height: 20px;
+		width: 44px;
+		height: 22px;
 	}
 
 	.related-hub-banner__body {
@@ -1929,7 +1933,8 @@ if (relatedCombined.includes('mini')) {
 			align-items: flex-start;
 			gap: 12px;
 			padding: 14px;
-			margin-bottom: 24px;
+			margin-top: 12px;
+			margin-bottom: 0;
 		}
 
 		.related-hub-banner__title {
