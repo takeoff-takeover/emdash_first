@@ -7,7 +7,7 @@ const showroom = {
 	name: "Nicole BMW 本社（川崎）",
 	subName: "Nicole BMW Kawasaki Headquarters & Service Center",
 	brand: "BMW",
-	serviceBrands: ["BMW", "MINI"],
+	serviceBrands: ["BMW", "ALPINA", "MINI"],
 	facilityType: "BMW正規ディーラー（ショールーム・サービス工場併設）",
 	postal: "〒212-0005",
 	address: "神奈川県川崎市幸区戸手2-5-7",
@@ -22,7 +22,7 @@ const showroom = {
 	lng: 139.6897264,
 	googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7",
 	image: "/uploads/2026/01/Nicole-BMW-本社.jpg",
-	services: ["BMW 新車販売", "最新試乗車常備", "BMW M認定ディーラー", "BMW i (EV) 急速充電", "BMW/MINI 正規車検・点検", "ファイナンシャルサービス", "自動車保険", "下取り査定"],
+	services: ["BMW 新車販売", "最新試乗車常備", "BMW M認定ディーラー", "BMW i (EV) 急速充電", "BMW/ALPINA/MINI 正規車検・点検", "ファイナンシャルサービス", "自動車保険", "下取り査定"],
 
 	// 部門別データ
 	departments: {
@@ -44,12 +44,12 @@ const showroom = {
 		},
 		service: {
 			name: "本社サービスセンター（車検・点検・整備工場）",
-			brandBadges: ["BMW", "MINI"],
+			brandBadges: ["BMW", "ALPINA", "MINI"],
 			tel: "044-522-1500",
 			telDirect: "044-522-1500",
 			hours: "09:00 〜 18:00",
 			closed: "水曜日（祝日を除く）",
-			note: "※BMWに加え、MINIの正規車検・点検・整備もワンストップで受け付けております。"
+			note: "※BMWに加え、BMW ALPINAおよびMINIの正規車検・点検・整備もワンストップで受け付けております。"
 		}
 	}
 };
@@ -102,10 +102,8 @@ const galleryPhotos = [
 			</div>
 
 			<div class="sr-hero__content">
-				<span class="sr-hero__eyebrow">BMW AUTHORIZED DEALER</span>
 				<h1 class="sr-hero__title">
 					Nicole BMW 本社（川崎）
-					<span class="sr-hero__title-sub">ショールーム ＆ 本社サービス工場</span>
 				</h1>
 
 				<div class="sr-hero__actions">
@@ -125,22 +123,18 @@ const galleryPhotos = [
 		<section class="facility-feature-bar" aria-label="店舗機能・取扱サービス">
 			<div class="facility-feature-container">
 				<div class="facility-feature-list">
-					<div class="feat-pill">
-						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-						<span>新車取扱（BMW）</span>
-					</div>
-					<div class="feat-pill">
-						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-						<span>本社サービス工場</span>
-					</div>
-					<div class="feat-pill feat-pill--highlight">
-						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-						<span>MINI 正規入庫対応</span>
-					</div>
-					<div class="feat-pill">
-						<svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-						<span>EV 急速充電</span>
-					</div>
+					<a href="#dept-sales" class="feat-pill" data-dept-trigger="sales">
+						<img src="/brands/bmw.svg" alt="BMW" class="feat-brand-logo feat-brand-logo--bmw" />
+						<span class="feat-label">BMW 新車</span>
+					</a>
+					<a href="#dept-service" class="feat-pill" data-dept-trigger="service">
+						<img src="/brands/bmw.svg" alt="BMW" class="feat-brand-logo feat-brand-logo--bmw" />
+						<span class="feat-label">BMW サービス</span>
+					</a>
+					<a href="#dept-service" class="feat-pill feat-pill--mini" data-dept-trigger="mini-service">
+						<img src="/brands/mini.svg" alt="MINI" class="feat-brand-logo feat-brand-logo--mini" />
+						<span class="feat-label">MINI サービス</span>
+					</a>
 				</div>
 			</div>
 		</section>
@@ -152,7 +146,6 @@ const galleryPhotos = [
 				<div class="sr-main-col">
 					<!-- ショールームコンセプト（デスクトップで表示、スマホでは非表示にしてギャラリーへ直結） -->
 					<section class="sr-section sr-section--concept">
-						<div class="section-tag">CONCEPT &amp; PHILOSOPHY</div>
 						<h2 class="section-title">首都圏随一のスケールを誇る、BMWの美学が息づく空間</h2>
 						<div class="prose-content">
 							<p>
@@ -200,42 +193,29 @@ const galleryPhotos = [
 
 					<!-- 店舗・窓口情報（基本情報 ＋ 各部門窓口タブ） -->
 					<section class="sr-section sr-section--depts" id="departments">
-						<div class="section-tag">DEALER INFORMATION</div>
 						<h2 class="section-title">店舗・窓口情報</h2>
 						<p class="section-desc">Nicole BMW 本社ショールームおよび併設サービス工場の詳細情報です。</p>
 
 						<div class="dealer-info-card">
-							<!-- 拠点共通・基本情報 -->
-							<div class="dealer-common-info">
-								<div class="common-info-grid">
-									<div class="c-info-item">
-										<span class="c-info-label">施設名称</span>
-										<span class="c-info-val c-info-val--bold">{showroom.name}</span>
-									</div>
-									<div class="c-info-item">
-										<span class="c-info-label">所在地</span>
-										<div class="c-info-val">
-											<span class="postal">{showroom.postal}</span>
-											<span>{showroom.address}</span>
-											<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
-												Googleマップで開く ↗
-											</a>
-										</div>
-									</div>
-									<div class="c-info-item">
-										<span class="c-info-label">運営法人</span>
-										<span class="c-info-val">ニコル・カーズ合同会社</span>
-									</div>
+							<!-- 拠点共通・基本情報バー（余分なラベルを廃止し、スマートなヘッダーに統合） -->
+							<div class="dealer-summary-bar">
+								<div class="dealer-summary-name">
+									{showroom.name}
+								</div>
+								<div class="dealer-summary-address">
+									<span class="dealer-address-text">{showroom.postal} {showroom.address}</span>
+									<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
+										Googleマップ ↗
+									</a>
 								</div>
 							</div>
 
 							<!-- 各部門（ショールーム／サービス工場）アコーディオン -->
 							<div class="dept-accordion-list" role="region" aria-label="店舗窓口一覧">
 								<!-- 1. ショールーム アコーディオン（デフォルト開） -->
-								<details class="dept-acc-item" open>
+								<details class="dept-acc-item" id="dept-sales" open>
 									<summary class="dept-acc-header">
 										<div class="dept-acc-title-group">
-											<span class="dept-acc-badge">新車販売</span>
 											<h3 class="dept-acc-name">ショールーム（新車）</h3>
 										</div>
 										<div class="dept-acc-meta-preview">
@@ -250,11 +230,14 @@ const galleryPhotos = [
 												<span class="d-val d-val--bold">BMW（新車販売）</span>
 											</div>
 											<div class="dept-table-row">
-												<span class="d-label">代表電話</span>
+												<span class="d-label">TEL</span>
 												<div class="d-val">
 													<a href={`tel:${showroom.departments.sales.tel}`} class="d-tel">{showroom.departments.sales.tel}</a>
-													<span class="d-sub-tel">（直通: {showroom.departments.sales.telDirect} / FAX: {showroom.departments.sales.fax}）</span>
 												</div>
+											</div>
+											<div class="dept-table-row">
+												<span class="d-label">FAX</span>
+												<span class="d-val d-fax">{showroom.departments.sales.fax}</span>
 											</div>
 											<div class="dept-table-row">
 												<span class="d-label">営業時間</span>
@@ -276,10 +259,9 @@ const galleryPhotos = [
 								</details>
 
 								<!-- 2. サービス工場 アコーディオン -->
-								<details class="dept-acc-item">
+								<details class="dept-acc-item" id="dept-service">
 									<summary class="dept-acc-header">
 										<div class="dept-acc-title-group">
-											<span class="dept-acc-badge dept-acc-badge--service">BMW / MINI 正規整備</span>
 											<h3 class="dept-acc-name">サービス工場（車検・点検・整備）</h3>
 										</div>
 										<div class="dept-acc-meta-preview">
@@ -294,10 +276,9 @@ const galleryPhotos = [
 												<span class="d-val d-val--bold">BMW ／ MINI（正規認定工場）</span>
 											</div>
 											<div class="dept-table-row">
-												<span class="d-label">直通電話</span>
+												<span class="d-label">TEL</span>
 												<div class="d-val">
 													<a href={`tel:${showroom.departments.service.tel}`} class="d-tel d-tel--service">{showroom.departments.service.tel}</a>
-													<span class="d-sub-tel">（サービス工場直通）</span>
 												</div>
 											</div>
 											<div class="dept-table-row">
@@ -308,12 +289,6 @@ const galleryPhotos = [
 												<span class="d-label">定休日</span>
 												<span class="d-val">{showroom.departments.service.closed}</span>
 											</div>
-										</div>
-
-										<!-- MINI入庫歓迎コールアウト -->
-										<div class="mini-service-alert">
-											<span class="mini-alert-badge">入庫対応</span>
-											<p>当サービス工場は、BMWに加え<strong>MINIの車検・点検・整備</strong>も受け付けております。</p>
 										</div>
 
 										<div class="dept-card__action">
@@ -328,10 +303,9 @@ const galleryPhotos = [
 						</div>
 					</section>
 
-					<!-- アクセス案内 & Googleマップ連携セクション -->
+					<!-- アクセス案内セクション -->
 					<section class="sr-section" id="access">
-						<div class="section-tag">LOCATION &amp; ACCESS</div>
-						<h2 class="section-title">アクセス &amp; Googleマップ連携</h2>
+						<h2 class="section-title">アクセス</h2>
 						<p class="section-desc">東京方面・横浜方面のどちらからも国道1号線経由で快適にお越しいただけます。</p>
 
 						<!-- Googleマップ インタラクティブ埋め込みビュー -->
@@ -432,17 +406,25 @@ const galleryPhotos = [
 							</a>
 							<a href={`tel:${showroom.departments.service.tel}`} class="btn-sidebar-tel btn-sidebar-tel--service">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-								車検・サービス工場：{showroom.departments.service.tel}
+								車検・点検：{showroom.departments.service.tel}
 							</a>
 							<a href={showroom.googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-sidebar-route">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
 								Googleマップでナビ開始
 							</a>
 						</div>
+
+						<!-- 本社管理オフィス併設に関するご案内 -->
+						<div class="sidebar-office-notice">
+							<span class="sidebar-office-notice__badge">※管理オフィス併設について</span>
+							<p class="sidebar-office-notice__text">
+								同敷地内にニコル・グループ川崎本社オフィスを併設しております。一般のお客様向けのショールーム・新車商談・車検点検のご案内は本ショールームおよびサービスセンターにて承っております。
+							</p>
+						</div>
 					</div>
 
-					<a href="/location/" class="btn-view-all-loc">
-						← 全25拠点一覧に戻る
+					<a href="/locations" class="btn-view-all-loc">
+						← 拠点一覧に戻る
 					</a>
 				</aside>
 			</div>
@@ -479,6 +461,41 @@ const galleryPhotos = [
 					}
 				});
 			});
+
+			// 上部ステータスバー（新車 / サービス）クリック連動
+			const deptTriggers = document.querySelectorAll('[data-dept-trigger]');
+			const salesAcc = document.getElementById('dept-sales');
+			const serviceAcc = document.getElementById('dept-service');
+
+			deptTriggers.forEach((trigger) => {
+				trigger.addEventListener('click', (e) => {
+					e.preventDefault();
+					const targetType = trigger.getAttribute('data-dept-trigger');
+
+					if (targetType === 'sales') {
+						if (salesAcc) {
+							salesAcc.open = true;
+							salesAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+							flashHighlight(salesAcc);
+						}
+					} else if (targetType === 'service' || targetType === 'mini-service') {
+						if (serviceAcc) {
+							serviceAcc.open = true;
+							serviceAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+							flashHighlight(serviceAcc);
+						}
+					}
+				});
+			});
+
+			function flashHighlight(el) {
+				el.classList.remove('is-targeted');
+				void el.offsetWidth;
+				el.classList.add('is-targeted');
+				setTimeout(() => {
+					el.classList.remove('is-targeted');
+				}, 1600);
+			}
 		});
 	</script>
 </NicoleLayout>
@@ -488,6 +505,7 @@ const galleryPhotos = [
 		background: #08090a;
 		color: #e5e5e5;
 		min-height: 100vh;
+		font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
 	}
 
 	/* ヒーローセクション（シンプルで開放感のあるレイアウト） */
@@ -531,16 +549,6 @@ const galleryPhotos = [
 		box-sizing: border-box;
 	}
 
-	.sr-hero__eyebrow {
-		display: inline-block;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #a0a5ad;
-		letter-spacing: 0.14em;
-		margin-bottom: 12px;
-	}
-
 	.sr-hero__title {
 		font-size: clamp(2rem, 4.5vw, 3.25rem);
 		font-weight: 800;
@@ -548,15 +556,6 @@ const galleryPhotos = [
 		letter-spacing: -0.02em;
 		line-height: 1.15;
 		margin: 0;
-	}
-
-	.sr-hero__title-sub {
-		display: block;
-		font-size: clamp(1.125rem, 2vw, 1.5rem);
-		font-weight: 400;
-		color: #c0c4cc;
-		margin-top: 8px;
-		letter-spacing: 0.03em;
 	}
 
 	.sr-hero__actions {
@@ -640,35 +639,52 @@ const galleryPhotos = [
 	.feat-pill {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
-		padding: 8px 14px;
+		gap: 9px;
+		padding: 7px 14px;
 		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 6px;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: #d1d5db;
+		color: #e5e7eb;
 		white-space: nowrap;
 		flex-shrink: 0;
+		cursor: pointer;
+		text-decoration: none;
 		transition: all 0.2s ease;
 	}
 
 	.feat-pill:hover {
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.09);
+		border-color: rgba(255, 255, 255, 0.25);
 		color: #ffffff;
 	}
 
-	.feat-pill--highlight {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255, 255, 255, 0.24);
-		color: #ffffff;
-		font-weight: 600;
+	.feat-pill--mini {
+		background: rgba(255, 255, 255, 0.07);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.feat-brand-logo {
+		display: inline-block;
+		object-fit: contain;
+		flex-shrink: 0;
+	}
+
+	.feat-brand-logo--bmw {
+		width: 18px;
+		height: 18px;
+	}
+
+	.feat-brand-logo--mini {
+		height: 12px;
+		width: auto;
 	}
 
 	.feat-icon {
 		width: 15px;
 		height: 15px;
-		color: #ffffff;
+		color: #e5e7eb;
 		flex-shrink: 0;
 	}
 
@@ -695,15 +711,6 @@ const galleryPhotos = [
 
 	.sr-section:last-child {
 		border-bottom: none;
-	}
-
-	.section-tag {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: #0066b1;
-		letter-spacing: 0.14em;
-		margin-bottom: 8px;
 	}
 
 	.section-title {
@@ -736,67 +743,55 @@ const galleryPhotos = [
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 	}
 
-	/* 拠点共通・基本情報 */
-	.dealer-common-info {
-		margin-bottom: 32px;
-		padding-bottom: 28px;
+	/* 拠点共通・基本情報サマリーバー */
+	.dealer-summary-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px 24px;
+		margin-bottom: 24px;
+		padding-bottom: 20px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.common-info-grid {
-		display: grid;
-		grid-template-columns: 1.2fr 1.8fr 1fr;
-		gap: 24px 32px;
-		align-items: start;
-	}
-
-	.c-info-item {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
-
-	.c-info-label {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #888888;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-	}
-
-	.c-info-val {
-		font-size: 0.9375rem;
-		color: #e2e8f0;
-		line-height: 1.6;
-	}
-
-	.c-info-val--bold {
-		font-size: 1.0625rem;
+	.dealer-summary-name {
+		font-size: 1.1875rem;
 		font-weight: 700;
 		color: #ffffff;
+		letter-spacing: -0.01em;
 	}
 
-	.c-info-val .postal {
-		display: block;
-		font-size: 0.8125rem;
+	.dealer-summary-address {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		flex-wrap: wrap;
+	}
+
+	.dealer-address-text {
+		font-size: 0.875rem;
 		color: #94a3b8;
 	}
 
-	.c-info-val .link-inline-gmap {
+	.link-inline-gmap {
 		display: inline-flex;
 		align-items: center;
-		margin-top: 4px;
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: #ffffff;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		transition: opacity 0.2s ease;
+		color: #34d399;
+		background: rgba(16, 185, 129, 0.08);
+		border: 1px solid rgba(16, 185, 129, 0.25);
+		padding: 3px 10px;
+		border-radius: 4px;
+		text-decoration: none;
+		transition: all 0.2s ease;
 	}
 
-	.c-info-val .link-inline-gmap:hover {
-		opacity: 0.75;
+	.link-inline-gmap:hover {
+		background: rgba(16, 185, 129, 0.18);
+		color: #6ee7b7;
+		border-color: rgba(16, 185, 129, 0.45);
 	}
 
 	/* 窓口アコーディオンリスト */
@@ -812,7 +807,23 @@ const galleryPhotos = [
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 8px;
 		overflow: hidden;
+		scroll-margin-top: 110px;
 		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.dept-acc-item.is-targeted {
+		animation: targetGlow 1.4s ease-out;
+	}
+
+	@keyframes targetGlow {
+		0% {
+			outline: 2px solid rgba(255, 255, 255, 0.9);
+			outline-offset: 4px;
+		}
+		100% {
+			outline: 2px solid transparent;
+			outline-offset: 8px;
+		}
 	}
 
 	.dept-acc-item[open] {
@@ -845,23 +856,6 @@ const galleryPhotos = [
 		gap: 12px;
 	}
 
-	.dept-acc-badge {
-		display: inline-block;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		padding: 3px 8px;
-		border-radius: 4px;
-		background: #ffffff;
-		color: #08090a;
-	}
-
-	.dept-acc-badge--service {
-		background: rgba(255, 255, 255, 0.12);
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-	}
-
 	.dept-acc-name {
 		font-size: 1.0625rem;
 		font-weight: 700;
@@ -877,7 +871,7 @@ const galleryPhotos = [
 	}
 
 	.preview-hours {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 0.8125rem;
 		color: #888888;
 	}
@@ -958,11 +952,11 @@ const galleryPhotos = [
 	}
 
 	.gallery-counter {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 0.8125rem;
 		font-weight: 700;
 		color: #ffffff;
-		letter-spacing: 0.1em;
+		letter-spacing: 0.05em;
 		flex-shrink: 0;
 	}
 
@@ -1051,6 +1045,7 @@ const galleryPhotos = [
 		flex-direction: column;
 		align-items: flex-end;
 		gap: 2px;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	}
 
 	.d-val--bold {
@@ -1059,54 +1054,24 @@ const galleryPhotos = [
 	}
 
 	.d-tel {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 1rem;
 		font-weight: 700;
 		color: #ffffff;
 		text-decoration: none;
+		letter-spacing: 0.02em;
 	}
 
 	.d-tel:hover {
 		text-decoration: underline;
 	}
 
-	.d-sub-tel {
-		font-size: 0.75rem;
-		color: #888888;
-	}
-
-	/* MINI入庫歓迎コールアウト */
-	.mini-service-alert {
-		margin: 0 0 20px;
-		padding: 12px 14px;
-		background: rgba(255, 255, 255, 0.04);
-		border-left: 3px solid #ffffff;
-		border-radius: 4px;
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.mini-alert-badge {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		background: #ffffff;
-		color: #08090a;
-		padding: 2px 6px;
-		border-radius: 3px;
-		white-space: nowrap;
-	}
-
-	.mini-service-alert p {
-		margin: 0;
-		font-size: 0.8125rem;
-		color: #dddddd;
-		line-height: 1.45;
-	}
-
-	.mini-service-alert strong {
-		color: #ffffff;
+	.d-fax {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: #cccccc;
+		letter-spacing: 0.02em;
 	}
 
 	/* 部門ダイヤルボタン */
@@ -1117,17 +1082,19 @@ const galleryPhotos = [
 		gap: 10px;
 		width: 100%;
 		padding: 13px 18px;
-		background: #ffffff;
-		color: #08090a;
+		background: #1c69d4;
+		color: #ffffff;
 		border-radius: 6px;
 		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
+		box-shadow: 0 4px 14px rgba(28, 105, 212, 0.3);
 		transition: all 0.2s ease;
 	}
 
 	.btn-dept-call:hover {
-		background: #e0e0e0;
+		background: #1557b0;
+		box-shadow: 0 6px 18px rgba(28, 105, 212, 0.45);
 		transform: translateY(-1px);
 	}
 
@@ -1139,17 +1106,19 @@ const galleryPhotos = [
 		min-height: 18px;
 		flex-shrink: 0;
 		display: inline-block;
+		color: #ffffff;
 	}
 
 	.btn-dept-call--service {
-		background: rgba(255, 255, 255, 0.1);
+		background: #1c69d4;
 		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.25);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		box-shadow: 0 4px 14px rgba(28, 105, 212, 0.3);
 	}
 
 	.btn-dept-call--service:hover {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: #ffffff;
+		background: #1557b0;
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	/* サイドバー部門タイル */
@@ -1184,7 +1153,7 @@ const galleryPhotos = [
 	}
 
 	.sb-dept-pill {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 0.625rem;
 		font-weight: 700;
 		background: rgba(255, 255, 255, 0.1);
@@ -1218,7 +1187,7 @@ const galleryPhotos = [
 	}
 
 	.sb-dept-tel {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-weight: 700;
 		color: #ffffff;
 		text-decoration: none;
@@ -1234,18 +1203,6 @@ const galleryPhotos = [
 		margin-top: 6px;
 		padding-top: 4px;
 		border-top: 1px dashed rgba(255, 255, 255, 0.06);
-	}
-
-	.btn-sidebar-tel--service {
-		background: rgba(255, 255, 255, 0.08);
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: none;
-	}
-
-	.btn-sidebar-tel--service:hover {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: #ffffff;
 	}
 
 	.prose-content p {
@@ -1301,19 +1258,20 @@ const galleryPhotos = [
 		align-items: center;
 		gap: 8px;
 		padding: 10px 18px;
-		background: #0066b1;
+		background: #0f9d58;
 		color: #ffffff;
 		border-radius: 6px;
 		font-size: 0.875rem;
 		font-weight: 600;
 		text-decoration: none;
 		white-space: nowrap;
-		box-shadow: 0 2px 10px rgba(0, 102, 177, 0.4);
+		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.35);
 		transition: all 0.2s ease;
 	}
 
 	.btn-gmap-direct:hover {
-		background: #0077cf;
+		background: #0b8043;
+		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
 		transform: translateY(-1px);
 	}
 
@@ -1413,13 +1371,14 @@ const galleryPhotos = [
 
 	.route-tag {
 		display: inline-block;
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
 		font-weight: 700;
-		color: #38bdf8;
-		background: rgba(56, 189, 248, 0.1);
-		padding: 2px 8px;
-		border-radius: 4px;
+		color: #08090a;
+		background: #ffffff;
+		padding: 2px 7px;
+		border-radius: 2px;
 		margin-bottom: 6px;
+		letter-spacing: 0.02em;
 	}
 
 	.route-item p {
@@ -1451,11 +1410,11 @@ const galleryPhotos = [
 	}
 
 	.sidebar-label {
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 0.6875rem;
 		font-weight: 700;
 		color: #888888;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.08em;
 		display: block;
 		margin-bottom: 4px;
 	}
@@ -1486,29 +1445,36 @@ const galleryPhotos = [
 		justify-content: center;
 		gap: 8px;
 		padding: 14px 18px;
-		background: #ffffff;
-		color: #08090a;
+		background: #1c69d4;
+		color: #ffffff;
 		border-radius: 6px;
 		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
 		transition: all 0.2s ease;
 	}
 
 	.btn-sidebar-tel:hover {
-		background: #e5e7eb;
+		background: #1557b0;
+		box-shadow: 0 6px 20px rgba(28, 105, 212, 0.5);
+		transform: translateY(-1px);
+	}
+
+	.btn-sidebar-tel .btn-icon {
+		color: #ffffff;
 	}
 
 	.btn-sidebar-tel--service {
-		background: rgba(255, 255, 255, 0.08);
+		background: #1c69d4;
 		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.18);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		box-shadow: 0 4px 14px rgba(28, 105, 212, 0.3);
 	}
 
 	.btn-sidebar-tel--service:hover {
-		background: rgba(255, 255, 255, 0.16);
-		border-color: rgba(255, 255, 255, 0.35);
+		background: #1557b0;
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	.btn-sidebar-route {
@@ -1517,19 +1483,21 @@ const galleryPhotos = [
 		justify-content: center;
 		gap: 8px;
 		padding: 13px 18px;
-		background: transparent;
+		background: #0f9d58;
 		color: #ffffff;
-		border: 1px dashed rgba(255, 255, 255, 0.25);
+		border: none;
 		border-radius: 6px;
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 0.875rem;
 		text-decoration: none;
+		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.3);
 		transition: all 0.2s ease;
 	}
 
 	.btn-sidebar-route:hover {
-		background: rgba(255, 255, 255, 0.06);
-		border-color: rgba(255, 255, 255, 0.5);
+		background: #0b8043;
+		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
+		transform: translateY(-1px);
 	}
 
 	.btn-icon {
@@ -1590,7 +1558,7 @@ const galleryPhotos = [
 	.related-tel {
 		font-size: 0.75rem;
 		color: #9ca3af;
-		font-family: 'JetBrains Mono', monospace;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	}
 
 	.btn-view-all-loc {
@@ -1641,11 +1609,6 @@ const galleryPhotos = [
 		.sr-content-wrap {
 			padding: 44px 24px 70px;
 		}
-
-		.common-info-grid {
-			grid-template-columns: 1fr;
-			gap: 20px;
-		}
 	}
 
 	@media (max-width: 768px) {
@@ -1688,8 +1651,18 @@ const galleryPhotos = [
 		}
 
 		.feat-pill {
-			padding: 7px 12px;
+			padding: 6px 11px;
 			font-size: 0.75rem;
+			gap: 7px;
+		}
+
+		.feat-brand-logo--bmw {
+			width: 16px;
+			height: 16px;
+		}
+
+		.feat-brand-logo--mini {
+			height: 11px;
 		}
 
 		.sr-content-wrap {
@@ -1701,14 +1674,18 @@ const galleryPhotos = [
 			border-radius: 10px;
 		}
 
-		.common-info-grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
+		.dealer-summary-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 18px;
+			padding-bottom: 14px;
 		}
 
-		.dealer-common-info {
-			margin-bottom: 22px;
-			padding-bottom: 18px;
+		.dealer-summary-address {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
 		}
 
 		.dept-acc-header {
@@ -1795,6 +1772,29 @@ const galleryPhotos = [
 		.btn-gmap-direct {
 			justify-content: center;
 		}
+	}
+
+	/* 本社管理オフィス併設に関するご案内 */
+	.sidebar-office-notice {
+		margin-top: 16px;
+		padding: 12px 14px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px dashed rgba(255, 255, 255, 0.12);
+		border-radius: 4px;
+	}
+	.sidebar-office-notice__badge {
+		display: block;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 4px;
+	}
+	.sidebar-office-notice__text {
+		font-size: 11px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.45);
+		margin: 0;
 	}
 
 	@media (max-width: 480px) {

@@ -230,6 +230,155 @@
 					"required": false
 				}
 			]
+		},
+		{
+			"slug": "locations",
+			"label": "拠点一覧",
+			"labelSingular": "拠点情報",
+			"description": "ショールーム・サービス工場・認定中古車等の拠点管理コレクション",
+			"urlPattern": "/location/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"commentsEnabled": false,
+			"fields": [
+				{
+					"slug": "title",
+					"label": "拠点名称",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "brand",
+					"label": "主要ブランド",
+					"type": "select",
+					"required": true,
+					"options": [
+						{ "label": "BMW", "value": "BMW" },
+						{ "label": "MINI", "value": "MINI" },
+						{ "label": "Rolls-Royce", "value": "Rolls-Royce" },
+						{ "label": "Ferrari", "value": "Ferrari" },
+						{ "label": "ALPINA", "value": "ALPINA" },
+						{ "label": "Nicole (グループ本社)", "value": "Nicole" }
+					]
+				},
+				{
+					"slug": "facility_type",
+					"label": "拠点区分",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "postal",
+					"label": "郵便番号",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "address",
+					"label": "所在地住所",
+					"type": "string",
+					"required": false,
+					"searchable": true
+				},
+				{
+					"slug": "tel",
+					"label": "代表TEL",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "fax",
+					"label": "代表FAX",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "google_maps_url",
+					"label": "GoogleマップURL",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "featured_image",
+					"label": "メイン外観写真",
+					"type": "image",
+					"required": false
+				},
+				{
+					"slug": "badges",
+					"label": "上部ナビバッジ (JSON)",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "concept_title",
+					"label": "コンセプト見出し",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "concept_text",
+					"label": "コンセプト説明文",
+					"type": "text",
+					"required": false,
+					"searchable": true
+				},
+				{
+					"slug": "departments",
+					"label": "窓口アコーディオン情報 (JSON)",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "related_hub_title",
+					"label": "同一敷地・姉妹拠点 リンク見出し",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "related_hub_url",
+					"label": "同一敷地・姉妹拠点 リンクURL",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "related_hub_desc",
+					"label": "同一敷地・姉妹拠点 案内文",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "access_car_tokyo",
+					"label": "車アクセス（東京方面より）",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "access_car_yokohama",
+					"label": "車アクセス（横浜方面より）",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "access_train",
+					"label": "電車・バスでお越しの方",
+					"type": "text",
+					"required": false
+				},
+				{
+					"slug": "access_taxi",
+					"label": "タクシーをご利用の場合",
+					"type": "text",
+					"required": false
+				}
+			]
 		}
 	],
 	"taxonomies": [

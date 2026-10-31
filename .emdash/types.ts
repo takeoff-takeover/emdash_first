@@ -3,17 +3,30 @@
 
 import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
 
-export interface Magazine {
+export interface Location {
   id: string;
   slug: string | null;
   status: string;
   title: string;
+  brand: string;
+  facility_type?: string;
+  postal?: string;
+  address?: string;
+  tel?: string;
+  fax?: string;
+  google_maps_url?: string;
   featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
-  featured_image_sp?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
-  content?: PortableTextBlock[];
-  excerpt?: string;
-  related_location?: string;
-  notes?: string;
+  badges?: string;
+  concept_title?: string;
+  concept_text?: string;
+  departments?: string;
+  related_hub_title?: string;
+  related_hub_url?: string;
+  related_hub_desc?: string;
+  access_car_tokyo?: string;
+  access_car_yokohama?: string;
+  access_train?: string;
+  access_taxi?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

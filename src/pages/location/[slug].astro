@@ -1,0 +1,1941 @@
+---
+// src/pages/location/[slug].astro
+// 拠点詳細動的テンプレート（ショールーム・サービス工場・認定中古車の複合対応）
+import { getEmDashEntry, decodeSlug } from "emdash";
+import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
+
+const slug = decodeSlug(Astro.params.slug);
+
+if (!slug) {
+	return Astro.rewrite("/404");
+}
+
+let loc: any = null;
+
+// 1. EmDash API から取得
+try {
+	const res = await getEmDashEntry("locations" as any, slug);
+	if (res?.entry) {
+		loc = res.entry;
+	}
+} catch (e) {}
+
+// 2. フォールバック: D1 SQLite ローカル直参照
+if (!loc) {
+	try {
+		const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
+		if (fs.existsSync(DB_PATH)) {
+			const db = new DatabaseSync(DB_PATH);
+			const row = db.prepare('SELECT * FROM ec_locations WHERE slug = ? AND (status = "published" OR status = "draft")').get(slug) as any;
+			if (row) {
+				loc = row;
+			}
+		}
+	} catch (e) {
+		console.error("D1 SQLite fallback query error:", e);
+	}
+}
+
+if (!loc) {
+	return Astro.rewrite("/404");
+}
+
+// EmDash entry の場合は entry.data にフィールドが格納されるため正規化
+const d = loc.data || loc;
+
+// データの安全なパース
+const parseJson = (val: any, fallback: any) => {
+	if (!val) return fallback;
+	if (typeof val === 'object') return val;
+	try {
+		return JSON.parse(val);
+	} catch (e) {
+		return fallback;
+	}
+};
+
+const featuredImageObj = parseJson(d.featured_image, null);
+const featuredImageSrc = featuredImageObj?.src || (typeof d.featured_image === 'string' ? d.featured_image : '/uploads/2026/01/Nicole-BMW-本社.jpg');
+const featuredImageAlt = featuredImageObj?.alt || d.title;
+
+// 1. ギャラリー写真6点（個別フィールド gallery_image_1 〜 6 を優先、なければ従来の gallery JSON）
+const customGallery: Array<{ src: string; caption?: string; alt?: string }> = [];
+for (let i = 1; i <= 6; i++) {
+	const imgVal = d[`gallery_image_${i}`];
+	const capVal = d[`gallery_caption_${i}`];
+	if (imgVal) {
+		const parsed = parseJson(imgVal, null);
+		const src = parsed?.src || (typeof imgVal === 'string' ? imgVal : '');
+		const alt = parsed?.alt || capVal || `${d.title} 外観写真 ${i}`;
+		if (src) {
+			customGallery.push({ src, caption: capVal || '', alt });
+		}
+	}
+}
+
+const galleryList: Array<{ src: string; caption?: string; alt?: string }> = customGallery.length > 0
+	? customGallery
+	: parseJson(d.gallery, [
+		{ src: featuredImageSrc, caption: `${d.title} 外観`, alt: d.title }
+	]);
+
+// 2. 部門窓口リスト（個別フィールド sales_*, used_*, service_* を優先、なければ従来の departments JSON）
+const customDepartments: Array<{
+	id: string;
+	brand: string;
+	type: 'sales' | 'used' | 'service';
+	title: string;
+	subtitle?: string;
+	tel?: string;
+	hours?: string;
+	closed?: string;
+	desc?: string;
+	ctaLabel?: string;
+	ctaUrl?: string;
+}> = [];
+
+// 新車部門
+if (d.sales_title || (d.sales_enabled !== '0' && (d.sales_tel || d.tel))) {
+	customDepartments.push({
+		id: 'dept-sales',
+		brand: d.brand || 'BMW',
+		type: 'sales',
+		title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
+		subtitle: d.title,
+		tel: d.sales_tel || d.tel || '',
+		hours: d.sales_hours || '10:00 〜 18:00',
+		closed: d.sales_closed || '水曜日（祝日を除く）',
+		desc: d.sales_desc || '',
+		ctaLabel: d.sales_cta_label || '試乗・来場予約',
+		ctaUrl: d.sales_cta_url || ''
+	});
+}
+
+// 認定中古車部門
+if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
+	customDepartments.push({
+		id: 'dept-used',
+		brand: d.brand || 'BMW',
+		type: 'used',
+		title: d.used_title,
+		subtitle: d.title,
+		tel: d.used_tel || d.tel || '',
+		hours: d.used_hours || '10:00 〜 18:00',
+		closed: d.used_closed || '水曜日（祝日を除く）',
+		desc: d.used_desc || '',
+		ctaLabel: d.used_cta_label || '認定中古車を見る',
+		ctaUrl: d.used_cta_url || ''
+	});
+}
+
+// サービス整備部門
+if (d.service_title || (d.service_enabled !== '0' && (d.service_tel || d.tel))) {
+	customDepartments.push({
+		id: 'dept-service',
+		brand: d.brand || 'BMW',
+		type: 'service',
+		title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
+		subtitle: d.title,
+		tel: d.service_tel || d.tel || '',
+		hours: d.service_hours || '09:00 〜 18:00',
+		closed: d.service_closed || '水曜日（祝日を除く）',
+		desc: d.service_desc || '',
+		ctaLabel: d.service_cta_label || 'サービス入庫予約',
+		ctaUrl: d.service_cta_url || ''
+	});
+}
+
+const departmentsList: Array<{
+	id?: string;
+	brand?: string;
+	type?: string;
+	title: string;
+	subtitle?: string;
+	tel?: string;
+	fax?: string;
+	hours?: string;
+	closed?: string;
+	desc?: string;
+	ctaLabel?: string;
+	ctaUrl?: string;
+}> = customDepartments.length > 0 ? customDepartments : parseJson(d.departments, [
+	{
+		id: 'dept-0',
+		brand: d.brand || 'BMW',
+		title: `${d.brand || 'BMW'} ショールーム`,
+		subtitle: d.title,
+		tel: d.tel || '',
+		fax: d.fax || '',
+		hours: '10:00 - 18:00',
+		closed: '水曜日（祝日を除く）',
+		desc: '最新モデルを展示。専門スタッフが丁寧にご案内いたします。'
+	}
+]);
+
+// 3. 上部ステータスピルバッジ
+const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = customDepartments.length > 0
+	? customDepartments.map(dept => {
+		let label = '新車販売';
+		if (dept.type === 'used') label = '認定中古車';
+		if (dept.type === 'service') label = '車検・整備工場';
+		return {
+			brand: dept.brand,
+			label: `${dept.brand} ${label}`,
+			targetId: dept.id
+		};
+	})
+	: parseJson(d.badges, [
+		{ brand: d.brand || 'BMW', label: `${d.brand || 'BMW'} 新車`, targetId: 'dept-0' }
+	]);
+
+const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`;
+---
+
+<NicoleLayout
+	title={`${d.title}｜正規ディーラー｜Nicole Group`}
+	description={`${d.title}の店舗情報。住所: ${d.postal || ''} ${d.address || ''}、電話番号: ${d.tel || ''}。新車・認定中古車・車検整備・サービス工場の詳細をご案内します。`}
+>
+	<div class="showroom-page">
+		<!-- ヒーローヘッダー -->
+		<header class="sr-hero">
+			<div class="sr-hero__media">
+				<img src={featuredImageSrc} alt={featuredImageAlt} class="sr-hero__img" />
+				<div class="sr-hero__overlay"></div>
+			</div>
+
+			<div class="sr-hero__content">
+				<h1 class="sr-hero__title">
+					{d.title}
+				</h1>
+
+				<div class="sr-hero__actions">
+					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--primary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+						ルート案内
+					</a>
+					<a href="#departments" class="btn-hero btn-hero--secondary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+						電話・窓口情報
+					</a>
+				</div>
+			</div>
+		</header>
+
+		<!-- 拠点提供サービス・機能ステータスバー（ヒーロー直下） -->
+		{badgesList && badgesList.length > 0 && (
+			<section class="facility-feature-bar" aria-label="店舗機能・取扱サービス">
+				<div class="facility-feature-container">
+					<div class="facility-feature-list">
+						{badgesList.map((badge, idx) => {
+							const brandLower = (badge.brand || 'bmw').toLowerCase();
+							const logoSrc = brandLower === 'mini' ? '/brands/mini.svg' : '/brands/bmw.svg';
+							const isMini = brandLower === 'mini';
+							const targetAccId = badge.targetId || (departmentsList[idx]?.id || `dept-${idx}`);
+							return (
+								<a href={`#${targetAccId}`} class={`feat-pill ${isMini ? 'feat-pill--mini' : ''}`} data-dept-target={targetAccId}>
+									<img src={logoSrc} alt={badge.brand || 'Brand'} class={`feat-brand-logo feat-brand-logo--${isMini ? 'mini' : 'bmw'}`} />
+									<span class="feat-label">{badge.label}</span>
+								</a>
+							);
+						})}
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- メインコンテンツグリッド -->
+		<div class="sr-content-wrap">
+			<div class="sr-layout-grid">
+				<!-- 左側：メイン詳細コンテンツ -->
+				<div class="sr-main-col">
+					<!-- 同一敷地内 姉妹拠点カード（新百合ヶ丘など複合拠点で表示） -->
+					{d.related_hub_url && (
+						<div class="related-hub-banner">
+							<div class="related-hub-banner__icon">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hub-icon"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+							</div>
+							<div class="related-hub-banner__body">
+								<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
+								<h3 class="related-hub-banner__title">{d.related_hub_title}</h3>
+								{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
+							</div>
+							<div class="related-hub-banner__action">
+								<a href={d.related_hub_url} class="btn-hub-link">
+									詳細を見る
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-icon"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+								</a>
+							</div>
+						</div>
+					)}
+
+					<!-- ショールームコンセプト（デスクトップで表示） -->
+					{(d.concept_title || d.concept_text) && (
+						<section class="sr-section sr-section--concept">
+							{d.concept_title && <h2 class="section-title">{d.concept_title}</h2>}
+							{d.concept_text && (
+								<div class="prose-content">
+									{d.concept_text.split('\n\n').map((paragraph: string) => (
+										<p>{paragraph}</p>
+									))}
+								</div>
+							)}
+						</section>
+					)}
+
+					<!-- 写真ギャラリー（大写真1点 + サムネイル） -->
+					{galleryList && galleryList.length > 0 && (
+						<section class="sr-section sr-section--gallery">
+							<div class="gallery-container">
+								<div class="gallery-main-frame">
+									<img
+										id="gallery-main-img"
+										src={galleryList[0].src}
+										alt={galleryList[0].alt || galleryList[0].caption || d.title}
+										class="gallery-main-img"
+									/>
+									<div class="gallery-info-bar">
+										<span id="gallery-counter" class="gallery-counter">01 / {String(galleryList.length).padStart(2, '0')}</span>
+										<span id="gallery-caption" class="gallery-caption">{galleryList[0].caption || ''}</span>
+									</div>
+								</div>
+								{galleryList.length > 1 && (
+									<div class="gallery-thumbs-grid" role="tablist" aria-label="店舗写真サムネイル">
+										{galleryList.map((photo, idx) => (
+											<button
+												type="button"
+												class={`gallery-thumb-btn ${idx === 0 ? 'is-active' : ''}`}
+												data-src={photo.src}
+												data-alt={photo.alt || photo.caption || ''}
+												data-caption={photo.caption || ''}
+												data-idx={idx}
+												aria-label={`写真 ${idx + 1}`}
+											>
+												<img src={photo.src} alt={photo.alt || photo.caption || ''} class="gallery-thumb-img" loading="lazy" />
+											</button>
+										))}
+									</div>
+								)}
+							</div>
+						</section>
+					)}
+
+					<!-- 店舗・窓口情報（基本情報 ＋ 各部門窓口アコーディオン） -->
+					<section class="sr-section sr-section--depts" id="departments">
+						<h2 class="section-title">店舗・窓口情報</h2>
+
+						<div class="dealer-info-card">
+							<!-- 拠点共通・基本情報バー -->
+							<div class="dealer-summary-bar">
+								<div class="dealer-summary-name">
+									{d.title}
+								</div>
+								<div class="dealer-summary-address">
+									<span class="dealer-address-text">{d.postal} {d.address}</span>
+									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
+										Googleマップ ↗
+									</a>
+								</div>
+							</div>
+
+							<!-- 各部門アコーディオン -->
+							<div class="dept-accordion-list" role="region" aria-label="店舗窓口一覧">
+								{departmentsList.map((dept, idx) => {
+									const deptId = dept.id || `dept-${idx}`;
+									const isDefaultOpen = idx === 0;
+									return (
+										<details class="dept-acc-item" id={deptId} open={isDefaultOpen}>
+											<summary class="dept-acc-header">
+												<div class="dept-acc-title-group">
+													<h3 class="dept-acc-name">{dept.title}</h3>
+												</div>
+												<div class="dept-acc-meta-preview">
+													{dept.hours && <span class="preview-hours">{dept.hours}</span>}
+													<svg class="dept-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+												</div>
+											</summary>
+											<div class="dept-acc-body">
+												<div class="dept-compact-table">
+													{dept.subtitle && (
+														<div class="dept-table-row">
+															<span class="d-label">部門名</span>
+															<span class="d-val d-val--bold">{dept.subtitle}</span>
+														</div>
+													)}
+													{dept.tel && (
+														<div class="dept-table-row">
+															<span class="d-label">TEL</span>
+															<div class="d-val">
+																<a href={`tel:${dept.tel}`} class="d-tel">{dept.tel}</a>
+															</div>
+														</div>
+													)}
+													{dept.fax && (
+														<div class="dept-table-row">
+															<span class="d-label">FAX</span>
+															<span class="d-val d-fax">{dept.fax}</span>
+														</div>
+													)}
+													{dept.hours && (
+														<div class="dept-table-row">
+															<span class="d-label">営業時間</span>
+															<span class="d-val">{dept.hours}</span>
+														</div>
+													)}
+													{dept.closed && (
+														<div class="dept-table-row">
+															<span class="d-label">定休日</span>
+															<span class="d-val">{dept.closed}</span>
+														</div>
+													)}
+													{dept.desc && (
+														<div class="dept-table-row">
+															<span class="d-label">案内</span>
+															<span class="d-val d-val--desc">{dept.desc}</span>
+														</div>
+													)}
+												</div>
+
+												<div class="dept-card__actions">
+													{dept.tel && (
+														<a href={`tel:${dept.tel}`} class="btn-dept-call">
+															<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="act-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+															電話：{dept.tel}
+														</a>
+													)}
+													{dept.ctaUrl && (
+														<a href={dept.ctaUrl} target="_blank" rel="noopener noreferrer" class="btn-dept-cta">
+															{dept.ctaLabel || 'Web予約・お問い合わせ'} ↗
+														</a>
+													)}
+												</div>
+											</div>
+										</details>
+									);
+								})}
+							</div>
+						</div>
+					</section>
+
+					<!-- アクセス案内セクション -->
+					<section class="sr-section" id="access">
+						<h2 class="section-title">アクセス</h2>
+						<p class="section-desc">お車・公共交通機関でのアクセスルートをご案内いたします。</p>
+
+						<!-- Googleマップ インタラクティブ埋め込み -->
+						<div class="map-container-box">
+							<iframe
+								src={`https://maps.google.com/maps?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+								width="100%"
+								height="440"
+								style="border:0; filter: contrast(1.05) saturate(0.9);"
+								allowfullscreen=""
+								loading="lazy"
+								referrerpolicy="no-referrer-when-downgrade"
+								title={`${d.title} Googleマップ`}
+								class="embedded-gmap"
+							></iframe>
+
+							<!-- 地図下フローティング連携バー -->
+							<div class="map-floating-bar">
+								<div class="map-floating-bar__info">
+									<strong>{d.title}</strong>
+									<span>{d.postal} {d.address}</span>
+								</div>
+								<div class="map-floating-bar__btns">
+									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-gmap-direct">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-svg"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+										Google Maps で経路案内を開く
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- アクセスルート詳細（アコーディオン） -->
+						<div class="access-accordion-list" role="region" aria-label="アクセス方法一覧">
+							<!-- 1. お車でお越しの方 -->
+							{(d.access_car || d.access_car_tokyo || d.access_car_yokohama) && (
+								<details class="access-acc-item" open>
+									<summary class="access-acc-header">
+										<div class="access-acc-title-group">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="access-acc-icon"><rect width="16" height="10" x="4" y="5" rx="2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>
+											<h3 class="access-acc-title">お車でお越しの方</h3>
+										</div>
+										<svg class="access-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+									</summary>
+									<div class="access-acc-body">
+										{d.access_car ? (
+											<div class="route-item">
+												<span class="route-tag">お車でのアクセスルート</span>
+												<div class="route-text">
+													{d.access_car.split('\n').map((line: string) => (
+														<p>{line}</p>
+													))}
+												</div>
+											</div>
+										) : (
+											<>
+												{d.access_car_tokyo && (
+													<div class="route-item">
+														<span class="route-tag">東京・主要方面より</span>
+														<p>{d.access_car_tokyo}</p>
+													</div>
+												)}
+												{d.access_car_yokohama && (
+													<div class="route-item">
+														<span class="route-tag">横浜・近隣方面より</span>
+														<p>{d.access_car_yokohama}</p>
+													</div>
+												)}
+											</>
+										)}
+									</div>
+								</details>
+							)}
+
+							<!-- 2. 電車・バスでお越しの方 -->
+							{(d.access_train || d.access_taxi) && (
+								<details class="access-acc-item">
+									<summary class="access-acc-header">
+										<div class="access-acc-title-group">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="access-acc-icon"><rect width="18" height="14" x="3" y="4" rx="2"/><line x1="3" x2="21" y1="10" y2="10"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/></svg>
+											<h3 class="access-acc-title">電車・バス・タクシーでお越しの方</h3>
+										</div>
+										<svg class="access-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+									</summary>
+									<div class="access-acc-body">
+										{d.access_train && (
+											<div class="route-item">
+												<span class="route-tag">最寄り駅・バスでお越しの場合</span>
+												<p>{d.access_train}</p>
+											</div>
+										)}
+										{d.access_taxi && (
+											<div class="route-item">
+												<span class="route-tag">タクシーをご利用の場合</span>
+												<p>{d.access_taxi}</p>
+											</div>
+										)}
+									</div>
+								</details>
+							)}
+						</div>
+					</section>
+				</div>
+
+				<!-- 右側：スティッキー店舗情報サイドバー -->
+				<aside class="sr-sidebar">
+					<div class="sidebar-card">
+						<div class="sidebar-header">
+							<span class="sidebar-label">DIRECT CONTACT</span>
+							<h3 class="sidebar-title">直通窓口・ご案内</h3>
+						</div>
+
+						<p class="sidebar-desc">ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。</p>
+
+						<!-- コンタクトボタン（用途別） -->
+						<div class="sidebar-cta">
+							{departmentsList.map((dept) => {
+								if (!dept.tel) return null;
+								return (
+									<a href={`tel:${dept.tel}`} class="btn-sidebar-tel">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+										{dept.title}：{dept.tel}
+									</a>
+								);
+							})}
+							<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-sidebar-route">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+								Googleマップでナビ開始
+							</a>
+						</div>
+
+						<!-- 本社管理オフィス併設等の注記（存在する場合） -->
+						{d.office_notice && (
+							<div class="sidebar-office-notice">
+								<span class="sidebar-office-notice__badge">※管理オフィス併設について</span>
+								<p class="sidebar-office-notice__text">
+									{d.office_notice}
+								</p>
+							</div>
+						)}
+
+						<!-- 同一敷地内 併設拠点へのサイドバー案内（存在する場合） -->
+						{d.related_hub_url && (
+							<div class="sidebar-related-hub">
+								<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
+								<h4 class="sidebar-related-hub__title">{d.related_hub_title}</h4>
+								<a href={d.related_hub_url} class="sidebar-related-hub__link">
+									併設拠点の詳細を見る ↗
+								</a>
+							</div>
+						)}
+					</div>
+
+					<a href="/locations" class="btn-view-all-loc">
+						← 拠点一覧に戻る
+					</a>
+				</aside>
+			</div>
+		</div>
+	</div>
+
+	<!-- インタラクティブ スクリプト（ギャラリー & 上部バッジ連動） -->
+	<script is:inline>
+		document.addEventListener('DOMContentLoaded', () => {
+			// ギャラリーサムネイル切り替え
+			const thumbBtns = document.querySelectorAll('.gallery-thumb-btn');
+			const mainImg = document.getElementById('gallery-main-img');
+			const counterEl = document.getElementById('gallery-counter');
+			const captionEl = document.getElementById('gallery-caption');
+			const totalCount = String(thumbBtns.length).padStart(2, '0');
+
+			thumbBtns.forEach((btn, index) => {
+				btn.addEventListener('click', () => {
+					thumbBtns.forEach((b) => b.classList.remove('is-active'));
+					btn.classList.add('is-active');
+
+					const src = btn.getAttribute('data-src');
+					const alt = btn.getAttribute('data-alt');
+					const caption = btn.getAttribute('data-caption');
+
+					if (mainImg && src) {
+						mainImg.setAttribute('src', src);
+						mainImg.setAttribute('alt', alt || '');
+					}
+					if (counterEl) {
+						counterEl.textContent = `${String(index + 1).padStart(2, '0')} / ${totalCount}`;
+					}
+					if (captionEl) {
+						captionEl.textContent = caption || '';
+					}
+				});
+			});
+
+			// 上部ステータスバー クリック連動（該当アコーディオンを開いてスクロール）
+			const deptPills = document.querySelectorAll('[data-dept-target]');
+			deptPills.forEach((pill) => {
+				pill.addEventListener('click', (e) => {
+					e.preventDefault();
+					const targetId = pill.getAttribute('data-dept-target');
+					if (!targetId) return;
+
+					const targetAcc = document.getElementById(targetId);
+					if (targetAcc) {
+						targetAcc.open = true;
+						targetAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+						flashHighlight(targetAcc);
+					}
+				});
+			});
+
+			function flashHighlight(el) {
+				el.classList.remove('is-targeted');
+				void el.offsetWidth;
+				el.classList.add('is-targeted');
+				setTimeout(() => {
+					el.classList.remove('is-targeted');
+				}, 1600);
+			}
+		});
+	</script>
+</NicoleLayout>
+
+<style>
+	.showroom-page {
+		background: #08090a;
+		color: #e5e5e5;
+		min-height: 100vh;
+		font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+	}
+
+	/* ヒーローセクション */
+	.sr-hero {
+		position: relative;
+		min-height: 440px;
+		display: flex;
+		align-items: flex-end;
+		padding: 70px 0;
+		overflow: hidden;
+		background: #08090a;
+	}
+
+	.sr-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+	}
+
+	.sr-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: brightness(0.65);
+		transform: scale(1.02);
+	}
+
+	.sr-hero__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(8, 9, 10, 0.2) 0%, rgba(8, 9, 10, 0.7) 60%, #08090a 100%);
+	}
+
+	.sr-hero__content {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
+
+	.sr-hero__title {
+		font-size: clamp(2rem, 4.5vw, 3.25rem);
+		font-weight: 800;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		line-height: 1.15;
+		margin: 0;
+	}
+
+	.sr-hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 24px;
+	}
+
+	.btn-hero {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 13px 24px;
+		border-radius: 6px;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.btn-hero--primary {
+		background: #ffffff;
+		color: #08090a;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	}
+
+	.btn-hero--primary:hover {
+		background: #e5e7eb;
+		transform: translateY(-1px);
+	}
+
+	.btn-hero--secondary {
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		backdrop-filter: blur(8px);
+	}
+
+	.btn-hero--secondary:hover {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: rgba(255, 255, 255, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.btn-hero-icon {
+		width: 17px;
+		height: 17px;
+	}
+
+	/* 拠点提供サービス・機能ステータスバー（ヒーロー直下） */
+	.facility-feature-bar {
+		background: #0d0f12;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 16px 0;
+	}
+
+	.facility-feature-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
+
+	.facility-feature-list {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 10px;
+		overflow-x: auto;
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.facility-feature-list::-webkit-scrollbar {
+		display: none;
+	}
+
+	.feat-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		padding: 7px 14px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: #e5e7eb;
+		white-space: nowrap;
+		flex-shrink: 0;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.feat-pill:hover {
+		background: rgba(255, 255, 255, 0.09);
+		border-color: rgba(255, 255, 255, 0.25);
+		color: #ffffff;
+	}
+
+	.feat-pill--mini {
+		background: rgba(255, 255, 255, 0.07);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.feat-brand-logo {
+		display: inline-block;
+		object-fit: contain;
+		flex-shrink: 0;
+	}
+
+	.feat-brand-logo--bmw {
+		width: 18px;
+		height: 18px;
+	}
+
+	.feat-brand-logo--mini {
+		height: 12px;
+		width: auto;
+	}
+
+	/* メインレイアウト */
+	.sr-content-wrap {
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 56px 40px 80px;
+	}
+
+	.sr-layout-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 380px;
+		gap: 48px;
+		align-items: start;
+	}
+
+	/* 同一敷地内 姉妹拠点バナー */
+	.related-hub-banner {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 20px 24px;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 10px;
+		margin-bottom: 40px;
+	}
+
+	.related-hub-banner__icon {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.08);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.hub-icon {
+		width: 22px;
+		height: 22px;
+		color: #ffffff;
+	}
+
+	.related-hub-banner__body {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.related-hub-banner__tag {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		color: #888888;
+		letter-spacing: 0.06em;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.related-hub-banner__title {
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 4px;
+	}
+
+	.related-hub-banner__desc {
+		font-size: 0.8125rem;
+		color: #aaaaaa;
+		line-height: 1.5;
+		margin: 0;
+	}
+
+	.btn-hub-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 10px 18px;
+		background: #ffffff;
+		color: #08090a;
+		border-radius: 6px;
+		font-size: 0.875rem;
+		font-weight: 700;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: all 0.2s ease;
+	}
+
+	.btn-hub-link:hover {
+		background: #e5e7eb;
+		transform: translateX(2px);
+	}
+
+	.arrow-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* セクション共通 */
+	.sr-section {
+		margin-bottom: 64px;
+		padding-bottom: 56px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.sr-section:last-child {
+		border-bottom: none;
+	}
+
+	.section-title {
+		font-size: clamp(1.5rem, 2.8vw, 2rem);
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		margin: 0 0 16px;
+		line-height: 1.3;
+	}
+
+	.section-desc {
+		font-size: 0.9375rem;
+		color: #a0a0a0;
+		line-height: 1.6;
+		margin: 0 0 28px;
+	}
+
+	.prose-content p {
+		font-size: 1rem;
+		line-height: 1.85;
+		color: #cccccc;
+		margin: 0 0 20px;
+	}
+
+	/* 写真ギャラリー */
+	.sr-section--gallery {
+		margin-bottom: 48px;
+		padding-bottom: 40px;
+	}
+
+	.gallery-container {
+		background: transparent;
+		border: none;
+		padding: 0;
+	}
+
+	.gallery-main-frame {
+		position: relative;
+		height: 420px;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #08090a;
+		margin-bottom: 12px;
+	}
+
+	.gallery-main-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: opacity 0.3s ease;
+	}
+
+	.gallery-info-bar {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 14px 20px;
+		background: linear-gradient(180deg, transparent 0%, rgba(8, 9, 10, 0.85) 40%, rgba(8, 9, 10, 0.96) 100%);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.gallery-counter {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: 0.05em;
+		flex-shrink: 0;
+	}
+
+	.gallery-caption {
+		margin: 0;
+		font-size: 0.875rem;
+		color: #cccccc;
+		line-height: 1.4;
+		text-align: right;
+	}
+
+	.gallery-thumbs-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+		gap: 10px;
+	}
+
+	.gallery-thumb-btn {
+		appearance: none;
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+		padding: 0;
+		overflow: hidden;
+		height: 68px;
+		cursor: pointer;
+		opacity: 0.55;
+		transition: all 0.2s ease;
+	}
+
+	.gallery-thumb-btn:hover {
+		opacity: 0.85;
+		border-color: rgba(255, 255, 255, 0.4);
+	}
+
+	.gallery-thumb-btn.is-active {
+		opacity: 1;
+		border: 2px solid #ffffff;
+		box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+	}
+
+	.gallery-thumb-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	/* 店舗・窓口情報 統合カード */
+	.sr-section--depts {
+		margin-bottom: 64px;
+		padding-bottom: 56px;
+	}
+
+	.dealer-info-card {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 36px 36px 32px;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+	}
+
+	.dealer-summary-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px 24px;
+		margin-bottom: 24px;
+		padding-bottom: 20px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.dealer-summary-name {
+		font-size: 1.1875rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+	}
+
+	.dealer-summary-address {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		flex-wrap: wrap;
+	}
+
+	.dealer-address-text {
+		font-size: 0.875rem;
+		color: #94a3b8;
+	}
+
+	.link-inline-gmap {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: #34d399;
+		background: rgba(16, 185, 129, 0.08);
+		border: 1px solid rgba(16, 185, 129, 0.25);
+		padding: 3px 10px;
+		border-radius: 4px;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.link-inline-gmap:hover {
+		background: rgba(16, 185, 129, 0.18);
+		color: #6ee7b7;
+		border-color: rgba(16, 185, 129, 0.45);
+	}
+
+	/* 窓口アコーディオンリスト */
+	.dept-accordion-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		margin-top: 6px;
+	}
+
+	.dept-acc-item {
+		background: #0d0f12;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		overflow: hidden;
+		scroll-margin-top: 110px;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.dept-acc-item.is-targeted {
+		animation: targetGlow 1.4s ease-out;
+	}
+
+	@keyframes targetGlow {
+		0% {
+			outline: 2px solid rgba(255, 255, 255, 0.9);
+			outline-offset: 4px;
+		}
+		100% {
+			outline: 2px solid transparent;
+			outline-offset: 8px;
+		}
+	}
+
+	.dept-acc-item[open] {
+		background: #14161b;
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	.dept-acc-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 18px 22px;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s ease;
+	}
+
+	.dept-acc-header::-webkit-details-marker {
+		display: none;
+	}
+
+	.dept-acc-header:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.dept-acc-title-group {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.dept-acc-name {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.dept-acc-meta-preview {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.preview-hours {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.8125rem;
+		color: #888888;
+	}
+
+	.dept-acc-chevron {
+		width: 18px;
+		height: 18px;
+		color: #888888;
+		transition: transform 0.25s ease, color 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.dept-acc-item[open] .dept-acc-chevron {
+		transform: rotate(180deg);
+		color: #ffffff;
+	}
+
+	.dept-acc-body {
+		padding: 0 22px 22px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		margin-top: 4px;
+		padding-top: 20px;
+		animation: accFadeIn 0.2s ease;
+	}
+
+	@keyframes accFadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.dept-compact-table {
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 8px;
+		padding: 14px 18px;
+		margin-bottom: 20px;
+	}
+
+	.dept-table-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		padding: 10px 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		font-size: 0.875rem;
+	}
+
+	.dept-table-row:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.dept-table-row:first-child {
+		padding-top: 0;
+	}
+
+	.d-label {
+		color: #777777;
+		font-weight: 500;
+		width: 100px;
+		flex-shrink: 0;
+	}
+
+	.d-val {
+		color: #e0e0e0;
+		text-align: right;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 2px;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	}
+
+	.d-val--bold {
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.d-val--desc {
+		font-family: inherit;
+		line-height: 1.5;
+		color: #bbbbbb;
+		font-size: 0.8125rem;
+	}
+
+	.d-tel {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #ffffff;
+		text-decoration: none;
+		letter-spacing: 0.02em;
+	}
+
+	.d-tel:hover {
+		text-decoration: underline;
+	}
+
+	.d-fax {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: #cccccc;
+		letter-spacing: 0.02em;
+	}
+
+	/* 部門アクションボタン */
+	.dept-card__actions {
+		display: flex;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.btn-dept-call {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		flex: 1;
+		min-width: 200px;
+		padding: 13px 18px;
+		background: #1c69d4;
+		color: #ffffff;
+		border-radius: 6px;
+		font-weight: 700;
+		font-size: 0.9375rem;
+		text-decoration: none;
+		box-shadow: 0 4px 14px rgba(28, 105, 212, 0.3);
+		transition: all 0.2s ease;
+	}
+
+	.btn-dept-call:hover {
+		background: #1557b0;
+		box-shadow: 0 6px 18px rgba(28, 105, 212, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.btn-dept-call .act-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
+
+	.btn-dept-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 13px 20px;
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.875rem;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.btn-dept-cta:hover {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: rgba(255, 255, 255, 0.35);
+	}
+
+	/* マップコンテナボックス */
+	.map-container-box {
+		position: relative;
+		border-radius: 12px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		margin-bottom: 32px;
+		background: #111317;
+	}
+
+	.embedded-gmap {
+		display: block;
+	}
+
+	.map-floating-bar {
+		position: absolute;
+		bottom: 16px;
+		left: 16px;
+		right: 16px;
+		background: rgba(13, 15, 18, 0.92);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 8px;
+		padding: 14px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.map-floating-bar__info strong {
+		display: block;
+		font-size: 0.9375rem;
+		color: #ffffff;
+	}
+
+	.map-floating-bar__info span {
+		font-size: 0.8125rem;
+		color: #999999;
+	}
+
+	.btn-gmap-direct {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 18px;
+		background: #0f9d58;
+		color: #ffffff;
+		border-radius: 6px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.35);
+		transition: all 0.2s ease;
+	}
+
+	.btn-gmap-direct:hover {
+		background: #0b8043;
+		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.btn-svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	/* アクセスアコーディオン */
+	.access-accordion-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	.access-acc-item {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+		overflow: hidden;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.access-acc-item[open] {
+		background: #14161b;
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	.access-acc-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 18px 24px;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition: background 0.2s ease;
+	}
+
+	.access-acc-header::-webkit-details-marker {
+		display: none;
+	}
+
+	.access-acc-header:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.access-acc-title-group {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.access-acc-icon {
+		width: 20px;
+		height: 20px;
+		color: #ffffff;
+		flex-shrink: 0;
+	}
+
+	.access-acc-title {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.access-acc-chevron {
+		width: 18px;
+		height: 18px;
+		color: #888888;
+		transition: transform 0.25s ease, color 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.access-acc-item[open] .access-acc-chevron {
+		transform: rotate(180deg);
+		color: #ffffff;
+	}
+
+	.access-acc-body {
+		padding: 0 24px 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		margin-top: 4px;
+		padding-top: 20px;
+		animation: accFadeIn 0.2s ease;
+	}
+
+	.route-item {
+		margin-bottom: 18px;
+	}
+
+	.route-item:last-child {
+		margin-bottom: 0;
+	}
+
+	.route-tag {
+		display: inline-block;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		color: #08090a;
+		background: #ffffff;
+		padding: 2px 7px;
+		border-radius: 2px;
+		margin-bottom: 6px;
+		letter-spacing: 0.02em;
+	}
+
+	.route-item p {
+		font-size: 0.875rem;
+		line-height: 1.65;
+		color: #bbbbbb;
+		margin: 0;
+	}
+
+	/* サイドバー */
+	.sr-sidebar {
+		position: sticky;
+		top: 100px;
+	}
+
+	.sidebar-card {
+		background: #111317;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 28px;
+		margin-bottom: 24px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	}
+
+	.sidebar-header {
+		margin-bottom: 20px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.sidebar-label {
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		color: #888888;
+		letter-spacing: 0.08em;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.sidebar-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+	}
+
+	.sidebar-desc {
+		font-size: 0.875rem;
+		color: #9ca3af;
+		line-height: 1.6;
+		margin: 0 0 20px;
+	}
+
+	.sidebar-cta {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.btn-sidebar-tel {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 18px;
+		background: #1c69d4;
+		color: #ffffff;
+		border-radius: 6px;
+		font-weight: 700;
+		font-size: 0.9375rem;
+		text-decoration: none;
+		box-shadow: 0 4px 16px rgba(28, 105, 212, 0.35);
+		transition: all 0.2s ease;
+	}
+
+	.btn-sidebar-tel:hover {
+		background: #1557b0;
+		box-shadow: 0 6px 20px rgba(28, 105, 212, 0.5);
+		transform: translateY(-1px);
+	}
+
+	.btn-sidebar-tel .btn-icon {
+		color: #ffffff;
+	}
+
+	.btn-sidebar-route {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 13px 18px;
+		background: #0f9d58;
+		color: #ffffff;
+		border: none;
+		border-radius: 6px;
+		font-weight: 700;
+		font-size: 0.875rem;
+		text-decoration: none;
+		box-shadow: 0 4px 14px rgba(15, 157, 88, 0.3);
+		transition: all 0.2s ease;
+	}
+
+	.btn-sidebar-route:hover {
+		background: #0b8043;
+		box-shadow: 0 6px 18px rgba(15, 157, 88, 0.45);
+		transform: translateY(-1px);
+	}
+
+	/* 本社管理オフィス併設等の注記 */
+	.sidebar-office-notice {
+		margin-top: 16px;
+		padding: 12px 14px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px dashed rgba(255, 255, 255, 0.12);
+		border-radius: 6px;
+	}
+	.sidebar-office-notice__badge {
+		display: block;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 4px;
+	}
+	.sidebar-office-notice__text {
+		font-size: 11px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.45);
+		margin: 0;
+	}
+
+	.btn-icon {
+		width: 16px;
+		height: 16px;
+	}
+
+	/* サイドバー 同一敷地内リンク */
+	.sidebar-related-hub {
+		margin-top: 20px;
+		padding: 14px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px dashed rgba(255, 255, 255, 0.15);
+		border-radius: 6px;
+	}
+
+	.sidebar-related-hub__tag {
+		display: block;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 4px;
+	}
+
+	.sidebar-related-hub__title {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 6px;
+	}
+
+	.sidebar-related-hub__link {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: #38bdf8;
+		text-decoration: none;
+	}
+
+	.sidebar-related-hub__link:hover {
+		text-decoration: underline;
+	}
+
+	.btn-view-all-loc {
+		display: block;
+		text-align: center;
+		padding: 10px;
+		font-size: 0.8125rem;
+		color: #888888;
+		text-decoration: none;
+		border: 1px dashed rgba(255, 255, 255, 0.15);
+		border-radius: 6px;
+		transition: all 0.2s ease;
+	}
+
+	.btn-view-all-loc:hover {
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.4);
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	/* レスポンシブ */
+	@media (max-width: 1024px) {
+		.sr-layout-grid {
+			grid-template-columns: 1fr;
+			gap: 40px;
+		}
+
+		.sr-sidebar {
+			position: static;
+		}
+
+		.sr-hero {
+			padding: 60px 0;
+		}
+
+		.sr-hero__content {
+			padding: 0 24px;
+		}
+
+		.facility-feature-bar {
+			padding: 14px 0;
+		}
+
+		.facility-feature-container {
+			padding: 0 24px;
+		}
+
+		.sr-content-wrap {
+			padding: 44px 24px 70px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.sr-section--concept {
+			display: none;
+		}
+
+		.sr-hero {
+			min-height: 360px;
+			padding: 48px 0 40px;
+		}
+
+		.sr-hero__content {
+			padding: 0 20px;
+		}
+
+		.sr-hero__actions {
+			flex-direction: column;
+			gap: 10px;
+			width: 100%;
+		}
+
+		.btn-hero {
+			width: 100%;
+			justify-content: center;
+			padding: 12px 20px;
+		}
+
+		.facility-feature-bar {
+			padding: 12px 0;
+		}
+
+		.facility-feature-container {
+			padding: 0 20px;
+		}
+
+		.facility-feature-list {
+			justify-content: flex-start;
+			gap: 8px;
+		}
+
+		.feat-pill {
+			padding: 6px 11px;
+			font-size: 0.75rem;
+			gap: 7px;
+		}
+
+		.feat-brand-logo--bmw {
+			width: 16px;
+			height: 16px;
+		}
+
+		.feat-brand-logo--mini {
+			height: 11px;
+		}
+
+		.related-hub-banner {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 14px;
+			padding: 16px;
+		}
+
+		.btn-hub-link {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.sr-content-wrap {
+			padding: 36px 20px 60px;
+		}
+
+		.dealer-info-card {
+			padding: 22px 16px;
+			border-radius: 10px;
+		}
+
+		.dealer-summary-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 18px;
+			padding-bottom: 14px;
+		}
+
+		.dealer-summary-address {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+
+		.dept-acc-header {
+			padding: 14px 16px;
+		}
+
+		.dept-acc-name {
+			font-size: 0.9375rem;
+		}
+
+		.preview-hours {
+			display: none;
+		}
+
+		.dept-acc-body {
+			padding: 0 16px 18px;
+			padding-top: 14px;
+		}
+
+		.access-acc-header {
+			padding: 14px 16px;
+		}
+
+		.access-acc-title {
+			font-size: 0.9375rem;
+		}
+
+		.access-acc-body {
+			padding: 0 16px 18px;
+			padding-top: 14px;
+		}
+
+		.dept-compact-table {
+			padding: 14px 14px;
+			margin-bottom: 16px;
+		}
+
+		.dept-table-row {
+			flex-direction: column;
+			gap: 4px;
+			align-items: flex-start;
+			padding: 8px 0;
+		}
+
+		.d-label {
+			width: auto;
+			font-size: 0.8125rem;
+		}
+
+		.d-val {
+			align-items: flex-start;
+			text-align: left;
+		}
+
+		.gallery-main-frame {
+			height: 240px;
+		}
+
+		.gallery-info-bar {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 4px;
+		}
+
+		.gallery-caption {
+			text-align: left;
+			font-size: 0.75rem;
+		}
+
+		.gallery-thumbs-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
+		}
+
+		.gallery-thumb-btn {
+			height: 52px;
+		}
+
+		.map-floating-bar {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn-gmap-direct {
+			justify-content: center;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.sr-hero__content {
+			padding: 0 16px;
+		}
+
+		.facility-feature-container {
+			padding: 0 16px;
+		}
+
+		.sr-content-wrap {
+			padding: 32px 16px 56px;
+		}
+	}
+</style>

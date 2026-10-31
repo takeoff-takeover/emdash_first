@@ -7,7 +7,9 @@
     "areaGroup": "神奈川",
     "specificArea": "川崎・幸区",
     "services": [
-      "BMW 新車"
+      "BMW 新車",
+      "BMW サービス",
+      "MINI サービス"
     ],
     "postal": "〒212-0005",
     "address": "神奈川県川崎市幸区戸手2-5-7",
@@ -30,7 +32,9 @@
     "areaGroup": "神奈川",
     "specificArea": "横浜・港北",
     "services": [
-      "BMW 新車"
+      "BMW 新車",
+      "BMW サービス",
+      "MINI サービス"
     ],
     "postal": "〒224-0025",
     "address": "神奈川県横浜市都筑区早渕3-21-28",
@@ -52,7 +56,8 @@
     "areaGroup": "神奈川",
     "specificArea": "川崎・宮前",
     "services": [
-      "BMW 新車"
+      "BMW 新車",
+      "BMW サービス"
     ],
     "postal": "〒216-0003",
     "address": "神奈川県川崎市宮前区有馬3-2-1",
@@ -74,7 +79,9 @@
     "areaGroup": "神奈川",
     "specificArea": "新百合ヶ丘",
     "services": [
-      "BMW 新車"
+      "BMW 新車",
+      "BMW サービス",
+      "MINI サービス"
     ],
     "postal": "〒215-0023",
     "address": "神奈川県川崎市麻生区片平1-5-11",
@@ -84,6 +91,7 @@
     "image": "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
     "url": "https://www.nicole.co.jp/location/nicole-bmw-shin-yurigaoka/",
     "mapQuery": "Nicole%20BMW%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%E6%94%AF%E5%BA%97%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
+    "detailUrl": "/location/nicole-bmw-shinyurigaoka/",
     "pointNumber": 6,
     "lat": 35.5990492,
     "lng": 139.50214
@@ -109,6 +117,75 @@
     "pointNumber": 3,
     "lat": 35.5996615,
     "lng": 139.7015461
+  },
+  {
+    "id": "loc-13",
+    "name": "BMW Premium Selection 横浜港北（BMW認定中古車）",
+    "brand": "BMW",
+    "facilityType": "認定中古車",
+    "areaGroup": "神奈川",
+    "specificArea": "横浜・港北",
+    "services": [
+      "BMW 認定中古車"
+    ],
+    "postal": "〒224-0045",
+    "address": "神奈川県横浜市都筑区東方町279",
+    "tel": "045-472-2600",
+    "hours": "10:00～18:00",
+    "closed": "水曜日（祝日を除く）",
+    "image": "/uploads/2026/02/BPS_MININEXT横浜港北2026-1024x682.jpg",
+    "url": "https://www.nicole.co.jp/location/bmw-premium-selection-yokohama-kohoku/",
+    "mapQuery": "BMW%20Premium%20Selection%20%E6%A8%AA%E6%B5%9C%E6%B8%AF%E5%8C%97%EF%BC%88BMW%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E6%9D%B1%E6%96%B9%E7%94%BA279",
+    "pointNumber": 11,
+    "lat": 35.5189692,
+    "lng": 139.5795125
+  },
+  {
+    "id": "loc-14",
+    "name": "BMW Premium Selection 新百合ヶ丘（BMW 認定中古車）",
+    "brand": "BMW",
+    "facilityType": "認定中古車",
+    "areaGroup": "神奈川",
+    "specificArea": "新百合ヶ丘",
+    "services": [
+      "BMW 認定中古車"
+    ],
+    "postal": "〒215-0023",
+    "address": "神奈川県川崎市麻生区片平1-5-11",
+    "tel": "044-396-0180",
+    "hours": "10:00～18:00",
+    "closed": "火曜日・水曜日（祝日を除く）",
+    "image": "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1024x682.jpg",
+    "url": "https://www.nicole.co.jp/location/bmw-premium-selection-shin-yurigaoka/",
+    "mapQuery": "BMW%20Premium%20Selection%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%EF%BC%88BMW%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
+    "detailUrl": "/location/nicole-bmw-shinyurigaoka/",
+    "pointNumber": 6,
+    "lat": 35.5990492,
+    "lng": 139.50214
+  },
+  {
+    "id": "loc-22",
+    "name": "Nicole BMW Service Centre",
+    "brand": "BMW",
+    "facilityType": "サービスセンター",
+    "areaGroup": "神奈川",
+    "specificArea": "川崎・幸区",
+    "services": [
+      "BMW 車検・点検・修理",
+      "MINI 車検・点検・修理",
+      "Rolls-Royce 車検・点検・修理"
+    ],
+    "postal": "〒224-0062",
+    "address": "神奈川県横浜市都筑区葛が谷15-46",
+    "tel": "045-948-2500",
+    "hours": "10:00～18:00",
+    "closed": "水曜日（祝日の場合は営業）",
+    "image": "/uploads/2026/02/BMWサービスセンター.jpg",
+    "url": "https://www.nicole.co.jp/location/nicole-bmw-service-centre/",
+    "mapQuery": "Nicole%20BMW%20Service%20Centre%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E8%91%9B%E3%81%8C%E8%B0%B715-46",
+    "pointNumber": 4,
+    "lat": 35.53572,
+    "lng": 139.56328
   },
   {
     "id": "loc-6",
@@ -162,7 +239,8 @@
     "areaGroup": "神奈川",
     "specificArea": "新百合ヶ丘",
     "services": [
-      "MINI 新車"
+      "MINI 新車",
+      "MINI サービス"
     ],
     "postal": "〒215-0023",
     "address": "神奈川県川崎市麻生区片平1-5-11",
@@ -172,6 +250,53 @@
     "image": "/uploads/2026/02/NicoleBMW新百合ヶ丘2025-2-1024x682.jpg",
     "url": "https://www.nicole.co.jp/location/mini-shin-yurigaoka/",
     "mapQuery": "MINI%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
+    "detailUrl": "/location/mini-shinyurigaoka/",
+    "pointNumber": 6,
+    "lat": 35.5990492,
+    "lng": 139.50214
+  },
+  {
+    "id": "loc-15",
+    "name": "MINI NEXT 横浜港北（MINI 認定中古車）",
+    "brand": "MINI",
+    "facilityType": "認定中古車",
+    "areaGroup": "神奈川",
+    "specificArea": "横浜・港北",
+    "services": [
+      "MINI 認定中古車"
+    ],
+    "postal": "〒224-0045",
+    "address": "神奈川県横浜市都筑区東方町279",
+    "tel": "045-470-3219",
+    "hours": "10:00～18:00",
+    "closed": "水曜日（祝日の場合は営業）",
+    "image": "/uploads/2026/02/DSC9048-1024x682.jpg",
+    "url": "https://www.nicole.co.jp/location/mini-next-yokohama-kohoku/",
+    "mapQuery": "MINI%20NEXT%20%E6%A8%AA%E6%B5%9C%E6%B8%AF%E5%8C%97%EF%BC%88MINI%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E6%9D%B1%E6%96%B9%E7%94%BA279",
+    "pointNumber": 11,
+    "lat": 35.5189692,
+    "lng": 139.5795125
+  },
+  {
+    "id": "loc-16",
+    "name": "MINI NEXT 新百合ヶ丘（MINI 認定中古車）",
+    "brand": "MINI",
+    "facilityType": "認定中古車",
+    "areaGroup": "神奈川",
+    "specificArea": "新百合ヶ丘",
+    "services": [
+      "MINI 認定中古車",
+      "MINI サービス"
+    ],
+    "postal": "〒215-0023",
+    "address": "神奈川県川崎市麻生区片平1-5-11",
+    "tel": "044-396-0180",
+    "hours": "10:00～18:00",
+    "closed": "火曜日・水曜日（祝日を除く）",
+    "image": "/uploads/2026/02/NicoleBMW新百合ヶ丘2025-1024x682.jpg",
+    "url": "https://www.nicole.co.jp/location/mini-next-shin-yurigaoka/",
+    "mapQuery": "MINI%20NEXT%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%EF%BC%88MINI%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
+    "detailUrl": "/location/mini-shinyurigaoka/",
     "pointNumber": 6,
     "lat": 35.5990492,
     "lng": 139.50214
@@ -196,8 +321,8 @@
     "url": "https://www.nicole.co.jp/location/rolls-royce-motor-cars-yokohama/",
     "mapQuery": "%E3%83%AD%E3%83%BC%E3%83%AB%E3%82%B9%E3%83%BB%E3%83%AD%E3%82%A4%E3%82%B9%E3%83%BB%E3%83%A2%E3%83%BC%E3%82%BF%E3%83%BC%E3%83%BB%E3%82%AB%E3%83%BC%E3%82%BA%E6%A8%AA%E6%B5%9C%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E8%A5%BF%E5%8C%BA%E3%81%BF%E3%81%AA%E3%81%A8%E3%81%BF%E3%82%89%E3%81%844-2-1",
     "pointNumber": 7,
-    "lat": 35.4602864,
-    "lng": 139.6246171
+    "lat": 35.45825,
+    "lng": 139.62674
   },
   {
     "id": "loc-10",
@@ -218,8 +343,52 @@
     "url": "https://www.nicole.co.jp/location/nicole-competizione-ferrari/",
     "mapQuery": "Nicole%20Competizione%20%E3%82%B7%E3%83%A7%E3%83%BC%E3%83%AB%E3%83%BC%E3%83%A0%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E8%A5%BF%E5%8C%BA%E3%81%BF%E3%81%AA%E3%81%A8%E3%81%BF%E3%82%89%E3%81%843-3-3",
     "pointNumber": 7,
-    "lat": 35.4602864,
-    "lng": 139.6246171
+    "lat": 35.45678,
+    "lng": 139.62909
+  },
+  {
+    "id": "loc-17",
+    "name": "Nicole Competizione プレオウンド ショールーム",
+    "brand": "Ferrari",
+    "facilityType": "認定中古車",
+    "areaGroup": "神奈川",
+    "specificArea": "川崎・幸区",
+    "services": [
+      "Ferrari 認定中古車"
+    ],
+    "postal": "〒224-0044",
+    "address": "神奈川県横浜市都筑区川向町2003-6",
+    "tel": "045-577-3817",
+    "hours": "10:00～18:00",
+    "closed": "水曜日",
+    "image": "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-2-1024x683.jpg",
+    "url": "https://www.nicole.co.jp/location/nicole-ccompetizione-ferrari-preowned/",
+    "mapQuery": "Nicole%20Competizione%20%E3%83%97%E3%83%AC%E3%82%AA%E3%82%A6%E3%83%B3%E3%83%89%20%E3%82%B7%E3%83%A7%E3%83%BC%E3%83%AB%E3%83%BC%E3%83%A0%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E5%B7%9D%E5%90%91%E7%94%BA2003-6",
+    "pointNumber": 4,
+    "lat": 35.51655,
+    "lng": 139.58922
+  },
+  {
+    "id": "loc-23",
+    "name": "Nicole Competizione サービスセンター",
+    "brand": "Ferrari",
+    "facilityType": "サービスセンター",
+    "areaGroup": "神奈川",
+    "specificArea": "川崎・幸区",
+    "services": [
+      "Ferrari 車検・点検・修理"
+    ],
+    "postal": "〒224-0044",
+    "address": "神奈川県横浜市都筑区川向町2003-6",
+    "tel": "045-577-3824",
+    "hours": "10:00～18:00",
+    "closed": "水曜日",
+    "image": "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-1-1024x683.jpg",
+    "url": "https://www.nicole.co.jp/location/nicole-competizione-service-centre/",
+    "mapQuery": "Nicole%20Competizione%20%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E5%B7%9D%E5%90%91%E7%94%BA2003-6",
+    "pointNumber": 4,
+    "lat": 35.51655,
+    "lng": 139.58922
   },
   {
     "id": "loc-11",
@@ -266,249 +435,24 @@
     "lng": 139.6424354
   },
   {
-    "id": "loc-13",
-    "name": "BMW Premium Selection 横浜港北（BMW認定中古車）",
-    "brand": "BMW",
-    "facilityType": "認定中古車",
-    "areaGroup": "神奈川",
-    "specificArea": "横浜・港北",
-    "services": [
-      "BMW 認定中古車"
-    ],
-    "postal": "〒224-0045",
-    "address": "神奈川県横浜市都筑区東方町279",
-    "tel": "045-472-2600",
-    "hours": "10:00～18:00",
-    "closed": "水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/BPS_MININEXT横浜港北2026-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/bmw-premium-selection-yokohama-kohoku/",
-    "mapQuery": "BMW%20Premium%20Selection%20%E6%A8%AA%E6%B5%9C%E6%B8%AF%E5%8C%97%EF%BC%88BMW%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E6%9D%B1%E6%96%B9%E7%94%BA279",
-    "pointNumber": 11,
-    "lat": 35.5189692,
-    "lng": 139.5795125
-  },
-  {
-    "id": "loc-14",
-    "name": "BMW Premium Selection 新百合ヶ丘（BMW 認定中古車）",
-    "brand": "BMW",
-    "facilityType": "認定中古車",
-    "areaGroup": "神奈川",
-    "specificArea": "新百合ヶ丘",
-    "services": [
-      "BMW 認定中古車"
-    ],
-    "postal": "〒215-0023",
-    "address": "神奈川県川崎市麻生区片平1-5-11",
-    "tel": "044-396-0180",
-    "hours": "10:00～18:00",
-    "closed": "火曜日・水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/bmw-premium-selection-shin-yurigaoka/",
-    "mapQuery": "BMW%20Premium%20Selection%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%EF%BC%88BMW%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
-    "pointNumber": 6,
-    "lat": 35.5990492,
-    "lng": 139.50214
-  },
-  {
-    "id": "loc-15",
-    "name": "MINI NEXT 横浜港北（MINI 認定中古車）",
-    "brand": "MINI",
-    "facilityType": "認定中古車",
-    "areaGroup": "神奈川",
-    "specificArea": "横浜・港北",
-    "services": [
-      "MINI 認定中古車"
-    ],
-    "postal": "〒224-0045",
-    "address": "神奈川県横浜市都筑区東方町279",
-    "tel": "045-470-3219",
-    "hours": "10:00～18:00",
-    "closed": "水曜日（祝日の場合は営業）",
-    "image": "/uploads/2026/02/DSC9048-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/mini-next-yokohama-kohoku/",
-    "mapQuery": "MINI%20NEXT%20%E6%A8%AA%E6%B5%9C%E6%B8%AF%E5%8C%97%EF%BC%88MINI%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E6%9D%B1%E6%96%B9%E7%94%BA279",
-    "pointNumber": 11,
-    "lat": 35.5189692,
-    "lng": 139.5795125
-  },
-  {
-    "id": "loc-16",
-    "name": "MINI NEXT 新百合ヶ丘（MINI 認定中古車）",
-    "brand": "MINI",
-    "facilityType": "認定中古車",
-    "areaGroup": "神奈川",
-    "specificArea": "新百合ヶ丘",
-    "services": [
-      "MINI 認定中古車"
-    ],
-    "postal": "〒215-0023",
-    "address": "神奈川県川崎市麻生区片平1-5-11",
-    "tel": "044-396-0180",
-    "hours": "10:00～18:00",
-    "closed": "火曜日・水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/NicoleBMW新百合ヶ丘2025-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/mini-next-shin-yurigaoka/",
-    "mapQuery": "MINI%20NEXT%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%EF%BC%88MINI%20%E8%AA%8D%E5%AE%9A%E4%B8%AD%E5%8F%A4%E8%BB%8A%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
-    "pointNumber": 6,
-    "lat": 35.5990492,
-    "lng": 139.50214
-  },
-  {
-    "id": "loc-17",
-    "name": "Nicole Competizione プレオウンド ショールーム",
-    "brand": "Ferrari",
-    "facilityType": "認定中古車",
+    "id": "loc-25",
+    "name": "川崎本社オフィス",
+    "brand": "Nicole",
+    "facilityType": "本社・オフィス",
     "areaGroup": "神奈川",
     "specificArea": "川崎・幸区",
     "services": [
-      "Ferrari 認定中古車"
-    ],
-    "postal": "〒224-0044",
-    "address": "神奈川県横浜市都筑区川向町2003-6",
-    "tel": "045-577-3817",
-    "hours": "10:00～18:00",
-    "closed": "水曜日",
-    "image": "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-2-1024x683.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-ccompetizione-ferrari-preowned/",
-    "mapQuery": "Nicole%20Competizione%20%E3%83%97%E3%83%AC%E3%82%AA%E3%82%A6%E3%83%B3%E3%83%89%20%E3%82%B7%E3%83%A7%E3%83%BC%E3%83%AB%E3%83%BC%E3%83%A0%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E5%B7%9D%E5%90%91%E7%94%BA2003-6",
-    "pointNumber": 4,
-    "lat": 35.5459772,
-    "lng": 139.6897264
-  },
-  {
-    "id": "loc-18",
-    "name": "Nicole BMW 本社サービス（川崎）",
-    "brand": "BMW",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "川崎・幸区",
-    "services": [
-      "BMW 車検・点検・修理",
-      "MINI 車検・点検・修理"
+      "Nicole 本社・オフィス"
     ],
     "postal": "〒212-0005",
     "address": "神奈川県川崎市幸区戸手2-5-7",
-    "tel": "044-522-1500",
+    "tel": "044-541-3011",
     "hours": "9:00～18:00",
-    "closed": "水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/Nicole-BMW-本社-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-bmw-kawasaki-service/",
-    "mapQuery": "Nicole%20BMW%20%E6%9C%AC%E7%A4%BE%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%EF%BC%88%E5%B7%9D%E5%B4%8E%EF%BC%89%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E5%B9%B8%E5%8C%BA%E6%88%B8%E6%89%8B2-5-7",
+    "closed": "土曜日・日曜日",
+    "image": "/uploads/2026/01/Nicole-BMW-本社-1-1024x682.jpg",
+    "url": "https://www.nicole.co.jp/location/nicole-racing-japan-kawasaki/",
+    "mapQuery": "%E5%B7%9D%E5%B4%8E%E6%9C%AC%E7%A4%BE%E3%82%AA%E3%83%95%E3%82%A3%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E5%B9%B8%E5%8C%BA%E6%88%B8%E6%89%8B2-5-7",
     "detailUrl": "/location/nicole-bmw-kawasaki/",
-    "pointNumber": 4,
-    "lat": 35.5459772,
-    "lng": 139.6897264
-  },
-  {
-    "id": "loc-19",
-    "name": "Nicole BMW 横浜港北支店 サービス",
-    "brand": "BMW",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "横浜・港北",
-    "services": [
-      "BMW 車検・点検・修理",
-      "MINI 車検・点検・修理"
-    ],
-    "postal": "〒224-0025",
-    "address": "神奈川県横浜市都筑区早渕3-21-28",
-    "tel": "045-592-2500",
-    "hours": "9:00～18:00",
-    "closed": "水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/Nicole-BMW-横浜港北支店-1-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-bmw-yokohama-kohoku-service/",
-    "mapQuery": "Nicole%20BMW%20%E6%A8%AA%E6%B5%9C%E6%B8%AF%E5%8C%97%E6%94%AF%E5%BA%97%20%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E6%97%A9%E6%B8%953-21-28",
-    "pointNumber": 10,
-    "lat": 35.5483816,
-    "lng": 139.600158
-  },
-  {
-    "id": "loc-20",
-    "name": "Nicole BMW 青葉宮前支店 サービス",
-    "brand": "BMW",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "川崎・宮前",
-    "services": [
-      "BMW 車検・点検・修理"
-    ],
-    "postal": "〒216-0003",
-    "address": "神奈川県川崎市宮前区有馬3-2-1",
-    "tel": "044-870-8555",
-    "hours": "9:00～18:00",
-    "closed": "水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/NicoleBMW青葉宮前2025-1-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-bmw-aobamiyamae-service/",
-    "mapQuery": "Nicole%20BMW%20%E9%9D%92%E8%91%89%E5%AE%AE%E5%89%8D%E6%94%AF%E5%BA%97%20%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E5%AE%AE%E5%89%8D%E5%8C%BA%E6%9C%89%E9%A6%AC3-2-1",
-    "pointNumber": 5,
-    "lat": 35.5774914,
-    "lng": 139.5820004
-  },
-  {
-    "id": "loc-21",
-    "name": "Nicole BMW 新百合ヶ丘支店 サービス",
-    "brand": "BMW",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "新百合ヶ丘",
-    "services": [
-      "BMW 車検・点検・修理",
-      "MINI 車検・点検・修理"
-    ],
-    "postal": "〒215-0023",
-    "address": "神奈川県川崎市麻生区片平1-5-11",
-    "tel": "044-959-1420",
-    "hours": "10:00～18:00",
-    "closed": "水曜日（祝日を除く）",
-    "image": "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-2-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-bmw-shin-yurigaoka-service/",
-    "mapQuery": "Nicole%20BMW%20%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%E6%94%AF%E5%BA%97%20%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E7%89%87%E5%B9%B31-5-11",
-    "pointNumber": 6,
-    "lat": 35.5990492,
-    "lng": 139.50214
-  },
-  {
-    "id": "loc-22",
-    "name": "Nicole BMW Service Centre",
-    "brand": "BMW",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "川崎・幸区",
-    "services": [
-      "BMW 車検・点検・修理",
-      "MINI 車検・点検・修理",
-      "Rolls-Royce 車検・点検・修理"
-    ],
-    "postal": "〒224-0062",
-    "address": "神奈川県横浜市都筑区葛が谷15-46",
-    "tel": "045-948-2500",
-    "hours": "10:00～18:00",
-    "closed": "水曜日（祝日の場合は営業）",
-    "image": "/uploads/2026/02/BMWサービスセンター.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-bmw-service-centre/",
-    "mapQuery": "Nicole%20BMW%20Service%20Centre%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E8%91%9B%E3%81%8C%E8%B0%B715-46",
-    "pointNumber": 4,
-    "lat": 35.5459772,
-    "lng": 139.6897264
-  },
-  {
-    "id": "loc-23",
-    "name": "Nicole Competizione サービスセンター",
-    "brand": "Ferrari",
-    "facilityType": "サービスセンター",
-    "areaGroup": "神奈川",
-    "specificArea": "川崎・幸区",
-    "services": [
-      "Ferrari 車検・点検・修理"
-    ],
-    "postal": "〒224-0044",
-    "address": "神奈川県横浜市都筑区川向町2003-6",
-    "tel": "045-577-3824",
-    "hours": "10:00～18:00",
-    "closed": "水曜日",
-    "image": "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-1-1024x683.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-competizione-service-centre/",
-    "mapQuery": "Nicole%20Competizione%20%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E5%B7%9D%E5%90%91%E7%94%BA2003-6",
     "pointNumber": 4,
     "lat": 35.5459772,
     "lng": 139.6897264
@@ -532,30 +476,7 @@
     "url": "https://www.nicole.co.jp/location/nicole-racing-japan-yokohama/",
     "mapQuery": "%E6%A8%AA%E6%B5%9C%E6%9C%AC%E7%A4%BE%E3%82%AA%E3%83%95%E3%82%A3%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E8%A5%BF%E5%8C%BA%E3%81%BF%E3%81%AA%E3%81%A8%E3%81%BF%E3%82%89%E3%81%844-4-2%20%E6%A8%AA%E6%B5%9C%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%99%E3%83%8B%E3%83%A5%E3%83%BC13F",
     "pointNumber": 7,
-    "lat": 35.4602864,
-    "lng": 139.6246171
-  },
-  {
-    "id": "loc-25",
-    "name": "川崎本社オフィス",
-    "brand": "Nicole",
-    "facilityType": "本社・オフィス",
-    "areaGroup": "神奈川",
-    "specificArea": "川崎・幸区",
-    "services": [
-      "Nicole 本社・オフィス"
-    ],
-    "postal": "〒212-0005",
-    "address": "神奈川県川崎市幸区戸手2-5-7",
-    "tel": "044-541-3011",
-    "hours": "9:00～18:00",
-    "closed": "土曜日・日曜日",
-    "image": "/uploads/2026/01/Nicole-BMW-本社-1-1024x682.jpg",
-    "url": "https://www.nicole.co.jp/location/nicole-racing-japan-kawasaki/",
-    "mapQuery": "%E5%B7%9D%E5%B4%8E%E6%9C%AC%E7%A4%BE%E3%82%AA%E3%83%95%E3%82%A3%E3%82%B9%20%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E5%B9%B8%E5%8C%BA%E6%88%B8%E6%89%8B2-5-7",
-    "detailUrl": "/location/nicole-bmw-kawasaki/",
-    "pointNumber": 4,
-    "lat": 35.5459772,
-    "lng": 139.6897264
+    "lat": 35.46014,
+    "lng": 139.62723
   }
 ]

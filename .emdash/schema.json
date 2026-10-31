@@ -1,11 +1,11 @@
 {
   "collections": [
     {
-      "slug": "magazine",
-      "label": "マガジン",
-      "labelSingular": "マガジン記事",
-      "description": "Nicole Connect Webマガジン専用特集記事コレクション",
-      "icon": "book-open",
+      "slug": "locations",
+      "label": "拠点一覧",
+      "labelSingular": "拠点情報",
+      "description": "ショールーム・サービス工場・認定中古車等の拠点管理コレクション",
+      "icon": "map-pin",
       "supports": [
         "drafts",
         "revisions",
@@ -15,91 +15,172 @@
         "seo"
       ],
       "hidden": false,
-      "sortOrder": 1,
+      "sortOrder": 2,
       "fields": [
         {
           "slug": "title",
-          "label": "タイトル",
+          "label": "拠点名称",
           "type": "string",
           "required": true,
           "unique": false
         },
         {
+          "slug": "brand",
+          "label": "主要ブランド",
+          "type": "select",
+          "required": true,
+          "unique": false,
+          "defaultValue": "BMW",
+          "options": [
+            {
+              "label": "BMW",
+              "value": "BMW"
+            },
+            {
+              "label": "MINI",
+              "value": "MINI"
+            },
+            {
+              "label": "Rolls-Royce",
+              "value": "Rolls-Royce"
+            },
+            {
+              "label": "Ferrari",
+              "value": "Ferrari"
+            },
+            {
+              "label": "ALPINA",
+              "value": "ALPINA"
+            },
+            {
+              "label": "Nicole (グループ本社)",
+              "value": "Nicole"
+            }
+          ]
+        },
+        {
+          "slug": "facility_type",
+          "label": "拠点区分",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "defaultValue": "ショールーム"
+        },
+        {
+          "slug": "postal",
+          "label": "郵便番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "address",
+          "label": "所在地住所",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "tel",
+          "label": "代表TEL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "fax",
+          "label": "代表FAX",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "google_maps_url",
+          "label": "GoogleマップURL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
           "slug": "featured_image",
-          "label": "アイキャッチ写真 (PC用)",
+          "label": "メイン外観写真",
           "type": "image",
           "required": false,
           "unique": false
         },
         {
-          "slug": "featured_image_sp",
-          "label": "アイキャッチ写真 (スマホ用)",
-          "type": "image",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "content",
-          "label": "本文",
-          "type": "portableText",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "excerpt",
-          "label": "抜粋 / リード文",
+          "slug": "badges",
+          "label": "上部ナビバッジ (JSON)",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
-          "slug": "related_location",
-          "label": "関連拠点 (Related Showroom)",
-          "type": "select",
+          "slug": "concept_title",
+          "label": "コンセプト見出し",
+          "type": "string",
           "required": false,
-          "unique": false,
-          "options": [
-            {
-              "label": "なし（設定しない）",
-              "value": ""
-            },
-            {
-              "label": "Nicole BMW 本社ショールーム（川崎）",
-              "value": "nicole-bmw-kawasaki"
-            },
-            {
-              "label": "Nicole BMW 大田支店",
-              "value": "nicole-bmw-ota"
-            },
-            {
-              "label": "Nicole BMW 青葉宮前支店",
-              "value": "nicole-bmw-aobamiyamae"
-            },
-            {
-              "label": "Nicole BMW 横浜港北支店",
-              "value": "nicole-bmw-yokohama-kohoku"
-            },
-            {
-              "label": "Nicole BMW 新百合ヶ丘支店",
-              "value": "nicole-bmw-shin-yurigaoka"
-            },
-            {
-              "label": "ロールス・ロイス・モーター・カーズ横浜",
-              "value": "rolls-royce-yokohama"
-            },
-            {
-              "label": "Nicole Competizione 青山（Ferrari）",
-              "value": "ferrari-aoyama"
-            },
-            {
-              "label": "ニコル世田谷ショールーム（ALPINA）",
-              "value": "alpina-setagaya"
-            }
-          ]
+          "unique": false
         },
         {
-          "slug": "notes",
-          "label": "注釈・免責事項（文字小・デフォルト空）",
+          "slug": "concept_text",
+          "label": "コンセプト説明文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "departments",
+          "label": "窓口アコーディオン情報 (JSON)",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_hub_title",
+          "label": "同一敷地・姉妹拠点 リンク見出し",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_hub_url",
+          "label": "同一敷地・姉妹拠点 リンクURL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_hub_desc",
+          "label": "同一敷地・姉妹拠点 案内文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "access_car_tokyo",
+          "label": "車アクセス（東京方面より）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "access_car_yokohama",
+          "label": "車アクセス（横浜方面より）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "access_train",
+          "label": "電車・バスでお越しの方",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "access_taxi",
+          "label": "タクシーをご利用の場合",
           "type": "text",
           "required": false,
           "unique": false
@@ -239,5 +320,5 @@
       ]
     }
   ],
-  "version": "0005cc61b9cd74fb"
+  "version": "d2e72ca4b458908a"
 }

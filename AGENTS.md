@@ -7,7 +7,7 @@ npm run dev              # Start the Astro dev server
 npx emdash types      # Regenerate TypeScript types from a running site
 ```
 
-The admin UI is at `http://localhost:4321/_emdash/admin`.
+The admin UI is at `http://localhost:4321/_emdash/admin` (Direct bypass login: `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin`).
 
 ## Key Files
 
@@ -47,6 +47,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
   1. **引き継ぎ書の作成（アーティファクト）**: 当日完了した内容、積み残しタスクの背景・原因、次回の具体的作業手順を網羅した引き継ぎ書を作成する。
   2. **GitHubへのアップロード**: 作業ツリーを整理し、最新の変更を `git commit & push origin main` する。
   3. **Cloudflareへのアップロード**: `npx astro build && npx wrangler deploy` を実行し、本番環境を最新状態に更新する。
+- **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin` を提示・案内すること。
 
 ## This Template
 
