@@ -585,7 +585,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 				<div class="filter-wrap">
 					<!-- ブランドフィルター（メインタブ） -->
 					<div class="filter-group filter-group--brand">
-						<span class="filter-group__label">BRAND:</span>
+						<span class="filter-group__label">ブランド</span>
 						<div class="filter-pills" id="brand-filters">
 							{brandsList.map((b) => (
 								<button 
@@ -603,7 +603,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 					<!-- トピックフィルター ＆ 検索バー -->
 					<div class="filter-controls-right">
 						<div class="filter-group filter-group--topic">
-							<span class="filter-group__label">CATEGORY:</span>
+							<span class="filter-group__label">カテゴリー</span>
 							<div class="filter-pills" id="topic-filters">
 								{topicsList.map((t) => (
 									<button 
@@ -674,7 +674,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 									<h3 class="article-item__title">{art.title}</h3>
 									{art.lead && <p class="article-item__lead">{art.lead}</p>}
 									<div class="article-item__footer">
-										<span class="article-item__more">記事を読む →</span>
+										<span class="article-item__more">記事を読む</span>
 										<span class="article-item__views">👁 {art.views}</span>
 									</div>
 								</div>
@@ -712,7 +712,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 					<div class="esg-section__titles">
 						<span class="esg-section__eyebrow">SUSTAINABILITY & COMMUNITY</span>
 						<h2 class="esg-section__heading">ESG / SDGs — 持続可能な未来への取り組み</h2>
-						<p class="esg-section__desc">地域社会への貢献、環境保全、そして未来を担う次世代育成。ニコル・グループが取り組む活動の歩みをお届けします。</p>
+						<p class="esg-section__desc">地域社会への貢献、環境保全、そして未来を担う次世代育成。<br class="pc-only" />ニコル・グループが取り組む活動の歩みを<span class="u-nowrap">お届けします。</span></p>
 					</div>
 					<a href="/esg_sdgs" class="esg-section__portal-link">
 						<span>ニコル・グループのESG方針を見る</span>
@@ -1509,7 +1509,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		gap: 24px;
+		gap: 20px;
 		flex-wrap: wrap;
 	}
 
@@ -1517,6 +1517,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		display: flex;
 		align-items: center;
 		gap: 12px;
+		flex-shrink: 0;
 	}
 
 	.filter-group__label {
@@ -1566,6 +1567,8 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		display: flex;
 		align-items: center;
 		gap: 16px;
+		flex-wrap: nowrap;
+		flex-shrink: 0;
 	}
 
 	.topic-dropdown {
@@ -1604,13 +1607,14 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 8px;
 		padding: 0 14px;
-		width: 220px;
-		transition: border-color 0.25s ease, width 0.3s ease;
+		width: 200px;
+		flex-shrink: 0;
+		transition: border-color 0.25s ease, box-shadow 0.25s ease;
 	}
 
 	.filter-search-box:focus-within {
 		border-color: #ffffff;
-		width: 280px;
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
 	}
 
 	.search-icon {
@@ -1998,6 +2002,10 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 			justify-content: center;
 		}
 
+		.pc-only {
+			display: none;
+		}
+
 		.apple-hero__footer {
 			display: none;
 		}
@@ -2101,6 +2109,16 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
 		color: #9aa1b2;
 		line-height: 1.6;
 		margin: 0;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	.u-nowrap {
+		white-space: nowrap;
+	}
+
+	.pc-only {
+		display: inline;
 	}
 
 	.esg-section__portal-link {

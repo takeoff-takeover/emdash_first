@@ -309,7 +309,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			<div class="locs-container">
 				<!-- ショールーム＆サービスファクトリー一覧 -->
 				<div class="locs-list" id="locations-list">
-					{retailLocations.map((loc) => {
+					{retailLocations.map((loc, idx) => {
 						const cat = getFacilityCategory(loc);
 						const badges = getFacilityBadges(loc);
 						const logo = getLocationLogo(loc);
@@ -319,6 +319,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 							<article 
 								class="loc-slim-row" 
 								data-brand={brandsList.join(",")} 
+								data-primary-brand={loc.brand}
+								data-initial-order={idx}
 								data-area={loc.areaGroup}
 								data-has-sales={cat.isSales ? "true" : "false"}
 								data-has-used={cat.isUsed ? "true" : "false"}
@@ -419,7 +421,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						</div>
 					</div>
 					<div class="locs-offices-list">
-						{officeLocations.map((loc) => {
+						{officeLocations.map((loc, idx) => {
 							const badges = getFacilityBadges(loc);
 							const logo = getLocationLogo(loc);
 							const brandsList = getLocationBrands(loc);
@@ -428,6 +430,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 								<article 
 									class="loc-slim-row loc-slim-row--office" 
 									data-brand={brandsList.join(",")} 
+									data-primary-brand={loc.brand}
+									data-initial-order={idx}
 									data-area={loc.areaGroup}
 									data-has-sales="false"
 									data-has-used="false"
@@ -673,83 +677,107 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 					const marker = L.marker([group.lat, group.lng], { icon: icon });
 
-					// ポップアップタイトルの決定（同一敷地の合体拠点のみ総合タイトル、単独は拠点名）
-					const isMulti = groupLocs.length > 1;
-					let mainTitle = groupLocs[0].name;
-					if (isMulti) {
-						if (group.address.includes('戸手')) {
-							mainTitle = 'Nicole 川崎本社 総合拠点';
-						} else if (group.address.includes('片平')) {
-							mainTitle = 'Nicole 新百合ヶ丘 総合拠点';
-						} else if (group.address.includes('東方町')) {
-							mainTitle = 'Nicole 横浜港北 認定中古車センター';
-						} else if (group.address.includes('川向町')) {
-							mainTitle = 'Nicole Competizione 横浜川向拠点';
+					// ポップアップHTML生成関数（選択ブランドに応じて施設順を動的ソート）
+					function buildPopupContent(activeBrand) {
+						const sortedLocs = [...groupLocs];
+						if (activeBrand !== 'all') {
+							sortedLocs.sort((a, b) => {
+								const getFacilityScore = (l) => {
+									const cat = getLocCategory(l);
+									const isTarget = (l.brand === activeBrand) ||
+										(activeBrand === 'ALPINA' && (l.brand === 'ALPINA' || l.brand === 'Nicole' || l.name.includes('青山') || l.name.includes('世田谷')));
+									if (isTarget) {
+										if (cat.isSales) return 1;  // 新車
+										if (cat.isUsed) return 2;   // 中古車
+										if (cat.isService) return 3;// サービス
+										return 4;
+									}
+									if (cat.isSales) return 10;
+									if (cat.isUsed) return 20;
+									if (cat.isService) return 30;
+									return 40;
+								};
+								return getFacilityScore(a) - getFacilityScore(b);
+							});
 						}
-					}
 
-					let facilitiesHtml = '';
-					if (isMulti) {
-						groupLocs.forEach(l => {
-							const cat = getLocCategory(l);
+						// ポップアップタイトルの決定（同一敷地の合体拠点のみ総合タイトル、単独は拠点名）
+						const isMulti = sortedLocs.length > 1;
+						let mainTitle = sortedLocs[0].name;
+						if (isMulti) {
+							if (group.address.includes('戸手')) {
+								mainTitle = 'Nicole 川崎本社 総合拠点';
+							} else if (group.address.includes('片平')) {
+								mainTitle = 'Nicole 新百合ヶ丘 総合拠点';
+							} else if (group.address.includes('東方町')) {
+								mainTitle = 'Nicole 横浜港北 認定中古車センター';
+							} else if (group.address.includes('川向町')) {
+								mainTitle = 'Nicole Competizione 横浜川向拠点';
+							}
+						}
+
+						let facilitiesHtml = '';
+						if (isMulti) {
+							sortedLocs.forEach(l => {
+								const cat = getLocCategory(l);
+								let badgeText = '';
+								if (cat.isSales) badgeText += '<span class="popup-tag popup-tag--sales">新車</span>';
+								if (cat.isUsed) badgeText += '<span class="popup-tag popup-tag--used">中古車</span>';
+								if (cat.isService) badgeText += '<span class="popup-tag popup-tag--service">サービス</span>';
+								if (cat.isOffice) badgeText += '<span class="popup-tag">オフィス</span>';
+
+								const isKawasakiBmw = (l.id === 'loc-1' || (l.name.includes('Nicole BMW 本社') && !l.name.includes('オフィス')));
+
+								facilitiesHtml += `
+									<div class="popup-facility-item">
+										<div class="popup-facility-main">
+											<strong class="popup-facility-name">${l.name}</strong>
+											<div class="popup-facility-tags">${badgeText}</div>
+										</div>
+										${isKawasakiBmw ? `<a href="/location/nicole-bmw-kawasaki/" class="popup-detail-btn" title="川崎本社の店舗詳細を見る">詳細</a>` : ''}
+									</div>
+								`;
+							});
+						} else {
+							const singleLoc = sortedLocs[0];
+							const cat = getLocCategory(singleLoc);
 							let badgeText = '';
 							if (cat.isSales) badgeText += '<span class="popup-tag popup-tag--sales">新車</span>';
 							if (cat.isUsed) badgeText += '<span class="popup-tag popup-tag--used">中古車</span>';
 							if (cat.isService) badgeText += '<span class="popup-tag popup-tag--service">サービス</span>';
 							if (cat.isOffice) badgeText += '<span class="popup-tag">オフィス</span>';
 
-							// 現在川崎のBMWのみ詳細ページが存在（右添えに詳細ボタンを配置、矢印なし）
-							const isKawasakiBmw = (l.id === 'loc-1' || (l.name.includes('Nicole BMW 本社') && !l.name.includes('オフィス')));
+							const isKawasakiBmw = (singleLoc.id === 'loc-1' || (singleLoc.name.includes('Nicole BMW 本社') && !singleLoc.name.includes('オフィス')));
 
 							facilitiesHtml += `
-								<div class="popup-facility-item">
+								<div class="popup-facility-item popup-facility-item--single">
 									<div class="popup-facility-main">
-										<strong class="popup-facility-name">${l.name}</strong>
 										<div class="popup-facility-tags">${badgeText}</div>
 									</div>
 									${isKawasakiBmw ? `<a href="/location/nicole-bmw-kawasaki/" class="popup-detail-btn" title="川崎本社の店舗詳細を見る">詳細</a>` : ''}
 								</div>
 							`;
-						});
-					} else {
-						const singleLoc = groupLocs[0];
-						const cat = getLocCategory(singleLoc);
-						let badgeText = '';
-						if (cat.isSales) badgeText += '<span class="popup-tag popup-tag--sales">新車</span>';
-						if (cat.isUsed) badgeText += '<span class="popup-tag popup-tag--used">中古車</span>';
-						if (cat.isService) badgeText += '<span class="popup-tag popup-tag--service">サービス</span>';
-						if (cat.isOffice) badgeText += '<span class="popup-tag">オフィス</span>';
+						}
 
-						const isKawasakiBmw = (singleLoc.id === 'loc-1' || (singleLoc.name.includes('Nicole BMW 本社') && !singleLoc.name.includes('オフィス')));
-
-						facilitiesHtml += `
-							<div class="popup-facility-item popup-facility-item--single">
-								<div class="popup-facility-main">
-									<div class="popup-facility-tags">${badgeText}</div>
+						return `
+							<div class="map-popup">
+								<div class="map-popup__header">
+									<div class="map-popup__title">${mainTitle}</div>
+									<div class="map-popup__addr">
+										<a href="https://maps.google.com/?q=${encodeURIComponent(group.address)}" target="_blank" rel="noopener noreferrer" class="map-popup__addr-link" title="Google Mapsで地図を確認">
+											<span class="map-popup__addr-text">${group.address}</span>
+											<span class="map-popup__addr-badge">MAP ↗</span>
+										</a>
+									</div>
 								</div>
-								${isKawasakiBmw ? `<a href="/location/nicole-bmw-kawasaki/" class="popup-detail-btn" title="川崎本社の店舗詳細を見る">詳細</a>` : ''}
+								<div class="map-popup__facilities">
+									${facilitiesHtml}
+								</div>
 							</div>
 						`;
 					}
 
-					const popupContent = `
-						<div class="map-popup">
-							<div class="map-popup__header">
-								<div class="map-popup__title">${mainTitle}</div>
-								<div class="map-popup__addr">
-									<a href="https://maps.google.com/?q=${encodeURIComponent(group.address)}" target="_blank" rel="noopener noreferrer" class="map-popup__addr-link" title="Google Mapsで地図を確認">
-										<span class="map-popup__addr-text">${group.address}</span>
-										<span class="map-popup__addr-badge">MAP ↗</span>
-									</a>
-								</div>
-							</div>
-							<div class="map-popup__facilities">
-								${facilitiesHtml}
-							</div>
-						</div>
-					`;
-
-					marker.bindPopup(popupContent, { 
+					marker.bindPopup(buildPopupContent(currentBrand), { 
 						maxWidth: 340,
 						minWidth: 260,
 						autoPan: true,
@@ -758,8 +786,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						keepInView: true
 					});
 
-					// ピンをクリックした際、吹き出しが画面外に消えないよう地図をスムーズに少し上方に移動
+					// ピンをクリックした際、最新の選択ブランド順でポップアップを更新し、吹き出しが画面外に消えないよう地図をスムーズに少し上方に移動
 					marker.on('click', () => {
+						marker.setPopupContent(buildPopupContent(currentBrand));
 						const targetLat = group.lat + 0.004;
 						map.panTo([targetLat, group.lng], { animate: true, duration: 0.35 });
 					});
@@ -775,13 +804,46 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 		initMap();
 
+		// リスト項目の並び替え優先度スコア計算（MINI選択時はMINI新車→MINI中古車→それ以降）
+		function getRowPriority(row, brand) {
+			const initialOrder = parseInt(row.getAttribute('data-initial-order') || '0', 10);
+			if (brand === 'all') {
+				return initialOrder;
+			}
+
+			const primaryBrand = row.getAttribute('data-primary-brand') || '';
+			const hasSales = row.getAttribute('data-has-sales') === 'true';
+			const hasUsed = row.getAttribute('data-has-used') === 'true';
+			const hasService = row.getAttribute('data-has-service') === 'true';
+
+			const isTargetPrimary = (primaryBrand === brand) || 
+				(brand === 'ALPINA' && (primaryBrand === 'ALPINA' || primaryBrand === 'Nicole'));
+
+			// 該当ブランド（例: MINI）自体の拠点
+			if (isTargetPrimary) {
+				if (hasSales) return 100 + initialOrder;   // 1. 新車販売
+				if (hasUsed) return 200 + initialOrder;    // 2. 認定中古車
+				if (hasService) return 300 + initialOrder; // 3. サービス専業
+				return 400 + initialOrder;
+			}
+
+			// 他ブランドだが対象ブランドのサービス等を扱う拠点（例: BMW本社・新百合ヶ丘など）
+			// 「それ以降」として後方に配置
+			if (hasSales) return 1000 + initialOrder;
+			if (hasUsed) return 2000 + initialOrder;
+			return 3000 + initialOrder;
+		}
+
 		// 3. 複合フィルタリング同期（マップ ＆ リスト）
 		function applyFilters() {
 			let visibleRetailCount = 0;
 			let visibleOfficeCount = 0;
 			const visibleLatLngs = [];
 
-			// リスト側のフィルタリング
+			const retailRows = [];
+			const officeRows = [];
+
+			// リスト側のフィルタリング ＆ 並び順スコア計算
 			rows.forEach(row => {
 				const brandsAttr = row.getAttribute('data-brand') || '';
 				const brands = brandsAttr.split(',').filter(Boolean);
@@ -801,15 +863,27 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 				if (matchBrand && matchArea && matchService) {
 					row.style.display = 'flex';
+					const priority = getRowPriority(row, currentBrand);
+					row.style.order = priority;
+
 					if (isOffice) {
 						visibleOfficeCount++;
+						officeRows.push({ row, priority });
 					} else {
 						visibleRetailCount++;
+						retailRows.push({ row, priority });
 					}
 				} else {
 					row.style.display = 'none';
 				}
 			});
+
+			// 一覧DOM自体の順序も整えて完全同期（MINI選択時はMINI新車→MINI中古車→それ以降の順）
+			const retailListEl = document.getElementById('locations-list');
+			if (retailListEl && retailRows.length > 0) {
+				retailRows.sort((a, b) => a.priority - b.priority);
+				retailRows.forEach(item => retailListEl.appendChild(item.row));
+			}
 
 			// オフィス別枠ブロックの表示・非表示連動
 			const officesBlock = document.getElementById('locs-offices-block');
