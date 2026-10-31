@@ -33,8 +33,6 @@ export interface Location {
   facility_type?: string;
   postal?: string;
   address?: string;
-  tel?: string;
-  fax?: string;
   office_notice?: string;
   featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   gallery_image_1?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
@@ -52,6 +50,7 @@ export interface Location {
   sales_title?: string;
   sales_subtitle?: string;
   sales_tel?: string;
+  sales_fax?: string;
   sales_hours?: string;
   sales_closed?: string;
   sales_desc?: string;
@@ -60,6 +59,7 @@ export interface Location {
   used_title?: string;
   used_subtitle?: string;
   used_tel?: string;
+  used_fax?: string;
   used_hours?: string;
   used_closed?: string;
   used_desc?: string;
@@ -68,6 +68,7 @@ export interface Location {
   service_title?: string;
   service_subtitle?: string;
   service_tel?: string;
+  service_fax?: string;
   service_hours?: string;
   service_closed?: string;
   service_desc?: string;

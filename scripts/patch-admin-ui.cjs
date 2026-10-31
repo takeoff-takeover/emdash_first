@@ -1,5 +1,5 @@
 // scripts/patch-admin-ui.cjs
-// EmDash 管理画面に拠点（locations）の「タブUI（Tabbed Interface）」を動的注入するパッチ
+// EmDash 管理画面に拠点（locations）の「アコーディオンUI（Accordion Interface）」を動的注入するパッチ
 const fs = require('fs');
 const path = require('path');
 
@@ -20,7 +20,6 @@ if (content.includes(MARKER)) {
     const endIdx = content.indexOf('</script>', startIdx) + '</script>'.length;
     content = content.slice(0, startIdx) + content.slice(endIdx);
   } else {
-    // 別のフォーマットで注入されている場合
     const simpleIdx = content.indexOf(MARKER);
     const scriptStart = content.lastIndexOf('<script', simpleIdx);
     const scriptEnd = content.indexOf('</script>', simpleIdx) + '</script>'.length;
@@ -38,51 +37,53 @@ const injectedCode = `
 					{
 						id: 'sec-basic',
 						prefix: '【基本情報】',
-						name: '基本情報',
+						title: '基本情報',
 						desc: '拠点名称、主要ブランド、住所、管理オフィス注記'
 					},
 					{
 						id: 'sec-gallery',
 						prefix: '【写真ギャラリー】',
-						name: '写真ギャラリー',
+						title: '写真ギャラリー',
 						desc: 'メイン外観写真（アイキャッチ）および詳細写真（最大6枚）と説明文'
 					},
 					{
 						id: 'sec-sales',
 						prefix: '【新車窓口】',
-						name: '新車窓口',
+						title: '新車窓口',
 						desc: '新車窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、展示案内、予約ボタン'
 					},
 					{
 						id: 'sec-used',
 						prefix: '【中古車窓口】',
-						name: '認定中古車窓口',
+						title: '認定中古車窓口',
 						desc: '中古車窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、在庫案内、在庫ボタン'
 					},
 					{
 						id: 'sec-service',
 						prefix: '【サービス窓口】',
-						name: 'サービス窓口',
+						title: 'サービス窓口',
 						desc: 'サービス窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、整備案内、予約ボタン'
 					},
 					{
 						id: 'sec-access',
 						prefix: '【併設・アクセス】',
-						name: '併設・アクセス',
+						title: '併設・アクセス',
 						desc: '同一敷地併設拠点への相互リンク、お車・電車バスでのアクセス方法、GoogleマップURL'
-					},
-					{
-						id: 'sec-all',
-						prefix: '',
-						name: 'すべて表示',
-						desc: '全セクションのフィールドを一覧表示'
 					}
 				];
 
-				let currentActiveTab = 'sec-basic';
+				// 各セクションの開閉状態（デフォルトは基本情報のみオープン）
+				const openState = {
+					'sec-basic': true,
+					'sec-gallery': false,
+					'sec-sales': false,
+					'sec-used': false,
+					'sec-service': false,
+					'sec-access': false
+				};
 
-				function applyTabs() {
-					// 画面内にプレフィックスが存在するか判定（URLに依存せず確実に検出）
+				function applyAccordion() {
+					// 画面内にプレフィックスが存在するか判定
 					const allElements = Array.from(document.querySelectorAll('label, p, span, h3, h4'));
 					const hasLocationsField = allElements.some(el =>
 						el.textContent && (
@@ -93,9 +94,10 @@ const injectedCode = `
 					);
 
 					if (!hasLocationsField) {
-						// 拠点編集画面以外ではタブコンテナを削除
-						const existingNav = document.getElementById('emdash-tabs-nav-bar');
-						if (existingNav) existingNav.remove();
+						// 拠点編集画面以外ではアコーディオンヘッダーやツールバーを削除
+						document.querySelectorAll('[data-accordion-header]').forEach(el => el.remove());
+						const existingToolbar = document.getElementById('emdash-accordion-toolbar');
+						if (existingToolbar) existingToolbar.remove();
 						return;
 					}
 
@@ -107,7 +109,7 @@ const injectedCode = `
 						if (el.children.length > 0 || !el.textContent) return;
 						const text = el.textContent;
 						for (const sec of SECTION_CONFIG) {
-							if (sec.prefix && text.includes(sec.prefix)) {
+							if (text.includes(sec.prefix)) {
 								let container = el.parentElement;
 								while (container && container.parentElement) {
 									if (container.parentElement.classList.contains('space-y-6') || container.parentElement.tagName === 'FIELDSET') {
@@ -123,7 +125,7 @@ const injectedCode = `
 						}
 					});
 
-					const totalFound = Object.entries(sectionElements).reduce((acc, [k, arr]) => k === 'sec-all' ? acc : acc + arr.length, 0);
+					const totalFound = Object.values(sectionElements).reduce((acc, arr) => acc + arr.length, 0);
 					if (totalFound < 3) return;
 
 					// ターゲットとなる親要素を取得
@@ -131,143 +133,197 @@ const injectedCode = `
 					if (!firstField || !firstField.parentElement) return;
 					const parentContainer = firstField.parentElement;
 
-					// タブナビゲーションバーの作成または更新
-					let navBar = document.getElementById('emdash-tabs-nav-bar');
-					if (!navBar) {
-						navBar = document.createElement('div');
-						navBar.id = 'emdash-tabs-nav-bar';
-						navBar.style.cssText = \`
-							margin-bottom: 24px;
-							padding: 6px;
+					// アコーディオン一括開閉ツールバーの生成または更新
+					let toolbar = document.getElementById('emdash-accordion-toolbar');
+					if (!toolbar) {
+						toolbar = document.createElement('div');
+						toolbar.id = 'emdash-accordion-toolbar';
+						toolbar.style.cssText = \`
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							margin-bottom: 20px;
+							padding: 10px 16px;
 							background: #141517;
 							border: 1px solid #27272a;
 							border-radius: 8px;
-							display: flex;
-							flex-wrap: wrap;
-							gap: 6px;
-							position: sticky;
-							top: 12px;
-							z-index: 50;
-							box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+							gap: 12px;
 						\`;
-						parentContainer.insertBefore(navBar, parentContainer.firstChild);
-					}
 
-					// タブボタンの生成・更新
-					navBar.innerHTML = '';
-					SECTION_CONFIG.forEach(sec => {
-						const count = sec.id === 'sec-all' ? totalFound : (sectionElements[sec.id]?.length || 0);
-						if (count === 0 && sec.id !== 'sec-all') return;
+						const infoText = document.createElement('span');
+						infoText.style.cssText = 'font-size: 13px; color: #a1a1aa; font-weight: 500;';
+						infoText.innerHTML = '<span style="color: #ffffff; font-weight: 700;">拠点詳細設定</span>（クリックで各セクションを開閉できます）';
 
-						const tabBtn = document.createElement('button');
-						tabBtn.type = 'button';
-						tabBtn.className = 'emdash-tab-btn';
-						tabBtn.setAttribute('data-tab-id', sec.id);
+						const btnGroup = document.createElement('div');
+						btnGroup.style.cssText = 'display: flex; gap: 8px;';
 
-						const isActive = currentActiveTab === sec.id;
-						tabBtn.style.cssText = \`
-							display: inline-flex;
-							align-items: center;
-							gap: 8px;
-							padding: 8px 14px;
-							font-size: 13px;
-							font-weight: \${isActive ? '700' : '500'};
-							color: \${isActive ? '#ffffff' : '#a1a1aa'};
-							background: \${isActive ? '#27272a' : 'transparent'};
-							border: 1px solid \${isActive ? '#3f3f46' : 'transparent'};
-							border-radius: 6px;
+						const expandAllBtn = document.createElement('button');
+						expandAllBtn.type = 'button';
+						expandAllBtn.textContent = 'すべて開く';
+						expandAllBtn.style.cssText = \`
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: #ffffff;
+							background: #27272a;
+							border: 1px solid #3f3f46;
+							border-radius: 4px;
+							cursor: pointer;
+							transition: background 0.15s ease;
+						\`;
+						expandAllBtn.onmouseenter = () => { expandAllBtn.style.background = '#3f3f46'; };
+						expandAllBtn.onmouseleave = () => { expandAllBtn.style.background = '#27272a'; };
+						expandAllBtn.onclick = (e) => {
+							e.preventDefault();
+							SECTION_CONFIG.forEach(s => { openState[s.id] = true; });
+							updateAccordionVisibility(sectionElements);
+						};
+
+						const collapseAllBtn = document.createElement('button');
+						collapseAllBtn.type = 'button';
+						collapseAllBtn.textContent = 'すべて閉じる';
+						collapseAllBtn.style.cssText = \`
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: #a1a1aa;
+							background: transparent;
+							border: 1px solid #3f3f46;
+							border-radius: 4px;
 							cursor: pointer;
 							transition: all 0.15s ease;
 						\`;
-
-						tabBtn.innerHTML = \`
-							<span>\${sec.name}</span>
-							<span style="
-								font-size: 11px;
-								padding: 1px 6px;
-								border-radius: 4px;
-								background: \${isActive ? '#3f3f46' : '#1f2023'};
-								color: \${isActive ? '#ffffff' : '#71717a'};
-							">\${count}</span>
-						\`;
-
-						tabBtn.onmouseenter = () => {
-							if (currentActiveTab !== sec.id) {
-								tabBtn.style.background = '#1c1d20';
-								tabBtn.style.color = '#e4e4e7';
-							}
+						collapseAllBtn.onmouseenter = () => {
+							collapseAllBtn.style.background = '#27272a';
+							collapseAllBtn.style.color = '#ffffff';
 						};
-						tabBtn.onmouseleave = () => {
-							if (currentActiveTab !== sec.id) {
-								tabBtn.style.background = 'transparent';
-								tabBtn.style.color = '#a1a1aa';
-							}
+						collapseAllBtn.onmouseleave = () => {
+							collapseAllBtn.style.background = 'transparent';
+							collapseAllBtn.style.color = '#a1a1aa';
 						};
-
-						tabBtn.onclick = (e) => {
+						collapseAllBtn.onclick = (e) => {
 							e.preventDefault();
-							currentActiveTab = sec.id;
-							applyTabs();
+							SECTION_CONFIG.forEach(s => { openState[s.id] = false; });
+							updateAccordionVisibility(sectionElements);
 						};
 
-						navBar.appendChild(tabBtn);
-					});
+						btnGroup.appendChild(expandAllBtn);
+						btnGroup.appendChild(collapseAllBtn);
+						toolbar.appendChild(infoText);
+						toolbar.appendChild(btnGroup);
 
-					// セクションフィールドの表示・非表示切り替え
-					SECTION_CONFIG.forEach(sec => {
-						if (sec.id === 'sec-all') return;
+						parentContainer.insertBefore(toolbar, parentContainer.firstChild);
+					}
+
+					// 各セクションのアコーディオンヘッダーを作成または配置
+					for (const sec of SECTION_CONFIG) {
 						const fields = sectionElements[sec.id] || [];
-						const shouldShow = currentActiveTab === 'sec-all' || currentActiveTab === sec.id;
+						if (fields.length === 0) continue;
 
-						fields.forEach(f => {
-							f.style.display = shouldShow ? '' : 'none';
-							if (shouldShow && currentActiveTab !== 'sec-all') {
-								f.style.animation = 'emdashFadeIn 0.2s ease';
+						const firstFieldOfSec = fields[0];
+						let header = document.querySelector(\`[data-accordion-header="\${sec.id}"]\`);
+
+						if (!header) {
+							header = document.createElement('div');
+							header.setAttribute('data-accordion-header', sec.id);
+							header.style.cssText = \`
+								margin-top: 24px;
+								margin-bottom: 14px;
+								padding: 14px 18px;
+								background: #18181b;
+								border: 1px solid #27272a;
+								border-left: 4px solid #ffffff;
+								border-radius: 6px;
+								cursor: pointer;
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								user-select: none;
+								transition: background 0.15s ease, border-color 0.15s ease;
+							\`;
+
+							header.onmouseenter = () => { header.style.background = '#222327'; };
+							header.onmouseleave = () => { header.style.background = '#18181b'; };
+
+							header.onclick = (e) => {
+								e.preventDefault();
+								openState[sec.id] = !openState[sec.id];
+								updateAccordionVisibility(sectionElements);
+							};
+
+							const leftDiv = document.createElement('div');
+							leftDiv.style.cssText = 'flex: 1;';
+
+							const h3 = document.createElement('div');
+							h3.className = 'acc-title-text';
+							h3.style.cssText = 'font-size: 15px; font-weight: 700; color: #ffffff; letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px;';
+
+							const p = document.createElement('div');
+							p.className = 'acc-desc-text';
+							p.textContent = sec.desc;
+							p.style.cssText = 'margin: 4px 0 0 0; font-size: 12px; color: #a1a1aa; line-height: 1.4;';
+
+							leftDiv.appendChild(h3);
+							leftDiv.appendChild(p);
+
+							const rightDiv = document.createElement('div');
+							rightDiv.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-left: 14px;';
+
+							const countBadge = document.createElement('span');
+							countBadge.className = 'acc-badge';
+							countBadge.textContent = \`\${fields.length}項目\`;
+							countBadge.style.cssText = 'font-size: 11px; background: #27272a; color: #d4d4d8; padding: 2px 8px; border-radius: 9999px; border: 1px solid #3f3f46;';
+
+							const arrow = document.createElement('span');
+							arrow.className = 'acc-arrow';
+							arrow.style.cssText = 'font-size: 12px; font-weight: 600; color: #ffffff; transition: transform 0.2s ease;';
+
+							rightDiv.appendChild(countBadge);
+							rightDiv.appendChild(arrow);
+
+							header.appendChild(leftDiv);
+							header.appendChild(rightDiv);
+
+							firstFieldOfSec.parentNode.insertBefore(header, firstFieldOfSec);
+						}
+
+						// タイトル更新
+						const h3El = header.querySelector('.acc-title-text');
+						if (h3El) h3El.textContent = sec.title;
+					}
+
+					updateAccordionVisibility(sectionElements);
+				}
+
+				function updateAccordionVisibility(sectionElements) {
+					SECTION_CONFIG.forEach(sec => {
+						const header = document.querySelector(\`[data-accordion-header="\${sec.id}"]\`);
+						const fields = sectionElements ? (sectionElements[sec.id] || []) : [];
+						const isOpen = !!openState[sec.id];
+
+						if (header) {
+							const arrow = header.querySelector('.acc-arrow');
+							if (arrow) {
+								arrow.textContent = isOpen ? '▲ 閉じる' : '▼ 開く';
+							}
+							header.style.borderLeftColor = isOpen ? '#ffffff' : '#52525b';
+							header.style.background = isOpen ? '#1c1d21' : '#18181b';
+						}
+
+						fields.forEach(fieldEl => {
+							fieldEl.style.display = isOpen ? '' : 'none';
+							if (isOpen) {
+								fieldEl.style.paddingLeft = '10px';
+								fieldEl.style.borderLeft = '2px solid #27272a';
+								fieldEl.style.marginLeft = '4px';
 							}
 						});
 					});
-
-					// セクション説明バナーの作成・更新
-					let descBanner = document.getElementById('emdash-tab-desc-banner');
-					const activeSecObj = SECTION_CONFIG.find(s => s.id === currentActiveTab);
-					if (activeSecObj && activeSecObj.desc) {
-						if (!descBanner) {
-							descBanner = document.createElement('div');
-							descBanner.id = 'emdash-tab-desc-banner';
-							descBanner.style.cssText = \`
-								padding: 10px 14px;
-								margin-bottom: 20px;
-								background: rgba(255, 255, 255, 0.03);
-								border-left: 3px solid #ffffff;
-								border-radius: 4px;
-								font-size: 12px;
-								color: #9ca3af;
-							\`;
-							navBar.parentNode.insertBefore(descBanner, navBar.nextSibling);
-						}
-						descBanner.textContent = activeSecObj.desc;
-						descBanner.style.display = '';
-					} else if (descBanner) {
-						descBanner.style.display = 'none';
-					}
 				}
 
-				// スタイルアニメーション注入
-				if (!document.getElementById('emdash-tab-keyframes')) {
-					const style = document.createElement('style');
-					style.id = 'emdash-tab-keyframes';
-					style.textContent = \`
-						@keyframes emdashFadeIn {
-							from { opacity: 0; transform: translateY(4px); }
-							to { opacity: 1; transform: translateY(0); }
-						}
-					\`;
-					document.head.appendChild(style);
-				}
-
-				// 定期実行とイベント監視
-				setInterval(applyTabs, 350);
-				window.addEventListener('popstate', () => setTimeout(applyTabs, 100));
+				// 定期実行とイベント監視でSPA遷移に完全追従
+				setInterval(applyAccordion, 350);
+				window.addEventListener('popstate', () => setTimeout(applyAccordion, 100));
 			})();
 		</script>
 `;
@@ -276,7 +332,7 @@ const bodyCloseIdx = content.lastIndexOf('</body>');
 if (bodyCloseIdx !== -1) {
   content = content.slice(0, bodyCloseIdx) + injectedCode + '\n' + content.slice(bodyCloseIdx);
   fs.writeFileSync(adminAstroPath, content, 'utf8');
-  console.log('[patch-admin-ui] Successfully injected clean Tabbed UI into admin.astro.');
+  console.log('[patch-admin-ui] Successfully injected clean Accordion UI into admin.astro.');
 } else {
   console.error('[patch-admin-ui] Could not find </body> in admin.astro.');
 }
