@@ -21,6 +21,7 @@ const kawasakiData = {
 	postal: '〒212-0005',
 	address: '神奈川県川崎市幸区戸手2-5-7',
 	tel: '044-511-2000',
+	fax: '044-544-0100',
 	office_notice: '同敷地内にニコル・グループ川崎本社オフィスを併設しております。一般のお客様向けのショールーム・新車商談・車検点検のご案内は本ショールームおよびサービスセンターにて承っております。',
 	google_maps_url: 'https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7',
 	featured_image: JSON.stringify({
@@ -85,6 +86,7 @@ const miniShinyurigaokaData = {
 	postal: '〒215-0023',
 	address: '神奈川県川崎市麻生区片平1-5-11',
 	tel: '044-959-3032',
+	fax: '044-959-3033',
 	office_notice: '',
 	google_maps_url: 'https://maps.google.com/?q=MINI+新百合ヶ丘+神奈川県川崎市麻生区片平1-5-11',
 	featured_image: JSON.stringify({
@@ -137,7 +139,7 @@ const miniShinyurigaokaData = {
 	service_cta_url: 'https://secure-p2.mini.jp/mini/jsf/service/index.jsf',
 
 	// 同一敷地内リンク
-	related_hub_title: '同一敷地内：Nicole BMW 新百合ヶ丘支店',
+	related_hub_title: 'Nicole BMW 新百合ヶ丘支店',
 	related_hub_url: '/location/nicole-bmw-shinyurigaoka/',
 	related_hub_desc: '同敷地内にNicole BMW 新車ショールームおよびBMW Premium Selection認定中古車センターを併設しております。BMWをご覧のお客様はこちらをご確認ください。',
 
@@ -154,6 +156,7 @@ const bmwShinyurigaokaData = {
 	postal: '〒215-0023',
 	address: '神奈川県川崎市麻生区片平1-5-11',
 	tel: '044-959-1400',
+	fax: '044-959-1401',
 	office_notice: '',
 	google_maps_url: 'https://maps.google.com/?q=Nicole+BMW+新百合ヶ丘支店+神奈川県川崎市麻生区片平1-5-11',
 	featured_image: JSON.stringify({
@@ -206,7 +209,7 @@ const bmwShinyurigaokaData = {
 	service_cta_url: 'https://form.bmw.co.jp/form/service/dealer/03110/index.html',
 
 	// 同一敷地内リンク
-	related_hub_title: '同一敷地内：MINI 新百合ヶ丘 / MINI NEXT 新百合ヶ丘',
+	related_hub_title: 'MINI 新百合ヶ丘 / MINI NEXT 新百合ヶ丘',
 	related_hub_url: '/location/mini-shinyurigaoka/',
 	related_hub_desc: '同敷地内にMINI正規新車ショールームおよびMINI NEXT認定中古車センターを併設しております。MINIをご覧のお客様はこちらをご確認ください。',
 

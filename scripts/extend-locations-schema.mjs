@@ -11,10 +11,11 @@ if (!fs.existsSync(DB_PATH)) {
 }
 
 const db = new DatabaseSync(DB_PATH);
-console.log('[Extend Schema] Updating _emdash_fields with minimal clean labels (no emoji, no block numbers, no parking)...');
+console.log('[Extend Schema] Updating _emdash_fields with fax and clean labels...');
 
-// 1. ec_locations テーブルのカラム追加（存在しない場合）
+// 1. ec_locations テーブルのカラム追加
 const newColumns = [
+	{ name: 'fax', type: 'text' },
 	{ name: 'office_notice', type: 'text' },
 	{ name: 'access_car', type: 'text' },
 
@@ -73,7 +74,7 @@ for (const col of newColumns) {
 	}
 }
 
-// 2. _emdash_fields に管理画面用フィールド定義をミニマル・クリーンに登録
+// 2. _emdash_fields に管理画面用フィールド定義を登録
 const COLLECTION_ID = '01M5WLOCAT000000000000001';
 
 const fieldDefs = [
@@ -84,7 +85,8 @@ const fieldDefs = [
 	{ slug: 'postal', label: '【基本情報】郵便番号', type: 'string', col: 'TEXT', order: 13 },
 	{ slug: 'address', label: '【基本情報】所在地住所', type: 'string', col: 'TEXT', order: 14 },
 	{ slug: 'tel', label: '【基本情報】代表電話番号', type: 'string', col: 'TEXT', order: 15 },
-	{ slug: 'office_notice', label: '【基本情報】管理オフィス注記（※空欄時は非表示）', type: 'text', col: 'TEXT', order: 16 },
+	{ slug: 'fax', label: '【基本情報】FAX番号（※空欄時は非表示）', type: 'string', col: 'TEXT', order: 16 },
+	{ slug: 'office_notice', label: '【基本情報】管理オフィス注記（※空欄時は非表示）', type: 'text', col: 'TEXT', order: 17 },
 
 	// ─── 【写真ギャラリー】 ───
 	{ slug: 'featured_image', label: '【写真ギャラリー】メイン外観写真（アイキャッチ）', type: 'image', col: 'TEXT', order: 20 },
@@ -102,7 +104,7 @@ const fieldDefs = [
 	{ slug: 'gallery_caption_6', label: '【写真ギャラリー】写真 6 説明文', type: 'string', col: 'TEXT', order: 32 },
 
 	// ─── 【新車窓口】 ───
-	{ slug: 'sales_title', label: '【新車窓口】部門名称（例: BMW 新車ショールーム）', type: 'string', col: 'TEXT', order: 40 },
+	{ slug: 'sales_title', label: '【新車窓口】名称（例: BMW 新車ショールーム）', type: 'string', col: 'TEXT', order: 40 },
 	{ slug: 'sales_tel', label: '【新車窓口】電話番号', type: 'string', col: 'TEXT', order: 41 },
 	{ slug: 'sales_hours', label: '【新車窓口】営業時間', type: 'string', col: 'TEXT', order: 42 },
 	{ slug: 'sales_closed', label: '【新車窓口】定休日', type: 'string', col: 'TEXT', order: 43 },
@@ -111,7 +113,7 @@ const fieldDefs = [
 	{ slug: 'sales_cta_url', label: '【新車窓口】ボタンリンクURL', type: 'string', col: 'TEXT', order: 46 },
 
 	// ─── 【中古車窓口】 ───
-	{ slug: 'used_title', label: '【中古車窓口】部門名称（例: MINI NEXT 認定中古車）', type: 'string', col: 'TEXT', order: 50 },
+	{ slug: 'used_title', label: '【中古車窓口】名称（例: MINI NEXT 認定中古車）', type: 'string', col: 'TEXT', order: 50 },
 	{ slug: 'used_tel', label: '【中古車窓口】電話番号', type: 'string', col: 'TEXT', order: 51 },
 	{ slug: 'used_hours', label: '【中古車窓口】営業時間', type: 'string', col: 'TEXT', order: 52 },
 	{ slug: 'used_closed', label: '【中古車窓口】定休日', type: 'string', col: 'TEXT', order: 53 },
@@ -120,7 +122,7 @@ const fieldDefs = [
 	{ slug: 'used_cta_url', label: '【中古車窓口】ボタンリンクURL', type: 'string', col: 'TEXT', order: 56 },
 
 	// ─── 【サービス窓口】 ───
-	{ slug: 'service_title', label: '【サービス窓口】部門名称（例: 本社サービス工場）', type: 'string', col: 'TEXT', order: 60 },
+	{ slug: 'service_title', label: '【サービス窓口】名称（例: 本社サービス工場）', type: 'string', col: 'TEXT', order: 60 },
 	{ slug: 'service_tel', label: '【サービス窓口】電話番号', type: 'string', col: 'TEXT', order: 61 },
 	{ slug: 'service_hours', label: '【サービス窓口】営業時間', type: 'string', col: 'TEXT', order: 62 },
 	{ slug: 'service_closed', label: '【サービス窓口】定休日', type: 'string', col: 'TEXT', order: 63 },

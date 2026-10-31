@@ -192,8 +192,9 @@ const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = 
 
 const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`;
 
-// 4. 同一敷地内 併設拠点案内のブランドロゴ判定
+// 4. 同一敷地内 併設拠点案内のブランドロゴ判定 ＆ タイトル整形
 const relatedHubTitle = d.related_hub_title || '';
+const cleanRelatedHubTitle = relatedHubTitle.replace(/^同一敷地内[：:]\s*/, '');
 const relatedHubUrl = d.related_hub_url || '';
 let relatedHubBrandLogo = '/brands/bmw.svg';
 let relatedHubBrandAlt = 'BMW';
@@ -270,26 +271,6 @@ if (relatedCombined.includes('mini')) {
 			<div class="sr-layout-grid">
 				<!-- 左側：メイン詳細コンテンツ -->
 				<div class="sr-main-col">
-					<!-- 同一敷地内 姉妹拠点カード（新百合ヶ丘など複合拠点で表示） -->
-					{d.related_hub_url && (
-						<div class="related-hub-banner">
-							<div class="related-hub-banner__icon">
-								<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`hub-brand-logo ${relatedHubBrandAlt === 'MINI' ? 'hub-brand-logo--mini' : ''}`} />
-							</div>
-							<div class="related-hub-banner__body">
-								<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
-								<h3 class="related-hub-banner__title">{d.related_hub_title}</h3>
-								{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
-							</div>
-							<div class="related-hub-banner__action">
-								<a href={d.related_hub_url} class="btn-hub-link">
-									詳細を見る
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-icon"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-								</a>
-							</div>
-						</div>
-					)}
-
 					<!-- ショールームコンセプト（デスクトップで表示） -->
 					{(d.concept_title || d.concept_text) && (
 						<section class="sr-section sr-section--concept">
@@ -344,6 +325,7 @@ if (relatedCombined.includes('mini')) {
 					<!-- 店舗・窓口情報（基本情報 ＋ 各部門窓口アコーディオン） -->
 					<section class="sr-section sr-section--depts" id="departments">
 						<h2 class="section-title">店舗・窓口情報</h2>
+						<p class="section-desc">ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。</p>
 
 						<div class="dealer-info-card">
 							<!-- 拠点共通・基本情報バー -->
@@ -354,9 +336,15 @@ if (relatedCombined.includes('mini')) {
 								<div class="dealer-summary-address">
 									<span class="dealer-address-text">{d.postal} {d.address}</span>
 									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
-										Googleマップ ↗
+										Googleマップ
 									</a>
 								</div>
+								{d.fax && (
+									<div class="dealer-summary-fax">
+										<span class="d-label">FAX</span>
+										<span class="d-val">{d.fax}</span>
+									</div>
+								)}
 							</div>
 
 							<!-- 各部門アコーディオン -->
@@ -379,7 +367,7 @@ if (relatedCombined.includes('mini')) {
 												<div class="dept-compact-table">
 													{dept.subtitle && (
 														<div class="dept-table-row">
-															<span class="d-label">部門名</span>
+															<span class="d-label">名称</span>
 															<span class="d-val d-val--bold">{dept.subtitle}</span>
 														</div>
 													)}
@@ -426,7 +414,7 @@ if (relatedCombined.includes('mini')) {
 													)}
 													{dept.ctaUrl && (
 														<a href={dept.ctaUrl} target="_blank" rel="noopener noreferrer" class="btn-dept-cta">
-															{dept.ctaLabel || 'Web予約・お問い合わせ'} ↗
+															{dept.ctaLabel || 'Web予約・お問い合わせ'}
 														</a>
 													)}
 												</div>
@@ -437,6 +425,25 @@ if (relatedCombined.includes('mini')) {
 							</div>
 						</div>
 					</section>
+
+					<!-- 同一敷地内 併設拠点案内（店舗・窓口情報の直後に配置） -->
+					{d.related_hub_url && (
+						<div class="related-hub-banner">
+							<div class="related-hub-banner__icon">
+								<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`hub-brand-logo ${relatedHubBrandAlt === 'MINI' ? 'hub-brand-logo--mini' : ''}`} />
+							</div>
+							<div class="related-hub-banner__body">
+								<span class="related-hub-banner__tag">同一敷地内 併設拠点のご案内</span>
+								<h3 class="related-hub-banner__title">{cleanRelatedHubTitle}</h3>
+								{d.related_hub_desc && <p class="related-hub-banner__desc">{d.related_hub_desc}</p>}
+							</div>
+							<div class="related-hub-banner__action">
+								<a href={d.related_hub_url} class="btn-hub-link">
+									詳細を見る
+								</a>
+							</div>
+						</div>
+					)}
 
 					<!-- アクセス案内セクション -->
 					<section class="sr-section" id="access">
@@ -590,9 +597,9 @@ if (relatedCombined.includes('mini')) {
 									<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`sidebar-related-hub__logo ${relatedHubBrandAlt === 'MINI' ? 'sidebar-related-hub__logo--mini' : ''}`} />
 									<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
 								</div>
-								<h4 class="sidebar-related-hub__title">{d.related_hub_title}</h4>
+								<h4 class="sidebar-related-hub__title">{cleanRelatedHubTitle}</h4>
 								<a href={d.related_hub_url} class="sidebar-related-hub__link">
-									併設拠点の詳細を見る ↗
+									詳細を見る
 								</a>
 							</div>
 						)}
@@ -1000,7 +1007,9 @@ if (relatedCombined.includes('mini')) {
 
 	.gallery-main-frame {
 		position: relative;
-		height: 420px;
+		aspect-ratio: 16 / 9;
+		max-height: 450px;
+		width: 100%;
 		border-radius: 8px;
 		overflow: hidden;
 		background: #08090a;
@@ -1118,6 +1127,28 @@ if (relatedCombined.includes('mini')) {
 		align-items: center;
 		gap: 14px;
 		flex-wrap: wrap;
+	}
+
+	.dealer-summary-fax {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.875rem;
+		color: #94a3b8;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.dealer-summary-fax .d-label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		color: #64748b;
+		background: rgba(255, 255, 255, 0.06);
+		padding: 2px 6px;
+		border-radius: 3px;
+	}
+
+	.dealer-summary-fax .d-val {
+		color: #e2e8f0;
 	}
 
 	.dealer-address-text {
@@ -1837,8 +1868,8 @@ if (relatedCombined.includes('mini')) {
 		}
 
 		.sr-hero {
-			min-height: 280px;
-			padding: 36px 0 28px;
+			min-height: 380px;
+			padding: 56px 0 44px;
 		}
 
 		.sr-hero__content {
@@ -1948,6 +1979,11 @@ if (relatedCombined.includes('mini')) {
 			word-break: auto-phrase;
 		}
 
+		.dealer-summary-fax {
+			font-size: 0.8125rem;
+			gap: 6px;
+		}
+
 		.sidebar-card {
 			padding: 18px 14px;
 		}
@@ -1976,7 +2012,6 @@ if (relatedCombined.includes('mini')) {
 		.btn-sidebar-route {
 			padding: 11px 14px;
 			font-size: 0.8125rem;
-		}
 		}
 
 		.dept-acc-header {
@@ -2032,7 +2067,9 @@ if (relatedCombined.includes('mini')) {
 		}
 
 		.gallery-main-frame {
-			height: 240px;
+			aspect-ratio: 16 / 9;
+			height: auto;
+			max-height: 280px;
 		}
 
 		.gallery-info-bar {
