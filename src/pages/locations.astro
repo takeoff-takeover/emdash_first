@@ -898,14 +898,17 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 					const anchorX = Math.round(pinW / 2);
 					const anchorY = pinH;
 
+					const logoW = isMobile ? 14 : 24;
+					const headSize = isMobile ? 22 : 38;
+
 					const icon = L.divIcon({
 						className: 'loc-map-marker',
 						html: `
-							<div class="map-pin" data-brands="${brands.join(',')}">
-								<div class="map-pin__head">
-									<img src="${brandLogo}" alt="" class="map-pin__logo" />
-									${badgeHtml}
+							<div class="map-pin ${isMobile ? 'map-pin--mobile' : ''}" data-brands="${brands.join(',')}">
+								<div class="map-pin__head" style="width:${headSize}px;height:${headSize}px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;box-sizing:border-box;">
+									<img src="${brandLogo}" alt="" class="map-pin__logo" width="${logoW}" height="${logoW}" style="width:${logoW}px!important;height:${logoW}px!important;max-width:${logoW}px!important;max-height:${logoW}px!important;object-fit:contain;display:block;" />
 								</div>
+								${badgeHtml}
 								<div class="map-pin__tip"></div>
 							</div>
 						`,
@@ -1551,11 +1554,15 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		box-sizing: border-box;
 		position: relative;
 		z-index: 2;
+		overflow: hidden;
 	}
 	:global(.map-pin__logo) {
-		max-width: 100%;
-		max-height: 100%;
-		object-fit: contain;
+		width: 24px !important;
+		height: 24px !important;
+		max-width: 24px !important;
+		max-height: 24px !important;
+		object-fit: contain !important;
+		display: block !important;
 	}
 	:global(.map-pin__count) {
 		position: absolute;
@@ -2161,8 +2168,12 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			border-width: 1.5px !important;
 		}
 		:global(.map-pin__logo) {
+			width: 14px !important;
+			height: 14px !important;
 			max-width: 14px !important;
 			max-height: 14px !important;
+			object-fit: contain !important;
+			display: block !important;
 		}
 		:global(.map-pin__count) {
 			width: 10px !important;

@@ -378,115 +378,21 @@ const placeData = await getGooglePlaceReviews({
 	description={`${d.title}の店舗情報。住所: ${d.postal || ''} ${d.address || ''}、電話番号: ${d.sales_tel || d.tel || ''}。新車・認定中古車・車検整備・サービス工場の詳細をご案内します。`}
 >
 	<div class="showroom-page">
-		<!-- パンくずナビゲーション -->
-		<div class="sr-top-nav">
-			<div class="sr-container">
-				<nav class="sr-breadcrumb-nav" aria-label="Breadcrumb">
-					<ol class="sr-breadcrumb-list">
-						<li><a href="/">HOME</a></li>
-						<li class="sr-breadcrumb-sep">/</li>
-						<li><a href="/locations">LOCATIONS</a></li>
-						<li class="sr-breadcrumb-sep">/</li>
-						<li aria-current="page">{displayTitle}</li>
-					</ol>
-				</nav>
+		<!-- ヒーローヘッダー -->
+		<header class="sr-hero">
+			<div class="sr-hero__media">
+				<img src={featuredImageSrc} alt={featuredImageAlt} class="sr-hero__img" />
+				<div class="sr-hero__overlay"></div>
 			</div>
-		</div>
 
-		<!-- 1. 店舗・窓口情報（写真の上・最優先配置） -->
-		<section class="sr-block sr-block--contacts" aria-label="店舗・直通窓口情報">
-			<div class="sr-container">
-				<div class="sr-contacts-header">
-					<span class="sr-eyebrow">DIRECT CONTACT</span>
-					<h2 class="sr-contacts-title">店舗・直通窓口</h2>
-					<p class="sr-contacts-desc">ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。</p>
-				</div>
-				<div class="sr-contacts-grid">
-					{departmentsList.map((dept) => {
-						if (!dept.tel) return null;
-						let unifiedName = dept.title;
-						const t = (dept.type || '').toLowerCase();
-						const title = dept.title || '';
-						if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
-							unifiedName = '新車（試乗・商談）';
-						} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
-							unifiedName = '認定中古車（試乗・商談）';
-						} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
-							unifiedName = 'サービス（整備・点検）';
-						}
-						const openStatus = getOpenStatus(dept.hours, dept.closed);
-						return (
-							<div class="sr-contact-item">
-								<div class="sr-contact-item__head">
-									<span class="sr-contact-item__name">{unifiedName}</span>
-									<span class={`dept-status-badge ${openStatus.statusClass}`}>
-										<span class="status-pulse-dot" aria-hidden="true"></span>
-										<span class="status-label">{openStatus.statusText}</span>
-									</span>
-								</div>
-								<a href={`tel:${dept.tel}`} class="sr-contact-item__tel">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sr-contact-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-									<span class="sr-contact-item__number">{dept.tel}</span>
-								</a>
-								<div class="sr-contact-item__meta">
-									{dept.hours && <span class="sr-contact-meta-item">営業時間: {dept.hours}</span>}
-									{dept.closed && <span class="sr-contact-meta-item">定休日: {dept.closed}</span>}
-								</div>
-							</div>
-						);
-					})}
-					<div class="sr-contact-item sr-contact-item--route">
-						<div class="sr-contact-item__head">
-							<span class="sr-contact-item__name">アクセス・所在地</span>
-						</div>
-						<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="sr-contact-item__route">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sr-contact-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-							<span>Googleマップで開く</span>
-						</a>
-						<div class="sr-contact-item__meta">
-							<span class="sr-contact-meta-item">{d.postal} {d.address}</span>
-						</div>
-					</div>
-				</div>
+			<div class="sr-hero__content">
+				<h1 class="sr-hero__title">
+					{displayTitle}
+				</h1>
+
+
 			</div>
-		</section>
-
-		<!-- 2. 説明文（紹介文・コンセプト） -->
-		{(d.concept_title || d.concept_text) && (
-			<section class="sr-block sr-block--concept" aria-label="ショールーム紹介">
-				<div class="sr-container">
-					{d.concept_title && <h3 class="sr-concept-heading">{d.concept_title}</h3>}
-					{d.concept_text && (
-						<div class="sr-concept-prose">
-							{d.concept_text.split('\n\n').map((paragraph: string) => (
-								<p>{paragraph}</p>
-							))}
-						</div>
-					)}
-				</div>
-			</section>
-		)}
-
-		<!-- 3. 店舗名（箱なし） -->
-		<section class="sr-block sr-block--title" aria-label="店舗名">
-			<div class="sr-container">
-				<div class="sr-store-header">
-					<div class="sr-store-brand">
-						<img src={mainBrandInfo.src} alt={mainBrandInfo.alt} class={`sr-store-logo ${mainBrandInfo.isMini ? 'sr-store-logo--mini' : ''}`} />
-					</div>
-					<h1 class="sr-store-name">{displayTitle}</h1>
-				</div>
-			</div>
-		</section>
-
-		<!-- 4. 写真（メイン写真） -->
-		<section class="sr-block sr-block--photo" aria-label="店舗外観写真">
-			<div class="sr-container">
-				<div class="sr-photo-wrap">
-					<img src={featuredImageSrc} alt={featuredImageAlt} class="sr-photo-img" />
-				</div>
-			</div>
-		</section>
+		</header>
 
 		<!-- 拠点提供サービス・機能ステータスバー（ヒーロー直下） -->
 		{badgesList && badgesList.length > 0 && (
@@ -532,7 +438,19 @@ const placeData = await getGooglePlaceReviews({
 			<div class="sr-layout-grid">
 				<!-- 左側：メイン詳細コンテンツ -->
 				<div class="sr-main-col">
-
+					<!-- ショールームコンセプト（デスクトップで表示） -->
+					{(d.concept_title || d.concept_text) && (
+						<section class="sr-section sr-section--concept">
+							{d.concept_title && <h2 class="section-title">{d.concept_title}</h2>}
+							{d.concept_text && (
+								<div class="prose-content">
+									{d.concept_text.split('\n\n').map((paragraph: string) => (
+										<p>{paragraph}</p>
+									))}
+								</div>
+							)}
+						</section>
+					)}
 
 					<!-- 写真ギャラリー（大写真1点 + サムネイル） -->
 					{galleryList && galleryList.length > 0 && (
@@ -903,12 +821,48 @@ const placeData = await getGooglePlaceReviews({
 					</section>
 				</div>
 
-								<!-- 右側：サイドバー（オフィス注記や併設拠点・ナビゲーション） -->
+				<!-- 右側：スティッキー店舗情報サイドバー -->
 				<aside class="sr-sidebar">
 					<div class="sidebar-card">
+						<div class="sidebar-header">
+							<h3 class="sidebar-title">直通窓口・ご案内</h3>
+						</div>
+
+						<p class="sidebar-desc">ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。</p>
+
+						<!-- コンタクトボタン（用途別） -->
+						<div class="sidebar-cta">
+							{departmentsList.map((dept) => {
+								if (!dept.tel) return null;
+								let unifiedName = dept.title;
+								const t = (dept.type || '').toLowerCase();
+								const title = dept.title || '';
+								if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
+									unifiedName = '新車（試乗・商談）';
+								} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
+									unifiedName = '認定中古車（試乗・商談）';
+								} else if (t === 'service' || dept.id?.includes('service') || title.includes('サービス') || title.includes('工場')) {
+									unifiedName = 'サービス（整備・点検）';
+								}
+								return (
+									<a href={`tel:${dept.tel}`} class="btn-sidebar-tel">
+										<div class="btn-sidebar-tel__header">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+											<span class="btn-sidebar-tel__name">{unifiedName}</span>
+										</div>
+										<span class="btn-sidebar-tel__number">{dept.tel}</span>
+									</a>
+								);
+							})}
+							<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-sidebar-route">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+								ルート案内
+							</a>
+						</div>
+
 						<!-- 本社管理オフィス併設等の注記（存在する場合） -->
 						{d.office_notice && (
-							<div class="sidebar-office-notice" style="margin-top:0;">
+							<div class="sidebar-office-notice">
 								<span class="sidebar-office-notice__badge">※管理オフィス併設について</span>
 								<p class="sidebar-office-notice__text">
 									{d.office_notice}
@@ -918,7 +872,7 @@ const placeData = await getGooglePlaceReviews({
 
 						<!-- 同一敷地内 併設拠点へのサイドバー案内（存在する場合） -->
 						{d.related_hub_url && (
-							<div class="sidebar-related-hub" style="margin-top:0;">
+							<div class="sidebar-related-hub">
 								<div class="sidebar-related-hub__header">
 									<img src={relatedHubBrandLogo} alt={relatedHubBrandAlt} class={`sidebar-related-hub__logo ${relatedHubBrandAlt === 'MINI' ? 'sidebar-related-hub__logo--mini' : ''}`} />
 									<span class="sidebar-related-hub__tag">同一敷地内 併設拠点</span>
@@ -929,11 +883,11 @@ const placeData = await getGooglePlaceReviews({
 								</a>
 							</div>
 						)}
-
-						<a href="/locations" class="btn-view-all-loc" style="margin-top:16px;">
-							← 拠点一覧に戻る
-						</a>
 					</div>
+
+					<a href="/locations" class="btn-view-all-loc">
+						← 拠点一覧に戻る
+					</a>
 				</aside>
 			</div>
 		</div>
@@ -2538,7 +2492,9 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	@media (max-width: 768px) {
-		/* .sr-section--concept display removed */
+		.sr-section--concept {
+			display: none;
+		}
 
 		.sr-hero {
 			min-height: 420px;
@@ -2851,277 +2807,4 @@ const placeData = await getGooglePlaceReviews({
 			padding: 20px 14px 40px;
 		}
 	}
-
-	/* ==============================================================
-	   上部コンテンツブロック（窓口情報 -> 説明文 -> 店舗名 -> 写真）
-	   ============================================================== */
-	.sr-container {
-		width: 100%;
-		max-width: 1440px;
-		margin: 0 auto;
-		padding: 0 40px;
-		box-sizing: border-box;
-	}
-
-	.sr-top-nav {
-		padding: 24px 0 12px;
-		background: #08090a;
-	}
-	.sr-breadcrumb-nav {
-		font-size: 11px;
-		letter-spacing: 0.05em;
-	}
-	.sr-breadcrumb-list {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 8px;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		color: rgba(255, 255, 255, 0.45);
-	}
-	.sr-breadcrumb-list a {
-		color: rgba(255, 255, 255, 0.6);
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-	.sr-breadcrumb-list a:hover {
-		color: #ffffff;
-	}
-	.sr-breadcrumb-sep {
-		opacity: 0.3;
-	}
-
-	/* 各セクションブロック共通 */
-	.sr-block {
-		padding: 32px 0;
-		background: #08090a;
-	}
-
-	/* 1. 店舗・窓口情報（箱なし、クリーンな配置） */
-	.sr-block--contacts {
-		padding-top: 16px;
-		padding-bottom: 28px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-	.sr-contacts-header {
-		margin-bottom: 20px;
-	}
-	.sr-contacts-title {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 6px 0 4px;
-		letter-spacing: -0.01em;
-	}
-	.sr-contacts-desc {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.55);
-		margin: 0;
-	}
-	.sr-contacts-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 14px;
-	}
-	.sr-contact-item {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		padding: 14px 18px;
-		background: rgba(255, 255, 255, 0.03);
-		border-left: 2px solid rgba(255, 255, 255, 0.3);
-		transition: background 0.2s ease;
-	}
-	.sr-contact-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-	.sr-contact-item__head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 10px;
-	}
-	.sr-contact-item__name {
-		font-size: 0.8125rem;
-		font-weight: 700;
-		letter-spacing: 0.05em;
-		color: rgba(255, 255, 255, 0.85);
-	}
-	.sr-contact-item__tel {
-		display: inline-flex;
-		align-items: center;
-		gap: 10px;
-		text-decoration: none;
-		color: #ffffff;
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: 0.04em;
-		transition: color 0.2s ease;
-	}
-	.sr-contact-item__tel:hover {
-		color: #ffffff;
-		text-decoration: underline;
-	}
-	.sr-contact-icon {
-		width: 18px;
-		height: 18px;
-		color: rgba(255, 255, 255, 0.6);
-		flex-shrink: 0;
-	}
-	.sr-contact-item__route {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		text-decoration: none;
-		color: #ffffff;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		padding: 6px 0;
-	}
-	.sr-contact-item__route:hover {
-		text-decoration: underline;
-	}
-	.sr-contact-item__meta {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.45);
-	}
-
-	/* 2. 説明文（箱なし） */
-	.sr-block--concept {
-		padding: 32px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-	.sr-concept-heading {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 12px;
-		letter-spacing: 0.02em;
-	}
-	.sr-concept-prose {
-		font-size: 0.9375rem;
-		line-height: 1.85;
-		color: rgba(255, 255, 255, 0.75);
-		max-width: 900px;
-	}
-	.sr-concept-prose p {
-		margin: 0 0 12px;
-	}
-	.sr-concept-prose p:last-child {
-		margin-bottom: 0;
-	}
-
-	/* 3. 店舗名（箱なし、ブランドロゴ付きの堂々とした見出し） */
-	.sr-block--title {
-		padding: 28px 0 20px;
-	}
-	.sr-store-header {
-		display: flex;
-		align-items: center;
-		gap: 20px;
-	}
-	.sr-store-brand {
-		width: 52px;
-		height: 52px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-	.sr-store-logo {
-		max-width: 100%;
-		max-height: 100%;
-		object-fit: contain;
-	}
-	.sr-store-logo--mini {
-		max-width: 56px;
-	}
-	.sr-store-name {
-		font-size: clamp(1.8rem, 4vw, 2.75rem);
-		font-weight: 800;
-		color: #ffffff;
-		letter-spacing: -0.02em;
-		line-height: 1.2;
-		margin: 0;
-	}
-
-	/* 4. 写真（メイン写真） */
-	.sr-block--photo {
-		padding: 0 0 36px;
-	}
-	.sr-photo-wrap {
-		width: 100%;
-		height: 480px;
-		overflow: hidden;
-		border-radius: 4px;
-		background: #000000;
-	}
-	.sr-photo-img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-	}
-
-	@media (max-width: 768px) {
-		.sr-container {
-			padding: 0 16px;
-		}
-		.sr-block {
-			padding: 24px 0;
-		}
-		.sr-block--contacts {
-			padding-top: 12px;
-			padding-bottom: 24px;
-		}
-		.sr-contacts-title {
-			font-size: 1.25rem;
-		}
-		.sr-contacts-grid {
-			grid-template-columns: 1fr;
-			gap: 10px;
-		}
-		.sr-contact-item {
-			padding: 12px 14px;
-		}
-		.sr-contact-item__tel {
-			font-size: 1.125rem;
-		}
-		.sr-block--concept {
-			padding: 24px 0;
-		}
-		.sr-concept-heading {
-			font-size: 1.125rem;
-		}
-		.sr-concept-prose {
-			font-size: 0.875rem;
-			line-height: 1.75;
-		}
-		.sr-block--title {
-			padding: 20px 0 16px;
-		}
-		.sr-store-header {
-			gap: 14px;
-		}
-		.sr-store-brand {
-			width: 36px;
-			height: 36px;
-		}
-		.sr-store-name {
-			font-size: 1.375rem;
-			line-height: 1.3;
-		}
-		.sr-block--photo {
-			padding: 0 0 24px;
-		}
-		.sr-photo-wrap {
-			height: 260px;
-		}
-	}
-
 </style>
