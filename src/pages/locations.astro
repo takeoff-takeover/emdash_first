@@ -1999,6 +1999,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 	/* スリム行カード（1行全幅・横長ストリップ） */
 	.loc-slim-row {
+		position: relative;
 		background: #0d0d0f;
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 4px;
@@ -2010,10 +2011,19 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		box-sizing: border-box;
 		width: 100%;
 	}
+	/* 詳細リンクを持つ店舗行はカード全体をクリッカブル（ポインター）に */
+	.loc-slim-row:not(.loc-slim-row--office) {
+		cursor: pointer;
+	}
 	.loc-slim-row:hover {
 		background: #141418;
 		border-color: rgba(255, 255, 255, 0.25);
 		transform: translateY(-2px);
+	}
+	/* 行ホバー時に詳細ボタンも連動して明るくアクティブ化 */
+	.loc-slim-row:hover .loc-btn--detail:not(.is-disabled) {
+		background: rgba(255, 255, 255, 0.16);
+		border-color: rgba(255, 255, 255, 0.45);
 	}
 
 	/* 1 & 2. ヘッダー共通（PCでは contents で親フレックスに直接参加） */
@@ -2206,9 +2216,19 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		text-align: center;
 	}
 	.loc-btn--detail {
+		position: relative;
+		z-index: 2;
 		background: rgba(255, 255, 255, 0.08);
 		color: #ffffff;
 		border: 1px solid rgba(255, 255, 255, 0.25);
+	}
+	/* Stretched Link: 詳細ボタンを活かしたまま、カード枠全体を透明に覆ってリンク化 */
+	.loc-btn--detail:not(.is-disabled)::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border-radius: 4px;
 	}
 	.loc-btn--detail:hover {
 		background: rgba(255, 255, 255, 0.18);
@@ -2427,13 +2447,13 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		gap: 10px;
 	}
 	.loc-slim-row--office {
-		background: rgba(255, 255, 255, 0.02);
-		border-style: dashed;
-		border-color: rgba(255, 255, 255, 0.1);
+		background: #0d0d0f;
+		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
 	.loc-slim-row--office:hover {
-		background: rgba(255, 255, 255, 0.04);
-		border-color: rgba(255, 255, 255, 0.22);
+		background: #141418;
+		border-color: rgba(255, 255, 255, 0.25);
+		transform: none; /* オフィスは詳細ページがないため浮き上がらせない */
 	}
 
 	/* Empty Message */

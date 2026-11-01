@@ -215,6 +215,18 @@ const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
 		factoryClosed: '水曜日（祝日を除く）',
 		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 横浜港北支店 神奈川県横浜市都筑区早渕3-21-28')}`,
 		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 横浜港北支店」にて承ります。'
+	},
+	'nicole-bmw-ota': {
+		factoryName: 'Nicole BMW 本社（川崎）',
+		factorySlug: 'nicole-bmw-kawasaki',
+		factoryUrl: '/location/nicole-bmw-kawasaki',
+		factoryPostal: '〒212-0005',
+		factoryAddress: '神奈川県川崎市幸区戸手2-5-7',
+		factoryTel: '044-522-1500',
+		factoryHours: '9:00 〜 18:00',
+		factoryClosed: '水曜日（祝日を除く）',
+		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 本社（川崎） 神奈川県川崎市幸区戸手2-5-7')}`,
+		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 本社（川崎）」にて承ります。'
 	}
 };
 
@@ -262,7 +274,7 @@ if (!isOfficeLocation) {
 		// 指定サービス工場への案内窓口（MINI港北・MINI都筑など）
 		customDepartments.push({
 			id: 'dept-service',
-			brand: 'MINI',
+			brand: d.brand || 'BMW',
 			type: 'service',
 			title: 'サービス（整備・点検）',
 			subtitle: `${externalServiceHub.factoryName}（指定工場）`,
