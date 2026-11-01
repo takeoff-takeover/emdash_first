@@ -54,7 +54,8 @@ try {
 				target_locations: d.target_locations || "Nicole Group 全拠点",
 				cta_label: d.cta_label || "試乗予約・お問い合わせ",
 				cta_url: d.cta_url || "/contact",
-				databaseId: found.data?.id || found.id
+				databaseId: found.data?.id || found.id,
+				layout_type: d.layout_type || "2col"
 			};
 		}
 	}
@@ -76,7 +77,8 @@ if (!item) {
 			excerpt: '最新のBMWモデルを体感できる特別試乗フェアを開催。期間中のご試乗・ご成約でNicole Group限定の特別記念品を進呈いたします。',
 			target_locations: 'Nicole BMW 全拠点（本社ショールーム・横浜港北・青葉宮前・新百合ヶ丘・大田）',
 			cta_label: '試乗予約はこちら',
-			cta_url: '/contact'
+			cta_url: '/contact',
+			layout_type: '2col'
 		},
 		'mini-new-generation-debut-fair': {
 			id: 'mini-new-generation-debut-fair',
@@ -240,12 +242,12 @@ const sampleGallery = [
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. エディトリアル2カラム・レイアウト（左：詳細 / 右：予約カード） -->
+		<!-- 2. エディトリアル・レイアウト（管理画面で1カラム / 2カラム切り替え対応） -->
 		<!-- ============================================================== -->
 		<section class="cmp-editorial-section">
-			<div class="cmp-container cmp-editorial-grid">
+			<div class={`cmp-container cmp-editorial-grid ${item.layout_type === '1col' ? 'cmp-editorial-grid--1col' : ''}`}>
 				
-				<!-- 左メインカラム（超リッチコンテンツ） -->
+				<!-- メインカラム -->
 				<div class="cmp-main-column">
 					
 					<!-- 3大特別特典プログラム（カードグリッド） -->
@@ -380,71 +382,127 @@ const sampleGallery = [
 						</div>
 					</section>
 
+					<!-- 1カラム選択時専用：末尾ワイドアクションカード -->
+					{item.layout_type === '1col' && (
+						<section class="cmp-wide-cta-block">
+							<div class="cmp-cta-card cmp-cta-card--wide">
+								<div class="cmp-cta-card__header">
+									<span class="cmp-cta-tag">LIMITED FAIR</span>
+									<h3 class="cmp-cta-title">フェア事前予約・商談申込</h3>
+									<p class="cmp-cta-desc">
+										専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
+									</p>
+								</div>
+
+								<div class="cmp-wide-cta-actions">
+									<a href={item.cta_url} class="cmp-btn-cta-primary cmp-btn-cta-primary--wide">
+										<span>{item.cta_label}</span>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
+											<line x1="5" y1="12" x2="19" y2="12"></line>
+											<polyline points="12 5 19 12 12 19"></polyline>
+										</svg>
+									</a>
+									<a href="/locations" class="cmp-btn-cta-secondary cmp-btn-cta-secondary--wide">
+										<span>開催ショールーム一覧を見る</span>
+									</a>
+								</div>
+
+								<div class="cmp-summary-list cmp-summary-list--wide">
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">対象ブランド</span>
+										<span class="cmp-summary-v">{item.brand}</span>
+									</div>
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">開催期間</span>
+										<span class="cmp-summary-v">{item.period_text}</span>
+									</div>
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">開催店舗</span>
+										<span class="cmp-summary-v">{item.target_locations}</span>
+									</div>
+								</div>
+
+								<div class="cmp-phone-card cmp-phone-card--wide">
+									<span class="cmp-phone-label">お電話でのご予約・お問い合わせ</span>
+									<a href="tel:0120980343" class="cmp-phone-num">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
+											<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+										</svg>
+										0120-980-343
+									</a>
+									<span class="cmp-phone-sub">受付時間: 10:00 - 18:00（水曜定休）</span>
+								</div>
+							</div>
+						</section>
+					)}
+
 				</div>
 
-				<!-- 右サイドバー（追従Sticky・勝負所の最重要CTAカード） -->
-				<aside class="cmp-sidebar">
-					<div class="cmp-sticky-box">
-						
-						<!-- 最重要アクションカード（勝負所：アクセントレッド） -->
-						<div class="cmp-cta-card">
-							<div class="cmp-cta-card__header">
-								<span class="cmp-cta-tag">LIMITED FAIR</span>
-								<h3 class="cmp-cta-title">フェア事前予約・商談申込</h3>
-								<p class="cmp-cta-desc">
-									専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
-								</p>
-							</div>
-
-							<!-- 最重要CTAボタン（勝負所の赤） -->
-							<a href={item.cta_url} class="cmp-btn-cta-primary">
-								<span>{item.cta_label}</span>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
-									<line x1="5" y1="12" x2="19" y2="12"></line>
-									<polyline points="12 5 19 12 12 19"></polyline>
-								</svg>
-							</a>
-
-							<!-- サブアクション（モノトーン） -->
-							<a href="/locations" class="cmp-btn-cta-secondary">
-								<span>開催ショールーム一覧を見る</span>
-							</a>
-
-							<!-- 概要スペックリスト -->
-							<div class="cmp-summary-list">
-								<div class="cmp-summary-row">
-									<span class="cmp-summary-k">対象ブランド</span>
-									<span class="cmp-summary-v">{item.brand}</span>
+				<!-- 2カラム選択時のみ表示：右サイドバー（追従Sticky） -->
+				{item.layout_type !== '1col' && (
+					<aside class="cmp-sidebar">
+						<div class="cmp-sticky-box">
+							
+							<!-- 最重要アクションカード（勝負所：アクセントレッド） -->
+							<div class="cmp-cta-card">
+								<div class="cmp-cta-card__header">
+									<span class="cmp-cta-tag">LIMITED FAIR</span>
+									<h3 class="cmp-cta-title">フェア事前予約・商談申込</h3>
+									<p class="cmp-cta-desc">
+										専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
+									</p>
 								</div>
-								<div class="cmp-summary-row">
-									<span class="cmp-summary-k">種別</span>
-									<span class="cmp-summary-v">{item.category}</span>
-								</div>
-								<div class="cmp-summary-row">
-									<span class="cmp-summary-k">開催期間</span>
-									<span class="cmp-summary-v">{item.period_text}</span>
-								</div>
-								<div class="cmp-summary-row">
-									<span class="cmp-summary-k">開催店舗</span>
-									<span class="cmp-summary-v">{item.target_locations}</span>
-								</div>
-							</div>
 
-							<!-- お電話でのお問い合わせ枠 -->
-							<div class="cmp-phone-card">
-								<span class="cmp-phone-label">お電話でのご予約・お問い合わせ</span>
-								<a href="tel:0120980343" class="cmp-phone-num">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
-										<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+								<!-- 最重要CTAボタン（勝負所の赤） -->
+								<a href={item.cta_url} class="cmp-btn-cta-primary">
+									<span>{item.cta_label}</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
+										<line x1="5" y1="12" x2="19" y2="12"></line>
+										<polyline points="12 5 19 12 12 19"></polyline>
 									</svg>
-									0120-980-343
 								</a>
-								<span class="cmp-phone-sub">受付時間: 10:00 - 18:00（水曜定休）</span>
-							</div>
-						</div>
 
-					</div>
-				</aside>
+								<!-- サブアクション（モノトーン） -->
+								<a href="/locations" class="cmp-btn-cta-secondary">
+									<span>開催ショールーム一覧を見る</span>
+								</a>
+
+								<!-- 概要スペックリスト -->
+								<div class="cmp-summary-list">
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">対象ブランド</span>
+										<span class="cmp-summary-v">{item.brand}</span>
+									</div>
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">種別</span>
+										<span class="cmp-summary-v">{item.category}</span>
+									</div>
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">開催期間</span>
+										<span class="cmp-summary-v">{item.period_text}</span>
+									</div>
+									<div class="cmp-summary-row">
+										<span class="cmp-summary-k">開催店舗</span>
+										<span class="cmp-summary-v">{item.target_locations}</span>
+									</div>
+								</div>
+
+								<!-- お電話でのお問い合わせ枠 -->
+								<div class="cmp-phone-card">
+									<span class="cmp-phone-label">お電話でのご予約・お問い合わせ</span>
+									<a href="tel:0120980343" class="cmp-phone-num">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
+											<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+										</svg>
+										0120-980-343
+									</a>
+									<span class="cmp-phone-sub">受付時間: 10:00 - 18:00（水曜定休）</span>
+								</div>
+							</div>
+
+						</div>
+					</aside>
+				)}
 
 			</div>
 		</section>
@@ -744,6 +802,48 @@ const sampleGallery = [
 		grid-template-columns: 1fr 380px;
 		gap: 60px;
 		align-items: start;
+	}
+
+	/* 1カラム切り替え用スタイル（管理画面設定準拠） */
+	.cmp-editorial-grid--1col {
+		grid-template-columns: 1fr;
+		max-width: 880px;
+		margin: 0 auto;
+	}
+
+	.cmp-wide-cta-block {
+		margin-top: 48px;
+	}
+
+	.cmp-cta-card--wide {
+		max-width: 100%;
+		padding: 36px 32px;
+	}
+
+	.cmp-wide-cta-actions {
+		display: flex;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+
+	.cmp-btn-cta-primary--wide {
+		flex: 1.3;
+		margin-bottom: 0;
+	}
+
+	.cmp-btn-cta-secondary--wide {
+		flex: 1;
+		margin-bottom: 0;
+	}
+
+	.cmp-summary-list--wide {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px 28px;
+	}
+
+	.cmp-phone-card--wide {
+		margin-top: 20px;
 	}
 
 	/* セクション見出し共通 */
@@ -1359,6 +1459,16 @@ const sampleGallery = [
 
 		.cmp-cta-card {
 			padding: 20px 16px;
+		}
+
+		.cmp-wide-cta-actions {
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.cmp-summary-list--wide {
+			grid-template-columns: 1fr;
+			gap: 10px;
 		}
 	}
 </style>

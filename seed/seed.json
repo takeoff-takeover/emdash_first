@@ -605,6 +605,23 @@
 					]
 				},
 				{
+					"slug": "layout_type",
+					"label": "ページレイアウト形式",
+					"type": "select",
+					"required": true,
+					"defaultValue": "2col",
+					"options": [
+						{
+							"label": "2カラム（右側サイドバー・予約枠あり）",
+							"value": "2col"
+						},
+						{
+							"label": "1カラム（サイドバーなし・中央ワイド構成）",
+							"value": "1col"
+						}
+					]
+				},
+				{
 					"slug": "period_text",
 					"label": "開催期間表記 (例: 2026年11月1日(日) 〜 11月30日(月))",
 					"type": "string"
