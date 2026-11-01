@@ -445,49 +445,29 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			<div class="locs-container">
 				<div class="locs-filter-matrix">
 					<!-- ブランド絞り込み -->
-					<div class="filter-row">
+					<div class="filter-row filter-row--brand">
 						<span class="filter-label">ブランド</span>
 						<div class="locs-filter-group" id="brand-filters">
-							<button type="button" class="locs-filter-btn is-active" data-filter="all">
-								すべて <span class="locs-filter-count">({brandCounts.ALL})</span>
-							</button>
-							<button type="button" class="locs-filter-btn" data-filter="BMW">
-								BMW <span class="locs-filter-count">({brandCounts.BMW})</span>
-							</button>
-							<button type="button" class="locs-filter-btn" data-filter="MINI">
-								MINI <span class="locs-filter-count">({brandCounts.MINI})</span>
-							</button>
-							<button type="button" class="locs-filter-btn" data-filter="Rolls-Royce">
-								Rolls-Royce <span class="locs-filter-count">({brandCounts["Rolls-Royce"]})</span>
-							</button>
-							<button type="button" class="locs-filter-btn" data-filter="Ferrari">
-								Ferrari <span class="locs-filter-count">({brandCounts.Ferrari})</span>
-							</button>
-							<button type="button" class="locs-filter-btn" data-filter="ALPINA">
-								ALPINA / Nicole <span class="locs-filter-count">({brandCounts.ALPINA})</span>
-							</button>
+							<button type="button" class="locs-filter-btn is-active" data-filter="all">すべて</button>
+							<button type="button" class="locs-filter-btn" data-filter="BMW">BMW</button>
+							<button type="button" class="locs-filter-btn" data-filter="MINI">MINI</button>
+							<button type="button" class="locs-filter-btn" data-filter="Rolls-Royce">Rolls-Royce</button>
+							<button type="button" class="locs-filter-btn" data-filter="Ferrari">Ferrari</button>
+							<button type="button" class="locs-filter-btn" data-filter="ALPINA">ALPINA / Nicole</button>
 						</div>
 					</div>
 
+					<div class="filter-divider" aria-hidden="true"></div>
+
 					<!-- 取扱機能絞り込み（新車販売、中古車販売、サービス整備） -->
-					<div class="filter-row">
+					<div class="filter-row filter-row--service">
 						<span class="filter-label">サービス</span>
 						<div class="locs-filter-group" id="service-filters">
-							<button type="button" class="locs-pill-btn is-active" data-service="all">
-								すべて
-							</button>
-							<button type="button" class="locs-pill-btn" data-service="sales">
-								新車販売 <span class="locs-filter-count">({functionCounts.sales})</span>
-							</button>
-							<button type="button" class="locs-pill-btn" data-service="used">
-								中古車販売 <span class="locs-filter-count">({functionCounts.used})</span>
-							</button>
-							<button type="button" class="locs-pill-btn" data-service="service">
-								サービス整備 <span class="locs-filter-count">({functionCounts.service})</span>
-							</button>
+							<button type="button" class="locs-pill-btn is-active" data-service="all">すべて</button>
+							<button type="button" class="locs-pill-btn" data-service="sales">新車販売</button>
+							<button type="button" class="locs-pill-btn" data-service="used">中古車販売</button>
+							<button type="button" class="locs-pill-btn" data-service="service">サービス整備</button>
 						</div>
-
-						
 					</div>
 				</div>
 			</div>
@@ -515,10 +495,19 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 								data-has-used={cat.isUsed ? "true" : "false"}
 								data-has-service={cat.isService ? "true" : "false"}
 								data-is-office="false"
+								data-detail-url={loc.detailUrl || ""}
 								data-loc-id={loc.id}
 								data-lat={loc.lat}
 								data-lng={loc.lng}
 							>
+								{loc.detailUrl && (
+									<a 
+										href={loc.detailUrl} 
+										class="loc-slim-row__hitbox" 
+										aria-label={`${loc.name}の店舗詳細を見る`}
+										tabindex="-1"
+									></a>
+								)}
 								<!-- 1 & 2. ヘッダー（ブランドマーク ＋ 拠点情報） -->
 								<div class="loc-slim-row__header">
 									<div class="loc-slim-row__brand" title={loc.brand}>
@@ -1380,6 +1369,19 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 				}
 			});
 		}
+
+		// 拠点行（帯）全体のクリックで詳細ページへ確実に遷移
+		rows.forEach(row => {
+			row.addEventListener('click', (e) => {
+				// aタグ自身（詳細ボタンやオーバーレイリンク）が押された場合はブラウザ標準遷移に任せる
+				if (e.target.closest('a')) return;
+
+				const detailUrl = row.getAttribute('data-detail-url');
+				if (detailUrl) {
+					window.location.href = detailUrl;
+				}
+			});
+		});
 	});
 </script>
 
@@ -1871,56 +1873,71 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	}
 
 	/* ==============================================================
-	   多層フィルターコントロールバー
+	   多層フィルターコントロールバー（上下にゆとりのある余白を確保）
 	   ============================================================== */
 	.locs-filter-section {
-		padding-bottom: 24px;
+		padding: 36px 0 40px 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 	.locs-filter-matrix {
 		display: flex;
-		flex-direction: column;
-		gap: 14px;
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 28px;
 	}
 	.filter-row {
 		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 8px;
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+	.filter-divider {
+		width: 1px;
+		height: 22px;
+		background: rgba(255, 255, 255, 0.12);
+		flex-shrink: 0;
 	}
 	.filter-label {
-		font-size: 11px;
+		font-size: 13px;
 		font-weight: 700;
-		letter-spacing: 0.12em;
-		color: rgba(255, 255, 255, 0.45);
+		letter-spacing: 0.08em;
+		color: #ffffff;
 		width: auto;
 		flex-shrink: 0;
+		white-space: nowrap;
 	}
 	.locs-filter-group {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
+		align-items: center;
+		gap: 6px;
 		flex: 1;
 	}
 
-	/* ブランドボタン */
-	.locs-filter-btn {
+	/* ブランド ＆ サービス機能ボタン（スタイル統一） */
+	.locs-filter-btn,
+	.locs-pill-btn {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		color: rgba(255, 255, 255, 0.7);
-		padding: 7px 12px;
+		padding: 6px 12px;
 		font-size: 12px;
 		font-weight: 500;
 		border-radius: 2px;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		white-space: nowrap;
 	}
-	.locs-filter-btn:hover {
+	.locs-filter-btn:hover,
+	.locs-pill-btn:hover {
 		border-color: rgba(255, 255, 255, 0.4);
 		color: #ffffff;
 	}
-	.locs-filter-btn.is-active {
-		background: rgba(255, 255, 255, 0.15);
+	.locs-filter-btn.is-active,
+	.locs-pill-btn.is-active {
+		background: rgba(255, 255, 255, 0.16);
 		border-color: rgba(255, 255, 255, 0.45);
 		color: #ffffff;
 		font-weight: 600;
@@ -1928,29 +1945,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	.locs-filter-count {
 		font-size: 11px;
 		opacity: 0.75;
-	}
-
-	/* サービス機能ピルボタン */
-	.locs-pill-btn {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		color: rgba(255, 255, 255, 0.7);
-		padding: 6px 10px;
-		font-size: 12px;
-		font-weight: 500;
-		border-radius: 2px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-	.locs-pill-btn:hover {
-		color: #ffffff;
-		border-color: rgba(255, 255, 255, 0.35);
-	}
-	.locs-pill-btn.is-active {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: #ffffff;
-		color: #ffffff;
-		font-weight: 600;
 	}
 
 	/* エリアチップ */
@@ -2024,6 +2018,17 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	.loc-slim-row:hover .loc-btn--detail:not(.is-disabled) {
 		background: rgba(255, 255, 255, 0.16);
 		border-color: rgba(255, 255, 255, 0.45);
+	}
+
+	/* 帯全体のヒットエリア（不可視リンク） */
+	.loc-slim-row__hitbox {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+		display: block;
+		border-radius: 4px;
 	}
 
 	/* 1 & 2. ヘッダー共通（PCでは contents で親フレックスに直接参加） */
@@ -2108,12 +2113,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.14);
 		color: rgba(255, 255, 255, 0.9);
-		transition: all 0.2s ease;
-	}
-	.loc-service-tag:hover {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255, 255, 255, 0.3);
-		color: #ffffff;
+		pointer-events: none; /* マウスオーバーのアクションはなし（余計な動きを完全撤廃） */
 	}
 	.loc-service-tag__icon {
 		display: flex;
@@ -2183,12 +2183,13 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	.loc-service-rating .rating-val {
 		color: #ffffff;
 		font-weight: 700;
-		font-family: var(--font-mono, monospace);
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 11px;
 		letter-spacing: 0;
 	}
 	.loc-service-rating .rating-cnt {
 		color: rgba(255, 255, 255, 0.45);
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 11px;
 	}
 
@@ -2222,14 +2223,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		color: #ffffff;
 		border: 1px solid rgba(255, 255, 255, 0.25);
 	}
-	/* Stretched Link: 詳細ボタンを活かしたまま、カード枠全体を透明に覆ってリンク化 */
-	.loc-btn--detail:not(.is-disabled)::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		border-radius: 4px;
-	}
 	.loc-btn--detail:hover {
 		background: rgba(255, 255, 255, 0.18);
 		border-color: rgba(255, 255, 255, 0.5);
@@ -2261,6 +2254,23 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 900px) {
+		.filter-divider {
+			display: none;
+		}
+		.locs-filter-matrix {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 12px;
+		}
+		.filter-row {
+			width: 100%;
+			gap: 10px;
+		}
+		.filter-label {
+			font-size: 12px;
+			min-width: 56px;
+		}
+
 		.loc-slim-row {
 			position: relative;
 			flex-wrap: wrap;
@@ -2297,6 +2307,23 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 640px) {
+		.locs-filter-section {
+			padding: 24px 0 28px 0;
+		}
+
+		.filter-row {
+			gap: 8px;
+		}
+		.filter-label {
+			font-size: 12px;
+			min-width: 50px;
+		}
+		.locs-filter-btn,
+		.locs-pill-btn {
+			padding: 5px 9px;
+			font-size: 11px;
+		}
+
 		/* スマホ時：NETWORK MAPの隣の文字（説明文）を綺麗に下段へ改行 */
 		.locs-map-title-wrap {
 			flex-direction: column;

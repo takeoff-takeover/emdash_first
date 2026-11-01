@@ -554,32 +554,29 @@ const placeData = await getGooglePlaceReviews({
 							const isMini = brandLower.includes('mini');
 							const targetAccId = badge.targetId || (departmentsList[idx]?.id || `dept-${idx}`);
 
-							const label = badge.label || '';
-							const isSales = label.includes('新車') || targetAccId?.includes('sales') || targetAccId?.includes('newcar');
-							const isUsed = label.includes('中古車') || targetAccId?.includes('used');
-							const isService = label.includes('サービス') || label.includes('点検') || label.includes('車検') || targetAccId?.includes('service');
-							const isOffice = label.includes('オフィス') || targetAccId?.includes('office');
-
 							return (
 								<a href={`#${targetAccId}`} class={`feat-pill ${isMini ? 'feat-pill--mini' : ''}`} data-dept-target={targetAccId}>
 									<img src={logoSrc} alt={badge.brand || 'Brand'} class={`feat-brand-logo ${logoClass}`} />
-									{isSales && (
-										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" style="transform: scaleX(-1);" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-									)}
-									{isUsed && (
-										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.64 5H8.36a2 2 0 0 0-1.86 1.3L5 10 3 8"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/><path d="M6.5 14h.01"/><path d="M17.5 14h.01"/><path d="m9.5 13.5 1.8 1.8 3.5-3.5" stroke-width="2.2"/></svg>
-									)}
-									{isService && (
-										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-									)}
-									{isOffice && (
-										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>
-									)}
 									<span class="feat-label">{badge.label}</span>
 								</a>
 							);
 						})}
 					</div>
+
+					<!-- 右側：Googleクチコミ評価数字（一覧と表記統一、右揃え） -->
+					{!isOfficeLocation && placeData && placeData.rating && (
+						<a href="#reviews" class="feat-rating-link" title={`Googleマップ評価: ${placeData.rating.toFixed(1)} (${placeData.user_ratings_total || 0}件のクチコミ)`}>
+							<svg viewBox="0 0 24 24" width="13" height="13" class="gmap-mini-g" aria-hidden="true">
+								<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+								<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+								<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+								<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+							</svg>
+							<span class="rating-star">★</span>
+							<strong class="rating-val">{placeData.rating.toFixed(1)}</strong>
+							<span class="rating-cnt">({placeData.user_ratings_total || 0})</span>
+						</a>
+					)}
 				</div>
 			</section>
 		)}
@@ -656,8 +653,8 @@ const placeData = await getGooglePlaceReviews({
 								</div>
 								<div class="dealer-summary-address">
 									<span class="dealer-address-text">{d.postal} {d.address}</span>
-									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
-										Googleマップ
+									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap" title="Googleマップで地図を見る">
+										MAP
 									</a>
 								</div>
 							</div>
@@ -907,15 +904,6 @@ const placeData = await getGooglePlaceReviews({
 									<h2 class="section-title">Googleマップの評価・クチコミ</h2>
 									<p class="section-desc">実際にご来場・ご利用いただいたお客様からの声をご紹介いたします。</p>
 								</div>
-								<a
-									href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="btn-all-reviews"
-								>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-									Googleマップで全クチコミを見る
-								</a>
 							</div>
 
 							<!-- 総合評価バナー -->
@@ -969,6 +957,19 @@ const placeData = await getGooglePlaceReviews({
 										<p class="review-card__text">{rev.text}</p>
 									</article>
 								))}
+							</div>
+
+							<!-- Googleマップで全クチコミを見る（クチコミ3件の下に配置） -->
+							<div class="reviews-footer-actions">
+								<a
+									href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="btn-all-reviews"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+									Googleマップで全クチコミを見る
+								</a>
 							</div>
 						</section>
 					)}
@@ -1053,9 +1054,11 @@ const placeData = await getGooglePlaceReviews({
 						)}
 					</div>
 
-					<a href="/locations" class="btn-view-all-loc">
-						← 拠点一覧に戻る
-					</a>
+					<div class="sidebar-back-wrap">
+						<a href="/locations" class="btn-view-all-loc">
+							拠点一覧に戻る
+						</a>
+					</div>
 				</aside>
 			</div>
 		</div>
@@ -1185,13 +1188,13 @@ const placeData = await getGooglePlaceReviews({
 		font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
 	}
 
-	/* ヒーローセクション */
+	/* ヒーローセクション（スリム＆コンパクトに圧縮） */
 	.sr-hero {
 		position: relative;
-		min-height: 540px;
+		min-height: 380px;
 		display: flex;
 		align-items: flex-end;
-		padding: 100px 0 36px;
+		padding: 56px 0 28px;
 		overflow: hidden;
 		background: #08090a;
 	}
@@ -1309,6 +1312,10 @@ const placeData = await getGooglePlaceReviews({
 		margin: 0 auto;
 		padding: 0 40px;
 		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
 	}
 
 	.facility-feature-list {
@@ -1354,13 +1361,6 @@ const placeData = await getGooglePlaceReviews({
 		border-color: rgba(255, 255, 255, 0.2);
 	}
 
-	.feat-type-icon {
-		width: 14px;
-		height: 14px;
-		color: rgba(255, 255, 255, 0.85);
-		flex-shrink: 0;
-	}
-
 	.feat-brand-logo {
 		display: inline-block;
 		object-fit: contain;
@@ -1395,6 +1395,49 @@ const placeData = await getGooglePlaceReviews({
 	.feat-brand-logo--nicole {
 		height: 16px;
 		width: auto;
+	}
+
+	/* 右側：Googleクチコミ評価リンク（アイコンと差別化：枠線なし・背景透明、フォントはHelvetica） */
+	.feat-rating-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 4px 0;
+		background: transparent;
+		border: none;
+		text-decoration: none;
+		white-space: nowrap;
+		flex-shrink: 0;
+		margin-left: auto;
+		transition: opacity 0.2s ease;
+	}
+
+	.feat-rating-link:hover {
+		opacity: 0.8;
+	}
+
+	.feat-rating-link .gmap-mini-g {
+		flex-shrink: 0;
+	}
+
+	.feat-rating-link .rating-star {
+		color: #fbbf24;
+		font-size: 12px;
+		line-height: 1;
+	}
+
+	.feat-rating-link .rating-val {
+		color: #ffffff;
+		font-weight: 700;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 12px;
+		letter-spacing: 0;
+	}
+
+	.feat-rating-link .rating-cnt {
+		color: rgba(255, 255, 255, 0.45);
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 11px;
 	}
 
 	/* メインレイアウト */
@@ -1636,18 +1679,18 @@ const placeData = await getGooglePlaceReviews({
 		display: block;
 	}
 
-	/* 店舗・窓口情報 統合カード */
+	/* 店舗・窓口情報 セクション（外枠を廃止し、アコーディオン部のみ枠線表示） */
 	.sr-section--depts {
 		margin-bottom: 64px;
 		padding-bottom: 56px;
 	}
 
 	.dealer-info-card {
-		background: #111317;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		padding: 36px 36px 20px;
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0;
+		box-shadow: none;
 	}
 
 	.dealer-summary-bar {
@@ -1656,8 +1699,8 @@ const placeData = await getGooglePlaceReviews({
 		align-items: center;
 		flex-wrap: wrap;
 		gap: 12px 24px;
-		margin-bottom: 24px;
-		padding-bottom: 20px;
+		margin-bottom: 20px;
+		padding-bottom: 16px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
@@ -1696,9 +1739,9 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.dealer-summary-address {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
-		gap: 14px;
+		gap: 8px;
 		flex-wrap: wrap;
 	}
 
@@ -1732,21 +1775,24 @@ const placeData = await getGooglePlaceReviews({
 	.link-inline-gmap {
 		display: inline-flex;
 		align-items: center;
-		font-size: 0.8125rem;
+		justify-content: center;
+		font-size: 0.6875rem;
 		font-weight: 600;
-		color: #34d399;
-		background: rgba(16, 185, 129, 0.08);
-		border: 1px solid rgba(16, 185, 129, 0.25);
-		padding: 3px 10px;
-		border-radius: 4px;
+		letter-spacing: 0.04em;
+		color: #d1d5db;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		padding: 2px 8px;
+		border-radius: 3px;
 		text-decoration: none;
+		line-height: 1.4;
 		transition: all 0.2s ease;
 	}
 
 	.link-inline-gmap:hover {
-		background: rgba(16, 185, 129, 0.18);
-		color: #6ee7b7;
-		border-color: rgba(16, 185, 129, 0.45);
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.35);
 	}
 
 	/* 営業状況に関する注記 */
@@ -1768,7 +1814,7 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.dept-acc-item {
-		background: #0d0f12;
+		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 8px;
 		overflow: hidden;
@@ -1792,7 +1838,7 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.dept-acc-item[open] {
-		background: #14161b;
+		background: rgba(255, 255, 255, 0.04);
 		border-color: rgba(255, 255, 255, 0.22);
 	}
 
@@ -1950,10 +1996,10 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.dept-compact-table {
-		background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
-		padding: 14px 18px;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0;
 		margin-bottom: 20px;
 	}
 
@@ -2044,6 +2090,7 @@ const placeData = await getGooglePlaceReviews({
 		color: #60a5fa;
 		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 6px;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
@@ -2217,40 +2264,49 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.reviews-header-wrap {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
 		margin-bottom: 24px;
-		gap: 20px;
-		flex-wrap: wrap;
+	}
+
+	.reviews-footer-actions {
+		display: flex;
+		justify-content: center;
+		margin-top: 28px;
 	}
 
 	.btn-all-reviews {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: 8px;
-		padding: 9px 16px;
-		background: rgba(16, 185, 129, 0.08);
-		color: #34d399;
-		border: 1px solid rgba(16, 185, 129, 0.3);
-		border-radius: 6px;
+		padding: 11px 26px;
+		background: rgba(255, 255, 255, 0.05);
+		color: #e5e7eb;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 4px;
 		font-size: 0.8125rem;
 		font-weight: 600;
+		letter-spacing: 0.04em;
 		text-decoration: none;
 		transition: all 0.2s ease;
 		white-space: nowrap;
 	}
 
 	.btn-all-reviews:hover {
-		background: rgba(16, 185, 129, 0.18);
-		color: #6ee7b7;
-		border-color: rgba(16, 185, 129, 0.5);
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.32);
 		transform: translateY(-1px);
 	}
 
 	.btn-all-reviews .btn-icon {
 		width: 14px;
 		height: 14px;
+		color: rgba(255, 255, 255, 0.65);
+		transition: color 0.2s ease;
+	}
+
+	.btn-all-reviews:hover .btn-icon {
+		color: #ffffff;
 	}
 
 	.gmap-rating-hero {
@@ -2281,7 +2337,7 @@ const placeData = await getGooglePlaceReviews({
 		font-weight: 800;
 		color: #ffffff;
 		line-height: 1;
-		font-family: var(--font-mono, monospace);
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		letter-spacing: -0.02em;
 	}
 
@@ -2505,7 +2561,7 @@ const placeData = await getGooglePlaceReviews({
 		font-size: 1.25rem;
 		font-weight: 800;
 		letter-spacing: 0.04em;
-		font-family: var(--font-mono, monospace);
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		color: #ffffff;
 		line-height: 1.15;
 		white-space: nowrap;
@@ -2521,6 +2577,7 @@ const placeData = await getGooglePlaceReviews({
 		color: #34d399;
 		border: 1px solid rgba(16, 185, 129, 0.35);
 		border-radius: 6px;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-weight: 700;
 		font-size: 0.875rem;
 		text-decoration: none;
@@ -2617,17 +2674,22 @@ const placeData = await getGooglePlaceReviews({
 		text-decoration: underline;
 	}
 
-	.btn-view-all-loc {
+	.sidebar-back-wrap {
 		display: flex;
+		justify-content: center;
+		margin-top: 18px;
+	}
+
+	.btn-view-all-loc {
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		text-align: center;
-		padding: 12px 18px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: #e2e8f0;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.18);
+		padding: 6px 14px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: #94a3b8;
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 4px;
 		text-decoration: none;
 		letter-spacing: 0.02em;
@@ -2636,8 +2698,8 @@ const placeData = await getGooglePlaceReviews({
 
 	.btn-view-all-loc:hover {
 		color: #ffffff;
-		border-color: rgba(255, 255, 255, 0.4);
-		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.3);
+		background: rgba(255, 255, 255, 0.04);
 	}
 
 	/* レスポンシブ */
@@ -2660,7 +2722,8 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.sr-hero {
-			padding: 60px 0;
+			min-height: 320px;
+			padding: 48px 0 22px;
 		}
 
 		.sr-hero__content {
@@ -2686,8 +2749,8 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.sr-hero {
-			min-height: 420px;
-			padding: 64px 0 20px;
+			min-height: 250px;
+			padding: 36px 0 18px;
 		}
 
 		.sr-hero__content {
@@ -2734,11 +2797,6 @@ const placeData = await getGooglePlaceReviews({
 			padding: 5px 10px;
 			font-size: 0.6875rem;
 			gap: 6px;
-		}
-
-		.feat-type-icon {
-			width: 12px;
-			height: 12px;
 		}
 
 		.feat-brand-logo--bmw {
@@ -2796,8 +2854,7 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.dealer-info-card {
-			padding: 18px 14px 12px;
-			border-radius: 8px;
+			padding: 0;
 			margin-bottom: 24px;
 		}
 
@@ -2858,7 +2915,7 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.dept-compact-table {
-			padding: 10px 12px;
+			padding: 0;
 			margin-bottom: 14px;
 		}
 
@@ -2882,11 +2939,13 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.dealer-summary-address {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 4px;
+			display: inline-flex;
+			flex-direction: row;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 6px 8px;
 			font-size: 0.8125rem;
-			word-break: auto-phrase;
+			line-height: 1.5;
 		}
 
 		.dealer-summary-fax {
@@ -2956,7 +3015,7 @@ const placeData = await getGooglePlaceReviews({
 		}
 
 		.dept-compact-table {
-			padding: 14px 14px;
+			padding: 0;
 			margin-bottom: 16px;
 		}
 
@@ -3008,6 +3067,33 @@ const placeData = await getGooglePlaceReviews({
 			gap: 12px;
 		}
 
+		.reviews-footer-actions {
+			margin-top: 18px;
+		}
+
+		.btn-all-reviews {
+			width: 100%;
+			box-sizing: border-box;
+			padding: 12px 16px;
+		}
+
+		.feat-rating-link {
+			padding: 2px 0;
+			gap: 4px;
+		}
+
+		.feat-rating-link .rating-star {
+			font-size: 11px;
+		}
+
+		.feat-rating-link .rating-val {
+			font-size: 11px;
+		}
+
+		.feat-rating-link .rating-cnt {
+			font-size: 10px;
+		}
+
 		.gmap-rating-hero {
 			padding: 18px 20px;
 		}
@@ -3018,6 +3104,11 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	@media (max-width: 480px) {
+		.sr-hero {
+			min-height: 220px;
+			padding: 28px 0 14px;
+		}
+
 		.sr-hero__content {
 			padding: 0 14px;
 		}
