@@ -417,7 +417,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 				<div class="locs-filter-matrix">
 					<!-- ブランド絞り込み -->
 					<div class="filter-row">
-						<span class="filter-label">BRAND</span>
+						<span class="filter-label">ブランド</span>
 						<div class="locs-filter-group" id="brand-filters">
 							<button type="button" class="locs-filter-btn is-active" data-filter="all">
 								すべて <span class="locs-filter-count">({brandCounts.ALL})</span>
@@ -442,10 +442,10 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 					<!-- 取扱機能絞り込み（新車販売、中古車販売、サービス整備） -->
 					<div class="filter-row">
-						<span class="filter-label">SERVICE</span>
+						<span class="filter-label">サービス</span>
 						<div class="locs-filter-group" id="service-filters">
 							<button type="button" class="locs-pill-btn is-active" data-service="all">
-								すべての機能
+								すべて
 							</button>
 							<button type="button" class="locs-pill-btn" data-service="sales">
 								新車販売 <span class="locs-filter-count">({functionCounts.sales})</span>
@@ -458,11 +458,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 							</button>
 						</div>
 
-						<div class="filter-area-group" id="area-filters">
-							<button type="button" class="locs-area-chip is-active" data-area="all">全エリア</button>
-							<button type="button" class="locs-area-chip" data-area="神奈川">神奈川</button>
-							<button type="button" class="locs-area-chip" data-area="東京">東京</button>
-						</div>
+						
 					</div>
 				</div>
 			</div>
@@ -716,7 +712,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 		const brandBtns = document.querySelectorAll('#brand-filters .locs-filter-btn');
 		const serviceBtns = document.querySelectorAll('#service-filters .locs-pill-btn');
-		const areaBtns = document.querySelectorAll('#area-filters .locs-area-chip');
 		const rows = document.querySelectorAll('.loc-slim-row');
 		const emptyMsg = document.getElementById('locs-empty');
 		const resetBtn = document.getElementById('reset-filters');
@@ -1286,16 +1281,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			});
 		});
 
-		// エリアボタン
-		areaBtns.forEach(btn => {
-			btn.addEventListener('click', () => {
-				areaBtns.forEach(b => b.classList.remove('is-active'));
-				btn.classList.add('is-active');
-				currentArea = btn.getAttribute('data-area') || 'all';
-				applyFilters();
-			});
-		});
-
 		// リセット処理
 		function resetAll() {
 			currentBrand = 'all';
@@ -1769,16 +1754,16 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	}
 	.filter-row {
 		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 12px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
 	}
 	.filter-label {
-		font-size: 10px;
+		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.4);
-		width: 60px;
+		letter-spacing: 0.12em;
+		color: rgba(255, 255, 255, 0.45);
+		width: auto;
 		flex-shrink: 0;
 	}
 	.locs-filter-group {
@@ -1793,7 +1778,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		color: rgba(255, 255, 255, 0.7);
-		padding: 8px 16px;
+		padding: 7px 12px;
 		font-size: 12px;
 		font-weight: 500;
 		border-radius: 2px;
@@ -1820,7 +1805,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		color: rgba(255, 255, 255, 0.7);
-		padding: 6px 14px;
+		padding: 6px 10px;
 		font-size: 12px;
 		font-weight: 500;
 		border-radius: 2px;
@@ -2150,6 +2135,15 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 640px) {
+		/* スマホ時マップピンアイコン小型化 */
+		:global(.map-pin) {
+			transform: scale(0.72);
+			transform-origin: 50% 100%;
+		}
+		:global(.map-pin:hover) {
+			transform: scale(0.85) translateY(-2px);
+		}
+
 		.loc-slim-row {
 			flex-direction: column;
 			align-items: flex-start;
