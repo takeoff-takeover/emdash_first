@@ -508,80 +508,86 @@ const injectedCode = `
 				let activeCampaignBrand = 'all';
 
 				function applyCampaignBrandFilterTabs() {
-					const isCampaignPage = window.location.pathname.includes('/content/campaigns') || window.location.hash.includes('/content/campaigns');
-					if (!isCampaignPage) {
-						const existingTabs = document.getElementById('campaign-brand-filter-bar');
-						if (existingTabs) existingTabs.remove();
-						return;
-					}
+					try {
+						const isCampaignPage = window.location.pathname.includes('/content/campaigns') || window.location.hash.includes('/content/campaigns');
+						if (!isCampaignPage) {
+							const existingTabs = document.getElementById('campaign-brand-filter-bar');
+							if (existingTabs) existingTabs.remove();
+							return;
+						}
 
-					// テーブルまたは一覧コンテナを探す
-					const table = document.querySelector('table');
-					if (!table) return;
+						// テーブルまたは一覧コンテナを探す
+						const table = document.querySelector('table');
+						if (!table) return;
 
-					let tabContainer = document.getElementById('campaign-brand-filter-bar');
-					if (!tabContainer || !table.parentNode.contains(tabContainer)) {
-						if (tabContainer) tabContainer.remove();
-						tabContainer = document.createElement('div');
-						tabContainer.id = 'campaign-brand-filter-bar';
-						tabContainer.style.cssText = \`
-							display: flex;
-							align-items: center;
-							gap: 8px;
-							margin-bottom: 16px;
-							padding: 12px 16px;
-							background: #18181b;
-							border: 1px solid #27272a;
-							border-radius: 8px;
-							overflow-x: auto;
-						\`;
-
-						const label = document.createElement('span');
-						label.textContent = 'ブランド絞り込み:';
-						label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
-						tabContainer.appendChild(label);
-
-						const brands = [
-							{ label: 'すべて', value: 'all' },
-							{ label: 'BMW', value: 'BMW' },
-							{ label: 'MINI', value: 'MINI' },
-							{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
-							{ label: 'Ferrari', value: 'Ferrari' },
-							{ label: 'ALPINA', value: 'ALPINA' }
-						];
-
-						brands.forEach(b => {
-							const btn = document.createElement('button');
-							btn.type = 'button';
-							btn.dataset.brandFilter = b.value;
-							btn.textContent = b.label;
-							btn.style.cssText = \`
-								padding: 6px 14px;
-								font-size: 12px;
-								font-weight: 600;
-								border-radius: 6px;
-								cursor: pointer;
-								transition: all 0.2s ease;
-								white-space: nowrap;
-								border: 1px solid \${activeCampaignBrand === b.value ? '#ffffff' : '#3f3f46'};
-								background: \${activeCampaignBrand === b.value ? '#ffffff' : '#27272a'};
-								color: \${activeCampaignBrand === b.value ? '#000000' : '#d4d4d8'};
+						const tableTarget = table.closest('.overflow-x-auto') || table;
+						let tabContainer = document.getElementById('campaign-brand-filter-bar');
+						if (!tabContainer || !document.body.contains(tabContainer)) {
+							if (tabContainer) tabContainer.remove();
+							tabContainer = document.createElement('div');
+							tabContainer.id = 'campaign-brand-filter-bar';
+							tabContainer.style.cssText = \`
+								display: flex;
+								align-items: center;
+								gap: 8px;
+								margin-bottom: 16px;
+								padding: 12px 16px;
+								background: #18181b;
+								border: 1px solid #27272a;
+								border-radius: 8px;
+								overflow-x: auto;
+								z-index: 10;
 							\`;
 
-							btn.addEventListener('click', (e) => {
-								e.preventDefault();
-								activeCampaignBrand = b.value;
-								updateCampaignTabButtons();
-								filterCampaignTableRows();
+							const label = document.createElement('span');
+							label.textContent = 'ブランド絞り込み:';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+							tabContainer.appendChild(label);
+
+							const brands = [
+								{ label: 'すべて', value: 'all' },
+								{ label: 'BMW', value: 'BMW' },
+								{ label: 'MINI', value: 'MINI' },
+								{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
+								{ label: 'Ferrari', value: 'Ferrari' },
+								{ label: 'ALPINA', value: 'ALPINA' }
+							];
+
+							brands.forEach(b => {
+								const btn = document.createElement('button');
+								btn.type = 'button';
+								btn.dataset.brandFilter = b.value;
+								btn.textContent = b.label;
+								btn.style.cssText = \`
+									padding: 6px 14px;
+									font-size: 12px;
+									font-weight: 600;
+									border-radius: 6px;
+									cursor: pointer;
+									transition: all 0.2s ease;
+									white-space: nowrap;
+									border: 1px solid \${activeCampaignBrand === b.value ? '#ffffff' : '#3f3f46'};
+									background: \${activeCampaignBrand === b.value ? '#ffffff' : '#27272a'};
+									color: \${activeCampaignBrand === b.value ? '#000000' : '#d4d4d8'};
+								\`;
+
+								btn.addEventListener('click', (e) => {
+									e.preventDefault();
+									activeCampaignBrand = b.value;
+									updateCampaignTabButtons();
+									filterCampaignTableRows();
+								});
+
+								tabContainer.appendChild(btn);
 							});
 
-							tabContainer.appendChild(btn);
-						});
+							tableTarget.parentNode.insertBefore(tabContainer, tableTarget);
+						}
 
-						table.parentNode.insertBefore(tabContainer, table);
+						filterCampaignTableRows();
+					} catch (e) {
+						console.error('[patch-admin-ui] Error in applyCampaignBrandFilterTabs:', e);
 					}
-
-					filterCampaignTableRows();
 				}
 
 				function updateCampaignTabButtons() {
@@ -616,82 +622,88 @@ const injectedCode = `
 				let activeMagazineFilter = 'all';
 
 				function applyMagazineFilterTabs() {
-					const isMagazinePage = window.location.pathname.includes('/content/magazine') || window.location.hash.includes('/content/magazine');
-					if (!isMagazinePage) {
-						const existingTabs = document.getElementById('magazine-filter-bar');
-						if (existingTabs) existingTabs.remove();
-						return;
-					}
+					try {
+						const isMagazinePage = window.location.pathname.includes('/content/magazine') || window.location.hash.includes('/content/magazine');
+						if (!isMagazinePage) {
+							const existingTabs = document.getElementById('magazine-filter-bar');
+							if (existingTabs) existingTabs.remove();
+							return;
+						}
 
-					// テーブルまたは一覧コンテナを探す
-					const table = document.querySelector('table');
-					if (!table) return;
+						// テーブルまたは一覧コンテナを探す
+						const table = document.querySelector('table');
+						if (!table) return;
 
-					let tabContainer = document.getElementById('magazine-filter-bar');
-					if (!tabContainer || !table.parentNode.contains(tabContainer)) {
-						if (tabContainer) tabContainer.remove();
-						tabContainer = document.createElement('div');
-						tabContainer.id = 'magazine-filter-bar';
-						tabContainer.style.cssText = \`
-							display: flex;
-							align-items: center;
-							gap: 8px;
-							margin-bottom: 16px;
-							padding: 12px 16px;
-							background: #18181b;
-							border: 1px solid #27272a;
-							border-radius: 8px;
-							overflow-x: auto;
-						\`;
-
-						const label = document.createElement('span');
-						label.textContent = '絞り込み:';
-						label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
-						tabContainer.appendChild(label);
-
-						const filters = [
-							{ label: 'すべて', value: 'all' },
-							{ label: 'BMW', value: 'BMW' },
-							{ label: 'MINI', value: 'MINI' },
-							{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
-							{ label: 'Ferrari', value: 'Ferrari' },
-							{ label: 'ALPINA', value: 'ALPINA' },
-							{ label: 'SDGs・地域活動', value: 'SDGs' },
-							{ label: 'イベント', value: 'イベント' }
-						];
-
-						filters.forEach(f => {
-							const btn = document.createElement('button');
-							btn.type = 'button';
-							btn.dataset.magFilter = f.value;
-							btn.textContent = f.label;
-							btn.style.cssText = \`
-								padding: 6px 14px;
-								font-size: 12px;
-								font-weight: 600;
-								border-radius: 6px;
-								cursor: pointer;
-								transition: all 0.2s ease;
-								white-space: nowrap;
-								border: 1px solid \${activeMagazineFilter === f.value ? '#ffffff' : '#3f3f46'};
-								background: \${activeMagazineFilter === f.value ? '#ffffff' : '#27272a'};
-								color: \${activeMagazineFilter === f.value ? '#000000' : '#d4d4d8'};
+						const tableTarget = table.closest('.overflow-x-auto') || table;
+						let tabContainer = document.getElementById('magazine-filter-bar');
+						if (!tabContainer || !document.body.contains(tabContainer)) {
+							if (tabContainer) tabContainer.remove();
+							tabContainer = document.createElement('div');
+							tabContainer.id = 'magazine-filter-bar';
+							tabContainer.style.cssText = \`
+								display: flex;
+								align-items: center;
+								gap: 8px;
+								margin-bottom: 16px;
+								padding: 12px 16px;
+								background: #18181b;
+								border: 1px solid #27272a;
+								border-radius: 8px;
+								overflow-x: auto;
+								z-index: 10;
 							\`;
 
-							btn.addEventListener('click', (e) => {
-								e.preventDefault();
-								activeMagazineFilter = f.value;
-								updateMagazineTabButtons();
-								filterMagazineTableRows();
+							const label = document.createElement('span');
+							label.textContent = '絞り込み:';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+							tabContainer.appendChild(label);
+
+							const filters = [
+								{ label: 'すべて', value: 'all' },
+								{ label: 'BMW', value: 'BMW' },
+								{ label: 'MINI', value: 'MINI' },
+								{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
+								{ label: 'Ferrari', value: 'Ferrari' },
+								{ label: 'ALPINA', value: 'ALPINA' },
+								{ label: 'SDGs・地域活動', value: 'SDGs' },
+								{ label: 'イベント', value: 'イベント' }
+							];
+
+							filters.forEach(f => {
+								const btn = document.createElement('button');
+								btn.type = 'button';
+								btn.dataset.magFilter = f.value;
+								btn.textContent = f.label;
+								btn.style.cssText = \`
+									padding: 6px 14px;
+									font-size: 12px;
+									font-weight: 600;
+									border-radius: 6px;
+									cursor: pointer;
+									transition: all 0.2s ease;
+									white-space: nowrap;
+									border: 1px solid \${activeMagazineFilter === f.value ? '#ffffff' : '#3f3f46'};
+									background: \${activeMagazineFilter === f.value ? '#ffffff' : '#27272a'};
+									color: \${activeMagazineFilter === f.value ? '#000000' : '#d4d4d8'};
+								\`;
+
+								btn.addEventListener('click', (e) => {
+									e.preventDefault();
+									activeMagazineFilter = f.value;
+									updateMagazineTabButtons();
+									filterMagazineTableRows();
+								});
+
+								tabContainer.appendChild(btn);
 							});
 
-							tabContainer.appendChild(btn);
-						});
+							tableTarget.parentNode.insertBefore(tabContainer, tableTarget);
+						}
 
-						table.parentNode.insertBefore(tabContainer, table);
+						filterMagazineTableRows();
+					} catch (e) {
+						console.error('[patch-admin-ui] Error in applyMagazineFilterTabs:', e);
 					}
-
-					filterMagazineTableRows();
 				}
 
 				function updateMagazineTabButtons() {
@@ -737,15 +749,15 @@ const injectedCode = `
 
 				// 定期実行とイベント監視でSPA遷移に完全追従
 				setInterval(() => {
-					applyAccordion();
-					applyCampaignBrandFilterTabs();
-					applyMagazineFilterTabs();
+					try { applyAccordion(); } catch(e){}
+					try { applyCampaignBrandFilterTabs(); } catch(e){}
+					try { applyMagazineFilterTabs(); } catch(e){}
 				}, 350);
 				window.addEventListener('popstate', () => {
 					setTimeout(() => {
-						applyAccordion();
-						applyCampaignBrandFilterTabs();
-						applyMagazineFilterTabs();
+						try { applyAccordion(); } catch(e){}
+						try { applyCampaignBrandFilterTabs(); } catch(e){}
+						try { applyMagazineFilterTabs(); } catch(e){}
 					}, 100);
 				});
 			})();
