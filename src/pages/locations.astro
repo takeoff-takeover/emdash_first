@@ -892,6 +892,12 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						? `<span class="map-pin__count">${groupLocs.length}</span>` 
 						: '';
 
+					const isMobile = window.innerWidth <= 640;
+					const pinW = isMobile ? 22 : 38;
+					const pinH = isMobile ? 26 : 44;
+					const anchorX = Math.round(pinW / 2);
+					const anchorY = pinH;
+
 					const icon = L.divIcon({
 						className: 'loc-map-marker',
 						html: `
@@ -903,9 +909,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 								<div class="map-pin__tip"></div>
 							</div>
 						`,
-						iconSize: [38, 44],
-						iconAnchor: [19, 44],
-						popupAnchor: [0, -44]
+						iconSize: [pinW, pinH],
+						iconAnchor: [anchorX, anchorY],
+						popupAnchor: [0, -anchorY]
 					});
 
 					const marker = L.marker([group.lat, group.lng], { icon: icon });
@@ -2135,13 +2141,41 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 640px) {
-		/* スマホ時マップピンアイコン小型化 */
+		/* スマホ時マップピンアイコン小型化（直接サイズ指定＋アンカー整合） */
+		:global(.loc-map-marker) {
+			width: 22px !important;
+			height: 26px !important;
+		}
 		:global(.map-pin) {
-			transform: scale(0.72);
-			transform-origin: 50% 100%;
+			width: 22px !important;
+			height: 26px !important;
+			transform: none !important;
 		}
 		:global(.map-pin:hover) {
-			transform: scale(0.85) translateY(-2px);
+			transform: scale(1.18) translateY(-2px) !important;
+		}
+		:global(.map-pin__head) {
+			width: 22px !important;
+			height: 22px !important;
+			padding: 2.5px !important;
+			border-width: 1.5px !important;
+		}
+		:global(.map-pin__logo) {
+			max-width: 14px !important;
+			max-height: 14px !important;
+		}
+		:global(.map-pin__count) {
+			width: 10px !important;
+			height: 10px !important;
+			font-size: 7px !important;
+			top: -3px !important;
+			right: -3px !important;
+		}
+		:global(.map-pin__tip) {
+			bottom: 0px !important;
+			border-left-width: 3px !important;
+			border-right-width: 3px !important;
+			border-top-width: 4px !important;
 		}
 
 		.loc-slim-row {
