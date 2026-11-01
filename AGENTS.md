@@ -51,6 +51,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。
 - **Clickable URL rule**: チャット上でユーザーにWebページのURLや管理画面リンクを提示する際は、インラインコードやプレーンテキストで囲まず、必ずワンクリックで直接遷移できるMarkdownリンク形式（例: `[表示名](URL)` または `[URL](URL)`）で記述すること。テキストをコピー＆ペーストさせないこと。
 - **Official location naming rule**: 拠点名や指定工場の表記には、拠点マスタ（データベース・一覧）に登録されている正式表記（例: カタカナ「サービスセンター」ではなく、正式英語表記「`Nicole BMW Service Centre`」等）を常に厳格に用いること。ユーザーがチャット上でカタカナや略称で指定した場合でも、コードおよびUI上の表示テキストには必ずマスタ準拠の正式表記を適用すること。
+- **Mobile layout density rule**: スマートフォン表示において、要素が無駄に改行・段落（行）化して縦に間延びすることや、変に左揃えになって右側に無駄な余白・隙間が空くことを厳禁とする。空いているスペース（ヘッダー右上など）を有効活用し、左右バランス良く密度の高い洗練されたレイアウトを設計すること。
 
 ## This Template
 

@@ -2262,6 +2262,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	}
 	@media (max-width: 900px) {
 		.loc-slim-row {
+			position: relative;
 			flex-wrap: wrap;
 			gap: 12px 14px;
 			padding: 16px 20px;
@@ -2269,17 +2270,22 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		.loc-slim-row__info {
 			flex: 1 1 calc(100% - 68px);
 			max-width: none;
+			padding-right: 110px; /* 右上のGoogle評価と重ならないよう余白確保 */
 		}
 		.loc-slim-row__services {
 			width: 100%;
 			padding-left: 68px;
 			flex: none;
 		}
+		/* スマホ・タブレット時：無駄な1行消費をやめ、右上の空きスペースに配置 */
 		.loc-slim-row__rating {
-			width: 100%;
-			padding-left: 68px;
-			flex: none;
-			margin-top: -2px;
+			position: absolute;
+			top: 16px;
+			right: 20px;
+			width: auto;
+			padding-left: 0;
+			margin: 0;
+			z-index: 2;
 		}
 		.loc-slim-row__rating:has(.loc-rating-empty) {
 			display: none;
@@ -2346,22 +2352,27 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 
 		.loc-slim-row {
+			position: relative;
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 12px;
-			padding: 16px;
+			gap: 10px;
+			padding: 14px 16px;
 		}
 		.loc-slim-row__header {
 			display: flex;
-			align-items: center;
-			gap: 12px;
+			align-items: flex-start;
+			gap: 10px;
 			width: 100%;
+			padding-right: 96px; /* 右上のGoogle評価と重ならないよう余白を確保し、無駄な改行を防ぐ */
+			box-sizing: border-box;
 		}
 		.loc-slim-row__brand {
 			width: 32px;
 			height: 32px;
 			min-width: 32px;
 			padding: 4px;
+			flex-shrink: 0;
+			margin-top: 1px;
 		}
 		.loc-slim-row__logo {
 			max-width: 24px;
@@ -2370,26 +2381,35 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		.loc-slim-row__info {
 			flex: 1;
 			min-width: 0;
+			padding-right: 0;
 		}
-		.loc-slim-row__services {
-			padding-left: 0;
-		}
+		/* スマホ時：Google口コミ評価はカード右上の空きスペースにスマート配置（無駄な1行消費を完全撤廃） */
 		.loc-slim-row__rating {
+			position: absolute;
+			top: 14px;
+			right: 16px;
+			width: auto;
 			padding-left: 0;
-			width: 100%;
-			margin-top: -2px;
+			margin: 0;
+			z-index: 2;
 		}
 		.loc-slim-row__rating:has(.loc-rating-empty) {
 			display: none;
 		}
+		.loc-slim-row__services {
+			padding-left: 0;
+			width: 100%;
+			gap: 6px;
+		}
 		.loc-slim-row__actions {
 			padding-left: 0;
 			width: 100%;
-			padding-top: 10px;
+			padding-top: 8px;
 			border-top: 1px solid rgba(255, 255, 255, 0.08);
 		}
 		.loc-btn {
 			width: 100%;
+			padding: 7px 16px;
 		}
 		.locs-map-header {
 			align-items: flex-start;
