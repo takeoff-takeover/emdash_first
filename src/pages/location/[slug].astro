@@ -154,7 +154,7 @@ if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
 	});
 }
 
-// 2.2 同一敷地に工場を持たない拠点の指定サービス工場マッピング（パターン3 ハイブリッド型）
+// 2.2 同一敷地に工場を持たない拠点の指定サービス工場マッピング
 interface ServiceHubInfo {
 	factoryName: string;
 	factorySlug: string;
@@ -170,16 +170,16 @@ interface ServiceHubInfo {
 
 const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
 	'mini-kohoku': {
-		factoryName: 'Nicole BMW Service Centre',
-		factorySlug: 'nicole-bmw-service-centre',
-		factoryUrl: '/location/nicole-bmw-service-centre',
-		factoryPostal: '〒224-0062',
-		factoryAddress: '神奈川県横浜市都筑区葛が谷15-46',
-		factoryTel: '045-948-2500',
+		factoryName: 'Nicole BMW 横浜港北支店',
+		factorySlug: 'nicole-bmw-kohoku',
+		factoryUrl: '/location/nicole-bmw-kohoku',
+		factoryPostal: '〒224-0025',
+		factoryAddress: '神奈川県横浜市都筑区早渕3-21-28',
+		factoryTel: '045-592-1200',
 		factoryHours: '10:00 〜 18:00',
-		factoryClosed: '水曜日（祝日の場合は営業）',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW Service Centre 神奈川県横浜市都筑区葛が谷15-46')}`,
-		noticeDesc: 'MINI港北にはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、専任メカニックが常駐する下記指定サービス工場にて承ります。'
+		factoryClosed: '水曜日（祝日を除く）',
+		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 横浜港北支店 神奈川県横浜市都筑区早渕3-21-28')}`,
+		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 横浜港北支店」にて承ります。'
 	},
 	'mini-tsuzuki': {
 		factoryName: 'Nicole BMW 横浜港北支店',
@@ -191,7 +191,7 @@ const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
 		factoryHours: '10:00 〜 18:00',
 		factoryClosed: '水曜日（祝日を除く）',
 		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 横浜港北支店 神奈川県横浜市都筑区早渕3-21-28')}`,
-		noticeDesc: 'MINI都筑にはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、近隣の指定サービス工場（Nicole BMW 横浜港北支店）にて承ります。'
+		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 横浜港北支店」にて承ります。'
 	}
 };
 
@@ -244,7 +244,7 @@ if (d.service_title || (d.service_enabled !== '0' && (d.service_tel || d.tel))) 
 		tel: externalServiceHub.factoryTel,
 		hours: externalServiceHub.factoryHours,
 		closed: externalServiceHub.factoryClosed,
-		desc: `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${externalServiceHub.factoryName}」（${externalServiceHub.factoryAddress}）にて承ります。`,
+		desc: `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${externalServiceHub.factoryName}」にて承ります。`,
 		ctaLabel: '指定工場詳細を見る',
 		ctaUrl: externalServiceHub.factoryUrl
 	});
@@ -307,17 +307,6 @@ function resolveBadgeItem(item: any): { brand: string; label: string; targetId: 
 }
 
 let parsedBadges: Array<{ brand: string; label: string; targetId: string }> = [];
-// 外部指定サービス工場がある場合はバッジにも自動連動
-if (externalServiceHub && d.badges) {
-	const badgesStr = typeof d.badges === 'string' ? d.badges : (Array.isArray(d.badges) ? d.badges.join(',') : '');
-	if (!badgesStr.includes('サービス') && !badgesStr.includes('点検')) {
-		if (typeof d.badges === 'string') {
-			d.badges = d.badges + ', MINI サービス（指定工場）';
-		} else if (Array.isArray(d.badges)) {
-			d.badges.push('MINI サービス（指定工場）');
-		}
-	}
-}
 
 if (d.badges) {
 	if (typeof d.badges === 'string') {
@@ -327,10 +316,10 @@ if (d.badges) {
 				const arr = JSON.parse(trimmed);
 				if (Array.isArray(arr)) parsedBadges = arr.map(resolveBadgeItem);
 			} catch (e) {
-				parsedBadges = trimmed.split(',').map(s => s.trim()).filter(Boolean).map(resolveBadgeItem);
+				parsedBadges = trimmed.split(',').map((s: string) => s.trim()).filter(Boolean).map(resolveBadgeItem);
 			}
 		} else {
-			parsedBadges = trimmed.split(',').map(s => s.trim()).filter(Boolean).map(resolveBadgeItem);
+			parsedBadges = trimmed.split(',').map((s: string) => s.trim()).filter(Boolean).map(resolveBadgeItem);
 		}
 	} else if (Array.isArray(d.badges)) {
 		parsedBadges = d.badges.map(resolveBadgeItem);
@@ -436,13 +425,20 @@ function getOpenStatus(hoursStr?: string, closedStr?: string): { isOpen: boolean
 	return { isOpen: false, statusText: '営業時間外', statusClass: 'status--closed' };
 }
 
-// 英名ブランドフレーズが途中で不自然に改行されないようノーブレークスペース（\u00A0）で保護
+// 英名ブランドフレーズが途中で不自然に改行されないようノーブレークスペース（\u00A0）で保護し、冗長なカッコ書きを除去
 function protectPhrases(str: string): string {
 	if (!str) return '';
 	return str
+		.replace(/[\(（](?:BMW|MINI)?\s*認定中古車[\)）]/g, '')
 		.replace(/BMW Premium Selection/g, 'BMW\u00A0Premium\u00A0Selection')
 		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT')
-		.replace(/Rolls-Royce Motor Cars/g, 'Rolls-Royce\u00A0Motor\u00A0Cars');
+		.replace(/Rolls-Royce Motor Cars/g, 'Rolls-Royce\u00A0Motor\u00A0Cars')
+		.trim();
+}
+
+function formatTitleHtml(str: string): string {
+	const cleaned = protectPhrases(str);
+	return cleaned.replace(/(プレオウンド|ショールーム|サービスセンター|サービスファクトリー)/g, '<span class="u-nowrap">$1</span>');
 }
 
 const displayTitle = protectPhrases(d.title);
@@ -471,7 +467,7 @@ const placeData = await getGooglePlaceReviews({
 
 			<div class="sr-hero__content">
 				<h1 class="sr-hero__title">
-					{displayTitle}
+					<Fragment set:html={formatTitleHtml(d.title)} />
 				</h1>
 
 
@@ -585,7 +581,7 @@ const placeData = await getGooglePlaceReviews({
 									<div class="dealer-summary-icon">
 										<img src={mainBrandInfo.src} alt={mainBrandInfo.alt} class={`dealer-brand-logo ${mainBrandInfo.isMini ? 'dealer-brand-logo--mini' : ''}`} />
 									</div>
-									<h3 class="dealer-summary-name">{displayTitle}</h3>
+									<h3 class="dealer-summary-name"><Fragment set:html={formatTitleHtml(d.title)} /></h3>
 								</div>
 								<div class="dealer-summary-address">
 									<span class="dealer-address-text">{d.postal} {d.address}</span>
@@ -720,55 +716,6 @@ const placeData = await getGooglePlaceReviews({
 								※ 臨時時短営業や季節休業を実施する場合がございます。ご来場の際は、各窓口までお電話にてお問い合わせください。
 							</p>
 						</div>
-
-						<!-- 指定サービス工場のご案内（工場非併設拠点の特別案内ブロック） -->
-						{externalServiceHub && (
-							<div class="ext-service-banner">
-								<div class="ext-service-banner__icon">
-									<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" class="ext-service-icon"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-								</div>
-								<div class="ext-service-banner__body">
-									<div class="ext-service-banner__tag-group">
-										<span class="ext-service-banner__tag">AFTER SALES & WORKSHOP</span>
-										<span class="ext-service-banner__status">指定サービス工場</span>
-									</div>
-									<h3 class="ext-service-banner__title">{externalServiceHub.factoryName}</h3>
-									<p class="ext-service-banner__desc">{externalServiceHub.noticeDesc}</p>
-
-									<div class="ext-service-meta-grid">
-										<div class="ext-service-meta-item">
-											<span class="es-label">所在地</span>
-											<span class="es-val">
-												{externalServiceHub.factoryPostal} {externalServiceHub.factoryAddress}
-												<a href={externalServiceHub.factoryGmapUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap">
-													Googleマップ
-												</a>
-											</span>
-										</div>
-										<div class="ext-service-meta-item">
-											<span class="es-label">直通電話</span>
-											<span class="es-val">
-												<a href={`tel:${externalServiceHub.factoryTel}`} class="es-tel">
-													{externalServiceHub.factoryTel}
-												</a>
-											</span>
-										</div>
-										<div class="ext-service-meta-item">
-											<span class="es-label">営業時間</span>
-											<span class="es-val">{externalServiceHub.factoryHours}（定休日: {externalServiceHub.factoryClosed}）</span>
-										</div>
-									</div>
-								</div>
-								<div class="ext-service-banner__action">
-									<a href={externalServiceHub.factoryUrl} class="btn-es-detail">
-										指定工場の詳細を見る →
-									</a>
-									<a href={`tel:${externalServiceHub.factoryTel}`} class="btn-es-call">
-										工場直通で電話する
-									</a>
-								</div>
-							</div>
-						)}
 
 						<!-- 同一敷地内 併設拠点案内（店舗・窓口情報カードに近接配置） -->
 						{d.related_hub_url && (
@@ -993,6 +940,15 @@ const placeData = await getGooglePlaceReviews({
 							</a>
 						</div>
 
+						<!-- 指定サービス工場に関する注意書き（ルート案内のすぐ下） -->
+						{externalServiceHub && (
+							<div class="sidebar-workshop-notice">
+								<p class="workshop-notice-text">
+									※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「<a href={externalServiceHub.factoryUrl} class="workshop-notice-link">{externalServiceHub.factoryName}</a>」にて承ります。
+								</p>
+							</div>
+						)}
+
 						<!-- 本社管理オフィス併設等の注記（存在する場合） -->
 						{d.office_notice && (
 							<div class="sidebar-office-notice">
@@ -1198,8 +1154,12 @@ const placeData = await getGooglePlaceReviews({
 		letter-spacing: -0.02em;
 		line-height: 1.15;
 		margin: 0;
-		word-break: normal;
+		word-break: keep-all;
 		overflow-wrap: break-word;
+	}
+	:global(.u-nowrap) {
+		white-space: nowrap;
+		display: inline-block;
 	}
 
 	.sr-hero__actions {
@@ -1642,7 +1602,7 @@ const placeData = await getGooglePlaceReviews({
 		color: #ffffff;
 		margin: 0;
 		letter-spacing: -0.01em;
-		word-break: normal;
+		word-break: keep-all;
 		overflow-wrap: break-word;
 	}
 
@@ -2641,7 +2601,7 @@ const placeData = await getGooglePlaceReviews({
 		.sr-hero__title {
 			font-size: clamp(1.625rem, 5.5vw, 2.25rem);
 			line-height: 1.25;
-			word-break: normal;
+			word-break: keep-all;
 			overflow-wrap: break-word;
 		}
 
@@ -2764,7 +2724,7 @@ const placeData = await getGooglePlaceReviews({
 
 		.dealer-summary-name {
 			font-size: 1.125rem;
-			word-break: normal;
+			word-break: keep-all;
 			overflow-wrap: break-word;
 		}
 
@@ -2942,165 +2902,41 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	/* ==============================================================
-	   指定サービス工場案内バナー（パターン3 ハイブリッド型）
+	   指定サービス工場案内注記（工場非併設拠点の案内）
 	   ============================================================== */
-	.ext-service-banner {
-		margin-top: 24px;
-		padding: 24px;
-		background: #0d0f12;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 4px;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		gap: 20px;
+	.sidebar-workshop-notice {
+		margin-top: 14px;
+		padding-top: 12px;
+		border-top: 1px dashed rgba(255, 255, 255, 0.12);
 	}
-	.ext-service-banner__icon {
-		width: 44px;
-		height: 44px;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #ffffff;
-		flex-shrink: 0;
-	}
-	.ext-service-banner__body {
-		flex: 1;
-		min-width: 260px;
-	}
-	.ext-service-banner__tag-group {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 6px;
-	}
-	.ext-service-banner__tag {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		color: rgba(255, 255, 255, 0.5);
-	}
-	.ext-service-banner__status {
-		font-size: 10px;
-		font-weight: 600;
-		background: rgba(255, 255, 255, 0.12);
-		color: #ffffff;
-		padding: 2px 8px;
-		border-radius: 2px;
-	}
-	.ext-service-banner__title {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 8px;
+	.workshop-notice-text {
+		font-size: 0.75rem;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0;
 		letter-spacing: -0.01em;
 	}
-	.ext-service-banner__desc {
-		font-size: 0.84375rem;
-		line-height: 1.6;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0 0 16px;
-	}
-	.ext-service-meta-grid {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		padding: 12px 14px;
-		background: rgba(0, 0, 0, 0.35);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 2px;
-	}
-	.ext-service-meta-item {
-		display: flex;
-		align-items: baseline;
-		gap: 12px;
-		font-size: 0.8125rem;
-	}
-	.es-label {
-		width: 70px;
-		flex-shrink: 0;
-		color: rgba(255, 255, 255, 0.45);
-		font-weight: 600;
-	}
-	.es-val {
+	.workshop-notice-link {
 		color: #ffffff;
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-	.es-tel {
-		color: #ffffff;
-		font-weight: 700;
-		text-decoration: none;
-		letter-spacing: 0.04em;
-	}
-	.es-tel:hover {
 		text-decoration: underline;
-	}
-	.ext-service-banner__action {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		width: 180px;
-		flex-shrink: 0;
-	}
-	.btn-es-detail {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 11px 14px;
-		background: #ffffff;
-		color: #000000;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		text-decoration: none;
-		border-radius: 2px;
-		transition: background 0.2s ease;
-		text-align: center;
-	}
-	.btn-es-detail:hover {
-		background: rgba(255, 255, 255, 0.85);
-	}
-	.btn-es-call {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 10px 14px;
-		background: transparent;
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		font-size: 0.8125rem;
+		text-underline-offset: 3px;
 		font-weight: 500;
-		text-decoration: none;
-		border-radius: 2px;
-		transition: all 0.2s ease;
-		text-align: center;
+		transition: opacity 0.15s ease;
 	}
-	.btn-es-call:hover {
-		border-color: #ffffff;
-		background: rgba(255, 255, 255, 0.05);
+	.workshop-notice-link:hover {
+		opacity: 0.8;
 	}
-	@media (max-width: 768px) {
-		.ext-service-banner {
-			flex-direction: column;
-			gap: 16px;
-			padding: 18px 14px;
-		}
-		.ext-service-banner__action {
-			width: 100%;
-			flex-direction: column;
-		}
-		.ext-service-meta-item {
-			flex-direction: column;
-			gap: 2px;
-		}
-		.es-label {
-			width: auto;
-		}
+	.dealer-info-notice--workshop {
+		margin-top: 8px;
+	}
+	.link-inline-workshop {
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		font-weight: 500;
+	}
+	.link-inline-workshop:hover {
+		opacity: 0.8;
 	}
 
 </style>

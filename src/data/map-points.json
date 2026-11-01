@@ -140,7 +140,7 @@
       },
       {
         "id": 4802,
-        "title": "BMW Premium Selection 新百合ヶ丘（BMW 認定中古車）",
+        "title": "BMW Premium Selection 新百合ヶ丘",
         "url": "https://www.nicole.co.jp/location/bmw-premium-selection-shin-yurigaoka/",
         "brand": "BMW",
         "types": [
@@ -158,7 +158,7 @@
       },
       {
         "id": 5256,
-        "title": "MINI NEXT 新百合ヶ丘（MINI 認定中古車）",
+        "title": "MINI NEXT 新百合ヶ丘",
         "url": "https://www.nicole.co.jp/location/mini-next-shin-yurigaoka/",
         "brand": "MINI",
         "types": [
@@ -271,7 +271,7 @@
     "locations": [
       {
         "id": 4788,
-        "title": "BMW Premium Selection 横浜港北（BMW認定中古車）",
+        "title": "BMW Premium Selection 横浜港北",
         "url": "https://www.nicole.co.jp/location/bmw-premium-selection-yokohama-kohoku/",
         "brand": "BMW",
         "types": [
@@ -280,7 +280,7 @@
       },
       {
         "id": 5229,
-        "title": "MINI NEXT 横浜港北（MINI 認定中古車）",
+        "title": "MINI NEXT 横浜港北",
         "url": "https://www.nicole.co.jp/location/mini-next-yokohama-kohoku/",
         "brand": "MINI",
         "types": [

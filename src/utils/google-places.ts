@@ -116,7 +116,7 @@ export async function getGooglePlaceReviews(options: {
 			};
 		}
 
-		const data = await res.json();
+		const data = (await res.json()) as any;
 		if (data.status !== 'OK' || !data.result) {
 			console.warn(`[GooglePlaces] API returned status: ${data.status}`);
 			return {

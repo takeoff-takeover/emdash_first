@@ -80,6 +80,9 @@ export interface Location {
   access_car?: string;
   access_train?: string;
   google_maps_url?: string;
+  google_place_id?: string;
+  google_rating_override?: string;
+  google_reviews_count_override?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

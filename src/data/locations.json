@@ -120,7 +120,7 @@
   },
   {
     "id": "loc-13",
-    "name": "BMW Premium Selection 横浜港北（BMW認定中古車）",
+    "name": "BMW Premium Selection 横浜港北",
     "brand": "BMW",
     "facilityType": "認定中古車",
     "areaGroup": "神奈川",
@@ -142,7 +142,7 @@
   },
   {
     "id": "loc-14",
-    "name": "BMW Premium Selection 新百合ヶ丘（BMW 認定中古車）",
+    "name": "BMW Premium Selection 新百合ヶ丘",
     "brand": "BMW",
     "facilityType": "認定中古車",
     "areaGroup": "神奈川",
@@ -257,7 +257,7 @@
   },
   {
     "id": "loc-15",
-    "name": "MINI NEXT 横浜港北（MINI 認定中古車）",
+    "name": "MINI NEXT 横浜港北",
     "brand": "MINI",
     "facilityType": "認定中古車",
     "areaGroup": "神奈川",
@@ -279,7 +279,7 @@
   },
   {
     "id": "loc-16",
-    "name": "MINI NEXT 新百合ヶ丘（MINI 認定中古車）",
+    "name": "MINI NEXT 新百合ヶ丘",
     "brand": "MINI",
     "facilityType": "認定中古車",
     "areaGroup": "神奈川",

@@ -227,11 +227,23 @@ locationsData.sort((a, b) => {
 	return orderA - orderB;
 });
 
-function protectPhrases(str: string): string {
+function cleanLocationName(str: string): string {
 	if (!str) return '';
 	return str
+		.replace(/[\(（](?:BMW|MINI)?\s*認定中古車[\)）]/g, '')
 		.replace(/BMW Premium Selection/g, 'BMW\u00A0Premium\u00A0Selection')
-		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT');
+		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT')
+		.trim();
+}
+
+function protectPhrases(str: string): string {
+	return cleanLocationName(str);
+}
+
+function formatLocationNameHtml(str: string): string {
+	const cleaned = cleanLocationName(str);
+	// 「プレオウンド」「ショールーム」など不自然に分断されやすいカタカナ単語を改行防止スパンで保護
+	return cleaned.replace(/(プレオウンド|ショールーム|サービスセンター|サービスファクトリー)/g, '<span class="u-nowrap">$1</span>');
 }
 
 // 拠点ごとのロゴ判定
@@ -400,12 +412,20 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						<h2 class="locs-map-title">NETWORK MAP</h2>
 						<span class="locs-map-sub">ピンをタップすると入居拠点一覧（新車・中古車・サービス）とGoogle Mapsルート案内が表示されます</span>
 					</div>
-					<button type="button" id="btn-reset-map" class="locs-map-reset-btn" title="地図全体を表示">
-						全体を表示
-					</button>
+					<div class="locs-map-header-actions">
+						<button type="button" id="btn-reset-map" class="locs-map-reset-btn" title="地図全体を表示">
+							全体を表示
+						</button>
+						<button type="button" id="btn-toggle-map" class="locs-map-toggle-btn" aria-expanded="true" title="地図の表示/折りたたみを切り替え">
+							<svg class="locs-map-toggle-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<polyline points="18 15 12 9 6 15"></polyline>
+							</svg>
+							<span class="locs-map-toggle-text">地図を閉じる</span>
+						</button>
+					</div>
 				</div>
 
-				<div class="locs-map-frame">
+				<div class="locs-map-frame" id="locs-map-frame">
 					<div id="nicole-leaflet-map" class="nicole-leaflet-map"></div>
 				</div>
 			</div>
@@ -496,7 +516,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 										<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
 									</div>
 									<div class="loc-slim-row__info">
-										<h2 class="loc-slim-row__name">{loc.name}</h2>
+										<h2 class="loc-slim-row__name"><Fragment set:html={formatLocationNameHtml(loc.name)} /></h2>
 										<p class="loc-slim-row__addr" title={loc.address}>
 											<span class="loc-postal">{loc.postal}</span> {loc.address}
 										</p>
@@ -620,7 +640,7 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 											<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
 										</div>
 										<div class="loc-slim-row__info">
-											<h2 class="loc-slim-row__name">{loc.name}</h2>
+											<h2 class="loc-slim-row__name"><Fragment set:html={formatLocationNameHtml(loc.name)} /></h2>
 											<p class="loc-slim-row__addr" title={loc.address}>
 												<span class="loc-postal">{loc.postal}</span> {loc.address}
 											</p>
@@ -893,13 +913,13 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						: '';
 
 					const isMobile = window.innerWidth <= 640;
-					const pinW = isMobile ? 22 : 38;
-					const pinH = isMobile ? 26 : 44;
+					const pinW = isMobile ? 25 : 38;
+					const pinH = isMobile ? 30 : 44;
 					const anchorX = Math.round(pinW / 2);
 					const anchorY = pinH;
 
-					const logoW = isMobile ? 14 : 24;
-					const headSize = isMobile ? 22 : 38;
+					const logoW = isMobile ? 16 : 24;
+					const headSize = isMobile ? 25 : 38;
 
 					const icon = L.divIcon({
 						className: 'loc-map-marker',
@@ -1315,6 +1335,34 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		if (btnResetMap) btnResetMap.addEventListener('click', () => {
 			if (map) map.setView(defaultCenter, defaultZoom);
 		});
+
+		// 地図開閉トグルボタン
+		const btnToggleMap = document.getElementById('btn-toggle-map');
+		const mapFrame = document.getElementById('locs-map-frame');
+		const toggleText = btnToggleMap?.querySelector('.locs-map-toggle-text');
+
+		if (btnToggleMap && mapFrame) {
+			let isMapOpen = true;
+			btnToggleMap.addEventListener('click', () => {
+				isMapOpen = !isMapOpen;
+				btnToggleMap.setAttribute('aria-expanded', isMapOpen ? 'true' : 'false');
+
+				if (isMapOpen) {
+					mapFrame.classList.remove('is-collapsed');
+					if (toggleText) toggleText.textContent = '地図を閉じる';
+					btnToggleMap.classList.remove('is-closed');
+					if (btnResetMap) btnResetMap.style.display = '';
+					setTimeout(() => {
+						if (map) map.invalidateSize();
+					}, 320);
+				} else {
+					mapFrame.classList.add('is-collapsed');
+					if (toggleText) toggleText.textContent = '地図を表示';
+					btnToggleMap.classList.add('is-closed');
+					if (btnResetMap) btnResetMap.style.display = 'none';
+				}
+			});
+		}
 	});
 </script>
 
@@ -1485,6 +1533,11 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		font-size: 11px;
 		color: rgba(255, 255, 255, 0.45);
 	}
+	.locs-map-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
 	.locs-map-reset-btn {
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.18);
@@ -1499,15 +1552,50 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 	.locs-map-reset-btn:hover {
 		background: rgba(255, 255, 255, 0.18);
 	}
+	.locs-map-toggle-btn {
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		color: #ffffff;
+		font-size: 11px;
+		font-weight: 500;
+		padding: 5px 12px;
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.locs-map-toggle-btn:hover {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.locs-map-toggle-icon {
+		transition: transform 0.25s ease;
+		flex-shrink: 0;
+	}
+	.locs-map-toggle-btn.is-closed .locs-map-toggle-icon {
+		transform: rotate(180deg);
+	}
 
 	.locs-map-frame {
 		width: 100%;
 		height: 600px;
+		max-height: 600px;
 		border-radius: 4px;
 		overflow: hidden;
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		background: #090a0d;
 		position: relative;
+		transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.35s ease;
+		opacity: 1;
+	}
+	.locs-map-frame.is-collapsed {
+		max-height: 0 !important;
+		opacity: 0 !important;
+		overflow: hidden !important;
+		border: none !important;
+		margin: 0 !important;
+		pointer-events: none !important;
 	}
 	.nicole-leaflet-map {
 		width: 100%;
@@ -1642,6 +1730,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		font-weight: 700;
 		color: #ffffff;
 		line-height: 1.3;
+		word-break: keep-all;
+		overflow-wrap: break-word;
 	}
 	:global(.map-popup__addr) {
 		margin-bottom: 10px;
@@ -1702,6 +1792,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		color: #ffffff;
 		font-weight: 600;
 		line-height: 1.3;
+		word-break: keep-all;
+		overflow-wrap: break-word;
 	}
 	:global(.popup-facility-tags) {
 		display: flex;
@@ -1940,8 +2032,12 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		margin: 0;
 		line-height: 1.35;
 		letter-spacing: -0.01em;
-		word-break: normal;
+		word-break: keep-all;
 		overflow-wrap: break-word;
+	}
+	:global(.u-nowrap) {
+		white-space: nowrap;
+		display: inline-block;
 	}
 	.loc-slim-row__addr {
 		color: rgba(255, 255, 255, 0.55);
@@ -2148,45 +2244,45 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 640px) {
-		/* スマホ時マップピンアイコン小型化（直接サイズ指定＋アンカー整合） */
+		/* スマホ時マップピンアイコン（22pxから約10%拡大した25pxで視認性向上＋アンカー整合） */
 		:global(.loc-map-marker) {
-			width: 22px !important;
-			height: 26px !important;
+			width: 25px !important;
+			height: 30px !important;
 		}
 		:global(.map-pin) {
-			width: 22px !important;
-			height: 26px !important;
+			width: 25px !important;
+			height: 30px !important;
 			transform: none !important;
 		}
 		:global(.map-pin:hover) {
 			transform: scale(1.18) translateY(-2px) !important;
 		}
 		:global(.map-pin__head) {
-			width: 22px !important;
-			height: 22px !important;
-			padding: 2.5px !important;
+			width: 25px !important;
+			height: 25px !important;
+			padding: 3px !important;
 			border-width: 1.5px !important;
 		}
 		:global(.map-pin__logo) {
-			width: 14px !important;
-			height: 14px !important;
-			max-width: 14px !important;
-			max-height: 14px !important;
+			width: 16px !important;
+			height: 16px !important;
+			max-width: 16px !important;
+			max-height: 16px !important;
 			object-fit: contain !important;
 			display: block !important;
 		}
 		:global(.map-pin__count) {
-			width: 10px !important;
-			height: 10px !important;
-			font-size: 7px !important;
+			width: 12px !important;
+			height: 12px !important;
+			font-size: 8px !important;
 			top: -3px !important;
 			right: -3px !important;
 		}
 		:global(.map-pin__tip) {
 			bottom: 0px !important;
-			border-left-width: 3px !important;
-			border-right-width: 3px !important;
-			border-top-width: 4px !important;
+			border-left-width: 3.5px !important;
+			border-right-width: 3.5px !important;
+			border-top-width: 5px !important;
 		}
 
 		.loc-slim-row {
@@ -2235,8 +2331,15 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		.loc-btn {
 			width: 100%;
 		}
+		.locs-map-header {
+			align-items: flex-start;
+		}
+		.locs-map-header-actions {
+			margin-left: auto;
+		}
 		.locs-map-frame {
 			height: 480px;
+			max-height: 480px;
 		}
 	}
 
