@@ -1,0 +1,499 @@
+---
+// src/pages/campaigns/[slug].astro
+// ニコル・グループ キャンペーン＆フェア詳細ページ
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import { getEmDashEntry, getEmDashCollection } from "emdash";
+import { PortableText } from "emdash/ui";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+	return Astro.redirect("/campaigns");
+}
+
+let item: any = null;
+
+// 1. EmDash から該当キャンペーンを取得
+try {
+	const res = await getEmDashCollection("campaigns" as any, { limit: 100 });
+	if (res?.entries && res.entries.length > 0) {
+		const found = res.entries.find((e: any) => (e.id === slug || e.data?.slug === slug || (e.data && e.data.slug === slug)));
+		if (found) {
+			const d = found.data || found;
+			item = {
+				id: found.id || d.slug || slug,
+				slug: found.id || d.slug || slug,
+				title: d.title || "",
+				brand: d.brand || "BMW",
+				category: d.category || "新車",
+				period_text: d.period_text || "",
+				period_start: d.period_start || "",
+				period_end: d.period_end || "",
+				featured_image: typeof d.featured_image === 'string' ? (d.featured_image.startsWith('{') ? JSON.parse(d.featured_image).src : d.featured_image) : (d.featured_image?.src || "/uploads/2026/02/DSC2293-scaled.avif"),
+				featured_image_sp: typeof d.featured_image_sp === 'string' ? (d.featured_image_sp.startsWith('{') ? JSON.parse(d.featured_image_sp).src : d.featured_image_sp) : (d.featured_image_sp?.src || ""),
+				excerpt: d.excerpt || "",
+				content: d.content || null,
+				target_locations: d.target_locations || "Nicole Group 全拠点",
+				cta_label: d.cta_label || "試乗予約・お問い合わせ",
+				cta_url: d.cta_url || "/contact"
+			};
+		}
+	}
+} catch (e) {
+	console.error(`[campaigns] Failed to get campaign from collection: ${slug}`, e);
+}
+
+// フォールバックデータ
+if (!item) {
+	const fallbackMap: Record<string, any> = {
+		'bmw-autumn-test-drive-2026': {
+			id: 'bmw-autumn-test-drive-2026',
+			slug: 'bmw-autumn-test-drive-2026',
+			title: 'BMW オータム・テストドライブ・フェア 2026',
+			brand: 'BMW',
+			category: '新車',
+			period_text: '2026年11月1日(日) 〜 11月30日(月)',
+			featured_image: '/uploads/2026/02/DSC2293-scaled.avif',
+			excerpt: '最新のBMWモデルを体感できる特別試乗フェアを開催。期間中のご試乗・ご成約でNicole Group限定の特別記念品を進呈いたします。',
+			target_locations: 'Nicole BMW 全拠点（本社ショールーム・横浜港北・青葉宮前・新百合ヶ丘・大田）',
+			cta_label: '試乗予約はこちら',
+			cta_url: '/contact'
+		},
+		'mini-new-generation-debut-fair': {
+			id: 'mini-new-generation-debut-fair',
+			slug: 'mini-new-generation-debut-fair',
+			title: 'MINI THE NEW GENERATION デビュー・フェア',
+			brand: 'MINI',
+			category: '新車',
+			period_text: '2026年11月7日(土) 〜 11月23日(月・祝)',
+			featured_image: '/uploads/2026/02/MINI-新百合ヶ丘.jpg',
+			excerpt: '新世代MINIファミリーが一堂に集結。個性あふれるデザインとゴーカート・フィーリングを各ショールームでご体感ください。',
+			target_locations: 'MINI 港北 / MINI 都筑 / MINI 新百合ヶ丘',
+			cta_label: '来場予約はこちら',
+			cta_url: '/contact'
+		},
+		'bmw-alpina-bps-special-selection': {
+			id: 'bmw-alpina-bps-special-selection',
+			slug: 'bmw-alpina-bps-special-selection',
+			title: 'BMW & BMW ALPINA 認定中古車 特選オータム・セレクション',
+			brand: 'ALPINA',
+			category: '認定中古車',
+			period_text: '2026年11月1日(日) 〜 11月30日(月)',
+			featured_image: '/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025.jpg',
+			excerpt: '厳格な基準をクリアしたBMWおよびBMW ALPINA認定中古車を特別プライスでご案内。特別低金利ローンをご利用いただけます。',
+			target_locations: 'BPS 横浜港北 / BPS 新百合ヶ丘 / ニコル世田谷',
+			cta_label: '認定中古車在庫を見る',
+			cta_url: '/locations'
+		},
+		'rolls-royce-private-preview-yokohama': {
+			id: 'rolls-royce-private-preview-yokohama',
+			slug: 'rolls-royce-private-preview-yokohama',
+			title: 'ロールス・ロイス スペクター プライベート・プレビュー',
+			brand: 'Rolls-Royce',
+			category: '新車',
+			period_text: '事前予約制・随時受付中',
+			featured_image: '/uploads/2026/06/cq5dam.web_-e1780380151979.jpg',
+			excerpt: 'ウルトラ・ラグジュアリー・クーペ「スペクター」を完全プライベート空間でご案内いたします。専任アンバサダーが極上の時間をお届けします。',
+			target_locations: 'ロールス・ロイス・モーター・カーズ横浜 ショールーム',
+			cta_label: 'プライベート内覧を予約する',
+			cta_url: '/contact'
+		},
+		'ferrari-winter-clinic-service': {
+			id: 'ferrari-winter-clinic-service',
+			slug: 'ferrari-winter-clinic-service',
+			title: 'Nicole Competizione ウィンター・チェックアップ・クリニック',
+			brand: 'Ferrari',
+			category: 'サービス',
+			period_text: '2026年11月15日(日) 〜 12月20日(日)',
+			featured_image: '/uploads/2026/02/0H9A1397.jpg',
+			excerpt: 'フェラーリ正規ファクトリーによる冬期特別点検プログラム。最新専用テスター診断とエキスパートメカニックによる30項目徹底チェックを実施。',
+			target_locations: 'Nicole Competizione サービスセンター（横浜川向）',
+			cta_label: '入庫・点検予約',
+			cta_url: '/contact'
+		}
+	};
+	item = fallbackMap[slug] || null;
+}
+
+if (!item) {
+	return Astro.redirect("/campaigns");
+}
+---
+
+<NicoleLayout 
+	title={`${item.title} | キャンペーン・フェア - ニコル・グループ公式`}
+	description={item.excerpt || `${item.title}の開催概要・特典情報・対象店舗をご案内します。`}
+>
+	<main class="cmp-detail-page">
+		<!-- 1. パンくず ＆ 記事ヘッダー -->
+		<section class="cmp-detail-header">
+			<div class="cmp-container">
+				<nav class="cmp-breadcrumbs" aria-label="Breadcrumb">
+					<ol class="cmp-breadcrumbs__list">
+						<li><a href="/">HOME</a></li>
+						<li class="cmp-breadcrumbs__sep">/</li>
+						<li><a href="/campaigns">CAMPAIGNS</a></li>
+						<li class="cmp-breadcrumbs__sep">/</li>
+						<li aria-current="page">{item.brand}</li>
+					</ol>
+				</nav>
+
+				<div class="cmp-detail-meta-top">
+					<span class="cmp-badge cmp-badge--brand">{item.brand}</span>
+					<span class="cmp-badge cmp-badge--cat">{item.category}</span>
+					<span class="cmp-detail-status">開催中</span>
+				</div>
+
+				<h1 class="cmp-detail-title">{item.title}</h1>
+
+				<div class="cmp-detail-info-strip">
+					<div class="cmp-info-item">
+						<span class="cmp-info-label">開催期間</span>
+						<strong class="cmp-info-val">{item.period_text}</strong>
+					</div>
+					<div class="cmp-info-item">
+						<span class="cmp-info-label">対象拠点</span>
+						<strong class="cmp-info-val">{item.target_locations}</strong>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 2. メインビジュアル -->
+		<section class="cmp-detail-visual">
+			<div class="cmp-container">
+				<div class="cmp-visual-frame">
+					<picture>
+						{item.featured_image_sp && (
+							<source media="(max-width: 640px)" srcset={item.featured_image_sp} />
+						)}
+						<img 
+							src={item.featured_image} 
+							alt={item.title} 
+							class="cmp-visual-img" 
+							loading="eager" 
+						/>
+					</picture>
+				</div>
+			</div>
+		</section>
+
+		<!-- 3. 詳細本文 ＆ 特典・応募エリア -->
+		<section class="cmp-detail-content-section">
+			<div class="cmp-container cmp-content-container">
+				<div class="cmp-content-body">
+					{item.excerpt && (
+						<p class="cmp-lead-text">{item.excerpt}</p>
+					)}
+
+					{item.content ? (
+						<div class="cmp-portable-text">
+							<PortableText value={item.content} />
+						</div>
+					) : (
+						<div class="cmp-default-body">
+							<h3>キャンペーン概要</h3>
+							<p>Nicole Group各ショールームにて、期間限定の特別キャンペーンを開催しております。期間中にご来場・ご試乗いただいたお客様、ならびにご成約いただいたお客様を対象に、特別なプランや特典をご用意しております。</p>
+							
+							<h3>特別特典・プログラム内容</h3>
+							<ul>
+								<li><strong>特別低金利ローン</strong>：新車・認定中古車対象モデルに特別優遇金利を適用いたします。</li>
+								<li><strong>ご来場・ご試乗記念品</strong>：正規ディーラー限定のオリジナルギフトを進呈。</li>
+								<li><strong>下取り査定優遇</strong>：現在お乗りの愛車を高価下取り査定いたします。</li>
+							</ul>
+
+							<h3>ご案内・注意事項</h3>
+							<p>※試乗車および展示車のラインナップは各ショールームにより異なります。事前のご予約をおすすめいたします。</p>
+							<p>※特典およびプレゼントは数に限りがございます。なくなり次第終了となる場合がございますので予めご了承ください。</p>
+						</div>
+					)}
+
+					<!-- CTA Box -->
+					<div class="cmp-action-card">
+						<h3 class="cmp-action-title">本キャンペーンに関するお問い合わせ・ご予約</h3>
+						<p class="cmp-action-desc">
+							専任セールス・コンサルタントが丁寧にご案内いたします。Webフォームまたはお電話にてお気軽にお申し付けください。
+						</p>
+						<div class="cmp-action-btns">
+							<a href={item.cta_url} class="cmp-btn-main cmp-btn-main--primary">
+								{item.cta_label}
+							</a>
+							<a href="/locations" class="cmp-btn-main cmp-btn-main--outline">
+								開催ショールーム一覧を見る
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<!-- 戻るリンク -->
+				<div class="cmp-back-wrap">
+					<a href="/campaigns" class="cmp-back-link">
+						← キャンペーン一覧に戻る
+					</a>
+				</div>
+			</div>
+		</section>
+	</main>
+</NicoleLayout>
+
+<style>
+	.cmp-detail-page {
+		background: #000000;
+		color: #ffffff;
+		min-height: 100vh;
+		font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+	}
+	.cmp-container {
+		width: 100%;
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
+
+	/* ヘッダー */
+	.cmp-detail-header {
+		padding: 100px 0 32px;
+		background: #08080a;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.cmp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		list-style: none;
+		margin: 0 0 20px 0;
+		padding: 0;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		color: rgba(255, 255, 255, 0.45);
+	}
+	.cmp-breadcrumbs__list a {
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+	}
+	.cmp-breadcrumbs__list a:hover {
+		color: #ffffff;
+	}
+	.cmp-breadcrumbs__sep {
+		opacity: 0.3;
+	}
+	.cmp-detail-meta-top {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.cmp-badge {
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 4px 10px;
+		border-radius: 2px;
+		text-transform: uppercase;
+	}
+	.cmp-badge--brand {
+		background: #ffffff;
+		color: #000000;
+	}
+	.cmp-badge--cat {
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffffff;
+	}
+	.cmp-detail-status {
+		font-size: 10px;
+		font-weight: 700;
+		padding: 3px 8px;
+		border-radius: 2px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: #ffffff;
+		margin-left: auto;
+	}
+	.cmp-detail-title {
+		font-size: 32px;
+		font-weight: 700;
+		line-height: 1.35;
+		letter-spacing: -0.01em;
+		margin: 0 0 24px 0;
+		color: #ffffff;
+		word-break: keep-all;
+		overflow-wrap: break-word;
+	}
+	.cmp-detail-info-strip {
+		display: flex;
+		align-items: center;
+		gap: 32px;
+		padding: 16px 20px;
+		background: #0d0d0f;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 4px;
+		flex-wrap: wrap;
+	}
+	.cmp-info-item {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.cmp-info-label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.45);
+	}
+	.cmp-info-val {
+		font-size: 13.5px;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	/* メイン画像 */
+	.cmp-detail-visual {
+		padding: 40px 0 20px;
+	}
+	.cmp-visual-frame {
+		width: 100%;
+		max-height: 520px;
+		border-radius: 6px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: #18181b;
+	}
+	.cmp-visual-img {
+		width: 100%;
+		height: 100%;
+		max-height: 520px;
+		object-fit: cover;
+		display: block;
+	}
+
+	/* 本文エリア */
+	.cmp-detail-content-section {
+		padding: 40px 0 80px;
+	}
+	.cmp-content-container {
+		max-width: 840px;
+	}
+	.cmp-lead-text {
+		font-size: 16px;
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.85);
+		margin: 0 0 40px 0;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	.cmp-default-body h3 {
+		font-size: 20px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 36px 0 16px 0;
+		border-left: 3px solid #ffffff;
+		padding-left: 12px;
+	}
+	.cmp-default-body p {
+		font-size: 14.5px;
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0 0 20px 0;
+	}
+	.cmp-default-body ul {
+		margin: 0 0 24px 0;
+		padding-left: 20px;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 14px;
+		line-height: 1.8;
+	}
+	.cmp-default-body li {
+		margin-bottom: 8px;
+	}
+
+	/* アクションカード */
+	.cmp-action-card {
+		margin-top: 56px;
+		padding: 36px;
+		background: #0d0d0f;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 6px;
+		text-align: center;
+	}
+	.cmp-action-title {
+		font-size: 20px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 12px 0;
+	}
+	.cmp-action-desc {
+		font-size: 13.5px;
+		line-height: 1.7;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 28px 0;
+	}
+	.cmp-action-btns {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	.cmp-btn-main {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 32px;
+		font-size: 13px;
+		font-weight: 600;
+		text-decoration: none;
+		border-radius: 2px;
+		transition: all 0.2s ease;
+	}
+	.cmp-btn-main--primary {
+		background: #ffffff;
+		color: #000000;
+		border: 1px solid #ffffff;
+	}
+	.cmp-btn-main--primary:hover {
+		background: rgba(255, 255, 255, 0.85);
+		transform: translateY(-1px);
+	}
+	.cmp-btn-main--outline {
+		background: transparent;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+	.cmp-btn-main--outline:hover {
+		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.cmp-back-wrap {
+		margin-top: 48px;
+		text-align: center;
+	}
+	.cmp-back-link {
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 13px;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+	.cmp-back-link:hover {
+		color: #ffffff;
+	}
+
+	@media (max-width: 768px) {
+		.cmp-container {
+			padding: 0 20px;
+		}
+		.cmp-detail-header {
+			padding: 80px 0 24px;
+		}
+		.cmp-detail-title {
+			font-size: 24px;
+		}
+		.cmp-detail-info-strip {
+			gap: 16px;
+		}
+		.cmp-action-card {
+			padding: 24px 16px;
+		}
+	}
+</style>

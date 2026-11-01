@@ -1,6 +1,112 @@
 {
   "collections": [
     {
+      "slug": "magazine",
+      "label": "マガジン",
+      "labelSingular": "マガジン記事",
+      "description": "Nicole Connect Webマガジン専用特集記事コレクション",
+      "icon": "book-open",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "scheduling",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "sortOrder": 1,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "タイトル",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "featured_image",
+          "label": "アイキャッチ写真 (PC用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "featured_image_sp",
+          "label": "アイキャッチ写真 (スマホ用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "本文",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "excerpt",
+          "label": "抜粋 / リード文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "related_location",
+          "label": "関連拠点 (Related Showroom)",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "なし（設定しない）",
+              "value": ""
+            },
+            {
+              "label": "Nicole BMW 本社ショールーム（川崎）",
+              "value": "nicole-bmw-kawasaki"
+            },
+            {
+              "label": "Nicole BMW 大田支店",
+              "value": "nicole-bmw-ota"
+            },
+            {
+              "label": "Nicole BMW 青葉宮前支店",
+              "value": "nicole-bmw-aobamiyamae"
+            },
+            {
+              "label": "Nicole BMW 横浜港北支店",
+              "value": "nicole-bmw-yokohama-kohoku"
+            },
+            {
+              "label": "Nicole BMW 新百合ヶ丘支店",
+              "value": "nicole-bmw-shin-yurigaoka"
+            },
+            {
+              "label": "ロールス・ロイス・モーター・カーズ横浜",
+              "value": "rolls-royce-yokohama"
+            },
+            {
+              "label": "Nicole Competizione 青山（Ferrari）",
+              "value": "ferrari-aoyama"
+            },
+            {
+              "label": "ニコル世田谷ショールーム（ALPINA）",
+              "value": "alpina-setagaya"
+            }
+          ]
+        },
+        {
+          "slug": "notes",
+          "label": "注釈・免責事項（文字小・デフォルト空）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
       "slug": "locations",
       "label": "拠点一覧",
       "labelSingular": "拠点情報",
@@ -19,18 +125,17 @@
       "fields": [
         {
           "slug": "title",
-          "label": "拠点名称",
+          "label": "【基本情報】拠点名称",
           "type": "string",
-          "required": true,
+          "required": false,
           "unique": false
         },
         {
           "slug": "brand",
-          "label": "主要ブランド",
+          "label": "【基本情報】主要ブランド",
           "type": "select",
-          "required": true,
+          "required": false,
           "unique": false,
-          "defaultValue": "BMW",
           "options": [
             {
               "label": "BMW",
@@ -59,129 +164,429 @@
           ]
         },
         {
-          "slug": "facility_type",
-          "label": "拠点区分",
+          "slug": "badges",
+          "label": "【基本情報】取扱サービス",
           "type": "string",
           "required": false,
-          "unique": false,
-          "defaultValue": "ショールーム"
+          "unique": false
         },
         {
           "slug": "postal",
-          "label": "郵便番号",
+          "label": "【基本情報】郵便番号",
           "type": "string",
           "required": false,
           "unique": false
         },
         {
           "slug": "address",
-          "label": "所在地住所",
+          "label": "【基本情報】所在地住所",
           "type": "string",
           "required": false,
           "unique": false
         },
         {
-          "slug": "tel",
-          "label": "代表TEL",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "fax",
-          "label": "代表FAX",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "google_maps_url",
-          "label": "GoogleマップURL",
-          "type": "string",
+          "slug": "office_notice",
+          "label": "【基本情報】管理オフィス注記（※空欄時は非表示）",
+          "type": "text",
           "required": false,
           "unique": false
         },
         {
           "slug": "featured_image",
-          "label": "メイン外観写真",
+          "label": "【写真ギャラリー】メイン外観写真（アイキャッチ）",
           "type": "image",
           "required": false,
           "unique": false
         },
         {
-          "slug": "badges",
-          "label": "上部ナビバッジ (JSON)",
-          "type": "text",
+          "slug": "gallery_image_1",
+          "label": "【写真ギャラリー】写真 1",
+          "type": "image",
           "required": false,
           "unique": false
         },
         {
-          "slug": "concept_title",
-          "label": "コンセプト見出し",
+          "slug": "gallery_caption_1",
+          "label": "【写真ギャラリー】写真 1 説明文",
           "type": "string",
           "required": false,
           "unique": false
         },
         {
-          "slug": "concept_text",
-          "label": "コンセプト説明文",
+          "slug": "gallery_image_2",
+          "label": "【写真ギャラリー】写真 2",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_caption_2",
+          "label": "【写真ギャラリー】写真 2 説明文",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_image_3",
+          "label": "【写真ギャラリー】写真 3",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_caption_3",
+          "label": "【写真ギャラリー】写真 3 説明文",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_image_4",
+          "label": "【写真ギャラリー】写真 4",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_caption_4",
+          "label": "【写真ギャラリー】写真 4 説明文",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_image_5",
+          "label": "【写真ギャラリー】写真 5",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_caption_5",
+          "label": "【写真ギャラリー】写真 5 説明文",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_image_6",
+          "label": "【写真ギャラリー】写真 6",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "gallery_caption_6",
+          "label": "【写真ギャラリー】写真 6 説明文",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_title",
+          "label": "【新車窓口】窓口見出し（例: MINI 新車ショールーム）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_subtitle",
+          "label": "【新車窓口】名称（例: MINI 新百合ヶ丘）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_tel",
+          "label": "【新車窓口】電話番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_fax",
+          "label": "【新車窓口】FAX番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_hours",
+          "label": "【新車窓口】営業時間",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_closed",
+          "label": "【新車窓口】定休日",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_desc",
+          "label": "【新車窓口】ご案内文・展示モデル",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
-          "slug": "departments",
-          "label": "窓口アコーディオン情報 (JSON)",
+          "slug": "sales_cta_label",
+          "label": "【新車窓口】ボタン表示名（例: 新車試乗・来場予約）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "sales_cta_url",
+          "label": "【新車窓口】ボタンリンクURL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_title",
+          "label": "【中古車窓口】窓口見出し（例: MINI 認定中古車）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_subtitle",
+          "label": "【中古車窓口】名称（例: MINI NEXT 新百合ヶ丘）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_tel",
+          "label": "【中古車窓口】電話番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_fax",
+          "label": "【中古車窓口】FAX番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_hours",
+          "label": "【中古車窓口】営業時間",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_closed",
+          "label": "【中古車窓口】定休日",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_desc",
+          "label": "【中古車窓口】ご案内文・在庫情報",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_cta_label",
+          "label": "【中古車窓口】ボタン表示名（例: 認定中古車を見る）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "used_cta_url",
+          "label": "【中古車窓口】ボタンリンクURL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_title",
+          "label": "【サービス窓口】窓口見出し（例: 本社サービス工場）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_subtitle",
+          "label": "【サービス窓口】名称（例: Nicole BMW 新百合ヶ丘支店）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_tel",
+          "label": "【サービス窓口】電話番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_fax",
+          "label": "【サービス窓口】FAX番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_hours",
+          "label": "【サービス窓口】営業時間",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_closed",
+          "label": "【サービス窓口】定休日",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_desc",
+          "label": "【サービス窓口】ご案内文・取扱サービス",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_cta_label",
+          "label": "【サービス窓口】ボタン表示名（例: サービス入庫予約）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "service_cta_url",
+          "label": "【サービス窓口】ボタンリンクURL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_name",
+          "label": "【指定サービス工場】工場名称（例: Nicole BMW Service Centre）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_url",
+          "label": "【指定サービス工場】工場ページURL（例: /location/nicole-bmw-service-centre）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_postal",
+          "label": "【指定サービス工場】郵便番号（例: 〒224-0062）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_address",
+          "label": "【指定サービス工場】所在地住所",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_tel",
+          "label": "【指定サービス工場】電話番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_hours",
+          "label": "【指定サービス工場】営業時間",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_closed",
+          "label": "【指定サービス工場】定休日",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "external_service_desc",
+          "label": "【指定サービス工場】ご案内文",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
           "slug": "related_hub_title",
-          "label": "同一敷地・姉妹拠点 リンク見出し",
+          "label": "【併設・アクセス】同一敷地併設拠点 リンク見出し",
           "type": "string",
           "required": false,
           "unique": false
         },
         {
           "slug": "related_hub_url",
-          "label": "同一敷地・姉妹拠点 リンクURL",
+          "label": "【併設・アクセス】同一敷地併設拠点 リンクURL",
           "type": "string",
           "required": false,
           "unique": false
         },
         {
           "slug": "related_hub_desc",
-          "label": "同一敷地・姉妹拠点 案内文",
+          "label": "【併設・アクセス】同一敷地併設拠点 案内文",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
-          "slug": "access_car_tokyo",
-          "label": "車アクセス（東京方面より）",
-          "type": "text",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "access_car_yokohama",
-          "label": "車アクセス（横浜方面より）",
+          "slug": "access_car",
+          "label": "【併設・アクセス】お車でのアクセス",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
           "slug": "access_train",
-          "label": "電車・バスでお越しの方",
+          "label": "【併設・アクセス】電車・バスでのアクセス",
           "type": "text",
           "required": false,
           "unique": false
         },
         {
-          "slug": "access_taxi",
-          "label": "タクシーをご利用の場合",
-          "type": "text",
+          "slug": "google_maps_url",
+          "label": "【併設・アクセス】Googleマップ案内URL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "google_place_id",
+          "label": "【Google連携】GoogleプレイスID（API自動取得用）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "google_rating_override",
+          "label": "【Google連携】評価スコア（手動設定時・空欄可）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "google_reviews_count_override",
+          "label": "【Google連携】クチコミ件数（手動設定時・空欄可）",
+          "type": "string",
           "required": false,
           "unique": false
         }
@@ -320,5 +725,5 @@
       ]
     }
   ],
-  "version": "d2e72ca4b458908a"
+  "version": "0358d853afa6f3fc"
 }

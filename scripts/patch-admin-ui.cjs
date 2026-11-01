@@ -65,6 +65,12 @@ const injectedCode = `
 						desc: 'サービス窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、整備案内、予約ボタン'
 					},
 					{
+						id: 'sec-external-service',
+						prefix: '【指定サービス工場】',
+						title: '指定サービス工場（※工場非併設店舗のみ）',
+						desc: '自社工場がない店舗（大田、MINI港北、MINI都筑など）の指定工場名称、URL、所在地、連絡先、営業時間、案内文'
+					},
+					{
 						id: 'sec-access',
 						prefix: '【併設・アクセス】',
 						title: '併設・アクセス',
@@ -85,6 +91,7 @@ const injectedCode = `
 					'sec-sales': false,
 					'sec-used': false,
 					'sec-service': false,
+					'sec-external-service': false,
 					'sec-access': false,
 					'sec-google': false
 				};
@@ -249,7 +256,8 @@ const injectedCode = `
 						el.textContent && (
 							el.textContent.includes('【基本情報】') ||
 							el.textContent.includes('【新車窓口】') ||
-							el.textContent.includes('【写真ギャラリー】')
+							el.textContent.includes('【写真ギャラリー】') ||
+							el.textContent.includes('【指定サービス工場】')
 						)
 					);
 
@@ -270,9 +278,14 @@ const injectedCode = `
 					const sectionElements = {};
 					SECTION_CONFIG.forEach(sec => { sectionElements[sec.id] = []; });
 
-					allElements.forEach(el => {
-						if (el.children.length > 0 || !el.textContent) return;
-						const text = el.textContent;
+					const searchTargets = [
+						...Array.from(document.querySelectorAll('label')),
+						...Array.from(document.querySelectorAll('p, span, h3, h4'))
+					];
+
+					searchTargets.forEach(el => {
+						const text = el.textContent || '';
+						if (!text) return;
 						for (const sec of SECTION_CONFIG) {
 							if (text.includes(sec.prefix)) {
 								let container = el.parentElement;
@@ -283,7 +296,10 @@ const injectedCode = `
 									container = container.parentElement;
 								}
 								if (container && !sectionElements[sec.id].includes(container)) {
-									sectionElements[sec.id].push(container);
+									const alreadyAdded = Object.values(sectionElements).some(arr => arr.includes(container));
+									if (!alreadyAdded) {
+										sectionElements[sec.id].push(container);
+									}
 								}
 								break;
 							}
@@ -486,9 +502,123 @@ const injectedCode = `
 					});
 				}
 
+				// ─────────────────────────────────────────────────────────────
+				// キャンペーン一覧画面でのブランド別フィルタタブUI
+				// ─────────────────────────────────────────────────────────────
+				let activeCampaignBrand = 'all';
+
+				function applyCampaignBrandFilterTabs() {
+					if (!window.location.pathname.includes('/collections/campaigns')) {
+						const existingTabs = document.getElementById('campaign-brand-filter-bar');
+						if (existingTabs) existingTabs.remove();
+						return;
+					}
+
+					// テーブルまたは一覧コンテナを探す
+					const table = document.querySelector('table');
+					if (!table) return;
+
+					let tabContainer = document.getElementById('campaign-brand-filter-bar');
+					if (!tabContainer) {
+						tabContainer = document.createElement('div');
+						tabContainer.id = 'campaign-brand-filter-bar';
+						tabContainer.style.cssText = \`
+							display: flex;
+							align-items: center;
+							gap: 8px;
+							margin-bottom: 16px;
+							padding: 12px 16px;
+							background: #18181b;
+							border: 1px solid #27272a;
+							border-radius: 8px;
+							overflow-x: auto;
+						\`;
+
+						const label = document.createElement('span');
+						label.textContent = 'ブランド絞り込み:';
+						label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+						tabContainer.appendChild(label);
+
+						const brands = [
+							{ label: 'すべて', value: 'all' },
+							{ label: 'BMW', value: 'BMW' },
+							{ label: 'MINI', value: 'MINI' },
+							{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
+							{ label: 'Ferrari', value: 'Ferrari' },
+							{ label: 'ALPINA', value: 'ALPINA' }
+						];
+
+						brands.forEach(b => {
+							const btn = document.createElement('button');
+							btn.type = 'button';
+							btn.dataset.brandFilter = b.value;
+							btn.textContent = b.label;
+							btn.style.cssText = \`
+								padding: 6px 14px;
+								font-size: 12px;
+								font-weight: 600;
+								border-radius: 6px;
+								cursor: pointer;
+								transition: all 0.2s ease;
+								white-space: nowrap;
+								border: 1px solid #3f3f46;
+								background: \${activeCampaignBrand === b.value ? '#ffffff' : '#27272a'};
+								color: \${activeCampaignBrand === b.value ? '#000000' : '#d4d4d8'};
+							\`;
+
+							btn.addEventListener('click', (e) => {
+								e.preventDefault();
+								activeCampaignBrand = b.value;
+								updateCampaignTabButtons();
+								filterCampaignTableRows();
+							});
+
+							tabContainer.appendChild(btn);
+						});
+
+						table.parentNode.insertBefore(tabContainer, table);
+					}
+
+					filterCampaignTableRows();
+				}
+
+				function updateCampaignTabButtons() {
+					const btns = document.querySelectorAll('#campaign-brand-filter-bar button[data-brand-filter]');
+					btns.forEach(btn => {
+						const isSelected = btn.dataset.brandFilter === activeCampaignBrand;
+						btn.style.background = isSelected ? '#ffffff' : '#27272a';
+						btn.style.color = isSelected ? '#000000' : '#d4d4d8';
+						btn.style.borderColor = isSelected ? '#ffffff' : '#3f3f46';
+					});
+				}
+
+				function filterCampaignTableRows() {
+					const rows = document.querySelectorAll('table tbody tr');
+					rows.forEach(tr => {
+						if (activeCampaignBrand === 'all') {
+							tr.style.display = '';
+							return;
+						}
+						const rowText = tr.textContent || '';
+						if (rowText.includes(activeCampaignBrand)) {
+							tr.style.display = '';
+						} else {
+							tr.style.display = 'none';
+						}
+					});
+				}
+
 				// 定期実行とイベント監視でSPA遷移に完全追従
-				setInterval(applyAccordion, 350);
-				window.addEventListener('popstate', () => setTimeout(applyAccordion, 100));
+				setInterval(() => {
+					applyAccordion();
+					applyCampaignBrandFilterTabs();
+				}, 350);
+				window.addEventListener('popstate', () => {
+					setTimeout(() => {
+						applyAccordion();
+						applyCampaignBrandFilterTabs();
+					}, 100);
+				});
 			})();
 		</script>
 `;

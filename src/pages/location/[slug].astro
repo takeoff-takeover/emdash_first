@@ -5,7 +5,9 @@ import { getEmDashEntry, decodeSlug } from "emdash";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import GoogleRatingBadge from "../../components/GoogleRatingBadge.astro";
 import { getGooglePlaceReviews } from "../../utils/google-places";
+import { protectPhrases, formatTitleHtml } from "../../utils/locationHelper";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -191,60 +193,19 @@ interface ServiceHubInfo {
 	noticeDesc: string;
 }
 
-const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
-	'mini-kohoku': {
-		factoryName: 'Nicole BMW Service Centre',
-		factorySlug: 'nicole-bmw-service-centre',
-		factoryUrl: '/location/nicole-bmw-service-centre',
-		factoryPostal: '〒224-0062',
-		factoryAddress: '神奈川県横浜市都筑区葛が谷15-46',
-		factoryTel: '045-948-2500',
-		factoryHours: '10:00 〜 18:00',
-		factoryClosed: '水曜日（祝日の場合は営業）',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW Service Centre 神奈川県横浜市都筑区葛が谷15-46')}`,
-		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW Service Centre」にて承ります。'
-	},
-	'mini-tsuzuki': {
-		factoryName: 'Nicole BMW 横浜港北支店',
-		factorySlug: 'nicole-bmw-kohoku',
-		factoryUrl: '/location/nicole-bmw-kohoku',
-		factoryPostal: '〒224-0025',
-		factoryAddress: '神奈川県横浜市都筑区早渕3-21-28',
-		factoryTel: '045-592-1200',
-		factoryHours: '10:00 〜 18:00',
-		factoryClosed: '水曜日（祝日を除く）',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 横浜港北支店 神奈川県横浜市都筑区早渕3-21-28')}`,
-		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 横浜港北支店」にて承ります。'
-	},
-	'nicole-bmw-ota': {
-		factoryName: 'Nicole BMW 本社（川崎）',
-		factorySlug: 'nicole-bmw-kawasaki',
-		factoryUrl: '/location/nicole-bmw-kawasaki',
-		factoryPostal: '〒212-0005',
-		factoryAddress: '神奈川県川崎市幸区戸手2-5-7',
-		factoryTel: '044-522-1500',
-		factoryHours: '9:00 〜 18:00',
-		factoryClosed: '水曜日（祝日を除く）',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW 本社（川崎） 神奈川県川崎市幸区戸手2-5-7')}`,
-		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW 本社（川崎）」にて承ります。'
-	}
-};
-
-const currentSlugKey = d.slug || (Astro.params.slug as string) || '';
-const externalServiceHub: ServiceHubInfo | null = EXTERNAL_SERVICE_HUBS[currentSlugKey] || (
-	d.external_service_name ? {
-		factoryName: d.external_service_name,
-		factorySlug: d.external_service_slug || '',
-		factoryUrl: d.external_service_url || `/location/${d.external_service_slug || ''}`,
-		factoryPostal: d.external_service_postal || '',
-		factoryAddress: d.external_service_address || '',
-		factoryTel: d.external_service_tel || '',
-		factoryHours: d.external_service_hours || '10:00 〜 18:00',
-		factoryClosed: d.external_service_closed || '水曜日',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent(`${d.external_service_name} ${d.external_service_address || ''}`)}`,
-		noticeDesc: d.external_service_desc || `${d.title}の整備・点検は下記指定サービス工場にて承ります。`
-	} : null
-);
+// 指定サービス工場（自社工場を併設していない店舗の場合、CMSで設定された指定工場データを利用）
+const externalServiceHub: ServiceHubInfo | null = d.external_service_name ? {
+	factoryName: d.external_service_name,
+	factorySlug: d.external_service_slug || '',
+	factoryUrl: d.external_service_url || (d.external_service_slug ? `/location/${d.external_service_slug}` : '#'),
+	factoryPostal: d.external_service_postal || '',
+	factoryAddress: d.external_service_address || '',
+	factoryTel: d.external_service_tel || '',
+	factoryHours: d.external_service_hours || '10:00 〜 18:00',
+	factoryClosed: d.external_service_closed || '水曜日',
+	factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent(`${d.external_service_name} ${d.external_service_address || ''}`)}`,
+	noticeDesc: d.external_service_desc || `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${d.external_service_name}」にて承ります。`
+} : null;
 
 // サービス整備部門
 if (!isOfficeLocation) {
@@ -477,21 +438,7 @@ function getOpenStatus(hoursStr?: string, closedStr?: string): { isOpen: boolean
 	return { isOpen: false, statusText: '営業時間外', statusClass: 'status--closed' };
 }
 
-// 英名ブランドフレーズが途中で不自然に改行されないようノーブレークスペース（\u00A0）で保護し、冗長なカッコ書きを除去
-function protectPhrases(str: string): string {
-	if (!str) return '';
-	return str
-		.replace(/[\(（](?:BMW|MINI)?\s*認定中古車[\)）]/g, '')
-		.replace(/BMW Premium Selection/g, 'BMW\u00A0Premium\u00A0Selection')
-		.replace(/MINI NEXT/g, 'MINI\u00A0NEXT')
-		.replace(/Rolls-Royce Motor Cars/g, 'Rolls-Royce\u00A0Motor\u00A0Cars')
-		.trim();
-}
 
-function formatTitleHtml(str: string): string {
-	const cleaned = protectPhrases(str);
-	return cleaned.replace(/(プレオウンド|ショールーム|サービスセンター|サービスファクトリー)/g, '<span class="u-nowrap">$1</span>');
-}
 
 const displayTitle = protectPhrases(d.title);
 const displayRelatedHubTitle = protectPhrases(cleanRelatedHubTitle);
@@ -565,17 +512,13 @@ const placeData = await getGooglePlaceReviews({
 
 					<!-- 右側：Googleクチコミ評価数字（一覧と表記統一、右揃え） -->
 					{!isOfficeLocation && placeData && placeData.rating && (
-						<a href="#reviews" class="feat-rating-link" title={`Googleマップ評価: ${placeData.rating.toFixed(1)} (${placeData.user_ratings_total || 0}件のクチコミ)`}>
-							<svg viewBox="0 0 24 24" width="13" height="13" class="gmap-mini-g" aria-hidden="true">
-								<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
-								<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
-								<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
-								<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
-							</svg>
-							<span class="rating-star">★</span>
-							<strong class="rating-val">{placeData.rating.toFixed(1)}</strong>
-							<span class="rating-cnt">({placeData.user_ratings_total || 0})</span>
-						</a>
+						<GoogleRatingBadge
+							rating={placeData.rating}
+							reviewsCount={placeData.user_ratings_total}
+							href="#reviews"
+							title={`Googleマップ評価: ${placeData.rating.toFixed(1)} (${placeData.user_ratings_total || 0}件のクチコミ)`}
+							class="feat-rating-link"
+						/>
 					)}
 				</div>
 			</section>
@@ -959,7 +902,7 @@ const placeData = await getGooglePlaceReviews({
 								))}
 							</div>
 
-							<!-- Googleマップで全クチコミを見る（クチコミ3件の下に配置） -->
+							<!-- Googleマップで全クチコミを見る（クチコミ4件の下に配置） -->
 							<div class="reviews-footer-actions">
 								<a
 									href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
@@ -2378,8 +2321,9 @@ const placeData = await getGooglePlaceReviews({
 
 	.reviews-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
 		gap: 16px;
+		align-items: stretch;
 	}
 
 	.review-card {
@@ -2389,7 +2333,8 @@ const placeData = await getGooglePlaceReviews({
 		padding: 22px 20px;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
+		height: 100%;
+		box-sizing: border-box;
 		transition: transform 0.2s ease, border-color 0.2s ease;
 	}
 
@@ -2404,6 +2349,15 @@ const placeData = await getGooglePlaceReviews({
 		align-items: flex-start;
 		gap: 10px;
 		margin-bottom: 14px;
+		flex-shrink: 0;
+	}
+
+	.review-card__text {
+		font-size: 0.875rem;
+		line-height: 1.7;
+		color: #c9cbcf;
+		margin: 0;
+		flex-grow: 1;
 	}
 
 	.review-card__author {
@@ -2447,13 +2401,6 @@ const placeData = await getGooglePlaceReviews({
 		color: #fbbf24;
 		font-size: 0.875rem;
 		letter-spacing: 1px;
-	}
-
-	.review-card__text {
-		font-size: 0.84375rem;
-		line-height: 1.65;
-		color: #d1d5db;
-		margin: 0;
 	}
 
 	/* サイドバー */

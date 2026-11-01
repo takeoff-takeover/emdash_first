@@ -74,6 +74,14 @@ export interface Location {
   service_desc?: string;
   service_cta_label?: string;
   service_cta_url?: string;
+  external_service_name?: string;
+  external_service_url?: string;
+  external_service_postal?: string;
+  external_service_address?: string;
+  external_service_tel?: string;
+  external_service_hours?: string;
+  external_service_closed?: string;
+  external_service_desc?: string;
   related_hub_title?: string;
   related_hub_url?: string;
   related_hub_desc?: string;

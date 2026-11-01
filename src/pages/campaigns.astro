@@ -1,0 +1,783 @@
+---
+// src/pages/campaigns.astro
+// ニコル・グループ キャンペーン＆フェア一覧ページ
+import NicoleLayout from "../layouts/NicoleLayout.astro";
+import { getEmDashCollection } from "emdash";
+
+// 1. EmDash 公式APIからキャンペーンデータを取得
+let campaignsList: any[] = [];
+try {
+	const res = await getEmDashCollection("campaigns" as any, {
+		limit: 100,
+	});
+	if (res?.entries && res.entries.length > 0) {
+		campaignsList = res.entries.map((e: any) => {
+			const d = e.data || e;
+			return {
+				id: e.id || d.slug || d.id,
+				slug: e.id || d.slug,
+				title: d.title || "",
+				brand: d.brand || "BMW",
+				category: d.category || "新車",
+				period_text: d.period_text || "",
+				period_start: d.period_start || "",
+				period_end: d.period_end || "",
+				featured_image: typeof d.featured_image === 'string' ? (d.featured_image.startsWith('{') ? JSON.parse(d.featured_image).src : d.featured_image) : (d.featured_image?.src || "/uploads/2026/02/DSC2293-scaled.avif"),
+				excerpt: d.excerpt || "",
+				target_locations: d.target_locations || "Nicole Group 全拠点",
+				cta_label: d.cta_label || "詳細を見る",
+				cta_url: `/campaigns/${e.id || d.slug}`
+			};
+		});
+	}
+} catch (e) {
+	console.error("[campaigns] Failed to query getEmDashCollection:", e);
+}
+
+// フォールバック（DB取得が空の場合の初期データ）
+if (campaignsList.length === 0) {
+	campaignsList = [
+		{
+			id: "bmw-autumn-test-drive-2026",
+			slug: "bmw-autumn-test-drive-2026",
+			title: "BMW オータム・テストドライブ・フェア 2026",
+			brand: "BMW",
+			category: "新車",
+			period_text: "2026年11月1日(日) 〜 11月30日(月)",
+			period_start: "2026-11-01",
+			period_end: "2026-11-30",
+			featured_image: "/uploads/2026/02/DSC2293-scaled.avif",
+			excerpt: "最新のBMWモデルを体感できる特別試乗フェアを開催。期間中のご試乗・ご成約でNicole Group限定の特別記念品を進呈いたします。",
+			target_locations: "Nicole BMW 全拠点（本社ショールーム・横浜港北・青葉宮前・新百合ヶ丘・大田）",
+			cta_label: "詳細を見る",
+			cta_url: "/campaigns/bmw-autumn-test-drive-2026"
+		},
+		{
+			id: "mini-new-generation-debut-fair",
+			slug: "mini-new-generation-debut-fair",
+			title: "MINI THE NEW GENERATION デビュー・フェア",
+			brand: "MINI",
+			category: "新車",
+			period_text: "2026年11月7日(土) 〜 11月23日(月・祝)",
+			period_start: "2026-11-07",
+			period_end: "2026-11-23",
+			featured_image: "/uploads/2026/02/MINI-新百合ヶ丘.jpg",
+			excerpt: "新世代MINIファミリーが一堂に集結。個性あふれるデザインとゴーカート・フィーリングを各ショールームでご体感ください。",
+			target_locations: "MINI 港北 / MINI 都筑 / MINI 新百合ヶ丘",
+			cta_label: "詳細を見る",
+			cta_url: "/campaigns/mini-new-generation-debut-fair"
+		},
+		{
+			id: "bmw-alpina-bps-special-selection",
+			slug: "bmw-alpina-bps-special-selection",
+			title: "BMW & BMW ALPINA 認定中古車 特選オータム・セレクション",
+			brand: "ALPINA",
+			category: "認定中古車",
+			period_text: "2026年11月1日(日) 〜 11月30日(月)",
+			period_start: "2026-11-01",
+			period_end: "2026-11-30",
+			featured_image: "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025.jpg",
+			excerpt: "厳格な基準をクリアしたBMWおよびBMW ALPINA認定中古車を特別プライスでご案内。特別低金利ローンをご利用いただけます。",
+			target_locations: "BPS 横浜港北 / BPS 新百合ヶ丘 / ニコル世田谷",
+			cta_label: "詳細を見る",
+			cta_url: "/campaigns/bmw-alpina-bps-special-selection"
+		},
+		{
+			id: "rolls-royce-private-preview-yokohama",
+			slug: "rolls-royce-private-preview-yokohama",
+			title: "ロールス・ロイス スペクター プライベート・プレビュー",
+			brand: "Rolls-Royce",
+			category: "新車",
+			period_text: "事前予約制・随時受付中",
+			period_start: "2026-11-01",
+			period_end: "2026-12-25",
+			featured_image: "/uploads/2026/06/cq5dam.web_-e1780380151979.jpg",
+			excerpt: "ウルトラ・ラグジュアリー・クーペ「スペクター」を完全プライベート空間でご案内いたします。専任アンバサダーが極上の時間をお届けします。",
+			target_locations: "ロールス・ロイス・モーター・カーズ横浜 ショールーム",
+			cta_label: "詳細を見る",
+			cta_url: "/campaigns/rolls-royce-private-preview-yokohama"
+		},
+		{
+			id: "ferrari-winter-clinic-service",
+			slug: "ferrari-winter-clinic-service",
+			title: "Nicole Competizione ウィンター・チェックアップ・クリニック",
+			brand: "Ferrari",
+			category: "サービス",
+			period_text: "2026年11月15日(日) 〜 12月20日(日)",
+			period_start: "2026-11-15",
+			period_end: "2026-12-20",
+			featured_image: "/uploads/2026/02/0H9A1397.jpg",
+			excerpt: "フェラーリ正規ファクトリーによる冬期特別点検プログラム。最新専用テスター診断とエキスパートメカニックによる30項目徹底チェックを実施。",
+			target_locations: "Nicole Competizione サービスセンター（横浜川向）",
+			cta_label: "詳細を見る",
+			cta_url: "/campaigns/ferrari-winter-clinic-service"
+		}
+	];
+}
+
+const BRAND_LOGOS: Record<string, string> = {
+	'BMW': '/brands/bmw.svg',
+	'MINI': '/brands/mini.svg',
+	'Rolls-Royce': '/brands/rolls-royce.svg',
+	'Ferrari': '/brands/ferrari.svg',
+	'ALPINA': '/brands/nicole-n-mark.svg',
+	'Nicole Group': '/brands/nicole-n-mark.svg'
+};
+---
+
+<NicoleLayout 
+	title="キャンペーン＆フェア一覧 | CAMPAIGNS & FAIRS - ニコル・グループ公式"
+	description="Nicole Group正規ディーラー（BMW・MINI・Rolls-Royce・Ferrari・ALPINA）の最新キャンペーン、試乗フェア、特選認定中古車フェア、特別サービスプログラムをご案内します。"
+>
+	<main class="cmp-page">
+		<!-- 1. Hero Showcase -->
+		<section class="cmp-hero">
+			<div class="cmp-hero__media">
+				<img 
+					src="/uploads/2026/02/DSC2293-scaled.avif" 
+					alt="Nicole Group Campaigns" 
+					class="cmp-hero__img" 
+					loading="eager" 
+				/>
+				<div class="cmp-hero__overlay"></div>
+			</div>
+			<div class="cmp-container cmp-hero__inner">
+				<nav class="cmp-breadcrumbs" aria-label="Breadcrumb">
+					<ol class="cmp-breadcrumbs__list">
+						<li><a href="/">HOME</a></li>
+						<li class="cmp-breadcrumbs__sep">/</li>
+						<li aria-current="page">CAMPAIGNS</li>
+					</ol>
+				</nav>
+				<div class="cmp-hero__content">
+					<span class="cmp-eyebrow">SPECIAL OFFERS & EVENTS</span>
+					<h1 class="cmp-hero__title">
+						<span class="heading-phrase">特別な体験をお届けする、</span><br />
+						<span class="heading-phrase">最新キャンペーン情報。</span>
+					</h1>
+					<p class="cmp-hero__lead">
+						新車特別低金利ローン、特選認定中古車フェア、正規ファクトリーによる特別整備プログラムなど、Nicole Group各ブランドの最新オファーをご案内します。
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- 2. ブランド ＆ 種別 フィルターバー -->
+		<section class="cmp-filter-section">
+			<div class="cmp-container">
+				<div class="cmp-filter-box">
+					<!-- ブランドフィルター -->
+					<div class="cmp-filter-row">
+						<span class="cmp-filter-label">BRAND</span>
+						<div class="cmp-filter-group" id="brand-filters">
+							<button type="button" class="cmp-filter-btn is-active" data-brand="all">すべて</button>
+							<button type="button" class="cmp-filter-btn" data-brand="BMW">BMW</button>
+							<button type="button" class="cmp-filter-btn" data-brand="MINI">MINI</button>
+							<button type="button" class="cmp-filter-btn" data-brand="Rolls-Royce">Rolls-Royce</button>
+							<button type="button" class="cmp-filter-btn" data-brand="Ferrari">Ferrari</button>
+							<button type="button" class="cmp-filter-btn" data-brand="ALPINA">ALPINA</button>
+						</div>
+					</div>
+
+					<!-- 種別フィルター -->
+					<div class="cmp-filter-row">
+						<span class="cmp-filter-label">CATEGORY</span>
+						<div class="cmp-filter-group" id="category-filters">
+							<button type="button" class="cmp-pill-btn is-active" data-cat="all">すべて</button>
+							<button type="button" class="cmp-pill-btn" data-cat="新車">新車フェア</button>
+							<button type="button" class="cmp-pill-btn" data-cat="認定中古車">認定中古車</button>
+							<button type="button" class="cmp-pill-btn" data-cat="サービス">サービス・車検</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 3. キャンペーンカードグリッド -->
+		<section class="cmp-grid-section">
+			<div class="cmp-container">
+				<div class="cmp-grid" id="campaigns-grid">
+					{campaignsList.map((item) => {
+						const logo = BRAND_LOGOS[item.brand] || '/brands/nicole-n-mark.svg';
+
+						return (
+							<article 
+								class="cmp-card" 
+								data-brand={item.brand} 
+								data-category={item.category}
+							>
+								<!-- カード全体クリッカブル（Stretched Link） -->
+								<a href={item.cta_url} class="cmp-card__hitbox" aria-label={`${item.title}を見る`}></a>
+
+								<!-- サムネイル画像 -->
+								<div class="cmp-card__thumb-wrap">
+									<img 
+										src={item.featured_image} 
+										alt={item.title} 
+										class="cmp-card__img" 
+										loading="lazy" 
+									/>
+									<div class="cmp-card__tags-floating">
+										<span class="cmp-badge cmp-badge--brand">{item.brand}</span>
+										<span class="cmp-badge cmp-badge--cat">{item.category}</span>
+									</div>
+								</div>
+
+								<!-- カード本体コンテンツ -->
+								<div class="cmp-card__body">
+									<div class="cmp-card__meta">
+										<span class="cmp-period">
+											<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cmp-icon" aria-hidden="true">
+												<circle cx="12" cy="12" r="10"></circle>
+												<polyline points="12 6 12 12 16 14"></polyline>
+											</svg>
+											{item.period_text}
+										</span>
+									</div>
+
+									<h2 class="cmp-card__title">{item.title}</h2>
+									<p class="cmp-card__excerpt">{item.excerpt}</p>
+
+									<div class="cmp-card__footer">
+										<span class="cmp-target-loc">
+											<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cmp-icon" aria-hidden="true">
+												<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+												<circle cx="12" cy="10" r="3"></circle>
+											</svg>
+											{item.target_locations}
+										</span>
+										<span class="cmp-card__arrow" aria-hidden="true">→</span>
+									</div>
+								</div>
+							</article>
+						);
+					})}
+				</div>
+
+				<!-- 該当なしメッセージ -->
+				<div class="cmp-empty" id="campaigns-empty" style="display: none;">
+					<p class="cmp-empty__text">選択された条件に一致するキャンペーンは見つかりませんでした。</p>
+					<button type="button" class="cmp-empty__reset" id="reset-campaign-filters">フィルターをリセット</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- 4. フッターCTA -->
+		<section class="cmp-cta">
+			<div class="cmp-container cmp-cta__container">
+				<span class="cmp-eyebrow">CONTACT & INQUIRY</span>
+				<h2 class="cmp-cta__title">お車に関するあらゆるご相談・試乗予約を承ります。</h2>
+				<p class="cmp-cta__desc">
+					最新モデルのご試乗、特選車のお見積もり、特別ローンプログラムのご相談など、お近くのNicole Group各店舗へお気軽にお問い合わせください。
+				</p>
+				<div class="cmp-cta__actions">
+					<a href="/contact" class="cmp-btn-cta cmp-btn-cta--primary">総合お問い合わせフォーム</a>
+					<a href="/locations" class="cmp-btn-cta cmp-btn-cta--outline">ショールーム・拠点一覧を見る</a>
+				</div>
+			</div>
+		</section>
+	</main>
+</NicoleLayout>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const brandBtns = document.querySelectorAll('#brand-filters .cmp-filter-btn');
+		const catBtns = document.querySelectorAll('#category-filters .cmp-pill-btn');
+		const cards = document.querySelectorAll('.cmp-card');
+		const emptyMsg = document.getElementById('campaigns-empty');
+		const resetBtn = document.getElementById('reset-campaign-filters');
+
+		let currentBrand = 'all';
+		let currentCat = 'all';
+
+		function applyFilters() {
+			let visibleCount = 0;
+
+			cards.forEach(card => {
+				const cardBrand = card.getAttribute('data-brand') || '';
+				const cardCat = card.getAttribute('data-category') || '';
+
+				const matchBrand = (currentBrand === 'all') || (cardBrand === currentBrand);
+				const matchCat = (currentCat === 'all') || (cardCat === currentCat);
+
+				if (matchBrand && matchCat) {
+					(card as HTMLElement).style.display = 'flex';
+					visibleCount++;
+				} else {
+					(card as HTMLElement).style.display = 'none';
+				}
+			});
+
+			if (emptyMsg) {
+				emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+			}
+		}
+
+		brandBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				brandBtns.forEach(b => b.classList.remove('is-active'));
+				btn.classList.add('is-active');
+				currentBrand = btn.getAttribute('data-brand') || 'all';
+				applyFilters();
+			});
+		});
+
+		catBtns.forEach(btn => {
+			btn.addEventListener('click', () => {
+				catBtns.forEach(b => b.classList.remove('is-active'));
+				btn.classList.add('is-active');
+				currentCat = btn.getAttribute('data-cat') || 'all';
+				applyFilters();
+			});
+		});
+
+		if (resetBtn) {
+			resetBtn.addEventListener('click', () => {
+				currentBrand = 'all';
+				currentCat = 'all';
+				brandBtns.forEach(b => b.classList.toggle('is-active', b.getAttribute('data-brand') === 'all'));
+				catBtns.forEach(b => b.classList.toggle('is-active', b.getAttribute('data-cat') === 'all'));
+				applyFilters();
+			});
+		}
+	});
+</script>
+
+<style>
+	/* ==============================================================
+	   キャンペーンページ（ミニマル・モノトーン・高密度レイアウト）
+	   ============================================================== */
+	.cmp-page {
+		background: #000000;
+		color: #ffffff;
+		min-height: 100vh;
+		font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+	}
+	.cmp-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
+
+	/* 1. Hero Showcase */
+	.cmp-hero {
+		position: relative;
+		min-height: 380px;
+		display: flex;
+		align-items: flex-end;
+		padding: 100px 0 48px;
+		overflow: hidden;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+	.cmp-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+	}
+	.cmp-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: brightness(0.35) contrast(1.15) grayscale(0.2);
+	}
+	.cmp-hero__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%);
+	}
+	.cmp-hero__inner {
+		position: relative;
+		z-index: 1;
+	}
+	.cmp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		list-style: none;
+		margin: 0 0 20px 0;
+		padding: 0;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		color: rgba(255, 255, 255, 0.45);
+	}
+	.cmp-breadcrumbs__list a {
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+	.cmp-breadcrumbs__list a:hover {
+		color: #ffffff;
+	}
+	.cmp-breadcrumbs__sep {
+		opacity: 0.3;
+	}
+	.cmp-eyebrow {
+		display: inline-block;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.22em;
+		color: rgba(255, 255, 255, 0.7);
+		margin-bottom: 12px;
+	}
+	.cmp-hero__title {
+		font-size: 38px;
+		font-weight: 700;
+		line-height: 1.25;
+		letter-spacing: -0.02em;
+		margin: 0 0 16px 0;
+		color: #ffffff;
+	}
+	.cmp-hero__lead {
+		font-size: 14px;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.7);
+		max-width: 680px;
+		margin: 0;
+	}
+
+	/* 2. フィルターバー */
+	.cmp-filter-section {
+		padding: 24px 0 16px;
+		background: #08080a;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.cmp-filter-box {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.cmp-filter-row {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	.cmp-filter-label {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.45);
+		min-width: 70px;
+	}
+	.cmp-filter-group {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+	.cmp-filter-btn {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 12px;
+		font-weight: 600;
+		padding: 6px 16px;
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.cmp-filter-btn:hover {
+		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(255, 255, 255, 0.3);
+		color: #ffffff;
+	}
+	.cmp-filter-btn.is-active {
+		background: #ffffff;
+		border-color: #ffffff;
+		color: #000000;
+	}
+
+	.cmp-pill-btn {
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 11px;
+		font-weight: 500;
+		padding: 4px 12px;
+		border-radius: 9999px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.cmp-pill-btn:hover {
+		border-color: rgba(255, 255, 255, 0.4);
+		color: #ffffff;
+	}
+	.cmp-pill-btn.is-active {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: #ffffff;
+		color: #ffffff;
+	}
+
+	/* 3. カードグリッド */
+	.cmp-grid-section {
+		padding: 48px 0 80px;
+	}
+	.cmp-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+		gap: 24px;
+	}
+
+	/* カード設計（Stretched Link ＆ 高密度） */
+	.cmp-card {
+		position: relative;
+		background: #0d0d0f;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 4px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		transition: all 0.25s ease;
+		cursor: pointer;
+	}
+	.cmp-card:hover {
+		background: #141418;
+		border-color: rgba(255, 255, 255, 0.25);
+		transform: translateY(-3px);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+	}
+	.cmp-card__hitbox {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+	}
+
+	/* サムネイル */
+	.cmp-card__thumb-wrap {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background: #18181b;
+	}
+	.cmp-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+	}
+	.cmp-card:hover .cmp-card__img {
+		transform: scale(1.04);
+	}
+	.cmp-card__tags-floating {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		z-index: 2;
+	}
+	.cmp-badge {
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 3px 8px;
+		border-radius: 2px;
+		text-transform: uppercase;
+	}
+	.cmp-badge--brand {
+		background: #000000;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+	.cmp-badge--cat {
+		background: rgba(255, 255, 255, 0.15);
+		backdrop-filter: blur(8px);
+		color: #ffffff;
+	}
+
+	/* カード本文 */
+	.cmp-card__body {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+	.cmp-card__meta {
+		margin-bottom: 8px;
+	}
+	.cmp-period {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 11px;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.55);
+	}
+	.cmp-icon {
+		opacity: 0.7;
+	}
+	.cmp-card__title {
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 1.4;
+		margin: 0 0 10px 0;
+		color: #ffffff;
+		word-break: keep-all;
+		overflow-wrap: break-word;
+	}
+	.cmp-card__excerpt {
+		font-size: 12.5px;
+		line-height: 1.7;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0 0 20px 0;
+		flex: 1;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.cmp-card__footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-top: 14px;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		gap: 12px;
+	}
+	.cmp-target-loc {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.cmp-card__arrow {
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.6);
+		transition: transform 0.2s ease, color 0.2s ease;
+		flex-shrink: 0;
+	}
+	.cmp-card:hover .cmp-card__arrow {
+		transform: translateX(4px);
+		color: #ffffff;
+	}
+
+	/* 該当なし */
+	.cmp-empty {
+		text-align: center;
+		padding: 60px 20px;
+		background: #0d0d0f;
+		border: 1px dashed rgba(255, 255, 255, 0.15);
+		border-radius: 4px;
+	}
+	.cmp-empty__text {
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 16px 0;
+	}
+	.cmp-empty__reset {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: #ffffff;
+		padding: 8px 20px;
+		font-size: 12px;
+		font-weight: 600;
+		border-radius: 2px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.cmp-empty__reset:hover {
+		background: #ffffff;
+		color: #000000;
+	}
+
+	/* 4. フッターCTA */
+	.cmp-cta {
+		background: #08080a;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 72px 0;
+		text-align: center;
+	}
+	.cmp-cta__container {
+		max-width: 800px;
+	}
+	.cmp-cta__title {
+		font-size: 26px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 16px 0;
+		letter-spacing: -0.01em;
+	}
+	.cmp-cta__desc {
+		font-size: 14px;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0 0 32px 0;
+	}
+	.cmp-cta__actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	.cmp-btn-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 32px;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		text-decoration: none;
+		border-radius: 2px;
+		transition: all 0.2s ease;
+	}
+	.cmp-btn-cta--primary {
+		background: #ffffff;
+		color: #000000;
+		border: 1px solid #ffffff;
+	}
+	.cmp-btn-cta--primary:hover {
+		background: rgba(255, 255, 255, 0.85);
+		transform: translateY(-1px);
+	}
+	.cmp-btn-cta--outline {
+		background: transparent;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+	.cmp-btn-cta--outline:hover {
+		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	/* レスポンシブ対応（モバイル密度ルール徹底） */
+	@media (max-width: 768px) {
+		.cmp-container {
+			padding: 0 20px;
+		}
+		.cmp-hero {
+			padding: 80px 0 36px;
+			min-height: 300px;
+		}
+		.cmp-hero__title {
+			font-size: 26px;
+		}
+		.cmp-grid {
+			grid-template-columns: 1fr;
+			gap: 16px;
+		}
+		.cmp-filter-box {
+			gap: 10px;
+		}
+		.cmp-filter-row {
+			gap: 8px;
+		}
+		.cmp-filter-label {
+			min-width: 60px;
+			font-size: 10px;
+		}
+		.cmp-filter-btn {
+			padding: 5px 12px;
+			font-size: 11px;
+		}
+	}
+</style>
