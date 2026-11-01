@@ -1,6 +1,6 @@
 ---
 // src/pages/campaigns/[slug].astro
-// ニコル・グループ キャンペーン＆フェア詳細ページ（Apple / Magazine スタイル 超リッチエディトリアル）
+// ニコル・グループ キャンペーンLP（モジュラー型リッチデザインブロックシステム）
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import { getEmDashEntry, getEmDashCollection } from "emdash";
 import { PortableText } from "emdash/ui";
@@ -14,7 +14,7 @@ if (!slug) {
 let item: any = null;
 let allCampaigns: any[] = [];
 
-// 1. EmDash から該当キャンペーンおよび全キャンペーンを取得
+// 1. EmDash からキャンペーン情報を取得
 try {
 	const res = await getEmDashCollection("campaigns" as any, { limit: 100 });
 	if (res?.entries && res.entries.length > 0) {
@@ -55,7 +55,7 @@ try {
 				cta_label: d.cta_label || "試乗予約・お問い合わせ",
 				cta_url: d.cta_url || "/contact",
 				databaseId: found.data?.id || found.id,
-				layout_type: d.layout_type || "2col"
+				layout_type: d.layout_type || "1col" // デモ用初期値
 			};
 		}
 	}
@@ -63,7 +63,7 @@ try {
 	console.error(`[campaigns] Failed to get campaign: ${slug}`, e);
 }
 
-// フォールバックデータ（未登録時の安全策）
+// フォールバックデータ
 if (!item) {
 	const fallbackMap: Record<string, any> = {
 		'bmw-autumn-test-drive-2026': {
@@ -91,7 +91,8 @@ if (!item) {
 			excerpt: '新世代MINIファミリーが一堂に集結。個性あふれるデザインとゴーカート・フィーリングを各ショールームでご体感ください。',
 			target_locations: 'MINI 港北 / MINI 都筑 / MINI 新百合ヶ丘',
 			cta_label: '来場予約はこちら',
-			cta_url: '/contact'
+			cta_url: '/contact',
+			layout_type: '1col'
 		},
 		'bmw-alpina-bps-special-selection': {
 			id: 'bmw-alpina-bps-special-selection',
@@ -104,7 +105,8 @@ if (!item) {
 			excerpt: '厳格な基準をクリアしたBMWおよびBMW ALPINA認定中古車を特別プライスでご案内。特別低金利ローンをご利用いただけます。',
 			target_locations: 'BPS 横浜港北 / BPS 新百合ヶ丘 / ニコル世田谷',
 			cta_label: '認定中古車在庫を見る',
-			cta_url: '/locations'
+			cta_url: '/locations',
+			layout_type: '2col'
 		},
 		'rolls-royce-private-preview-yokohama': {
 			id: 'rolls-royce-private-preview-yokohama',
@@ -117,7 +119,8 @@ if (!item) {
 			excerpt: 'ウルトラ・ラグジュアリー・クーペ「スペクター」を完全プライベート空間でご案内いたします。専任アンバサダーが極上の時間をお届けします。',
 			target_locations: 'ロールス・ロイス・モーター・カーズ横浜 ショールーム',
 			cta_label: 'プライベート内覧を予約する',
-			cta_url: '/contact'
+			cta_url: '/contact',
+			layout_type: '2col'
 		},
 		'ferrari-winter-clinic-service': {
 			id: 'ferrari-winter-clinic-service',
@@ -130,7 +133,8 @@ if (!item) {
 			excerpt: 'フェラーリ正規ファクトリーによる冬期特別点検プログラム。最新専用テスター診断とエキスパートメカニックによる30項目徹底チェックを実施。',
 			target_locations: 'Nicole Competizione サービスセンター（横浜川向）',
 			cta_label: '入庫・点検予約',
-			cta_url: '/contact'
+			cta_url: '/contact',
+			layout_type: '2col'
 		}
 	};
 	item = fallbackMap[slug] || null;
@@ -140,13 +144,10 @@ if (!item) {
 	return Astro.redirect("/campaigns");
 }
 
-// 他のキャンペーン（Related）
 const otherCampaigns = allCampaigns.filter(c => c.slug !== item.slug).slice(0, 3);
-
-// 管理画面編集URL
 const editUrl = `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin/content/campaigns/${item.databaseId || item.slug}`;
 
-// サンプルギャラリー（ミニマル表示用・ルール準拠）
+// サンプルギャラリー（ルール準拠）
 const sampleGallery = [
 	{
 		image: item.featured_image,
@@ -169,7 +170,7 @@ const sampleGallery = [
 >
 	<main class="cmp-lp-page">
 		<!-- ============================================================== -->
-		<!-- 1. シネマティック・フルスクリーンHERO（Apple Magazineスタイル） -->
+		<!-- ブロック1: 【フルワイド 100vw】大迫力シネマティックHERO -->
 		<!-- ============================================================== -->
 		<section class="cmp-hero">
 			<div class="cmp-hero__media">
@@ -184,13 +185,11 @@ const sampleGallery = [
 						loading="eager" 
 					/>
 				</picture>
-				<!-- 映画的グラデーション＆ビネット（文字の可読性を極限まで高める） -->
 				<div class="cmp-hero__scrim"></div>
 			</div>
 
 			<div class="cmp-hero__content">
 				<div class="cmp-container">
-					<!-- パンくず & 管理画面編集リンク -->
 					<div class="cmp-hero__top-row">
 						<nav class="cmp-breadcrumbs" aria-label="Breadcrumb">
 							<ol class="cmp-breadcrumbs__list">
@@ -211,7 +210,6 @@ const sampleGallery = [
 						</a>
 					</div>
 
-					<!-- バッジ行（高密度・左右バランス最適化） -->
 					<div class="cmp-hero__meta-strip">
 						<span class="cmp-pill cmp-pill--status">
 							<span class="status-dot"></span>
@@ -230,10 +228,8 @@ const sampleGallery = [
 						</span>
 					</div>
 
-					<!-- キャンペーン大見出し -->
 					<h1 class="cmp-hero__title">{item.title}</h1>
 
-					<!-- リード文 -->
 					{item.excerpt && (
 						<p class="cmp-hero__lead">{item.excerpt}</p>
 					)}
@@ -242,273 +238,276 @@ const sampleGallery = [
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. エディトリアル・レイアウト（管理画面で1カラム / 2カラム切り替え対応） -->
+		<!-- ブロック2: 【ワイド 1240px】3大特別特典プログラム（カードグリッド） -->
 		<!-- ============================================================== -->
-		<section class="cmp-editorial-section">
-			<div class={`cmp-container cmp-editorial-grid ${item.layout_type === '1col' ? 'cmp-editorial-grid--1col' : ''}`}>
-				
-				<!-- メインカラム -->
-				<div class="cmp-main-column">
-					
-					<!-- 3大特別特典プログラム（カードグリッド） -->
-					<section class="cmp-benefits-block">
-						<div class="cmp-section-heading">
-							<span class="cmp-eyebrow">SPECIAL BENEFITS</span>
-							<h2 class="cmp-heading-title">期間限定の特別プログラム ＆ ご成約特典</h2>
-						</div>
-
-						<div class="cmp-benefits-grid">
-							<!-- 特典1 -->
-							<div class="cmp-benefit-card">
-								<div class="cmp-benefit-card__num">01</div>
-								<h3 class="cmp-benefit-card__title">特別低金利プログラム</h3>
-								<p class="cmp-benefit-card__text">
-									対象モデルに期間限定の特別優遇金利を適用。頭金サポートや据置額設定など、お客様に最適なファイナンシャル・プランをご提案いたします。
-								</p>
-							</div>
-
-							<!-- 特典2 -->
-							<div class="cmp-benefit-card">
-								<div class="cmp-benefit-card__num">02</div>
-								<h3 class="cmp-benefit-card__title">ご来場・ご試乗記念品</h3>
-								<p class="cmp-benefit-card__text">
-									期間中にWeb事前予約の上、ショールームにご来場・ご試乗いただいたお客様へ、Nicole Group限定オリジナルギフトを進呈いたします。
-								</p>
-							</div>
-
-							<!-- 特典3 -->
-							<div class="cmp-benefit-card">
-								<div class="cmp-benefit-card__num">03</div>
-								<h3 class="cmp-benefit-card__title">下取り査定特別優遇</h3>
-								<p class="cmp-benefit-card__text">
-									現在お乗りの愛車をメーカー・車種問わず高価下取り査定。正規ディーラーならではの安心と透明性をもってお応えいたします。
-								</p>
-							</div>
-						</div>
-					</section>
-
-					<!-- 本文（Portable Text または デフォルトリッチボディ） -->
-					<section class="cmp-body-block">
-						<div class="cmp-section-heading">
-							<span class="cmp-eyebrow">CAMPAIGN DETAILS</span>
-							<h2 class="cmp-heading-title">キャンペーン詳細 ＆ ご案内</h2>
-						</div>
-
-						{item.content ? (
-							<div class="cmp-portable-text prose prose-invert">
-								<PortableText value={item.content} />
-							</div>
-						) : (
-							<div class="cmp-rich-article">
-								<p class="cmp-body-p">
-									Nicole Group各ショールームでは、皆様の日頃のご愛顧に感謝を込め、最新モデルの魅力を存分にご体感いただける特別なキャンペーンを開催いたしております。
-								</p>
-								<p class="cmp-body-p">
-									卓越した走行性能と最新のデジタル・テクノロジーが融合した新世代ラインナップを豊富に取り揃え、お客様一人ひとりのライフスタイルに寄り添うご提案をお届けします。ゆったりとしたプライベート空間で、心ゆくまでご試乗・ご相談をお楽しみください。
-								</p>
-							</div>
-						)}
-					</section>
-
-					<!-- 写真ギャラリー（ギャラリーフォーマットルール準拠：余計な見出し・ラベル一切なし） -->
-					<section class="cmp-gallery-block">
-						<div class="cmp-gallery-slider">
-							<div class="cmp-gallery-main-view">
-								<img 
-									id="cmpGalleryImg" 
-									src={sampleGallery[0].image} 
-									alt="" 
-									class="cmp-gallery-active-img" 
-								/>
-								<span id="cmpGalleryBadge" class="cmp-gallery-counter">1 / {sampleGallery.length}</span>
-							</div>
-							<p id="cmpGalleryCap" class="cmp-gallery-caption">{sampleGallery[0].caption}</p>
-
-							<!-- サムネイルセレクター -->
-							<div class="cmp-gallery-thumbs">
-								{sampleGallery.map((g, idx) => (
-									<button 
-										type="button" 
-										class={`cmp-thumb-btn ${idx === 0 ? 'is-active' : ''}`}
-										data-img={g.image}
-										data-cap={g.caption}
-										data-idx={idx + 1}
-										aria-label={`写真 ${idx + 1}`}
-									>
-										<img src={g.image} alt="" />
-									</button>
-								))}
-							</div>
-						</div>
-					</section>
-
-					<!-- アコーディオンFAQ ＆ 注意事項 -->
-					<section class="cmp-faq-block">
-						<div class="cmp-section-heading">
-							<span class="cmp-eyebrow">FAQ & NOTES</span>
-							<h2 class="cmp-heading-title">よくあるご質問 ＆ ご留意事項</h2>
-						</div>
-
-						<div class="cmp-accordion-list">
-							<details class="cmp-accordion-item" open>
-								<summary class="cmp-accordion-summary">
-									<span>試乗は当日の飛び込みでも可能ですか？</span>
-									<span class="cmp-accordion-icon">＋</span>
-								</summary>
-								<div class="cmp-accordion-body">
-									<p>当日のご案内も可能ですが、フェア期間中は混雑が予想され、ご希望の試乗車が貸出中の場合もございます。Webフォームより事前予約をいただくことで、スムーズにお乗り比べいただけます。</p>
-								</div>
-							</details>
-
-							<details class="cmp-accordion-item">
-								<summary class="cmp-accordion-summary">
-									<span>記念品やプレゼントの受け取り条件はありますか？</span>
-									<span class="cmp-accordion-icon">＋</span>
-								</summary>
-								<div class="cmp-accordion-body">
-									<p>事前Web予約のうえ、対象ショールームにてご試乗・ご商談アンケートにご協力いただいたお客様を対象とさせていただきます。なお、数量限定につき、無くなり次第終了となりますので予めご了承ください。</p>
-								</div>
-							</details>
-
-							<details class="cmp-accordion-item">
-								<summary class="cmp-accordion-summary">
-									<span>他社ブランドの車両に乗っていますが、下取りは可能ですか？</span>
-									<span class="cmp-accordion-icon">＋</span>
-								</summary>
-								<div class="cmp-accordion-body">
-									<p>はい、国産車・輸入車を問わず全メーカーのお車を高価下取り査定させていただきます。車検証をお持ちいただければ、ご試乗の間に迅速に無料査定を実施いたします。</p>
-								</div>
-							</details>
-						</div>
-					</section>
-
-					<!-- 1カラム選択時専用：末尾ワイドアクションカード -->
-					{item.layout_type === '1col' && (
-						<section class="cmp-wide-cta-block">
-							<div class="cmp-cta-card cmp-cta-card--wide">
-								<div class="cmp-cta-card__header">
-									<span class="cmp-cta-tag">LIMITED FAIR</span>
-									<h3 class="cmp-cta-title">フェア事前予約・商談申込</h3>
-									<p class="cmp-cta-desc">
-										専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
-									</p>
-								</div>
-
-								<div class="cmp-wide-cta-actions">
-									<a href={item.cta_url} class="cmp-btn-cta-primary cmp-btn-cta-primary--wide">
-										<span>{item.cta_label}</span>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
-											<line x1="5" y1="12" x2="19" y2="12"></line>
-											<polyline points="12 5 19 12 12 19"></polyline>
-										</svg>
-									</a>
-									<a href="/locations" class="cmp-btn-cta-secondary cmp-btn-cta-secondary--wide">
-										<span>開催ショールーム一覧を見る</span>
-									</a>
-								</div>
-
-								<div class="cmp-summary-list cmp-summary-list--wide">
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">対象ブランド</span>
-										<span class="cmp-summary-v">{item.brand}</span>
-									</div>
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">開催期間</span>
-										<span class="cmp-summary-v">{item.period_text}</span>
-									</div>
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">開催店舗</span>
-										<span class="cmp-summary-v">{item.target_locations}</span>
-									</div>
-								</div>
-
-								<div class="cmp-phone-card cmp-phone-card--wide">
-									<span class="cmp-phone-label">お電話でのご予約・お問い合わせ</span>
-									<a href="tel:0120980343" class="cmp-phone-num">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
-											<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-										</svg>
-										0120-980-343
-									</a>
-									<span class="cmp-phone-sub">受付時間: 10:00 - 18:00（水曜定休）</span>
-								</div>
-							</div>
-						</section>
-					)}
-
+		<section class="cmp-section cmp-section--wide cmp-benefits-section">
+			<div class="cmp-container">
+				<div class="cmp-section-heading">
+					<span class="cmp-eyebrow">SPECIAL BENEFITS</span>
+					<h2 class="cmp-heading-title">期間限定の特別プログラム ＆ ご成約特典</h2>
 				</div>
 
-				<!-- 2カラム選択時のみ表示：右サイドバー（追従Sticky） -->
-				{item.layout_type !== '1col' && (
-					<aside class="cmp-sidebar">
-						<div class="cmp-sticky-box">
-							
-							<!-- 最重要アクションカード（勝負所：アクセントレッド） -->
-							<div class="cmp-cta-card">
-								<div class="cmp-cta-card__header">
-									<span class="cmp-cta-tag">LIMITED FAIR</span>
-									<h3 class="cmp-cta-title">フェア事前予約・商談申込</h3>
-									<p class="cmp-cta-desc">
-										専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
-									</p>
-								</div>
+				<div class="cmp-benefits-grid">
+					<div class="cmp-benefit-card">
+						<div class="cmp-benefit-card__num">01</div>
+						<h3 class="cmp-benefit-card__title">特別低金利プログラム</h3>
+						<p class="cmp-benefit-card__text">
+							対象モデルに期間限定の特別優遇金利を適用。頭金サポートや据置額設定など、お客様に最適なファイナンシャル・プランをご提案いたします。
+						</p>
+					</div>
 
-								<!-- 最重要CTAボタン（勝負所の赤） -->
-								<a href={item.cta_url} class="cmp-btn-cta-primary">
-									<span>{item.cta_label}</span>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
-										<line x1="5" y1="12" x2="19" y2="12"></line>
-										<polyline points="12 5 19 12 12 19"></polyline>
-									</svg>
-								</a>
+					<div class="cmp-benefit-card">
+						<div class="cmp-benefit-card__num">02</div>
+						<h3 class="cmp-benefit-card__title">ご来場・ご試乗記念品</h3>
+						<p class="cmp-benefit-card__text">
+							期間中にWeb事前予約の上、ショールームにご来場・ご試乗いただいたお客様へ、Nicole Group限定オリジナルギフトを進呈いたします。
+						</p>
+					</div>
 
-								<!-- サブアクション（モノトーン） -->
-								<a href="/locations" class="cmp-btn-cta-secondary">
-									<span>開催ショールーム一覧を見る</span>
-								</a>
-
-								<!-- 概要スペックリスト -->
-								<div class="cmp-summary-list">
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">対象ブランド</span>
-										<span class="cmp-summary-v">{item.brand}</span>
-									</div>
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">種別</span>
-										<span class="cmp-summary-v">{item.category}</span>
-									</div>
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">開催期間</span>
-										<span class="cmp-summary-v">{item.period_text}</span>
-									</div>
-									<div class="cmp-summary-row">
-										<span class="cmp-summary-k">開催店舗</span>
-										<span class="cmp-summary-v">{item.target_locations}</span>
-									</div>
-								</div>
-
-								<!-- お電話でのお問い合わせ枠 -->
-								<div class="cmp-phone-card">
-									<span class="cmp-phone-label">お電話でのご予約・お問い合わせ</span>
-									<a href="tel:0120980343" class="cmp-phone-num">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
-											<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-										</svg>
-										0120-980-343
-									</a>
-									<span class="cmp-phone-sub">受付時間: 10:00 - 18:00（水曜定休）</span>
-								</div>
-							</div>
-
-						</div>
-					</aside>
-				)}
-
+					<div class="cmp-benefit-card">
+						<div class="cmp-benefit-card__num">03</div>
+						<h3 class="cmp-benefit-card__title">下取り査定特別優遇</h3>
+						<p class="cmp-benefit-card__text">
+							現在お乗りの愛車をメーカー・車種問わず高価下取り査定。正規ディーラーならではの安心と透明性をもってお応えいたします。
+						</p>
+					</div>
+				</div>
 			</div>
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 3. その他の開催中キャンペーン（OTHER CAMPAIGNS） -->
+		<!-- ブロック3: 【左右分割 A: 左に写真、右にテキスト】 -->
+		<!-- ============================================================== -->
+		<section class="cmp-section cmp-section--wide cmp-split-section">
+			<div class="cmp-container">
+				<div class="cmp-split-card cmp-split-card--left-media">
+					<!-- 左：写真 -->
+					<div class="cmp-split-media">
+						<img src="/uploads/2026/02/DSC2293-scaled.avif" alt="ショールームでの体験" loading="lazy" />
+					</div>
+					<!-- 右：テキスト -->
+					<div class="cmp-split-content">
+						<span class="cmp-eyebrow">EXCLUSIVE EXPERIENCE</span>
+						<h3 class="cmp-split-title">最新ラインナップを揃えたプライベート試乗</h3>
+						<p class="cmp-split-desc">
+							Nicole Group各ショールームでは、厳選された最新モデルの試乗車を常時ご用意。市街地から高速走行まで、実車ならではの走行フィールや先進運転支援システムを専任コンサルタントのエスコートのもと存分にご体感いただけます。
+						</p>
+						<div class="cmp-split-actions">
+							<a href="#cmp-booking" class="cmp-btn-outline-pill">試乗モデルについて相談する →</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- ブロック4: 【左右分割 B: 右に写真、左にテキスト】 -->
+		<!-- ※スマホ（SP）では写真が自然に上、テキストが下へ自動並び替え -->
+		<!-- ============================================================== -->
+		<section class="cmp-section cmp-section--wide cmp-split-section">
+			<div class="cmp-container">
+				<div class="cmp-split-card cmp-split-card--right-media">
+					<!-- PCでは右、スマホでは上に自動配置される写真 -->
+					<div class="cmp-split-media">
+						<img src="/uploads/2026/02/0H9A1397.jpg" alt="正規指定工場の技術力" loading="lazy" />
+					</div>
+					<!-- PCでは左、スマホでは下に自動配置されるテキスト -->
+					<div class="cmp-split-content">
+						<span class="cmp-eyebrow">CERTIFIED QUALITY</span>
+						<h3 class="cmp-split-title">マイスターが支える最高峰の安心と整備品質</h3>
+						<p class="cmp-split-desc">
+							ドイツ本国の厳しいトレーニングと認定を受けた熟練メカニックが常駐。最新鋭の専用診断テスターと専用特殊工具を駆使し、お乗りいただくすべての瞬間に揺るぎない歓びと安心をお約束いたします。
+						</p>
+						<div class="cmp-split-actions">
+							<a href="/locations" class="cmp-btn-outline-pill">サービス拠点ネットワークを見る →</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- ブロック5: 【フルワイド 100vw】大迫力全画面パノラマビジュアル -->
+		<!-- ============================================================== -->
+		<section class="cmp-panorama-section">
+			<div class="cmp-panorama-wrap">
+				<img 
+					src="https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" 
+					alt="パノラマビジュアル" 
+					class="cmp-panorama-img" 
+					loading="lazy" 
+				/>
+				<div class="cmp-panorama-scrim"></div>
+				<div class="cmp-panorama-caption">
+					<div class="cmp-container">
+						<span class="cmp-panorama-tag">THE NEW ERA OF DRIVING PLEASURE</span>
+						<p class="cmp-panorama-text">革新が宿るステアリングを握り、未来への扉を開く特別なひとときを。</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- ブロック6: 【中央標準 960px】キャンペーン詳細本文 ＆ FAQ -->
+		<!-- ============================================================== -->
+		<section class="cmp-section cmp-section--standard cmp-article-section">
+			<div class="cmp-container cmp-container--standard">
+				<div class="cmp-section-heading">
+					<span class="cmp-eyebrow">CAMPAIGN DETAILS</span>
+					<h2 class="cmp-heading-title">キャンペーン詳細 ＆ プログラム概要</h2>
+				</div>
+
+				{item.content ? (
+					<div class="cmp-portable-text prose prose-invert">
+						<PortableText value={item.content} />
+					</div>
+				) : (
+					<div class="cmp-rich-article">
+						<p class="cmp-body-p">
+							Nicole Group各ショールームでは、皆様の日頃のご愛顧に感謝を込め、最新モデルの魅力を存分にご体感いただける特別なキャンペーンを開催いたしております。
+						</p>
+						<p class="cmp-body-p">
+							卓越した走行性能と最新のデジタル・テクノロジーが融合した新世代ラインナップを豊富に取り揃え、お客様一人ひとりのライフスタイルに寄り添うご提案をお届けします。ゆったりとしたプライベート空間で、心ゆくまでご試乗・ご相談をお楽しみください。
+						</p>
+					</div>
+				)}
+
+				<!-- 写真ギャラリー（ミニマル・ルール準拠） -->
+				<div class="cmp-gallery-slider">
+					<div class="cmp-gallery-main-view">
+						<img 
+							id="cmpGalleryImg" 
+							src={sampleGallery[0].image} 
+							alt="" 
+							class="cmp-gallery-active-img" 
+						/>
+						<span id="cmpGalleryBadge" class="cmp-gallery-counter">1 / {sampleGallery.length}</span>
+					</div>
+					<p id="cmpGalleryCap" class="cmp-gallery-caption">{sampleGallery[0].caption}</p>
+
+					<div class="cmp-gallery-thumbs">
+						{sampleGallery.map((g, idx) => (
+							<button 
+								type="button" 
+								class={`cmp-thumb-btn ${idx === 0 ? 'is-active' : ''}`}
+								data-img={g.image}
+								data-cap={g.caption}
+								data-idx={idx + 1}
+								aria-label={`写真 ${idx + 1}`}
+							>
+								<img src={g.image} alt="" />
+							</button>
+						))}
+					</div>
+				</div>
+
+				<!-- アコーディオンFAQ -->
+				<div class="cmp-faq-block">
+					<div class="cmp-section-heading">
+						<span class="cmp-eyebrow">FAQ & NOTES</span>
+						<h2 class="cmp-heading-title">よくあるご質問 ＆ ご留意事項</h2>
+					</div>
+
+					<div class="cmp-accordion-list">
+						<details class="cmp-accordion-item" open>
+							<summary class="cmp-accordion-summary">
+								<span>試乗は当日の飛び込みでも可能ですか？</span>
+								<span class="cmp-accordion-icon">＋</span>
+							</summary>
+							<div class="cmp-accordion-body">
+								<p>当日のご案内も可能ですが、フェア期間中は混雑が予想され、ご希望の試乗車が貸出中の場合もございます。Webフォームより事前予約をいただくことで、スムーズにお乗り比べいただけます。</p>
+							</div>
+						</details>
+
+						<details class="cmp-accordion-item">
+							<summary class="cmp-accordion-summary">
+								<span>記念品やプレゼントの受け取り条件はありますか？</span>
+								<span class="cmp-accordion-icon">＋</span>
+							</summary>
+							<div class="cmp-accordion-body">
+								<p>事前Web予約のうえ、対象ショールームにてご試乗・ご商談アンケートにご協力いただいたお客様を対象とさせていただきます。なお、数量限定につき、無くなり次第終了となりますので予めご了承ください。</p>
+							</div>
+						</details>
+
+						<details class="cmp-accordion-item">
+							<summary class="cmp-accordion-summary">
+								<span>他社ブランドの車両に乗っていますが、下取りは可能ですか？</span>
+								<span class="cmp-accordion-icon">＋</span>
+							</summary>
+							<div class="cmp-accordion-body">
+								<p>はい、国産車・輸入車を問わず全メーカーのお車を高価下取り査定させていただきます。車検証をお持ちいただければ、ご試乗の間に迅速に無料査定を実施いたします。</p>
+							</div>
+						</details>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- ブロック7: 【ワイド 1240px】大判予約・商談アクションカード（最重要CTA） -->
+		<!-- ============================================================== -->
+		<section class="cmp-section cmp-section--wide cmp-booking-section" id="cmp-booking">
+			<div class="cmp-container">
+				<div class="cmp-booking-card">
+					<div class="cmp-booking-header">
+						<span class="cmp-cta-tag">LIMITED FAIR</span>
+						<h2 class="cmp-booking-title">フェア事前予約・商談申込</h2>
+						<p class="cmp-booking-desc">
+							専任セールス・コンサルタントが丁寧にご案内いたします。Web予約で優先的に試乗車をご用意いたします。
+						</p>
+					</div>
+
+					<!-- 最重要アクション（勝負所のアクセントレッド） -->
+					<div class="cmp-booking-actions">
+						<a href={item.cta_url} class="cmp-btn-cta-primary">
+							<span>{item.cta_label}</span>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow">
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+								<polyline points="12 5 19 12 12 19"></polyline>
+							</svg>
+						</a>
+						<a href="/locations" class="cmp-btn-cta-secondary">
+							<span>開催ショールーム一覧を見る</span>
+						</a>
+					</div>
+
+					<!-- 概要スペックリスト -->
+					<div class="cmp-summary-grid">
+						<div class="cmp-summary-item">
+							<span class="cmp-summary-k">対象ブランド</span>
+							<span class="cmp-summary-v">{item.brand}</span>
+						</div>
+						<div class="cmp-summary-item">
+							<span class="cmp-summary-k">種別</span>
+							<span class="cmp-summary-v">{item.category}</span>
+						</div>
+						<div class="cmp-summary-item">
+							<span class="cmp-summary-k">開催期間</span>
+							<span class="cmp-summary-v">{item.period_text}</span>
+						</div>
+						<div class="cmp-summary-item">
+							<span class="cmp-summary-k">開催店舗</span>
+							<span class="cmp-summary-v">{item.target_locations}</span>
+						</div>
+					</div>
+
+					<!-- お電話窓口 -->
+					<div class="cmp-phone-strip">
+						<span class="cmp-phone-label">お電話でのご予約・お問い合わせ:</span>
+						<a href="tel:0120980343" class="cmp-phone-num">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="phone-icon">
+								<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+							</svg>
+							0120-980-343
+						</a>
+						<span class="cmp-phone-sub">（受付時間: 10:00 - 18:00 / 水曜定休）</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- ブロック8: その他の開催中キャンペーン（OTHER CAMPAIGNS） -->
 		<!-- ============================================================== -->
 		{otherCampaigns.length > 0 && (
 			<section class="cmp-other-section">
@@ -574,7 +573,7 @@ const sampleGallery = [
 
 <style>
 	/* ============================================================== */
-	/* 共通・ベース設定（徹底したモノトーン・厳格ルール準拠） */
+	/* 共通設定（厳格なモノトーン・高品格ルール準拠） */
 	/* ============================================================== */
 	.cmp-lp-page {
 		background: #000000;
@@ -592,8 +591,40 @@ const sampleGallery = [
 		box-sizing: border-box;
 	}
 
+	.cmp-container--standard {
+		max-width: 960px;
+	}
+
+	.cmp-section {
+		padding: 70px 0;
+	}
+
+	.cmp-section-heading {
+		margin-bottom: 32px;
+		border-bottom: 1px solid #1f1f23;
+		padding-bottom: 16px;
+	}
+
+	.cmp-eyebrow {
+		display: block;
+		font-family: var(--font-mono, monospace);
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.18em;
+		color: #71717a;
+		margin-bottom: 6px;
+	}
+
+	.cmp-heading-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
 	/* ============================================================== */
-	/* 1. HEROセクション（大迫力シネマティックビジュアル） */
+	/* 1. HEROセクション（フルワイド 100vw） */
 	/* ============================================================== */
 	.cmp-hero {
 		position: relative;
@@ -620,8 +651,6 @@ const sampleGallery = [
 		height: 100%;
 		object-fit: cover;
 		object-position: center;
-		transform: scale(1.02);
-		transition: transform 0.8s ease-out;
 	}
 
 	.cmp-hero__scrim {
@@ -632,7 +661,7 @@ const sampleGallery = [
 		height: 100%;
 		background: linear-gradient(
 			180deg,
-			rgba(0, 0, 0, 0.45) 0%,
+			rgba(0, 0, 0, 0.4) 0%,
 			rgba(0, 0, 0, 0.15) 35%,
 			rgba(0, 0, 0, 0.75) 75%,
 			#000000 100%
@@ -654,7 +683,6 @@ const sampleGallery = [
 		gap: 16px;
 	}
 
-	/* パンくず */
 	.cmp-breadcrumbs__list {
 		display: flex;
 		align-items: center;
@@ -670,18 +698,12 @@ const sampleGallery = [
 	.cmp-breadcrumbs__list a {
 		color: rgba(255, 255, 255, 0.7);
 		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.cmp-breadcrumbs__list a:hover {
-		color: #ffffff;
 	}
 
 	.cmp-sep {
 		opacity: 0.3;
 	}
 
-	/* 編集ボタン */
 	.cmp-edit-btn {
 		display: inline-flex;
 		align-items: center;
@@ -692,7 +714,6 @@ const sampleGallery = [
 		border-radius: 999px;
 		font-size: 11px;
 		font-weight: 600;
-		letter-spacing: 0.05em;
 		color: rgba(255, 255, 255, 0.85);
 		text-decoration: none;
 		backdrop-filter: blur(8px);
@@ -710,7 +731,6 @@ const sampleGallery = [
 		height: 12px;
 	}
 
-	/* メタストリップ */
 	.cmp-hero__meta-strip {
 		display: flex;
 		align-items: center;
@@ -777,7 +797,6 @@ const sampleGallery = [
 		line-height: 1.25;
 		letter-spacing: -0.02em;
 		margin: 0 0 16px 0;
-		color: #ffffff;
 		max-width: 900px;
 	}
 
@@ -790,122 +809,19 @@ const sampleGallery = [
 	}
 
 	/* ============================================================== */
-	/* 2. エディトリアル2カラム・レイアウト */
+	/* 2. 3大特別特典ブロック（ワイド 1240px） */
 	/* ============================================================== */
-	.cmp-editorial-section {
-		padding: 60px 0 100px;
-		background: #000000;
-	}
-
-	.cmp-editorial-grid {
-		display: grid;
-		grid-template-columns: 1fr 380px;
-		gap: 60px;
-		align-items: start;
-	}
-
-	/* 1カラム切り替え用スタイル（サイドバーを外し、落ち着いた品格のある自然な幅に） */
-	.cmp-editorial-grid--1col {
-		grid-template-columns: 1fr;
-		max-width: 960px;
-		margin: 0 auto;
-	}
-
-	.cmp-editorial-grid--1col .cmp-benefits-grid {
-		grid-template-columns: repeat(3, 1fr);
-		gap: 16px;
-	}
-
-	.cmp-editorial-grid--1col .cmp-gallery-main-view {
-		aspect-ratio: 16 / 9;
-	}
-
-	.cmp-editorial-grid--1col .cmp-body-p,
-	.cmp-editorial-grid--1col .cmp-portable-text {
-		font-size: 1rem;
-		line-height: 1.9;
-	}
-
-	.cmp-wide-cta-block {
-		margin-top: 48px;
-	}
-
-	.cmp-cta-card--wide {
-		max-width: 100%;
-		padding: 32px 28px;
-		background: #09090b;
-		border: 1px solid #27272a;
-		border-radius: 12px;
-	}
-
-	.cmp-wide-cta-actions {
-		display: flex;
-		gap: 16px;
-		margin-bottom: 24px;
-	}
-
-	.cmp-btn-cta-primary--wide {
-		flex: 1.2;
-		margin-bottom: 0;
-	}
-
-	.cmp-btn-cta-secondary--wide {
-		flex: 1;
-		margin-bottom: 0;
-	}
-
-	.cmp-summary-list--wide {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 14px 28px;
-	}
-
-	.cmp-phone-card--wide {
-		margin-top: 20px;
-	}
-
-	/* セクション見出し共通 */
-	.cmp-section-heading {
-		margin-bottom: 28px;
-		border-bottom: 1px solid #1f1f23;
-		padding-bottom: 16px;
-	}
-
-	.cmp-eyebrow {
-		display: block;
-		font-family: var(--font-mono, monospace);
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.18em;
-		color: #71717a;
-		margin-bottom: 6px;
-	}
-
-	.cmp-heading-title {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0;
-		letter-spacing: -0.01em;
-	}
-
-	/* 3大特別特典ブロック */
-	.cmp-benefits-block {
-		margin-bottom: 64px;
-	}
-
 	.cmp-benefits-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 16px;
+		gap: 20px;
 	}
 
 	.cmp-benefit-card {
 		background: #09090b;
 		border: 1px solid #1f1f23;
 		border-radius: 8px;
-		padding: 24px 20px;
-		position: relative;
+		padding: 28px 24px;
 		transition: border-color 0.2s ease, transform 0.2s ease;
 	}
 
@@ -923,7 +839,7 @@ const sampleGallery = [
 	}
 
 	.cmp-benefit-card__title {
-		font-size: 1.05rem;
+		font-size: 1.1rem;
 		font-weight: 700;
 		color: #ffffff;
 		margin: 0 0 10px 0;
@@ -931,17 +847,164 @@ const sampleGallery = [
 	}
 
 	.cmp-benefit-card__text {
-		font-size: 0.85rem;
-		line-height: 1.65;
+		font-size: 0.875rem;
+		line-height: 1.7;
 		color: #a1a1aa;
 		margin: 0;
 	}
 
-	/* 本文ブロック */
-	.cmp-body-block {
-		margin-bottom: 64px;
+	/* ============================================================== */
+	/* 3 & 4. 左右スプリットブロック（左写真・右文 / 右写真・左文） */
+	/* ============================================================== */
+	.cmp-split-card {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 60px;
+		align-items: center;
+		background: #09090b;
+		border: 1px solid #1f1f23;
+		border-radius: 12px;
+		padding: 44px;
+		box-sizing: border-box;
 	}
 
+	.cmp-split-media {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #18181b;
+	}
+
+	.cmp-split-media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+	}
+
+	.cmp-split-card:hover .cmp-split-media img {
+		transform: scale(1.03);
+	}
+
+	.cmp-split-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.cmp-split-title {
+		font-size: 1.6rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 16px 0;
+		line-height: 1.4;
+		letter-spacing: -0.01em;
+	}
+
+	.cmp-split-desc {
+		font-size: 0.95rem;
+		line-height: 1.85;
+		color: #a1a1aa;
+		margin: 0 0 24px 0;
+	}
+
+	.cmp-btn-outline-pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 10px 22px;
+		background: #18181b;
+		border: 1px solid #3f3f46;
+		border-radius: 999px;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #ffffff;
+		text-decoration: none;
+		transition: all 0.2s ease;
+		width: fit-content;
+	}
+
+	.cmp-btn-outline-pill:hover {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+	}
+
+	/* パターンB: デスクトップでは右に写真、左にテキスト */
+	.cmp-split-card--right-media .cmp-split-media {
+		order: 2;
+	}
+	.cmp-split-card--right-media .cmp-split-content {
+		order: 1;
+	}
+
+	/* ============================================================== */
+	/* 5. 大迫力パノラマセクション（フルワイド 100vw 端から端まで） */
+	/* ============================================================== */
+	.cmp-panorama-section {
+		width: 100%;
+		padding: 40px 0;
+		box-sizing: border-box;
+	}
+
+	.cmp-panorama-wrap {
+		position: relative;
+		width: 100vw;
+		margin-left: calc(-50vw + 50%);
+		height: 520px;
+		overflow: hidden;
+	}
+
+	.cmp-panorama-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	.cmp-panorama-scrim {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			180deg,
+			rgba(0, 0, 0, 0.3) 0%,
+			rgba(0, 0, 0, 0.6) 100%
+		);
+	}
+
+	.cmp-panorama-caption {
+		position: absolute;
+		bottom: 40px;
+		left: 0;
+		width: 100%;
+		z-index: 2;
+	}
+
+	.cmp-panorama-tag {
+		font-family: var(--font-mono, monospace);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		color: #a1a1aa;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	.cmp-panorama-text {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		max-width: 800px;
+		line-height: 1.45;
+	}
+
+	/* ============================================================== */
+	/* 6. 中央標準 960px（本文 ＆ ギャラリー ＆ FAQ） */
+	/* ============================================================== */
 	.cmp-body-p {
 		font-size: 1rem;
 		line-height: 1.9;
@@ -963,30 +1026,13 @@ const sampleGallery = [
 		margin-bottom: 14px;
 	}
 
-	.cmp-portable-text :global(p) {
-		margin-bottom: 18px;
-	}
-
-	.cmp-portable-text :global(ul) {
-		padding-left: 20px;
-		margin-bottom: 24px;
-	}
-
-	.cmp-portable-text :global(li) {
-		margin-bottom: 8px;
-	}
-
-	/* ギャラリーブロック（ルール準拠：余計な見出しなし） */
-	.cmp-gallery-block {
-		margin-bottom: 64px;
-	}
-
 	.cmp-gallery-slider {
 		background: #09090b;
 		border: 1px solid #1f1f23;
 		border-radius: 8px;
 		overflow: hidden;
-		padding: 16px;
+		padding: 20px;
+		margin: 48px 0;
 	}
 
 	.cmp-gallery-main-view {
@@ -1002,7 +1048,6 @@ const sampleGallery = [
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: opacity 0.25s ease;
 	}
 
 	.cmp-gallery-counter {
@@ -1056,9 +1101,9 @@ const sampleGallery = [
 		object-fit: cover;
 	}
 
-	/* アコーディオンFAQブロック */
+	/* アコーディオンFAQ */
 	.cmp-faq-block {
-		margin-bottom: 40px;
+		margin-top: 56px;
 	}
 
 	.cmp-accordion-list {
@@ -1093,7 +1138,6 @@ const sampleGallery = [
 
 	.cmp-accordion-icon {
 		font-size: 16px;
-		font-weight: 400;
 		color: #71717a;
 		transition: transform 0.2s ease;
 	}
@@ -1114,22 +1158,14 @@ const sampleGallery = [
 	}
 
 	/* ============================================================== */
-	/* 3. 右サイドバー（追従Sticky・最重要CTA） */
+	/* 7. 最重要予約アクションカード（勝負所：アクセントレッド） */
 	/* ============================================================== */
-	.cmp-sidebar {
-		position: relative;
-	}
-
-	.cmp-sticky-box {
-		position: sticky;
-		top: 100px;
-	}
-
-	.cmp-cta-card {
+	.cmp-booking-card {
 		background: #09090b;
 		border: 1px solid #27272a;
 		border-radius: 12px;
-		padding: 28px 24px;
+		padding: 48px;
+		box-sizing: border-box;
 	}
 
 	.cmp-cta-tag {
@@ -1146,40 +1182,43 @@ const sampleGallery = [
 		margin-bottom: 12px;
 	}
 
-	.cmp-cta-title {
-		font-size: 1.25rem;
+	.cmp-booking-title {
+		font-size: 1.6rem;
 		font-weight: 700;
 		color: #ffffff;
 		margin: 0 0 10px 0;
-		line-height: 1.35;
 	}
 
-	.cmp-cta-desc {
-		font-size: 0.85rem;
+	.cmp-booking-desc {
+		font-size: 0.95rem;
 		line-height: 1.6;
 		color: #a1a1aa;
-		margin: 0 0 24px 0;
+		margin: 0 0 32px 0;
+		max-width: 700px;
 	}
 
-	/* 最重要CTAボタン：Color policy rule遵守（勝負所のハイライトのみにアクセントレッド使用） */
-	.cmp-btn-cta-primary {
+	.cmp-booking-actions {
 		display: flex;
+		gap: 16px;
+		margin-bottom: 36px;
+	}
+
+	/* 最重要ボタン（勝負所の赤） */
+	.cmp-btn-cta-primary {
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		width: 100%;
-		padding: 16px 20px;
-		background: #dc2626; /* アクセントレッド */
+		padding: 18px 36px;
+		background: #dc2626;
 		border: 1px solid #ef4444;
 		border-radius: 6px;
-		font-size: 0.95rem;
+		font-size: 1rem;
 		font-weight: 700;
 		letter-spacing: 0.05em;
 		color: #ffffff;
 		text-decoration: none;
-		box-sizing: border-box;
 		transition: all 0.2s ease;
-		margin-bottom: 12px;
 		box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
 	}
 
@@ -1200,23 +1239,19 @@ const sampleGallery = [
 		transform: translateX(3px);
 	}
 
-	/* サブボタン（モノトーン） */
 	.cmp-btn-cta-secondary {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 100%;
-		padding: 12px 16px;
+		padding: 18px 28px;
 		background: #18181b;
 		border: 1px solid #27272a;
 		border-radius: 6px;
-		font-size: 0.85rem;
+		font-size: 0.95rem;
 		font-weight: 600;
 		color: #d4d4d8;
 		text-decoration: none;
-		box-sizing: border-box;
 		transition: all 0.2s ease;
-		margin-bottom: 24px;
 	}
 
 	.cmp-btn-cta-secondary:hover {
@@ -1225,85 +1260,61 @@ const sampleGallery = [
 		color: #ffffff;
 	}
 
-	/* 概要スペックリスト */
-	.cmp-summary-list {
+	.cmp-summary-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 20px;
 		border-top: 1px solid #1f1f23;
-		padding-top: 20px;
-		margin-bottom: 20px;
+		padding-top: 28px;
+		margin-bottom: 24px;
+	}
+
+	.cmp-summary-item {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
-	}
-
-	.cmp-summary-row {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 12px;
-		font-size: 0.85rem;
-	}
-
-	.cmp-summary-k {
-		color: #71717a;
-		white-space: nowrap;
-		flex-shrink: 0;
-	}
-
-	.cmp-summary-v {
-		color: #ffffff;
-		font-weight: 600;
-		text-align: right;
-		word-break: break-word;
-	}
-
-	/* 電話カード */
-	.cmp-phone-card {
-		background: #121214;
-		border: 1px solid #1f1f23;
-		border-radius: 8px;
-		padding: 16px;
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 		gap: 4px;
 	}
 
-	.cmp-phone-label {
+	.cmp-summary-k {
 		font-size: 11px;
+		color: #71717a;
+	}
+
+	.cmp-summary-v {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.cmp-phone-strip {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding-top: 16px;
+		border-top: 1px solid #1f1f23;
+		font-size: 0.85rem;
 		color: #71717a;
 	}
 
 	.cmp-phone-num {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
+		gap: 4px;
 		font-family: var(--font-mono, monospace);
-		font-size: 1.15rem;
+		font-size: 1.1rem;
 		font-weight: 700;
 		color: #ffffff;
 		text-decoration: none;
-		letter-spacing: 0.05em;
-	}
-
-	.cmp-phone-num:hover {
-		color: #ffffff;
-		text-decoration: underline;
 	}
 
 	.phone-icon {
 		width: 14px;
 		height: 14px;
-		opacity: 0.8;
-	}
-
-	.cmp-phone-sub {
-		font-size: 10px;
-		color: #71717a;
 	}
 
 	/* ============================================================== */
-	/* 4. その他のキャンペーン（OTHER CAMPAIGNS） */
+	/* 8. その他のキャンペーン */
 	/* ============================================================== */
 	.cmp-other-section {
 		padding: 80px 0 100px;
@@ -1426,14 +1437,9 @@ const sampleGallery = [
 	}
 
 	/* ============================================================== */
-	/* レスポンシブ最適化（Mobile layout density rule 厳格遵守） */
+	/* レスポンシブ最適化（Mobile layout density rule 徹底遵守） */
 	/* ============================================================== */
 	@media (max-width: 1024px) {
-		.cmp-editorial-grid {
-			grid-template-columns: 1fr;
-			gap: 48px;
-		}
-
 		.cmp-hero__title {
 			font-size: 2.25rem;
 		}
@@ -1445,9 +1451,13 @@ const sampleGallery = [
 		.cmp-other-grid {
 			grid-template-columns: repeat(2, 1fr);
 		}
+
+		.cmp-summary-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
 	}
 
-	@media (max-width: 640px) {
+	@media (max-width: 768px) {
 		.cmp-container {
 			padding: 0 20px;
 		}
@@ -1458,35 +1468,67 @@ const sampleGallery = [
 		}
 
 		.cmp-hero__title {
-			font-size: 1.65rem;
+			font-size: 1.7rem;
 			line-height: 1.3;
 		}
 
-		.cmp-hero__lead {
-			font-size: 0.95rem;
+		/* スプリットカードのスマホ挙動：
+		   ★重要★「右写真・左文」の場合でも、スマホでは【写真が上・文が下】に整然と配置！
+		*/
+		.cmp-split-card {
+			grid-template-columns: 1fr;
+			gap: 24px;
+			padding: 24px 20px;
+		}
+
+		.cmp-split-card--right-media .cmp-split-media {
+			order: 1 !important; /* スマホでは写真が上 */
+		}
+		.cmp-split-card--right-media .cmp-split-content {
+			order: 2 !important; /* スマホではテキストが下 */
+		}
+
+		.cmp-split-card--left-media .cmp-split-media {
+			order: 1 !important;
+		}
+		.cmp-split-card--left-media .cmp-split-content {
+			order: 2 !important;
+		}
+
+		.cmp-split-title {
+			font-size: 1.3rem;
+		}
+
+		.cmp-panorama-wrap {
+			height: 360px;
+		}
+
+		.cmp-panorama-text {
+			font-size: 1.15rem;
+		}
+
+		.cmp-booking-card {
+			padding: 28px 20px;
+		}
+
+		.cmp-booking-actions {
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.cmp-btn-cta-primary,
+		.cmp-btn-cta-secondary {
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.cmp-summary-grid {
+			grid-template-columns: 1fr;
+			gap: 12px;
 		}
 
 		.cmp-other-grid {
 			grid-template-columns: 1fr;
-		}
-
-		/* スマホでのボタン縦積み・余白調整 */
-		.cmp-hero__top-row {
-			margin-bottom: 16px;
-		}
-
-		.cmp-cta-card {
-			padding: 20px 16px;
-		}
-
-		.cmp-wide-cta-actions {
-			flex-direction: column;
-			gap: 10px;
-		}
-
-		.cmp-summary-list--wide {
-			grid-template-columns: 1fr;
-			gap: 10px;
 		}
 	}
 </style>
