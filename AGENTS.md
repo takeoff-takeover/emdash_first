@@ -43,12 +43,14 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 - **Color policy rule**: デザインは徹底して「黒・白・グレー（モノトーン）」を基調とし、無駄な多色使いを禁ずる。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトなど「ここぞという時」にのみ限定して使用する。日常的なテキストや通常の装飾に赤色を乱用しない。
 - **Gallery format rule**: ギャラリーには「PHOTO GALLERY」「全○点」などの冗長な見出しや宣伝ラベル、キャプション先頭の「【エクステリア】」などの不要なテキストを入れない。写真、番号カウント、シンプルな説明文のみでミニマルに表示する。
-- **Handover & Wrap-up rule**: ユーザーから「引き継ぎ」「まとめて」などの指示があった際は、以下の3点を必ずワンストップで一括実行すること：
+- **Handover & Wrap-up rule**: ユーザーから「引き継ぎ」「まとめて」などの指示があった際は、以下の2点をワンストップで一括実行すること：
   1. **引き継ぎ書の作成（アーティファクト）**: 当日完了した内容、積み残しタスクの背景・原因、次回の具体的作業手順を網羅した引き継ぎ書を作成する。
   2. **GitHubへのアップロード**: 作業ツリーを整理し、最新の変更を `git commit & push origin main` する。
-  3. **Cloudflareへのアップロード**: `npx astro build && npx wrangler deploy` を実行し、本番環境を最新状態に更新する。
+  ※ Cloudflareへの本番デプロイは指示がない限り行わない。
+- **Deploy rule**: Cloudflareへのデプロイ・本番アップロード（`wrangler deploy`）は、ユーザーから明示的に指示があった場合のみ実行すること。ユーザーの指示がない限り勝手に本番へアップロードせず、ローカル環境（`http://localhost:4321`）での確認にとどめること。
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。
 - **Clickable URL rule**: チャット上でユーザーにWebページのURLや管理画面リンクを提示する際は、インラインコードやプレーンテキストで囲まず、必ずワンクリックで直接遷移できるMarkdownリンク形式（例: `[表示名](URL)` または `[URL](URL)`）で記述すること。テキストをコピー＆ペーストさせないこと。
+- **Official location naming rule**: 拠点名や指定工場の表記には、拠点マスタ（データベース・一覧）に登録されている正式表記（例: カタカナ「サービスセンター」ではなく、正式英語表記「`Nicole BMW Service Centre`」等）を常に厳格に用いること。ユーザーがチャット上でカタカナや略称で指定した場合でも、コードおよびUI上の表示テキストには必ずマスタ準拠の正式表記を適用すること。
 
 ## This Template
 
