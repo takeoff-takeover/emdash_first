@@ -390,16 +390,7 @@ const placeData = await getGooglePlaceReviews({
 					{displayTitle}
 				</h1>
 
-				<div class="sr-hero__actions">
-					<a href="#departments" class="btn-hero btn-hero--tel">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-						電話・窓口情報
-					</a>
-					<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="btn-hero btn-hero--route">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-hero-icon"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-						ルート案内
-					</a>
-				</div>
+
 			</div>
 		</header>
 
@@ -1331,11 +1322,16 @@ const placeData = await getGooglePlaceReviews({
 	.sr-section {
 		margin-bottom: 64px;
 		padding-bottom: 56px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: none;
 	}
 
 	.sr-section:last-child {
 		border-bottom: none;
+	}
+
+	/* テキスト情報のみが連続する場合のみ1pxの繊細な区切り線を適用する共通ユーティリティ */
+	.has-text-divider {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	.section-title {
@@ -2032,8 +2028,8 @@ const placeData = await getGooglePlaceReviews({
 	/* Googleマップ評価・レビューセクション */
 	.sr-section--reviews {
 		margin-top: 56px;
-		padding-top: 48px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		padding-top: 0;
+		border-top: none;
 	}
 
 	.reviews-header-wrap {
@@ -2458,12 +2454,20 @@ const placeData = await getGooglePlaceReviews({
 	/* レスポンシブ */
 	@media (max-width: 1024px) {
 		.sr-layout-grid {
-			grid-template-columns: 1fr;
+			display: flex;
+			flex-direction: column;
 			gap: 40px;
 		}
 
 		.sr-sidebar {
 			position: static;
+			order: -1;
+			width: 100%;
+		}
+
+		.sr-main-col {
+			order: 1;
+			width: 100%;
 		}
 
 		.sr-hero {

@@ -494,17 +494,17 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 								data-lat={loc.lat}
 								data-lng={loc.lng}
 							>
-								<!-- 1. ブランドマーク -->
-								<div class="loc-slim-row__brand" title={loc.brand}>
-									<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
-								</div>
-
-								<!-- 2. 拠点情報（拠点名 ＆ 住所） -->
-								<div class="loc-slim-row__info">
-									<h2 class="loc-slim-row__name">{loc.name}</h2>
-									<p class="loc-slim-row__addr" title={loc.address}>
-										<span class="loc-postal">{loc.postal}</span> {loc.address}
-									</p>
+								<!-- 1 & 2. ヘッダー（ブランドマーク ＋ 拠点情報） -->
+								<div class="loc-slim-row__header">
+									<div class="loc-slim-row__brand" title={loc.brand}>
+										<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
+									</div>
+									<div class="loc-slim-row__info">
+										<h2 class="loc-slim-row__name">{loc.name}</h2>
+										<p class="loc-slim-row__addr" title={loc.address}>
+											<span class="loc-postal">{loc.postal}</span> {loc.address}
+										</p>
+									</div>
 								</div>
 
 								<!-- 3. 提供サービス・機能バッジ群 -->
@@ -619,15 +619,16 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 									data-lat={loc.lat}
 									data-lng={loc.lng}
 								>
-									<div class="loc-slim-row__brand" title={loc.brand}>
-										<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
-									</div>
-
-									<div class="loc-slim-row__info">
-										<h2 class="loc-slim-row__name">{loc.name}</h2>
-										<p class="loc-slim-row__addr" title={loc.address}>
-											<span class="loc-postal">{loc.postal}</span> {loc.address}
-										</p>
+									<div class="loc-slim-row__header">
+										<div class="loc-slim-row__brand" title={loc.brand}>
+											<img src={logo} alt={loc.brand} class="loc-slim-row__logo" loading="lazy" />
+										</div>
+										<div class="loc-slim-row__info">
+											<h2 class="loc-slim-row__name">{loc.name}</h2>
+											<p class="loc-slim-row__addr" title={loc.address}>
+												<span class="loc-postal">{loc.postal}</span> {loc.address}
+											</p>
+										</div>
 									</div>
 
 									<div class="loc-slim-row__services">
@@ -1900,6 +1901,11 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		transform: translateY(-2px);
 	}
 
+	/* 1 & 2. ヘッダー共通（PCでは contents で親フレックスに直接参加） */
+	.loc-slim-row__header {
+		display: contents;
+	}
+
 	/* 1. ブランドロゴ */
 	.loc-slim-row__brand {
 		width: 44px;
@@ -2150,8 +2156,25 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			gap: 12px;
 			padding: 16px;
 		}
-		.loc-slim-row__info {
+		.loc-slim-row__header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
 			width: 100%;
+		}
+		.loc-slim-row__brand {
+			width: 32px;
+			height: 32px;
+			min-width: 32px;
+			padding: 4px;
+		}
+		.loc-slim-row__logo {
+			max-width: 24px;
+			max-height: 24px;
+		}
+		.loc-slim-row__info {
+			flex: 1;
+			min-width: 0;
 		}
 		.loc-slim-row__services {
 			padding-left: 0;
