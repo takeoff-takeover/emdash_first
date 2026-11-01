@@ -144,14 +144,7 @@ const corporateLinks = [
 					</a>
 				</li>
 
-				<!-- 5. CAMPAIGN -->
-				<li class="nav-item">
-					<a href="/campaigns" class="nav-link">
-						<span>CAMPAIGN</span>
-					</a>
-				</li>
-
-				<!-- 6. RECRUIT -->
+				<!-- 5. RECRUIT -->
 				<li class="nav-item">
 					<a href="https://www.nicole-recruit.com/" target="_blank" rel="noopener noreferrer" class="nav-link">
 						<span>RECRUIT</span>
@@ -163,17 +156,6 @@ const corporateLinks = [
 				<li class="nav-item nav-item--cta">
 					<a href="/contact" class="nav-cta-btn">
 						<span>CONTACT</span>
-					</a>
-				</li>
-
-				<!-- 7. ADMIN (管理画面) -->
-				<li class="nav-item nav-item--admin">
-					<a href="/admin" class="nav-admin-btn" title="EmDash CMS 管理画面">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" aria-hidden="true">
-							<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-							<circle cx="12" cy="12" r="3"></circle>
-						</svg>
-						<span>ADMIN</span>
 					</a>
 				</li>
 			</ul>
@@ -245,13 +227,6 @@ const corporateLinks = [
 					</li>
 
 					<li class="mobile-nav-item">
-						<a href="/campaigns" class="mobile-main-link">
-							<span>CAMPAIGN</span>
-							<span class="mobile-link-sub">限定フェア・特別オファー</span>
-						</a>
-					</li>
-
-					<li class="mobile-nav-item">
 						<a href="https://www.nicole-recruit.com/" target="_blank" rel="noopener noreferrer" class="mobile-main-link">
 							<span>RECRUIT</span>
 							<span class="mobile-link-sub">採用情報 ↗</span>
@@ -263,13 +238,6 @@ const corporateLinks = [
 			<div class="mobile-drawer__footer">
 				<a href="/contact" class="mobile-contact-btn">
 					お問い合わせフォーム
-				</a>
-				<a href="/admin" class="mobile-admin-btn">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="admin-icon" width="16" height="16" aria-hidden="true">
-						<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-						<circle cx="12" cy="12" r="3"></circle>
-					</svg>
-					<span>管理画面（ADMIN）</span>
 				</a>
 				<p class="mobile-copyright">© Nicole Group. All rights reserved.</p>
 			</div>
@@ -415,7 +383,7 @@ const corporateLinks = [
 		});
 
 		// ドロップダウンを持たない他のメニュー項目に移動したら即座に閉じる
-		const directLinks = document.querySelectorAll('.desktop-nav .nav-link:not(.nav-link--btn), .nav-cta-btn, .nav-admin-btn');
+		const directLinks = document.querySelectorAll('.desktop-nav .nav-link:not(.nav-link--btn), .nav-cta-btn');
 		directLinks.forEach(link => {
 			link.addEventListener('mouseenter', () => {
 				dropdownItems.forEach(item => {
@@ -621,38 +589,6 @@ const corporateLinks = [
 		transform: translateY(-1px);
 	}
 
-	/* 管理画面ボタン（ADMIN） */
-	.nav-admin-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 8px 16px;
-		background: rgba(0, 0, 0, 0.5);
-		border: 1px solid rgba(255, 255, 255, 0.25);
-		border-radius: 999px;
-		font-family: 'Inter', -apple-system, sans-serif;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		color: rgba(255, 255, 255, 0.85);
-		text-decoration: none;
-		backdrop-filter: blur(8px);
-		transition: all 0.25s ease;
-	}
-
-	.nav-admin-btn:hover {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: #ffffff;
-		color: #ffffff;
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-		transform: translateY(-1px);
-	}
-
-	.admin-icon {
-		width: 13px;
-		height: 13px;
-		opacity: 0.85;
-	}
 
 	/* ============================================================== */
 	/* ドロップダウン付きナビアイテムのホバー領域拡張 */
@@ -719,7 +655,7 @@ const corporateLinks = [
 		font-size: 10px;
 		font-weight: 700;
 		letter-spacing: 0.18em;
-		color: #c5a059;
+		color: rgba(255, 255, 255, 0.5);
 		display: block;
 		margin-bottom: 4px;
 	}
@@ -752,7 +688,7 @@ const corporateLinks = [
 
 	.brand-dropdown-card:hover {
 		background: rgba(255, 255, 255, 0.07);
-		border-color: rgba(197, 160, 89, 0.4);
+		border-color: rgba(255, 255, 255, 0.35);
 		transform: translateY(-2px);
 	}
 
@@ -840,7 +776,7 @@ const corporateLinks = [
 
 	.corporate-dropdown-item:hover {
 		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(197, 160, 89, 0.4);
+		border-color: rgba(255, 255, 255, 0.35);
 		transform: translateX(3px);
 	}
 
@@ -904,12 +840,12 @@ const corporateLinks = [
 	/* メニュー開時の「×」モーフィングアニメーション */
 	.nicole-header.is-menu-open .hamburger-line--1 {
 		transform: translateY(4.25px) rotate(45deg);
-		background: #c5a059;
+		background: #ffffff;
 	}
 
 	.nicole-header.is-menu-open .hamburger-line--2 {
 		transform: translateY(-4.25px) rotate(-45deg);
-		background: #c5a059;
+		background: #ffffff;
 	}
 
 	/* ============================================================== */
@@ -946,7 +882,7 @@ const corporateLinks = [
 		font-size: 10px;
 		font-weight: 700;
 		letter-spacing: 0.2em;
-		color: #c5a059;
+		color: rgba(255, 255, 255, 0.45);
 		display: block;
 		margin-bottom: 20px;
 	}
@@ -985,7 +921,7 @@ const corporateLinks = [
 
 	.mobile-accordion-toggle[aria-expanded="true"] .accordion-arrow {
 		transform: rotate(180deg);
-		stroke: #c5a059;
+		stroke: #ffffff;
 	}
 
 	.mobile-accordion-content {
@@ -1015,7 +951,7 @@ const corporateLinks = [
 
 	.mobile-sub-link:hover {
 		background: rgba(255, 255, 255, 0.05);
-		color: #c5a059;
+		color: #ffffff;
 	}
 
 	.brand-sub-name {
@@ -1074,30 +1010,6 @@ const corporateLinks = [
 		background: #f0f0f0;
 	}
 
-	.mobile-admin-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		text-align: center;
-		padding: 13px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 8px;
-		color: rgba(255, 255, 255, 0.9);
-		font-weight: 600;
-		font-size: 13px;
-		letter-spacing: 0.12em;
-		text-decoration: none;
-		margin-bottom: 20px;
-		transition: all 0.2s ease;
-	}
-
-	.mobile-admin-btn:hover {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: #ffffff;
-		color: #ffffff;
-	}
 
 	.mobile-copyright {
 		font-size: 11px;
