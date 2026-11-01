@@ -29,6 +29,10 @@ if (!slug) {
 	return Astro.rewrite("/404");
 }
 
+if (slug === "mini-new-generation-debut-fair") {
+	return Astro.redirect("/campaigns/mini-new-generation-debut-fair", 301);
+}
+
 let cmsPost: any = null;
 let cacheHint: any = null;
 

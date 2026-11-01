@@ -49,6 +49,19 @@ const staticArticles = [
 		isFeatured: true
 	},
 	{
+		id: "campaign_mini_new_generation_debut_fair",
+		slug: "mini-new-generation-debut-fair",
+		title: "MINI THE NEW GENERATION デビュー・フェア開催。新世代ファミリーが集結する特別な試乗週間",
+		brand: "MINI",
+		topic: "Campaign",
+		date: "2026.11.07",
+		views: "3,890",
+		image: "/uploads/2026/08/169P90635275_highRes_mini-family-04-2026-scaled.jpg",
+		lead: "新世代MINIファミリーが一堂に集結。個性あふれるデザインと進化したゴーカート・フィーリングを各ショールームでご体感いただける特別フェアを開催。",
+		url: "/campaigns/mini-new-generation-debut-fair",
+		isFeatured: true
+	},
+	{
 		id: "202607_new_bmw_x5",
 		slug: "202607_new_bmw_x5",
 		title: "【公式発表】新型BMW X5誕生。Neue Klasseの革新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代",
@@ -467,7 +480,7 @@ const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.
 const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).length;
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
-const topicsList = ["ALL", "Cars", "People", "Buyer's Guide"];
+const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 ---
 
 <NicoleLayout 

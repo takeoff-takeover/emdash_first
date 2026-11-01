@@ -540,11 +540,12 @@ const sampleGallery = [
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- ブロック7: 【ワイド 1240px】大判予約・商談アクションカード（最重要CTA） -->
+		<!-- ブロック7: 【縦積みコンパクトCTA】予約・商談アクションカード（最重要CTA） -->
+		<!-- 無理に左右に広げず、縦積みに集約した洗練レイアウト -->
 		<!-- ============================================================== -->
-		<section class="cmp-section cmp-section--wide cmp-booking-section" id="cmp-booking">
-			<div class="cmp-container">
-				<div class="cmp-booking-card">
+		<section class="cmp-section cmp-booking-section" id="cmp-booking">
+			<div class="cmp-container cmp-container--narrow">
+				<div class="cmp-booking-card cmp-booking-card--stacked">
 					<div class="cmp-booking-header">
 						<h2 class="cmp-booking-title">フェア事前予約・商談申込</h2>
 						<p class="cmp-booking-desc">
@@ -552,7 +553,7 @@ const sampleGallery = [
 						</p>
 					</div>
 
-					<!-- 最重要アクション（勝負所のアクセントレッド） -->
+					<!-- 最重要アクション（縦積み：勝負所のアクセントレッド） -->
 					<div class="cmp-booking-actions">
 						<a href={item.cta_url} class="cmp-btn-cta-primary">
 							<span>{item.cta_label}</span>
@@ -566,7 +567,7 @@ const sampleGallery = [
 						</a>
 					</div>
 
-					<!-- 概要スペックリスト -->
+					<!-- 概要スペックリスト（2カラム・コンパクト） -->
 					<div class="cmp-summary-grid">
 						<div class="cmp-summary-item">
 							<span class="cmp-summary-k">対象ブランド</span>
@@ -595,7 +596,7 @@ const sampleGallery = [
 							</svg>
 							0120-980-343
 						</a>
-						<span class="cmp-phone-sub">（受付時間: 10:00 - 18:00 / 水曜定休）</span>
+						<span class="cmp-phone-sub">（10:00 - 18:00 / 水曜定休）</span>
 					</div>
 				</div>
 			</div>
@@ -892,6 +893,8 @@ const sampleGallery = [
 		letter-spacing: -0.02em;
 		margin: 0 0 16px 0;
 		max-width: 900px;
+		color: #ffffff !important;
+		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 	}
 
 	.cmp-hero__lead {
@@ -1437,49 +1440,54 @@ const sampleGallery = [
 	}
 
 	/* ============================================================== */
-	/* 7. 最重要予約アクションカード（勝負所：アクセントレッド） */
+	/* 7. 最重要予約アクションカード（勝負所：アクセントレッド / 縦積みコンパクト） */
 	/* ============================================================== */
+	.cmp-container--narrow {
+		max-width: 760px;
+		margin: 0 auto;
+		width: 100%;
+	}
+
 	.cmp-booking-card {
 		background: #09090b;
 		border: 1px solid #27272a;
 		border-radius: 12px;
-		padding: 48px;
+		padding: 40px 36px;
 		box-sizing: border-box;
 	}
 
-	.cmp-cta-tag {
-		display: inline-block;
-		font-family: var(--font-mono, monospace);
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		padding: 3px 8px;
-		background: #18181b;
-		border: 1px solid #27272a;
-		border-radius: 2px;
-		color: #a1a1aa;
-		margin-bottom: 12px;
+	.cmp-booking-card--stacked {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.cmp-booking-card--stacked .cmp-booking-header {
+		text-align: center;
+		margin-bottom: 24px;
 	}
 
 	.cmp-booking-title {
-		font-size: 1.6rem;
+		font-size: 1.55rem;
 		font-weight: 700;
 		color: #ffffff;
 		margin: 0 0 10px 0;
+		letter-spacing: -0.01em;
 	}
 
 	.cmp-booking-desc {
-		font-size: 0.95rem;
-		line-height: 1.6;
+		font-size: 0.92rem;
+		line-height: 1.65;
 		color: #a1a1aa;
-		margin: 0 0 32px 0;
-		max-width: 700px;
+		margin: 0 auto;
+		max-width: 580px;
 	}
 
-	.cmp-booking-actions {
+	.cmp-booking-card--stacked .cmp-booking-actions {
 		display: flex;
-		gap: 16px;
-		margin-bottom: 36px;
+		flex-direction: column;
+		gap: 10px;
+		margin-bottom: 28px;
+		width: 100%;
 	}
 
 	/* 最重要ボタン（勝負所の赤） */
@@ -1488,7 +1496,8 @@ const sampleGallery = [
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		padding: 18px 36px;
+		width: 100%;
+		padding: 16px 28px;
 		background: #dc2626;
 		border: 1px solid #ef4444;
 		border-radius: 6px;
@@ -1499,6 +1508,7 @@ const sampleGallery = [
 		text-decoration: none;
 		transition: all 0.2s ease;
 		box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
+		box-sizing: border-box;
 	}
 
 	.cmp-btn-cta-primary:hover {
@@ -1522,15 +1532,17 @@ const sampleGallery = [
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 18px 28px;
+		width: 100%;
+		padding: 14px 24px;
 		background: #18181b;
 		border: 1px solid #27272a;
 		border-radius: 6px;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 		color: #d4d4d8;
 		text-decoration: none;
 		transition: all 0.2s ease;
+		box-sizing: border-box;
 	}
 
 	.cmp-btn-cta-secondary:hover {
@@ -1541,11 +1553,11 @@ const sampleGallery = [
 
 	.cmp-summary-grid {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px 20px;
 		border-top: 1px solid #1f1f23;
-		padding-top: 28px;
-		margin-bottom: 24px;
+		padding-top: 24px;
+		margin-bottom: 20px;
 	}
 
 	.cmp-summary-item {
@@ -1568,6 +1580,7 @@ const sampleGallery = [
 	.cmp-phone-strip {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		flex-wrap: wrap;
 		gap: 8px;
 		padding-top: 16px;
