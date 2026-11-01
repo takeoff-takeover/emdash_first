@@ -337,6 +337,11 @@ function determineArticleCategory(p: any): string {
 	const title = (p.title || p.data?.title || "").toLowerCase();
 	const topic = (p.topic || "").toLowerCase();
 
+	// Campaign 判定
+	if (slug.includes("campaign") || slug.includes("fair") || slug.includes("debut") || title.includes("フェア") || title.includes("キャンペーン")) {
+		return "Campaign";
+	}
+
 	// Buyer's Guide 判定
 	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
 		return "Buyer's Guide";
@@ -380,19 +385,33 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	);
 	const cat = determineArticleCategory(p);
 
+	const s = (p.id || "").toLowerCase();
+	const t = (p.data.title || "").toLowerCase();
+	let b = "ALL";
+	if (t.includes("mini") || s.includes("mini")) b = "MINI";
+	else if (t.includes("bmw") || s.includes("bmw")) b = "BMW";
+	else if (t.includes("ferrari") || s.includes("ferrari")) b = "Ferrari";
+	else if (t.includes("rolls") || s.includes("rolls") || t.includes("ロールス")) b = "Rolls-Royce";
+	else if (t.includes("alpina") || s.includes("alpina") || t.includes("アルピナ")) b = "ALPINA";
+	else if (p.data.related_location) b = "BMW";
+
+	const articleUrl = (s.includes("mini-new-generation-debut-fair") || cat === "Campaign")
+		? `/campaigns/${p.id}`
+		: `/magazine/${p.id}/`;
+
 	return {
 		id: p.id || p.data.id,
 		slug: p.id,
 		title: p.data.title,
-		brand: p.data.related_location ? "BMW" : "ALL",
+		brand: b,
 		topic: cat,
 		category: cat,
-		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25",
+		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.11.07",
 		views: "NEW",
 		image: imgUrl,
 		lead: extractLead(p),
-		url: `/magazine/${p.id}/`,
-		isFeatured: false
+		url: articleUrl,
+		isFeatured: cat === "Campaign" || s.includes("mini-new-generation")
 	};
 });
 
@@ -460,11 +479,17 @@ const isESGArticle = (p: any): boolean => {
 const mainArticles = allArticles.filter(a => !isESGArticle(a));
 const esgArticles = allArticles.filter(a => isESGArticle(a)).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
-// 一番目玉の記事（Cover Story）
-// 最新の最重要記事（BMW iX4）を確実に先頭（Cover Story）にする
+// 一番目玉の記事（Cover Story）および注目ハイライト（MINIフェア）を先頭に固定
 mainArticles.sort((a, b) => {
-	if (a.id === "2027_new_bmw_ix4_neue_klasse" || a.slug === "2027_new_bmw_ix4_neue_klasse") return -1;
-	if (b.id === "2027_new_bmw_ix4_neue_klasse" || b.slug === "2027_new_bmw_ix4_neue_klasse") return 1;
+	const aSlug = a.slug || a.id || "";
+	const bSlug = b.slug || b.id || "";
+
+	if (aSlug.includes("2027_new_bmw_ix4_neue_klasse")) return -1;
+	if (bSlug.includes("2027_new_bmw_ix4_neue_klasse")) return 1;
+
+	if (aSlug.includes("mini-new-generation")) return -1;
+	if (bSlug.includes("mini-new-generation")) return 1;
+
 	return 0;
 });
 

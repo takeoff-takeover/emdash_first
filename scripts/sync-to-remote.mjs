@@ -190,66 +190,160 @@ async function syncMedia() {
 }
 
 // ==============================================================
-// STEP 2: 記事（ec_posts）の同期
+// STEP 2: 記事（ec_posts / ec_magazine / ec_campaigns）の同期
 // ==============================================================
 async function syncArticles() {
   if (mediaOnly) return;
 
   console.log('\n========================================');
-  console.log('📝 [2/2] 記事データの同期を開始...');
+  console.log('📝 [2/3] 記事・マガジン・キャンペーンデータの同期を開始...');
   console.log('========================================');
 
   const localDbPath = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
   if (!fs.existsSync(localDbPath)) {
-    console.log('ℹ️ ローカルSQLiteが見つかりません。記事同期をスキップします。');
+    console.log('ℹ️ ローカルSQLiteが見つかりません。同期をスキップします。');
     return;
   }
 
   const db = new DatabaseSync(localDbPath);
-  const localPosts = db.prepare('SELECT id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale FROM ec_posts').all();
+  const escape = (str) => str != null ? `'${String(str).replace(/'/g, "''")}'` : 'NULL';
 
-  console.log(`ℹ️ ローカルの記事数: ${localPosts.length} 件`);
-
-  // リモートの既存slug一覧
-  let remoteSlugs = new Set();
+  // --- 1. ec_posts 同期 ---
   try {
-    const out = execSync(
-      'npx wrangler d1 execute my-emdash-site --remote --command "SELECT slug FROM ec_posts;" --json',
-      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
-    );
-    const parsed = JSON.parse(out);
-    if (parsed && parsed[0] && parsed[0].results) {
-      parsed[0].results.forEach(r => remoteSlugs.add(r.slug));
+    const localPosts = db.prepare('SELECT id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale FROM ec_posts').all();
+    console.log(`ℹ️ [Posts] ローカル記事数: ${localPosts.length} 件`);
+
+    let remoteSlugs = new Set();
+    try {
+      const out = execSync(
+        'npx wrangler d1 execute my-emdash-site --remote --command "SELECT slug FROM ec_posts;" --json',
+        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
+      );
+      const parsed = JSON.parse(out);
+      if (parsed?.[0]?.results) parsed[0].results.forEach(r => remoteSlugs.add(r.slug));
+    } catch (err) {}
+
+    const missingPosts = localPosts.filter(p => !remoteSlugs.has(p.slug));
+    if (missingPosts.length > 0) {
+      console.log(`🚀 [Posts] リモート未反映: ${missingPosts.length} 件`);
+      const stmts = missingPosts.map(p =>
+        `INSERT INTO ec_posts (id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale, created_at, updated_at) VALUES (${escape(p.id)}, ${escape(p.slug)}, ${escape(p.status || 'published')}, ${escape(p.title)}, ${escape(p.excerpt)}, ${escape(p.content)}, ${escape(p.related_location)}, ${escape(p.featured_image)}, ${escape(p.featured_image_sp)}, ${escape(p.published_at)}, ${escape(p.locale || 'en')}, datetime('now'), datetime('now'));`
+      );
+      const f = '/tmp/sync_posts.sql';
+      fs.writeFileSync(f, stmts.join('\n'), 'utf8');
+      execSync(`npx wrangler d1 execute my-emdash-site --remote --file ${f} -y`, { stdio: 'inherit' });
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+      console.log('✅ [Posts] 同期完了');
+    } else {
+      console.log('✅ [Posts] すでにリモートと同期済みです。');
     }
   } catch (err) {
-    console.warn('⚠️ リモート記事一覧の取得に失敗しました。');
+    console.warn('⚠️ [Posts] 同期中にスキップまたはエラー:', err.message);
   }
 
-  const missingInRemote = localPosts.filter(p => !remoteSlugs.has(p.slug));
-  console.log(`🚀 リモートへ未反映の記事: ${missingInRemote.length} 件`);
-
-  if (missingInRemote.length === 0) {
-    console.log('✅ すべての記事がリモートと同期済みです。');
-    return;
-  }
-
-  // 一括インサート用SQLを生成してリモートD1に実行
-  const statements = missingInRemote.map(p => {
-    const escape = (str) => str != null ? `'${String(str).replace(/'/g, "''")}'` : 'NULL';
-    return `INSERT INTO ec_posts (id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale, created_at, updated_at) VALUES (${escape(p.id)}, ${escape(p.slug)}, ${escape(p.status || 'published')}, ${escape(p.title)}, ${escape(p.excerpt)}, ${escape(p.content)}, ${escape(p.related_location)}, ${escape(p.featured_image)}, ${escape(p.featured_image_sp)}, ${escape(p.published_at)}, ${escape(p.locale || 'en')}, datetime('now'), datetime('now'));`;
-  });
-
-  const sqlFile = '/tmp/sync_posts.sql';
-  fs.writeFileSync(sqlFile, statements.join('\n'), 'utf8');
-
+  // --- 2. ec_magazine 同期 ---
   try {
-    console.log(`📤 ${missingInRemote.length} 件の記事をリモートD1に反映中...`);
-    execSync(`npx wrangler d1 execute my-emdash-site --remote --file ${sqlFile} -y`, { stdio: 'inherit' });
-    console.log('✅ 記事の同期が完了しました。');
+    const localMag = db.prepare('SELECT id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale FROM ec_magazine').all();
+    console.log(`\nℹ️ [Magazine] ローカル記事数: ${localMag.length} 件`);
+
+    let remoteMagSlugs = new Set();
+    try {
+      const out = execSync(
+        'npx wrangler d1 execute my-emdash-site --remote --command "SELECT slug FROM ec_magazine;" --json',
+        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
+      );
+      const parsed = JSON.parse(out);
+      if (parsed?.[0]?.results) parsed[0].results.forEach(r => remoteMagSlugs.add(r.slug));
+    } catch (err) {}
+
+    const missingMag = localMag.filter(m => !remoteMagSlugs.has(m.slug));
+    if (missingMag.length > 0) {
+      console.log(`🚀 [Magazine] リモート未反映: ${missingMag.length} 件`);
+      const stmts = missingMag.map(m =>
+        `INSERT OR REPLACE INTO ec_magazine (id, slug, status, title, excerpt, content, related_location, featured_image, featured_image_sp, published_at, locale, created_at, updated_at) VALUES (${escape(m.id)}, ${escape(m.slug)}, ${escape(m.status || 'published')}, ${escape(m.title)}, ${escape(m.excerpt)}, ${escape(m.content)}, ${escape(m.related_location)}, ${escape(m.featured_image)}, ${escape(m.featured_image_sp)}, ${escape(m.published_at)}, ${escape(m.locale || 'en')}, datetime('now'), datetime('now'));`
+      );
+      const f = '/tmp/sync_magazine.sql';
+      fs.writeFileSync(f, stmts.join('\n'), 'utf8');
+      execSync(`npx wrangler d1 execute my-emdash-site --remote --file ${f} -y`, { stdio: 'inherit' });
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+      console.log('✅ [Magazine] 同期完了');
+    } else {
+      console.log('✅ [Magazine] すでにリモートと同期済みです。');
+    }
   } catch (err) {
-    console.error('❌ 記事の同期中にエラーが発生しました:', err.message);
-  } finally {
-    if (fs.existsSync(sqlFile)) fs.unlinkSync(sqlFile);
+    console.warn('⚠️ [Magazine] 同期中にエラー:', err.message);
+  }
+
+  // --- 3. ec_campaigns 同期 ---
+  try {
+    // リモートにテーブルがなければ作成
+    const ddl = `
+      CREATE TABLE IF NOT EXISTS ec_campaigns (
+        id TEXT PRIMARY KEY,
+        slug TEXT,
+        status TEXT DEFAULT 'published',
+        author_id TEXT,
+        primary_byline_id TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        published_at TEXT DEFAULT (datetime('now')),
+        scheduled_at TEXT,
+        deleted_at TEXT,
+        version INTEGER DEFAULT 1,
+        live_revision_id TEXT,
+        draft_revision_id TEXT,
+        locale TEXT NOT NULL DEFAULT 'ja',
+        translation_group TEXT,
+        title TEXT NOT NULL DEFAULT '',
+        brand TEXT DEFAULT 'BMW',
+        category TEXT DEFAULT '新車',
+        period_start TEXT,
+        period_end TEXT,
+        period_text TEXT,
+        featured_image TEXT,
+        featured_image_sp TEXT,
+        excerpt TEXT,
+        content JSON,
+        target_locations TEXT,
+        cta_label TEXT DEFAULT '詳しく見る',
+        cta_url TEXT DEFAULT '/contact',
+        layout_type TEXT DEFAULT '2col'
+      );
+    `;
+    const fDdl = '/tmp/create_campaigns.sql';
+    fs.writeFileSync(fDdl, ddl, 'utf8');
+    execSync(`npx wrangler d1 execute my-emdash-site --remote --file ${fDdl} -y`, { stdio: 'ignore' });
+    if (fs.existsSync(fDdl)) fs.unlinkSync(fDdl);
+
+    const localCamp = db.prepare('SELECT * FROM ec_campaigns').all();
+    console.log(`\nℹ️ [Campaigns] ローカル件数: ${localCamp.length} 件`);
+
+    let remoteCampSlugs = new Set();
+    try {
+      const out = execSync(
+        'npx wrangler d1 execute my-emdash-site --remote --command "SELECT slug FROM ec_campaigns;" --json',
+        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
+      );
+      const parsed = JSON.parse(out);
+      if (parsed?.[0]?.results) parsed[0].results.forEach(r => remoteCampSlugs.add(r.slug));
+    } catch (err) {}
+
+    const missingCamp = localCamp.filter(c => !remoteCampSlugs.has(c.slug));
+    if (missingCamp.length > 0) {
+      console.log(`🚀 [Campaigns] リモート未反映: ${missingCamp.length} 件`);
+      const stmts = missingCamp.map(c =>
+        `INSERT OR REPLACE INTO ec_campaigns (id, slug, status, title, brand, category, period_text, period_start, period_end, featured_image, featured_image_sp, excerpt, content, target_locations, cta_label, cta_url, layout_type, published_at, locale, created_at, updated_at) VALUES (${escape(c.id)}, ${escape(c.slug)}, ${escape(c.status || 'published')}, ${escape(c.title)}, ${escape(c.brand)}, ${escape(c.category)}, ${escape(c.period_text)}, ${escape(c.period_start)}, ${escape(c.period_end)}, ${escape(c.featured_image)}, ${escape(c.featured_image_sp)}, ${escape(c.excerpt)}, ${escape(c.content)}, ${escape(c.target_locations)}, ${escape(c.cta_label)}, ${escape(c.cta_url)}, ${escape(c.layout_type || '2col')}, ${escape(c.published_at)}, ${escape(c.locale || 'ja')}, datetime('now'), datetime('now'));`
+      );
+      const f = '/tmp/sync_campaigns.sql';
+      fs.writeFileSync(f, stmts.join('\n'), 'utf8');
+      execSync(`npx wrangler d1 execute my-emdash-site --remote --file ${f} -y`, { stdio: 'inherit' });
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+      console.log('✅ [Campaigns] 同期完了');
+    } else {
+      console.log('✅ [Campaigns] すでにリモートと同期済みです。');
+    }
+  } catch (err) {
+    console.warn('⚠️ [Campaigns] 同期中にエラー:', err.message);
   }
 }
 
