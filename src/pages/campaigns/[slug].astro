@@ -87,7 +87,7 @@ if (!item) {
 			brand: 'MINI',
 			category: '新車',
 			period_text: '2026年11月7日(土) 〜 11月23日(月・祝)',
-			featured_image: '/uploads/2026/02/MINI-新百合ヶ丘.jpg',
+			featured_image: '/uploads/2026/08/169P90635275_highRes_mini-family-04-2026-scaled.jpg',
 			excerpt: '新世代MINIファミリーが一堂に集結。個性あふれるデザインとゴーカート・フィーリングを各ショールームでご体感ください。',
 			target_locations: 'MINI 港北 / MINI 都筑 / MINI 新百合ヶ丘',
 			cta_label: '来場予約はこちら',
@@ -150,12 +150,16 @@ const editUrl = `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_em
 // サンプルギャラリー（ルール準拠）
 const sampleGallery = [
 	{
-		image: item.featured_image,
+		image: item.featured_image || "/uploads/2026/08/169P90635275_highRes_mini-family-04-2026-scaled.jpg",
 		caption: `${item.title} メインビジュアル。正規ショールームにて特別な体験をご提供いたします。`
 	},
 	{
-		image: "/uploads/2026/02/DSC2293-scaled.avif",
-		caption: "最新モデルを揃えたショールーム展示エリア。専任セールス・コンサルタントが丁寧にご案内します。"
+		image: "/uploads/2026/04/mini2P90618119_highRes_sir-paul-smith-und-d-1-scaled-e1779256599764.jpg",
+		caption: "新世代MINIのデザインフィロソフィーを体感できる特別ショールーム展示。"
+	},
+	{
+		image: "/uploads/2026/06/1P90515769_highRes_mini-crossover-highl-scaled.jpg",
+		caption: "力強さと洗練を極めたエクステリア。全方位にわたる卓越したプロポーション。"
 	},
 	{
 		image: "/uploads/2026/02/0H9A1397.jpg",
@@ -283,7 +287,7 @@ const sampleGallery = [
 				<div class="cmp-split-card cmp-split-card--left-media">
 					<!-- 左：写真 -->
 					<div class="cmp-split-media">
-						<img src="/uploads/2026/02/DSC2293-scaled.avif" alt="ショールームでの体験" loading="lazy" />
+						<img src="/uploads/2026/04/mini2P90618119_highRes_sir-paul-smith-und-d-1-scaled-e1779256599764.jpg" alt="ショールームでの体験" loading="lazy" />
 					</div>
 					<!-- 右：テキスト -->
 					<div class="cmp-split-content">
@@ -342,7 +346,7 @@ const sampleGallery = [
 					<!-- カード 1 -->
 					<div class="cmp-feature-card cmp-feature-card--dark">
 						<div class="cmp-feature-card__media">
-							<img src="/uploads/2026/02/DSC2293-scaled.avif" alt="円形OLEDセンター・ディスプレイ" loading="lazy" />
+							<img src="/uploads/ix4/int-01.jpg" alt="円形OLEDセンター・ディスプレイ" loading="lazy" />
 						</div>
 						<div class="cmp-feature-card__body">
 							<span class="cmp-feature-card__tag">INTERIOR INNOVATION</span>
@@ -356,7 +360,7 @@ const sampleGallery = [
 					<!-- カード 2 -->
 					<div class="cmp-feature-card cmp-feature-card--dark">
 						<div class="cmp-feature-card__media">
-							<img src="/uploads/2026/02/0H9A1397.jpg" alt="進化したゴーカート・フィーリング" loading="lazy" />
+							<img src="/uploads/2026/09/169KV_color_1er-e1789542842388.jpg" alt="進化したゴーカート・フィーリング" loading="lazy" />
 						</div>
 						<div class="cmp-feature-card__body">
 							<span class="cmp-feature-card__tag">DRIVING DYNAMICS</span>
@@ -390,7 +394,7 @@ const sampleGallery = [
 		<section class="cmp-panorama-section">
 			<div class="cmp-panorama-wrap">
 				<img 
-					src="https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" 
+					src="/uploads/2026/09/169KV_color_X3-scaled.jpg" 
 					alt="パノラマビジュアル" 
 					class="cmp-panorama-img" 
 					loading="lazy" 
@@ -421,7 +425,7 @@ const sampleGallery = [
 					<!-- 大判カード 1 -->
 					<div class="cmp-feature-card cmp-feature-card--light">
 						<div class="cmp-feature-card__media cmp-feature-card__media--large">
-							<img src="/uploads/2026/02/DSC2293-scaled.avif" alt="CLASSIC PACKAGE" loading="lazy" />
+							<img src="/uploads/2026/06/1P90515769_highRes_mini-crossover-highl-scaled.jpg" alt="CLASSIC PACKAGE" loading="lazy" />
 						</div>
 						<div class="cmp-feature-card__body">
 							<span class="cmp-feature-card__tag cmp-feature-card__tag--dark">EDITION 01</span>
@@ -438,7 +442,7 @@ const sampleGallery = [
 					<!-- 大判カード 2 -->
 					<div class="cmp-feature-card cmp-feature-card--light">
 						<div class="cmp-feature-card__media cmp-feature-card__media--large">
-							<img src="/uploads/2026/02/0H9A1397.jpg" alt="JCW SPORT PACKAGE" loading="lazy" />
+							<img src="/uploads/2026/05/P90580177_highRes_bmw-m235-xdrive-gran-scaled-e1779344456477.jpg" alt="JCW SPORT PACKAGE" loading="lazy" />
 						</div>
 						<div class="cmp-feature-card__body">
 							<span class="cmp-feature-card__tag cmp-feature-card__tag--dark">EDITION 02</span>
