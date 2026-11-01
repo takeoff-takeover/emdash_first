@@ -508,7 +508,8 @@ const injectedCode = `
 				let activeCampaignBrand = 'all';
 
 				function applyCampaignBrandFilterTabs() {
-					if (!window.location.pathname.includes('/collections/campaigns')) {
+					const isCampaignPage = window.location.pathname.includes('/content/campaigns') || window.location.hash.includes('/content/campaigns');
+					if (!isCampaignPage) {
 						const existingTabs = document.getElementById('campaign-brand-filter-bar');
 						if (existingTabs) existingTabs.remove();
 						return;
@@ -519,7 +520,8 @@ const injectedCode = `
 					if (!table) return;
 
 					let tabContainer = document.getElementById('campaign-brand-filter-bar');
-					if (!tabContainer) {
+					if (!tabContainer || !table.parentNode.contains(tabContainer)) {
+						if (tabContainer) tabContainer.remove();
 						tabContainer = document.createElement('div');
 						tabContainer.id = 'campaign-brand-filter-bar';
 						tabContainer.style.cssText = \`
@@ -561,7 +563,7 @@ const injectedCode = `
 								cursor: pointer;
 								transition: all 0.2s ease;
 								white-space: nowrap;
-								border: 1px solid #3f3f46;
+								border: 1px solid \${activeCampaignBrand === b.value ? '#ffffff' : '#3f3f46'};
 								background: \${activeCampaignBrand === b.value ? '#ffffff' : '#27272a'};
 								color: \${activeCampaignBrand === b.value ? '#000000' : '#d4d4d8'};
 							\`;
@@ -608,15 +610,142 @@ const injectedCode = `
 					});
 				}
 
+				// ─────────────────────────────────────────────────────────────
+				// マガジン一覧画面でのカテゴリ・ブランド別フィルタタブUI
+				// ─────────────────────────────────────────────────────────────
+				let activeMagazineFilter = 'all';
+
+				function applyMagazineFilterTabs() {
+					const isMagazinePage = window.location.pathname.includes('/content/magazine') || window.location.hash.includes('/content/magazine');
+					if (!isMagazinePage) {
+						const existingTabs = document.getElementById('magazine-filter-bar');
+						if (existingTabs) existingTabs.remove();
+						return;
+					}
+
+					// テーブルまたは一覧コンテナを探す
+					const table = document.querySelector('table');
+					if (!table) return;
+
+					let tabContainer = document.getElementById('magazine-filter-bar');
+					if (!tabContainer || !table.parentNode.contains(tabContainer)) {
+						if (tabContainer) tabContainer.remove();
+						tabContainer = document.createElement('div');
+						tabContainer.id = 'magazine-filter-bar';
+						tabContainer.style.cssText = \`
+							display: flex;
+							align-items: center;
+							gap: 8px;
+							margin-bottom: 16px;
+							padding: 12px 16px;
+							background: #18181b;
+							border: 1px solid #27272a;
+							border-radius: 8px;
+							overflow-x: auto;
+						\`;
+
+						const label = document.createElement('span');
+						label.textContent = '絞り込み:';
+						label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+						tabContainer.appendChild(label);
+
+						const filters = [
+							{ label: 'すべて', value: 'all' },
+							{ label: 'BMW', value: 'BMW' },
+							{ label: 'MINI', value: 'MINI' },
+							{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
+							{ label: 'Ferrari', value: 'Ferrari' },
+							{ label: 'ALPINA', value: 'ALPINA' },
+							{ label: 'SDGs・地域活動', value: 'SDGs' },
+							{ label: 'イベント', value: 'イベント' }
+						];
+
+						filters.forEach(f => {
+							const btn = document.createElement('button');
+							btn.type = 'button';
+							btn.dataset.magFilter = f.value;
+							btn.textContent = f.label;
+							btn.style.cssText = \`
+								padding: 6px 14px;
+								font-size: 12px;
+								font-weight: 600;
+								border-radius: 6px;
+								cursor: pointer;
+								transition: all 0.2s ease;
+								white-space: nowrap;
+								border: 1px solid \${activeMagazineFilter === f.value ? '#ffffff' : '#3f3f46'};
+								background: \${activeMagazineFilter === f.value ? '#ffffff' : '#27272a'};
+								color: \${activeMagazineFilter === f.value ? '#000000' : '#d4d4d8'};
+							\`;
+
+							btn.addEventListener('click', (e) => {
+								e.preventDefault();
+								activeMagazineFilter = f.value;
+								updateMagazineTabButtons();
+								filterMagazineTableRows();
+							});
+
+							tabContainer.appendChild(btn);
+						});
+
+						table.parentNode.insertBefore(tabContainer, table);
+					}
+
+					filterMagazineTableRows();
+				}
+
+				function updateMagazineTabButtons() {
+					const btns = document.querySelectorAll('#magazine-filter-bar button[data-mag-filter]');
+					btns.forEach(btn => {
+						const isSelected = btn.dataset.magFilter === activeMagazineFilter;
+						btn.style.background = isSelected ? '#ffffff' : '#27272a';
+						btn.style.color = isSelected ? '#000000' : '#d4d4d8';
+						btn.style.borderColor = isSelected ? '#ffffff' : '#3f3f46';
+					});
+				}
+
+				function filterMagazineTableRows() {
+					const rows = document.querySelectorAll('table tbody tr');
+					rows.forEach(tr => {
+						if (activeMagazineFilter === 'all') {
+							tr.style.display = '';
+							return;
+						}
+						const rowText = (tr.textContent || '').toLowerCase();
+						const target = activeMagazineFilter.toLowerCase();
+
+						if (target === 'sdgs') {
+							if (rowText.includes('sdgs') || rowText.includes('美化') || rowText.includes('クリーンアップ') || rowText.includes('交通安全') || rowText.includes('寄付')) {
+								tr.style.display = '';
+								return;
+							}
+						}
+						if (target === 'イベント') {
+							if (rowText.includes('イベント') || rowText.includes('united') || rowText.includes('ミーティング') || rowText.includes('体験')) {
+								tr.style.display = '';
+								return;
+							}
+						}
+
+						if (rowText.includes(target)) {
+							tr.style.display = '';
+						} else {
+							tr.style.display = 'none';
+						}
+					});
+				}
+
 				// 定期実行とイベント監視でSPA遷移に完全追従
 				setInterval(() => {
 					applyAccordion();
 					applyCampaignBrandFilterTabs();
+					applyMagazineFilterTabs();
 				}, 350);
 				window.addEventListener('popstate', () => {
 					setTimeout(() => {
 						applyAccordion();
 						applyCampaignBrandFilterTabs();
+						applyMagazineFilterTabs();
 					}, 100);
 				});
 			})();
