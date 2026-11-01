@@ -91,10 +91,12 @@ const galleryList: Array<{ src: string; caption?: string; alt?: string }> = cust
 	]);
 
 // 2. 部門窓口リスト（個別フィールド sales_*, used_*, service_* を優先、なければ従来の departments JSON）
+const isOfficeLocation = d.facility_type === '本社・オフィス' || slug === 'office-kawasaki' || slug === 'office-yokohama' || d.slug === 'office-kawasaki' || d.slug === 'office-yokohama';
+
 const customDepartments: Array<{
 	id: string;
 	brand: string;
-	type: 'sales' | 'used' | 'service';
+	type: 'sales' | 'used' | 'service' | 'office';
 	title: string;
 	subtitle?: string;
 	tel?: string;
@@ -106,52 +108,73 @@ const customDepartments: Array<{
 	ctaUrl?: string;
 }> = [];
 
-// 新車部門
-if (d.sales_title || (d.sales_enabled !== '0' && (d.sales_tel || d.tel))) {
-	let autoSubtitle = d.sales_subtitle;
-	if (!autoSubtitle) {
-		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI 新百合ヶ丘';
-		else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW 本社';
-		else autoSubtitle = d.title;
-	}
+if (isOfficeLocation) {
+	// オフィス拠点は一般向けの車両販売・整備を一切行っていないため、代表・管理窓口のみを設定
 	customDepartments.push({
-		id: 'dept-sales',
-		brand: d.brand || 'BMW',
-		type: 'sales',
-		title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
-		subtitle: autoSubtitle,
-		tel: d.sales_tel || d.tel || '',
-		fax: d.sales_fax || '',
-		hours: d.sales_hours || '10:00 〜 18:00',
-		closed: d.sales_closed || '水曜日（祝日を除く）',
-		desc: d.sales_desc || '',
-		ctaLabel: d.sales_cta_label || '試乗・来場予約',
-		ctaUrl: d.sales_cta_url || ''
+		id: 'dept-office',
+		brand: 'Nicole',
+		type: 'office',
+		title: d.title || '本社・統括オフィス',
+		subtitle: '統括管理オフィス',
+		tel: d.tel || '044-541-3011',
+		fax: d.fax || '',
+		hours: d.hours || '09:00 〜 18:00',
+		closed: d.closed || '土曜日・日曜日',
+		desc: d.office_notice || '※一般のお客様向けのショールーム・車両展示・整備受付は行っておりません。',
+		ctaLabel: '',
+		ctaUrl: ''
 	});
-}
+} else {
+	// 新車部門
+	const isSalesEnabled = d.sales_enabled !== 0 && d.sales_enabled !== '0';
+	if (d.sales_title || (isSalesEnabled && (d.sales_tel || d.tel))) {
+		let autoSubtitle = d.sales_subtitle;
+		if (!autoSubtitle) {
+			if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI 新百合ヶ丘';
+			else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW 本社';
+			else autoSubtitle = d.title;
+		}
+		customDepartments.push({
+			id: 'dept-sales',
+			brand: d.brand || 'BMW',
+			type: 'sales',
+			title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
+			subtitle: autoSubtitle,
+			tel: d.sales_tel || d.tel || '',
+			fax: d.sales_fax || '',
+			hours: d.sales_hours || '10:00 〜 18:00',
+			closed: d.sales_closed || '水曜日（祝日を除く）',
+			desc: d.sales_desc || '',
+			ctaLabel: d.sales_cta_label || '試乗・来場予約',
+			ctaUrl: d.sales_cta_url || ''
+		});
+	}
 
-// 認定中古車部門
-if (d.used_title || (d.used_enabled === '1' && d.used_title)) {
-	let autoSubtitle = d.used_subtitle;
-	if (!autoSubtitle) {
-		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI NEXT 新百合ヶ丘';
-		else if (d.title?.includes('新百合')) autoSubtitle = 'BMW Premium Selection 新百合ヶ丘';
-		else autoSubtitle = d.title;
+	// 認定中古車部門
+	const isMiniShinyurigaoka = d.slug === 'mini-shinyurigaoka' || slug === 'mini-shinyurigaoka';
+	const isUsedEnabled = isMiniShinyurigaoka || d.used_enabled === 1 || d.used_enabled === '1';
+	if (d.used_title || isMiniShinyurigaoka || (isUsedEnabled && d.used_title)) {
+		let autoSubtitle = d.used_subtitle;
+		if (!autoSubtitle) {
+			if (isMiniShinyurigaoka) autoSubtitle = 'MINI NEXT 新百合ヶ丘';
+			else if (d.title?.includes('新百合')) autoSubtitle = 'BMW Premium Selection 新百合ヶ丘';
+			else autoSubtitle = d.title;
+		}
+		customDepartments.push({
+			id: 'dept-used',
+			brand: isMiniShinyurigaoka ? 'MINI' : (d.brand || 'BMW'),
+			type: 'used',
+			title: d.used_title || (isMiniShinyurigaoka ? 'MINI NEXT 新百合ヶ丘' : '認定中古車'),
+			subtitle: autoSubtitle,
+			tel: d.used_tel || (isMiniShinyurigaoka ? '044-396-0180' : (d.tel || '')),
+			fax: d.used_fax || '',
+			hours: d.used_hours || '10:00 〜 18:00',
+			closed: d.used_closed || '火曜日・水曜日（祝日を除く）',
+			desc: d.used_desc || (isMiniShinyurigaoka ? '厳格な基準をクリアした高品質なMINI認定中古車を常時多数展示。安心の保証ときめ細やかなサポートで、理想のMINIライフをお届けします。' : ''),
+			ctaLabel: d.used_cta_label || 'MINI認定中古車を見る',
+			ctaUrl: d.used_cta_url || 'https://www.carsensor.net/shop/kanagawa/204859005/'
+		});
 	}
-	customDepartments.push({
-		id: 'dept-used',
-		brand: d.brand || 'BMW',
-		type: 'used',
-		title: d.used_title,
-		subtitle: autoSubtitle,
-		tel: d.used_tel || d.tel || '',
-		fax: d.used_fax || '',
-		hours: d.used_hours || '10:00 〜 18:00',
-		closed: d.used_closed || '水曜日（祝日を除く）',
-		desc: d.used_desc || '',
-		ctaLabel: d.used_cta_label || '認定中古車を見る',
-		ctaUrl: d.used_cta_url || ''
-	});
 }
 
 // 2.2 同一敷地に工場を持たない拠点の指定サービス工場マッピング
@@ -170,7 +193,7 @@ interface ServiceHubInfo {
 
 const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
 	'mini-kohoku': {
-		factoryName: 'Nicole BMW サービスセンター',
+		factoryName: 'Nicole BMW Service Centre',
 		factorySlug: 'nicole-bmw-service-centre',
 		factoryUrl: '/location/nicole-bmw-service-centre',
 		factoryPostal: '〒224-0062',
@@ -178,8 +201,8 @@ const EXTERNAL_SERVICE_HUBS: Record<string, ServiceHubInfo> = {
 		factoryTel: '045-948-2500',
 		factoryHours: '10:00 〜 18:00',
 		factoryClosed: '水曜日（祝日の場合は営業）',
-		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW サービスセンター 神奈川県横浜市都筑区葛が谷15-46')}`,
-		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW サービスセンター」にて承ります。'
+		factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent('Nicole BMW Service Centre 神奈川県横浜市都筑区葛が谷15-46')}`,
+		noticeDesc: '※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「Nicole BMW Service Centre」にて承ります。'
 	},
 	'mini-tsuzuki': {
 		factoryName: 'Nicole BMW 横浜港北支店',
@@ -212,42 +235,45 @@ const externalServiceHub: ServiceHubInfo | null = EXTERNAL_SERVICE_HUBS[currentS
 );
 
 // サービス整備部門
-if (d.service_title || (d.service_enabled !== '0' && (d.service_tel || d.tel))) {
-	let autoSubtitle = d.service_subtitle;
-	if (!autoSubtitle) {
-		if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'Nicole BMW 新百合ヶ丘支店';
-		else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW サービスセンター';
-		else autoSubtitle = d.title;
+if (!isOfficeLocation) {
+	const isServiceEnabled = d.service_enabled !== 0 && d.service_enabled !== '0';
+	if (d.service_title || (isServiceEnabled && (d.service_tel || d.tel))) {
+		let autoSubtitle = d.service_subtitle;
+		if (!autoSubtitle) {
+			if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'Nicole BMW 新百合ヶ丘支店';
+			else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW Service Centre';
+			else autoSubtitle = d.title;
+		}
+		customDepartments.push({
+			id: 'dept-service',
+			brand: d.brand || 'BMW',
+			type: 'service',
+			title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
+			subtitle: autoSubtitle,
+			tel: d.service_tel || d.tel || '',
+			fax: d.service_fax || '',
+			hours: d.service_hours || '09:00 〜 18:00',
+			closed: d.service_closed || '水曜日（祝日を除く）',
+			desc: d.service_desc || '',
+			ctaLabel: d.service_cta_label || 'サービス入庫予約',
+			ctaUrl: d.service_cta_url || ''
+		});
+	} else if (externalServiceHub) {
+		// 指定サービス工場への案内窓口（MINI港北・MINI都筑など）
+		customDepartments.push({
+			id: 'dept-service',
+			brand: 'MINI',
+			type: 'service',
+			title: 'サービス（整備・点検）',
+			subtitle: `${externalServiceHub.factoryName}（指定工場）`,
+			tel: externalServiceHub.factoryTel,
+			hours: externalServiceHub.factoryHours,
+			closed: externalServiceHub.factoryClosed,
+			desc: `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${externalServiceHub.factoryName}」にて承ります。`,
+			ctaLabel: '指定工場を見る',
+			ctaUrl: externalServiceHub.factoryUrl
+		});
 	}
-	customDepartments.push({
-		id: 'dept-service',
-		brand: d.brand || 'BMW',
-		type: 'service',
-		title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
-		subtitle: autoSubtitle,
-		tel: d.service_tel || d.tel || '',
-		fax: d.service_fax || '',
-		hours: d.service_hours || '09:00 〜 18:00',
-		closed: d.service_closed || '水曜日（祝日を除く）',
-		desc: d.service_desc || '',
-		ctaLabel: d.service_cta_label || 'サービス入庫予約',
-		ctaUrl: d.service_cta_url || ''
-	});
-} else if (externalServiceHub) {
-	// 指定サービス工場への案内窓口（MINI港北・MINI都筑など）
-	customDepartments.push({
-		id: 'dept-service',
-		brand: 'MINI',
-		type: 'service',
-		title: 'サービス（整備・点検）',
-		subtitle: `${externalServiceHub.factoryName}（指定工場）`,
-		tel: externalServiceHub.factoryTel,
-		hours: externalServiceHub.factoryHours,
-		closed: externalServiceHub.factoryClosed,
-		desc: `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${externalServiceHub.factoryName}」にて承ります。`,
-		ctaLabel: '指定工場詳細を見る',
-		ctaUrl: externalServiceHub.factoryUrl
-	});
 }
 
 const departmentsList: Array<{
@@ -263,7 +289,7 @@ const departmentsList: Array<{
 	desc?: string;
 	ctaLabel?: string;
 	ctaUrl?: string;
-}> = customDepartments.length > 0 ? customDepartments : parseJson(d.departments, [
+}> = customDepartments.length > 0 ? customDepartments : (isOfficeLocation ? [] : parseJson(d.departments, [
 	{
 		id: 'dept-0',
 		brand: d.brand || 'BMW',
@@ -275,7 +301,7 @@ const departmentsList: Array<{
 		closed: '水曜日（祝日を除く）',
 		desc: '最新モデルを展示。専門スタッフが丁寧にご案内いたします。'
 	}
-]);
+]));
 
 // 3. 上部ステータスピルバッジ（基本情報 badges のチェック項目を最優先し、地図と表記統一）
 function resolveBadgeItem(item: any): { brand: string; label: string; targetId: string } {
@@ -296,9 +322,9 @@ function resolveBadgeItem(item: any): { brand: string; label: string; targetId: 
 	}
 
 	if (rawLabel.includes('新車') || rawLabel.includes('車両')) {
-		targetId = 'dept-newcar';
+		targetId = 'dept-sales';
 	} else if (rawLabel.includes('認定中古車') || rawLabel.includes('中古車')) {
-		targetId = 'dept-usedcar';
+		targetId = 'dept-used';
 	} else if (rawLabel.includes('サービス') || rawLabel.includes('点検') || rawLabel.includes('車検')) {
 		targetId = 'dept-service';
 	}
@@ -326,22 +352,36 @@ if (d.badges) {
 	}
 }
 
-const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = parsedBadges.length > 0
-	? parsedBadges
-	: (customDepartments.length > 0
-		? customDepartments.map(dept => {
-			let label = '新車';
-			if (dept.type === 'used') label = '認定中古車';
-			if (dept.type === 'service') label = 'サービス';
-			return {
-				brand: dept.brand,
-				label: `${dept.brand} ${label}`,
-				targetId: dept.id
-			};
-		})
-		: [
-			{ brand: d.brand || 'BMW', label: `${d.brand || 'BMW'} 新車`, targetId: 'dept-0' }
-		]);
+// MINI新百合ヶ丘は認定中古車（MINI NEXT）を併設するため、バッジに認定中古車を確実に含める
+if ((d.slug === 'mini-shinyurigaoka' || slug === 'mini-shinyurigaoka') && !parsedBadges.some(b => b.label.includes('認定中古車'))) {
+	const miniUsedBadge = resolveBadgeItem({ brand: 'MINI', label: 'MINI 認定中古車', targetId: 'dept-used' });
+	// 新車バッジの直後に挿入
+	const salesIdx = parsedBadges.findIndex(b => b.label.includes('新車'));
+	if (salesIdx !== -1) {
+		parsedBadges.splice(salesIdx + 1, 0, miniUsedBadge);
+	} else {
+		parsedBadges.unshift(miniUsedBadge);
+	}
+}
+
+const badgesList: Array<{ brand?: string; label: string; targetId?: string }> = isOfficeLocation
+	? [{ brand: 'Nicole', label: '本社・統括オフィス', targetId: 'dept-office' }]
+	: (parsedBadges.length > 0
+		? parsedBadges
+		: (customDepartments.length > 0
+			? customDepartments.map(dept => {
+				let label = '新車';
+				if (dept.type === 'used') label = '認定中古車';
+				if (dept.type === 'service') label = 'サービス';
+				return {
+					brand: dept.brand,
+					label: `${dept.brand} ${label}`,
+					targetId: dept.id
+				};
+			})
+			: [
+				{ brand: d.brand || 'BMW', label: `${d.brand || 'BMW'} 新車`, targetId: 'dept-0' }
+			]));
 
 const googleMapsUrl = d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`;
 
@@ -501,9 +541,28 @@ const placeData = await getGooglePlaceReviews({
 							}
 							const isMini = brandLower.includes('mini');
 							const targetAccId = badge.targetId || (departmentsList[idx]?.id || `dept-${idx}`);
+
+							const label = badge.label || '';
+							const isSales = label.includes('新車') || targetAccId?.includes('sales') || targetAccId?.includes('newcar');
+							const isUsed = label.includes('中古車') || targetAccId?.includes('used');
+							const isService = label.includes('サービス') || label.includes('点検') || label.includes('車検') || targetAccId?.includes('service');
+							const isOffice = label.includes('オフィス') || targetAccId?.includes('office');
+
 							return (
 								<a href={`#${targetAccId}`} class={`feat-pill ${isMini ? 'feat-pill--mini' : ''}`} data-dept-target={targetAccId}>
 									<img src={logoSrc} alt={badge.brand || 'Brand'} class={`feat-brand-logo ${logoClass}`} />
+									{isSales && (
+										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" style="transform: scaleX(-1);" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+									)}
+									{isUsed && (
+										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.64 5H8.36a2 2 0 0 0-1.86 1.3L5 10 3 8"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/><path d="M6.5 14h.01"/><path d="M17.5 14h.01"/><path d="m9.5 13.5 1.8 1.8 3.5-3.5" stroke-width="2.2"/></svg>
+									)}
+									{isService && (
+										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+									)}
+									{isOffice && (
+										<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feat-type-icon" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>
+									)}
 									<span class="feat-label">{badge.label}</span>
 								</a>
 							);
@@ -828,87 +887,93 @@ const placeData = await getGooglePlaceReviews({
 						</div>
 					</section>
 
-					<!-- Googleマップ評価・お客様のクチコミ -->
-					<section class="sr-section sr-section--reviews" id="reviews">
-						<div class="reviews-header-wrap">
-							<div>
-								<h2 class="section-title">Googleマップの評価・クチコミ</h2>
-								<p class="section-desc">実際にご来場・ご利用いただいたお客様からの声をご紹介いたします。</p>
+					<!-- Googleマップ評価・お客様のクチコミ（オフィスは車両を扱わないため非表示） -->
+					{!isOfficeLocation && (
+						<section class="sr-section sr-section--reviews" id="reviews">
+							<div class="reviews-header-wrap">
+								<div>
+									<h2 class="section-title">Googleマップの評価・クチコミ</h2>
+									<p class="section-desc">実際にご来場・ご利用いただいたお客様からの声をご紹介いたします。</p>
+								</div>
+								<a
+									href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="btn-all-reviews"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+									Googleマップで全クチコミを見る
+								</a>
 							</div>
-							<a
-								href={placeData.place_id ? `https://search.google.com/local/reviews?placeid=${placeData.place_id}` : `https://maps.google.com/?q=${encodeURIComponent(`${d.title} ${d.address || ''}`)}`}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="btn-all-reviews"
-							>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-								Googleマップで全クチコミを見る
-							</a>
-						</div>
 
-						<!-- 総合評価バナー -->
-						<div class="gmap-rating-hero">
-							<div class="gmap-rating-main">
-								<div class="gmap-rating-score-box">
-									<span class="gmap-rating-num">{placeData.rating.toFixed(1)}</span>
-									<div class="gmap-rating-stars-wrap">
-										<div class="gmap-stars" aria-label={`評価${placeData.rating.toFixed(1)}（5つ星中）`}>
-											{Array.from({ length: 5 }).map((_, i) => {
-												const fillLevel = placeData.rating - i;
-												if (fillLevel >= 0.8) return <span class="star-full">★</span>;
-												if (fillLevel >= 0.3) return <span class="star-half">★</span>;
-												return <span class="star-empty">☆</span>;
-											})}
+							<!-- 総合評価バナー -->
+							<div class="gmap-rating-hero">
+								<div class="gmap-rating-main">
+									<div class="gmap-rating-score-box">
+										<span class="gmap-rating-num">{placeData.rating.toFixed(1)}</span>
+										<div class="gmap-rating-stars-wrap">
+											<div class="gmap-stars" aria-label={`評価${placeData.rating.toFixed(1)}（5つ星中）`}>
+												{Array.from({ length: 5 }).map((_, i) => {
+													const fillLevel = placeData.rating - i;
+													if (fillLevel >= 0.8) return <span class="star-full">★</span>;
+													if (fillLevel >= 0.3) return <span class="star-half">★</span>;
+													return <span class="star-empty">☆</span>;
+												})}
+											</div>
+											<span class="gmap-review-count">{placeData.user_ratings_total}件のGoogleクチコミ</span>
 										</div>
-										<span class="gmap-review-count">{placeData.user_ratings_total}件のGoogleクチコミ</span>
+									</div>
+									<div class="gmap-rating-badge">
+										<svg viewBox="0 0 24 24" width="18" height="18" class="gmap-g-icon" aria-hidden="true">
+											<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+											<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+											<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+											<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+										</svg>
+										<span>Google 評価{placeData.is_live_api ? '（公式連携）' : ''}</span>
 									</div>
 								</div>
-								<div class="gmap-rating-badge">
-									<svg viewBox="0 0 24 24" width="18" height="18" class="gmap-g-icon" aria-hidden="true">
-										<path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
-										<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
-										<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
-										<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
-									</svg>
-									<span>Google 評価{placeData.is_live_api ? '（公式連携）' : ''}</span>
-								</div>
 							</div>
-						</div>
 
-						<!-- クチコミカードグリッド -->
-						<div class="reviews-grid">
-							{placeData.reviews.map((rev) => (
-								<article class="review-card">
-									<div class="review-card__header">
-										<div class="review-card__author">
-											<div class="review-author-avatar">{rev.author_avatar || rev.author_name.slice(0, 1)}</div>
-											<div class="review-author-meta">
-												<strong class="review-author-name">{rev.author_name}</strong>
-												<span class="review-date">
-													{rev.relative_time_description}
-													{rev.category_tag ? `（${rev.category_tag}）` : ''}
-												</span>
+							<!-- クチコミカードグリッド -->
+							<div class="reviews-grid">
+								{placeData.reviews.map((rev) => (
+									<article class="review-card">
+										<div class="review-card__header">
+											<div class="review-card__author">
+												<div class="review-author-avatar">{rev.author_avatar || rev.author_name.slice(0, 1)}</div>
+												<div class="review-author-meta">
+													<strong class="review-author-name">{rev.author_name}</strong>
+													<span class="review-date">
+														{rev.relative_time_description}
+														{rev.category_tag ? `（${rev.category_tag}）` : ''}
+													</span>
+												</div>
+											</div>
+											<div class="review-stars" aria-label={`${rev.rating}つ星`}>
+												{'★'.repeat(rev.rating)}
 											</div>
 										</div>
-										<div class="review-stars" aria-label={`${rev.rating}つ星`}>
-											{'★'.repeat(rev.rating)}
-										</div>
-									</div>
-									<p class="review-card__text">{rev.text}</p>
-								</article>
-							))}
-						</div>
-					</section>
+										<p class="review-card__text">{rev.text}</p>
+									</article>
+								))}
+							</div>
+						</section>
+					)}
 				</div>
 
 				<!-- 右側：スティッキー店舗情報サイドバー -->
 				<aside class="sr-sidebar">
 					<div class="sidebar-card">
 						<div class="sidebar-header">
-							<h3 class="sidebar-title">直通窓口・ご案内</h3>
+							<h3 class="sidebar-title">{isOfficeLocation ? '本社オフィス窓口' : '直通窓口・ご案内'}</h3>
 						</div>
 
-						<p class="sidebar-desc">ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。</p>
+						<p class="sidebar-desc">
+							{isOfficeLocation 
+								? 'ニコル・グループ各社の統括管理オフィスです。業務・お問い合わせは代表窓口にて承ります。'
+								: 'ご商談予約や試乗、車検・点検のご相談は各直通窓口にて承ります。'}
+						</p>
 
 						<!-- コンタクトボタン（用途別） -->
 						<div class="sidebar-cta">
@@ -917,7 +982,9 @@ const placeData = await getGooglePlaceReviews({
 								let unifiedName = dept.title;
 								const t = (dept.type || '').toLowerCase();
 								const title = dept.title || '';
-								if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
+								if (t === 'office' || dept.id?.includes('office') || title.includes('オフィス')) {
+									unifiedName = '代表・管理窓口';
+								} else if (t === 'sales' || dept.id?.includes('sales') || (!t && title.includes('新車'))) {
 									unifiedName = '新車（試乗・商談）';
 								} else if (t === 'used' || dept.id?.includes('used') || title.includes('中古')) {
 									unifiedName = '認定中古車（試乗・商談）';
@@ -1275,6 +1342,13 @@ const placeData = await getGooglePlaceReviews({
 		border-color: rgba(255, 255, 255, 0.2);
 	}
 
+	.feat-type-icon {
+		width: 14px;
+		height: 14px;
+		color: rgba(255, 255, 255, 0.85);
+		flex-shrink: 0;
+	}
+
 	.feat-brand-logo {
 		display: inline-block;
 		object-fit: contain;
@@ -1391,18 +1465,21 @@ const placeData = await getGooglePlaceReviews({
 		align-items: center;
 		gap: 6px;
 		padding: 10px 18px;
-		background: #ffffff;
-		color: #08090a;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		color: #ffffff;
 		border-radius: 6px;
 		font-size: 0.875rem;
-		font-weight: 700;
+		font-weight: 600;
 		text-decoration: none;
 		white-space: nowrap;
 		transition: all 0.2s ease;
 	}
 
 	.btn-hub-link:hover {
-		background: #e5e7eb;
+		background: rgba(255, 255, 255, 0.18);
+		border-color: rgba(255, 255, 255, 0.5);
+		color: #ffffff;
 		transform: translateX(2px);
 	}
 
@@ -1768,11 +1845,11 @@ const placeData = await getGooglePlaceReviews({
 		user-select: none;
 	}
 
-	/* 営業中：上品で鮮明なエメラルドグリーン */
+	/* 営業中：マップ系（グリーン）と明確に差別化した爽快なスカイブルー */
 	.dept-status-badge.status--open {
-		background: rgba(16, 185, 129, 0.12);
-		border: 1px solid rgba(16, 185, 129, 0.4);
-		color: #34d399;
+		background: rgba(56, 189, 248, 0.12);
+		border: 1px solid rgba(56, 189, 248, 0.35);
+		color: #38bdf8;
 	}
 
 	.status-pulse-dot {
@@ -1783,20 +1860,20 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.dept-status-badge.status--open .status-pulse-dot {
-		background: #10b981;
-		box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+		background: #38bdf8;
+		box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
 		animation: statusPulse 2s infinite ease-out;
 	}
 
 	@keyframes statusPulse {
 		0% {
-			box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+			box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
 		}
 		70% {
-			box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+			box-shadow: 0 0 0 6px rgba(56, 189, 248, 0);
 		}
 		100% {
-			box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+			box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
 		}
 	}
 
@@ -1989,6 +2066,7 @@ const placeData = await getGooglePlaceReviews({
 		font-size: 0.875rem;
 		text-decoration: none;
 		transition: all 0.2s ease;
+		white-space: nowrap;
 	}
 
 	.btn-dept-cta:hover {
@@ -2101,14 +2179,15 @@ const placeData = await getGooglePlaceReviews({
 
 	.route-tag {
 		display: inline-block;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		color: #08090a;
-		background: #ffffff;
-		padding: 2px 7px;
-		border-radius: 2px;
-		margin-bottom: 6px;
-		letter-spacing: 0.02em;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: #e2e8f0;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		padding: 3px 10px;
+		border-radius: 3px;
+		margin-bottom: 8px;
+		letter-spacing: 0.03em;
 	}
 
 	.route-item p {
@@ -2527,21 +2606,26 @@ const placeData = await getGooglePlaceReviews({
 	}
 
 	.btn-view-all-loc {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
-		padding: 10px;
+		padding: 12px 18px;
 		font-size: 0.8125rem;
-		color: #888888;
+		font-weight: 600;
+		color: #e2e8f0;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 4px;
 		text-decoration: none;
-		border: 1px dashed rgba(255, 255, 255, 0.15);
-		border-radius: 6px;
+		letter-spacing: 0.02em;
 		transition: all 0.2s ease;
 	}
 
 	.btn-view-all-loc:hover {
 		color: #ffffff;
 		border-color: rgba(255, 255, 255, 0.4);
-		background: rgba(255, 255, 255, 0.04);
+		background: rgba(255, 255, 255, 0.12);
 	}
 
 	/* レスポンシブ */
@@ -2638,6 +2722,11 @@ const placeData = await getGooglePlaceReviews({
 			padding: 5px 10px;
 			font-size: 0.6875rem;
 			gap: 6px;
+		}
+
+		.feat-type-icon {
+			width: 12px;
+			height: 12px;
 		}
 
 		.feat-brand-logo--bmw {
@@ -2749,6 +2838,35 @@ const placeData = await getGooglePlaceReviews({
 			margin-bottom: 0;
 			font-size: 0.75rem;
 			line-height: 1.5;
+		}
+
+		.dept-acc-body {
+			padding: 0 14px 16px;
+			padding-top: 14px;
+		}
+
+		.dept-compact-table {
+			padding: 10px 12px;
+			margin-bottom: 14px;
+		}
+
+		.dept-card__actions {
+			flex-direction: column;
+			gap: 8px;
+			width: 100%;
+		}
+
+		.btn-dept-call,
+		.btn-dept-cta {
+			width: 100%;
+			min-width: 0;
+			flex: none;
+			box-sizing: border-box;
+			white-space: nowrap;
+			text-align: center;
+			justify-content: center;
+			padding: 11px 16px;
+			font-size: 0.84375rem;
 		}
 
 		.dealer-summary-address {

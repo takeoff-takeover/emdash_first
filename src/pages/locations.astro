@@ -94,7 +94,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				brand: 'BMW',
 				facilityType: 'ショールーム',
 				areaGroup,
-				services: ['BMW 認定中古車'],
+				services: ['BMW（ALPINA）認定中古車'],
 				postal: row.postal || "〒215-0023",
 				address: addr,
 				tel: row.used_tel || "044-396-0180",
@@ -286,16 +286,19 @@ function getFacilityBadges(loc: any): ServiceBadge[] {
 			} else if (label.includes("認定中古車") || label.includes("中古車")) {
 				type = "used";
 				icon = "shield";
+				if (label.includes("BMW（ALPINA）") || label.includes("BMW(ALPINA)")) {
+					brands = ["BMW", "ALPINA"];
+				}
 			} else if (label.includes("サービス") || label.includes("点検") || label.includes("車検") || label.includes("修理")) {
 				type = "service";
 				icon = "wrench";
-				if (label.includes("BMW（ALPINA）")) {
+				if (label.includes("BMW（ALPINA）") || label.includes("BMW(ALPINA)")) {
 					brands = ["BMW", "ALPINA"];
 				}
 			} else if (label.includes("本社・オフィス")) {
 				type = "office";
 				icon = "building";
-				brands = loc.id === "loc-24" ? ["Rolls-Royce", "Ferrari"] : ["BMW", "MINI", "ALPINA"];
+				brands = [];
 			}
 
 			return { type, label, icon, brands };
@@ -307,6 +310,10 @@ function getFacilityBadges(loc: any): ServiceBadge[] {
 
 // 拠点ごとの対応ブランド取得
 function getLocationBrands(loc: any): string[] {
+	// オフィスは車両を一切扱っていないため、ブランドには含めない
+	if (loc.facilityType === "本社・オフィス" || loc.id === "office-kawasaki" || loc.id === "office-yokohama") {
+		return [];
+	}
 	const brands = new Set<string>();
 	if (loc.brand === "ALPINA" || loc.brand === "Nicole" || loc.name.includes("青山") || loc.name.includes("世田谷")) {
 		brands.add("ALPINA");
@@ -408,8 +415,10 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 			<div class="locs-container">
 				<div class="locs-map-header">
 					<div class="locs-map-title-wrap">
-						<span class="locs-map-dot"></span>
-						<h2 class="locs-map-title">NETWORK MAP</h2>
+						<div class="locs-map-title-main">
+							<span class="locs-map-dot"></span>
+							<h2 class="locs-map-title">NETWORK MAP</h2>
+						</div>
 						<span class="locs-map-sub">ピンをタップすると入居拠点一覧（新車・中古車・サービス）とGoogle Mapsルート案内が表示されます</span>
 					</div>
 					<div class="locs-map-header-actions">
@@ -531,18 +540,23 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 											data-badge-type={b.type}
 											data-badge-brands={b.brands.join(",")}
 										>
-											{b.icon === "car" && (
-												<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-service-tag__icon">
+											{(b.icon === "car" || b.type === "sales") && (
+												<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-service-tag__icon" style="transform: scaleX(-1);" aria-label="新車">
 													<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2" />
 													<circle cx="7" cy="17" r="2" />
 													<path d="M9 17h6" />
 													<circle cx="17" cy="17" r="2" />
 												</svg>
 											)}
-											{b.icon === "shield" && (
-												<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-service-tag__icon">
-													<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-													<path d="m9 12 2 2 4-4"/>
+											{(b.icon === "shield" || b.type === "used") && (
+												<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-service-tag__icon" aria-label="認定中古車">
+													<path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.64 5H8.36a2 2 0 0 0-1.86 1.3L5 10 3 8"/>
+													<rect width="18" height="8" x="3" y="10" rx="2"/>
+													<path d="M5 18v2"/>
+													<path d="M19 18v2"/>
+													<path d="M6.5 14h.01"/>
+													<path d="M17.5 14h.01"/>
+													<path d="m9.5 13.5 1.8 1.8 3.5-3.5" stroke-width="2.2"/>
 												</svg>
 											)}
 											{b.icon === "wrench" && (
@@ -779,14 +793,17 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 						type = "sales";
 					} else if (label.includes("認定中古車") || label.includes("中古車")) {
 						type = "used";
+						if (label.includes("BMW（ALPINA）") || label.includes("BMW(ALPINA)")) {
+							brands = ["BMW", "ALPINA"];
+						}
 					} else if (label.includes("サービス") || label.includes("点検") || label.includes("車検")) {
 						type = "service";
-						if (label.includes("BMW（ALPINA）")) {
+						if (label.includes("BMW（ALPINA）") || label.includes("BMW(ALPINA)")) {
 							brands = ["BMW", "ALPINA"];
 						}
 					} else if (label.includes("本社・オフィス")) {
 						type = "office";
-						brands = loc.id === "office-yokohama" ? ["Rolls-Royce", "Ferrari"] : ["BMW", "MINI", "ALPINA"];
+						brands = [];
 					}
 
 					return { type, label, brands };
@@ -846,6 +863,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 				Object.values(addrGroups).forEach(group => {
 					const groupLocs = group.locations;
 					const brands = [...new Set(groupLocs.flatMap(l => {
+						if (l.facilityType === "本社・オフィス" || l.id === "office-kawasaki" || l.id === "office-yokohama") {
+							return [];
+						}
 						const bList = [];
 						if (l.brand === "ALPINA" || l.brand === "Nicole" || l.name.includes("青山") || l.name.includes("世田谷")) {
 							bList.push("ALPINA");
@@ -1117,11 +1137,8 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 
 			const isOffice = row.getAttribute('data-is-office') === 'true';
 			if (isOffice) {
-				// オフィスは一般向け販売・整備を行っていないため、機能（新車・中古車・サービス）選択時は非表示
-				if (targetService !== 'all') return false;
-				const brandsAttr = row.getAttribute('data-brand') || '';
-				const brands = brandsAttr.split(',').filter(Boolean);
-				return (targetBrand === 'all') || brands.includes(targetBrand);
+				// 川崎・横浜オフィスは車両を一切取り扱っていないため、「すべて（ブランド:all かつ サービス:all）」の時のみ表示
+				return targetBrand === 'all' && targetService === 'all';
 			}
 
 			const tags = Array.from(row.querySelectorAll('.loc-service-tag'));
@@ -1515,6 +1532,12 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		align-items: center;
 		gap: 10px;
 	}
+	.locs-map-title-main {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		flex-shrink: 0;
+	}
 	.locs-map-dot {
 		width: 8px;
 		height: 8px;
@@ -1807,10 +1830,10 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		justify-content: center;
 		padding: 5px 12px;
 		font-size: 11px;
-		font-weight: 700;
-		color: #000000;
-		background: #ffffff;
-		border: 1px solid #ffffff;
+		font-weight: 600;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.25);
 		border-radius: 2px;
 		text-decoration: none;
 		white-space: nowrap;
@@ -1821,7 +1844,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		margin-left: auto;
 	}
 	:global(.popup-detail-btn:hover) {
-		background: rgba(255, 255, 255, 0.85);
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(255, 255, 255, 0.5);
+		color: #ffffff;
 		transform: translateY(-1px);
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 	}
@@ -1895,9 +1920,9 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		color: #ffffff;
 	}
 	.locs-filter-btn.is-active {
-		background: #ffffff;
-		border-color: #ffffff;
-		color: #000000;
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(255, 255, 255, 0.45);
+		color: #ffffff;
 		font-weight: 600;
 	}
 	.locs-filter-count {
@@ -2181,12 +2206,14 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		text-align: center;
 	}
 	.loc-btn--detail {
-		background: #ffffff;
-		color: #000000;
-		border: 1px solid #ffffff;
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.25);
 	}
 	.loc-btn--detail:hover {
-		background: rgba(255, 255, 255, 0.85);
+		background: rgba(255, 255, 255, 0.18);
+		border-color: rgba(255, 255, 255, 0.5);
+		color: #ffffff;
 	}
 	.loc-btn--detail.is-disabled {
 		background: rgba(255, 255, 255, 0.03);
@@ -2244,6 +2271,19 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		}
 	}
 	@media (max-width: 640px) {
+		/* スマホ時：NETWORK MAPの隣の文字（説明文）を綺麗に下段へ改行 */
+		.locs-map-title-wrap {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 4px;
+			width: 100%;
+		}
+		.locs-map-sub {
+			padding-left: 18px;
+			font-size: 10.5px;
+			line-height: 1.4;
+		}
+
 		/* スマホ時マップピンアイコン（22pxから約10%拡大した25pxで視認性向上＋アンカー整合） */
 		:global(.loc-map-marker) {
 			width: 25px !important;
@@ -2461,12 +2501,13 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		transition: all 0.2s ease;
 	}
 	.locs-btn-large--primary {
-		background: #ffffff;
-		color: #000000;
-		border: 1px solid #ffffff;
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.28);
 	}
 	.locs-btn-large--primary:hover {
-		background: rgba(255, 255, 255, 0.85);
+		background: rgba(255, 255, 255, 0.18);
+		border-color: rgba(255, 255, 255, 0.5);
 	}
 	.locs-btn-large--outline {
 		border: 1px solid rgba(255, 255, 255, 0.3);
