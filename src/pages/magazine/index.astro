@@ -1,7 +1,7 @@
 ---
 // src/pages/magazine/index.astro
 // Nicole Connect - Web Magazine（Apple風の巨大写真ヒーロー＆エディトリアル・マガジンカバー）
-import { getEmDashCollection } from "emdash";
+import { getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 
 // CMS（magazineコレクション および postsコレクション）から記事を取得
@@ -377,19 +377,41 @@ function determineArticleCategory(p: any): string {
 // magazineコレクションおよびpostsコレクションの記事を統合
 const allCmsEntries = [...cmsMagazines, ...cmsPosts.filter(p => !cmsMagazines.some(m => m.id === p.id))];
 
+// 共通の「ブランド (brand)」および「カテゴリー (category)」分類グループから一括取得
+let brandTermsByEntry = new Map<string, any[]>();
+let categoryTermsByEntry = new Map<string, any[]>();
+try {
+	const magIds = cmsMagazines.map((p: any) => p.data?.id || p.id).filter(Boolean);
+	if (magIds.length > 0) {
+		[brandTermsByEntry, categoryTermsByEntry] = await Promise.all([
+			getTermsForEntries("magazine", magIds, "brand"),
+			getTermsForEntries("magazine", magIds, "category"),
+		]);
+	}
+} catch (e) {}
+
 const cmsArticles = allCmsEntries.map((p: any) => {
 	const featImg = p.data.featured_image;
 	const imgUrl = resolveMediaUrl(
 		featImg,
 		"https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
 	);
-	const cat = determineArticleCategory(p);
+	const entryDbId = p.data?.id || p.id;
+	const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+	const inferredCat = determineArticleCategory(p);
+	const cat = (inferredCat === "Campaign")
+		? "Campaign"
+		: (assignedCategories.length > 0 ? assignedCategories[0] : inferredCat);
 
 	const s = (p.id || "").toLowerCase();
 	const t = (p.data.title || "").toLowerCase();
+	const assignedBrands = (brandTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+
 	let b = "ALL";
-	if (t.includes("mini") || s.includes("mini")) b = "MINI";
-	else if (t.includes("bmw") || s.includes("bmw")) b = "BMW";
+	if (assignedBrands.length > 0) {
+		b = assignedBrands.join(" / ");
+	} else if (t.includes("mini") || s.includes("mini")) b = "MINI";
+	else if (t.includes("bmw") || s.includes("bmw") || t.includes("7シリーズ") || t.includes("3シリーズ")) b = "BMW";
 	else if (t.includes("ferrari") || s.includes("ferrari")) b = "Ferrari";
 	else if (t.includes("rolls") || s.includes("rolls") || t.includes("ロールス")) b = "Rolls-Royce";
 	else if (t.includes("alpina") || s.includes("alpina") || t.includes("アルピナ")) b = "ALPINA";
@@ -456,8 +478,11 @@ const allArticles = [
 	...staticArticles.filter(sa => !cmsArticles.some(ca => ca.slug === sa.slug || ca.id === sa.id))
 ].filter(a => !isNoticeArticle(a));
 
-// ESG / SDGs 記事判定ヘルパー
+// ESG / SDGs 記事判定ヘルパー（管理画面の「カテゴリー」設定があれば最優先）
 const isESGArticle = (p: any): boolean => {
+	if (p.category && ["Cars", "People", "ESG", "Buyer's Guide", "Campaign"].includes(p.category)) {
+		return p.category === "ESG";
+	}
 	const slug = (p.slug || p.id || "").toLowerCase();
 	const topic = (p.topic || "").toLowerCase();
 	const title = (p.title || "").toLowerCase();
@@ -871,7 +896,8 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 					}
 				}
 
-				const matchBrand = (currentBrand === 'ALL') || (brand === currentBrand);
+				const brandTokens = brand.split('/').map(s => s.trim());
+				const matchBrand = (currentBrand === 'ALL') || (brand === currentBrand) || brandTokens.includes(currentBrand);
 				const matchTopic = (currentTopic === 'ALL') || (topic === currentTopic);
 				const matchSearch = (!searchQuery) || (title.includes(searchQuery) || lead.includes(searchQuery) || brand.toLowerCase().includes(searchQuery));
 

@@ -2,7 +2,7 @@
 // src/pages/campaigns.astro
 // ニコル・グループ キャンペーン＆フェア一覧ページ
 import NicoleLayout from "../layouts/NicoleLayout.astro";
-import { getEmDashCollection } from "emdash";
+import { getEmDashCollection, getTermsForEntries } from "emdash";
 
 // 1. EmDash 公式APIからキャンペーンデータを取得
 let campaignsList: any[] = [];
@@ -11,13 +11,21 @@ try {
 		limit: 100,
 	});
 	if (res?.entries && res.entries.length > 0) {
+		const campIds = res.entries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+		const brandTermsByEntry = campIds.length > 0
+			? await getTermsForEntries("campaigns", campIds, "brand")
+			: new Map();
+
 		campaignsList = res.entries.map((e: any) => {
 			const d = e.data || e;
+			const entryDbId = e.data?.id || d.id || e.id;
+			const assignedBrands = (brandTermsByEntry.get(entryDbId) || []).map((t: any) => t.label).filter(Boolean);
+			const resolvedBrand = assignedBrands.length > 0 ? assignedBrands.join(" / ") : (d.brand || "BMW");
 			return {
 				id: e.id || d.slug || d.id,
 				slug: e.id || d.slug,
 				title: d.title || "",
-				brand: d.brand || "BMW",
+				brand: resolvedBrand,
 				category: d.category || "新車",
 				period_text: d.period_text || "",
 				period_start: d.period_start || "",
@@ -297,7 +305,8 @@ const BRAND_LOGOS: Record<string, string> = {
 				const cardBrand = card.getAttribute('data-brand') || '';
 				const cardCat = card.getAttribute('data-category') || '';
 
-				const matchBrand = (currentBrand === 'all') || (cardBrand === currentBrand);
+				const brandTokens = cardBrand.split('/').map(s => s.trim());
+				const matchBrand = (currentBrand === 'all') || (cardBrand === currentBrand) || brandTokens.includes(currentBrand);
 				const matchCat = (currentCat === 'all') || (cardCat === currentCat);
 
 				if (matchBrand && matchCat) {

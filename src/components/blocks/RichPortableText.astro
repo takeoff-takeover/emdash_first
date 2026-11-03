@@ -1,0 +1,229 @@
+---
+// src/components/blocks/RichPortableText.astro
+// 「▼ 背景エリア（開始）」〜「▲ 背景エリア（終了）」で挟まれた範囲を単色・グラデーション帯で包み、
+// 通常のビジュアルエディタ要素（H2・段落等）とカスタムレイアウトブロックを一体描画するラッパー
+import { PortableText } from "emdash/ui";
+import SliderBlock from "./SliderBlock.astro";
+import FAQBlock from "./FAQBlock.astro";
+import NotesBlock from "./NotesBlock.astro";
+import ColumnCardsBlock from "./ColumnCardsBlock.astro";
+import SplitMediaBlock from "./SplitMediaBlock.astro";
+import FeatureBand3ColBlock from "./FeatureBand3ColBlock.astro";
+import FeatureBand2ColBlock from "./FeatureBand2ColBlock.astro";
+
+interface Props {
+	value: any[];
+}
+
+const { value } = Astro.props;
+const blocks = Array.isArray(value) ? value : [];
+
+const portableTextComponents = {
+	type: {
+		column_cards: ColumnCardsBlock,
+		"editorial-tools:column_cards": ColumnCardsBlock,
+		benefit_cards_3col: ColumnCardsBlock,
+		feature_band_3col: FeatureBand3ColBlock,
+		feature_band_2col: FeatureBand2ColBlock,
+		split_media: SplitMediaBlock,
+		"editorial-tools:split_media": SplitMediaBlock,
+		slider: SliderBlock,
+		"editorial-tools:slider": SliderBlock,
+		faq: FAQBlock,
+		"editorial-tools:faq": FAQBlock,
+		accordion_faq: FAQBlock,
+		accordion: FAQBlock,
+		notes: NotesBlock,
+		"editorial-tools:notes": NotesBlock,
+		annotation: NotesBlock,
+	},
+};
+
+function hexLuminance(hex: string): number {
+	const clean = String(hex || "").replace(/[^0-9a-fA-F]/g, "");
+	let r = 18, g = 18, b = 21;
+	if (clean.length === 3) {
+		r = parseInt(clean[0] + clean[0], 16);
+		g = parseInt(clean[1] + clean[1], 16);
+		b = parseInt(clean[2] + clean[2], 16);
+	} else if (clean.length >= 6) {
+		r = parseInt(clean.slice(0, 2), 16);
+		g = parseInt(clean.slice(2, 4), 16);
+		b = parseInt(clean.slice(4, 6), 16);
+	}
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function buildBandStyle(settings: any): { styleAttr: string; isDarkText: boolean } {
+	const startColor = (settings?.color || "#141418").trim();
+	const endColor = (settings?.end_color || startColor).trim();
+	const gradType = settings?.gradient_type || "vertical";
+	const textColorPref = settings?.text_color || "auto";
+
+	let bgCss = startColor;
+	if (gradType !== "solid" && startColor.toLowerCase() !== endColor.toLowerCase()) {
+		if (gradType === "diagonal") {
+			bgCss = `linear-gradient(135deg, ${startColor} 0%, ${endColor} 100%)`;
+		} else if (gradType === "spotlight") {
+			bgCss = `radial-gradient(circle at 50% 25%, ${endColor} 0%, ${startColor} 85%)`;
+		} else {
+			bgCss = `linear-gradient(180deg, ${startColor} 0%, ${endColor} 100%)`;
+		}
+	}
+
+	let isDarkText = false;
+	if (textColorPref === "dark") {
+		isDarkText = true;
+	} else if (textColorPref === "light") {
+		isDarkText = false;
+	} else {
+		const avgLum = (hexLuminance(startColor) + hexLuminance(endColor)) / 2;
+		isDarkText = avgLum > 0.55;
+	}
+
+	return {
+		styleAttr: `background: ${bgCss};`,
+		isDarkText,
+	};
+}
+
+interface Segment {
+	kind: "normal" | "band";
+	settings?: any;
+	items: any[];
+}
+
+const segments: Segment[] = [];
+let currentBand: Segment | null = null;
+
+for (const blk of blocks) {
+	if (!blk || typeof blk !== "object") continue;
+	const bType = String(blk._type || "");
+	if (bType === "bg_band_start" || bType.endsWith(":bg_band_start")) {
+		if (currentBand && currentBand.items.length > 0) {
+			segments.push(currentBand);
+		}
+		currentBand = { kind: "band", settings: blk, items: [] };
+		continue;
+	}
+	if (bType === "bg_band_end" || bType.endsWith(":bg_band_end")) {
+		if (currentBand) {
+			if (currentBand.items.length > 0) {
+				segments.push(currentBand);
+			}
+			currentBand = null;
+		}
+		continue;
+	}
+	if (currentBand) {
+		currentBand.items.push(blk);
+	} else {
+		const last = segments[segments.length - 1];
+		if (!last || last.kind !== "normal") {
+			segments.push({ kind: "normal", items: [blk] });
+		} else {
+			last.items.push(blk);
+		}
+	}
+}
+if (currentBand && currentBand.items.length > 0) {
+	segments.push(currentBand);
+}
+---
+
+{segments.map((seg) => {
+	if (seg.kind === "band") {
+		const { styleAttr, isDarkText } = buildBandStyle(seg.settings);
+		return (
+			<div class={`cms-bg-band ${isDarkText ? "is-dark-text" : "is-light-text"}`} style={styleAttr}>
+				<div class="cms-bg-band__inner">
+					<PortableText value={seg.items} components={portableTextComponents} />
+				</div>
+			</div>
+		);
+	}
+	return <PortableText value={seg.items} components={portableTextComponents} />;
+})}
+
+<style>
+	.cms-bg-band {
+		width: 100vw;
+		position: relative;
+		left: 50%;
+		right: 50%;
+		margin-left: -50vw;
+		margin-right: -50vw;
+		margin-top: 3.25rem;
+		margin-bottom: 3.25rem;
+		padding: 4.25rem 1.5rem;
+		box-sizing: border-box;
+		border-top: 1px solid rgba(128, 128, 128, 0.14);
+		border-bottom: 1px solid rgba(128, 128, 128, 0.14);
+	}
+	.cms-bg-band__inner {
+		max-width: 1160px;
+		margin: 0 auto;
+	}
+
+	/* 暗い背景帯（白文字モード） */
+	.cms-bg-band.is-light-text {
+		color: #ffffff;
+		--cms-card-bg: rgba(255, 255, 255, 0.05);
+		--cms-card-border: rgba(255, 255, 255, 0.12);
+		--cms-card-heading: #ffffff;
+		--cms-card-text: #d4d4d8;
+		--cms-step-bg: rgba(255, 255, 255, 0.14);
+	}
+	.cms-bg-band.is-light-text :global(h1),
+	.cms-bg-band.is-light-text :global(h2),
+	.cms-bg-band.is-light-text :global(h3),
+	.cms-bg-band.is-light-text :global(h4),
+	.cms-bg-band.is-light-text :global(strong) {
+		color: #ffffff !important;
+	}
+	.cms-bg-band.is-light-text :global(p),
+	.cms-bg-band.is-light-text :global(li) {
+		color: rgba(255, 255, 255, 0.86) !important;
+	}
+
+	/* 明るい背景帯（黒文字モード：グレー帯や白帯でもくっきり読める） */
+	.cms-bg-band.is-dark-text {
+		color: #111113;
+		--cms-card-bg: #ffffff;
+		--cms-card-border: rgba(0, 0, 0, 0.1);
+		--cms-card-heading: #111113;
+		--cms-card-text: #3f3f46;
+		--cms-step-bg: rgba(0, 0, 0, 0.08);
+	}
+	.cms-bg-band.is-dark-text :global(h1),
+	.cms-bg-band.is-dark-text :global(h2),
+	.cms-bg-band.is-dark-text :global(h3),
+	.cms-bg-band.is-dark-text :global(h4),
+	.cms-bg-band.is-dark-text :global(strong) {
+		color: #111113 !important;
+		border-bottom-color: rgba(0, 0, 0, 0.12) !important;
+	}
+	.cms-bg-band.is-dark-text :global(p),
+	.cms-bg-band.is-dark-text :global(li) {
+		color: #3f3f46 !important;
+	}
+	.cms-bg-band.is-dark-text :global(.cms-col-card) {
+		box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+	}
+
+	/* 帯の最初の見出しの上マージンを詰めて自然に配置 */
+	.cms-bg-band__inner > :global(:first-child) {
+		margin-top: 0 !important;
+	}
+	.cms-bg-band__inner > :global(:last-child) {
+		margin-bottom: 0 !important;
+	}
+
+	@media (max-width: 640px) {
+		.cms-bg-band {
+			padding: 3rem 1.25rem;
+			margin-top: 2.25rem;
+			margin-bottom: 2.25rem;
+		}
+	}
+</style>

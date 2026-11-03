@@ -2,8 +2,9 @@
 // src/pages/campaigns/[slug].astro
 // ニコル・グループ キャンペーンLP（モジュラー型リッチデザインブロックシステム）
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
-import { getEmDashEntry, getEmDashCollection } from "emdash";
-import { PortableText } from "emdash/ui";
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries } from "emdash";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
+import "../../styles/prose.css";
 
 const { slug } = Astro.params;
 
@@ -18,13 +19,21 @@ let allCampaigns: any[] = [];
 try {
 	const res = await getEmDashCollection("campaigns" as any, { limit: 100 });
 	if (res?.entries && res.entries.length > 0) {
+		const campIds = res.entries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+		const brandTermsByEntry = campIds.length > 0
+			? await getTermsForEntries("campaigns", campIds, "brand")
+			: new Map();
+
 		allCampaigns = res.entries.map((e: any) => {
 			const d = e.data || e;
+			const entryDbId = e.data?.id || d.id || e.id;
+			const assignedBrands = (brandTermsByEntry.get(entryDbId) || []).map((t: any) => t.label).filter(Boolean);
+			const resolvedBrand = assignedBrands.length > 0 ? assignedBrands.join(" / ") : (d.brand || "BMW");
 			return {
 				id: e.id || d.slug,
 				slug: e.id || d.slug,
 				title: d.title || "",
-				brand: d.brand || "BMW",
+				brand: resolvedBrand,
 				category: d.category || "新車",
 				period_text: d.period_text || "",
 				featured_image: typeof d.featured_image === 'string' ? (d.featured_image.startsWith('{') ? JSON.parse(d.featured_image).src : d.featured_image) : (d.featured_image?.src || "/uploads/2026/02/DSC2293-scaled.avif"),
@@ -35,14 +44,24 @@ try {
 			};
 		});
 
-		const found = res.entries.find((e: any) => (e.id === slug || e.data?.slug === slug || (e.data && e.data.slug === slug)));
+		let found: any = null;
+		try {
+			const entryRes = await getEmDashEntry("campaigns" as any, slug);
+			if (entryRes?.entry) found = entryRes.entry;
+		} catch {}
+		if (!found) {
+			found = res.entries.find((e: any) => (e.id === slug || e.data?.slug === slug || (e.data && e.data.slug === slug)));
+		}
 		if (found) {
 			const d = found.data || found;
+			const foundDbId = found.data?.id || d.id || found.id;
+			const foundBrands = (brandTermsByEntry.get(foundDbId) || []).map((t: any) => t.label).filter(Boolean);
+			const foundResolvedBrand = foundBrands.length > 0 ? foundBrands.join(" / ") : (d.brand || "BMW");
 			item = {
 				id: found.id || d.slug || slug,
 				slug: found.id || d.slug || slug,
 				title: d.title || "",
-				brand: d.brand || "BMW",
+				brand: foundResolvedBrand,
 				category: d.category || "新車",
 				period_text: d.period_text || "",
 				period_start: d.period_start || "",
@@ -146,26 +165,9 @@ if (!item) {
 
 const otherCampaigns = allCampaigns.filter(c => c.slug !== item.slug).slice(0, 3);
 const editUrl = `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin/content/campaigns/${item.databaseId || item.slug}`;
-
-// サンプルギャラリー（ルール準拠）
-const sampleGallery = [
-	{
-		image: item.featured_image || "/uploads/2026/08/169P90635275_highRes_mini-family-04-2026-scaled.jpg",
-		caption: `${item.title} メインビジュアル。正規ショールームにて特別な体験をご提供いたします。`
-	},
-	{
-		image: "/uploads/2026/04/mini2P90618119_highRes_sir-paul-smith-und-d-1-scaled-e1779256599764.jpg",
-		caption: "新世代MINIのデザインフィロソフィーを体感できる特別ショールーム展示。"
-	},
-	{
-		image: "/uploads/2026/06/1P90515769_highRes_mini-crossover-highl-scaled.jpg",
-		caption: "力強さと洗練を極めたエクステリア。全方位にわたる卓越したプロポーション。"
-	},
-	{
-		image: "/uploads/2026/02/0H9A1397.jpg",
-		caption: "最新設備を備えた指定サービス工場。万全の体制でお客様のカーライフをサポートいたします。"
-	}
-];
+const parsedContent = typeof item.content === "string"
+	? (() => { try { return JSON.parse(item.content); } catch { return null; } })()
+	: item.content;
 ---
 
 <NicoleLayout 
@@ -242,300 +244,15 @@ const sampleGallery = [
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- ブロック2: 【ワイド 1240px】3大特別特典プログラム（カードグリッド） -->
+		<!-- 本文（Portable Text ブロックエディタから出力） -->
 		<!-- ============================================================== -->
-		<section class="cmp-section cmp-section--wide cmp-benefits-section">
+		<section class="cmp-section cmp-section--wide cmp-article-section">
 			<div class="cmp-container">
-				<div class="cmp-section-heading">
-					<h2 class="cmp-heading-title">期間限定の特別プログラム ＆ ご成約特典</h2>
-				</div>
-
-				<div class="cmp-benefits-grid">
-					<div class="cmp-benefit-card">
-						<h3 class="cmp-benefit-card__title">特別低金利プログラム</h3>
-						<p class="cmp-benefit-card__text">
-							対象モデルに期間限定の特別優遇金利を適用。頭金サポートや据置額設定など、お客様に最適なファイナンシャル・プランをご提案いたします。
-						</p>
-					</div>
-
-					<div class="cmp-benefit-card">
-						<h3 class="cmp-benefit-card__title">ご来場・ご試乗記念品</h3>
-						<p class="cmp-benefit-card__text">
-							期間中にWeb事前予約の上、ショールームにご来場・ご試乗いただいたお客様へ、Nicole Group限定オリジナルギフトを進呈いたします。
-						</p>
-					</div>
-
-					<div class="cmp-benefit-card">
-						<h3 class="cmp-benefit-card__title">下取り査定特別優遇</h3>
-						<p class="cmp-benefit-card__text">
-							現在お乗りの愛車をメーカー・車種問わず高価下取り査定。正規ディーラーならではの安心と透明性をもってお応えいたします。
-						</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ブロック3: 【左右分割 A: 左に写真、右にテキスト】 -->
-		<!-- ============================================================== -->
-		<section class="cmp-section cmp-section--wide cmp-split-section">
-			<div class="cmp-container">
-				<div class="cmp-split-card cmp-split-card--left-media">
-					<!-- 左：写真 -->
-					<div class="cmp-split-media">
-						<img src="/uploads/2026/04/mini2P90618119_highRes_sir-paul-smith-und-d-1-scaled-e1779256599764.jpg" alt="ショールームでの体験" loading="lazy" />
-					</div>
-					<!-- 右：テキスト -->
-					<div class="cmp-split-content">
-						<h3 class="cmp-split-title">最新ラインナップを揃えたプライベート試乗</h3>
-						<p class="cmp-split-desc">
-							Nicole Group各ショールームでは、厳選された最新モデルの試乗車を常時ご用意。市街地から高速走行まで、実車ならではの走行フィールや先進運転支援システムを専任コンサルタントのエスコートのもと存分にご体感いただけます。
-						</p>
-						<div class="cmp-split-actions">
-							<a href="#cmp-booking" class="cmp-btn-outline-pill">試乗モデルについて相談する →</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ブロック4: 【左右分割 B: 右に写真、左にテキスト】 -->
-		<!-- ※スマホ（SP）では写真が自然に上、テキストが下へ自動並び替え -->
-		<!-- ============================================================== -->
-		<section class="cmp-section cmp-section--wide cmp-split-section">
-			<div class="cmp-container">
-				<div class="cmp-split-card cmp-split-card--right-media">
-					<!-- PCでは右、スマホでは上に自動配置される写真 -->
-					<div class="cmp-split-media">
-						<img src="/uploads/2026/02/0H9A1397.jpg" alt="正規指定工場の技術力" loading="lazy" />
-					</div>
-					<!-- PCでは左、スマホでは下に自動配置されるテキスト -->
-					<div class="cmp-split-content">
-						<h3 class="cmp-split-title">マイスターが支える最高峰の安心と整備品質</h3>
-						<p class="cmp-split-desc">
-							ドイツ本国の厳しいトレーニングと認定を受けた熟練メカニックが常駐。最新鋭の専用診断テスターと専用特殊工具を駆使し、お乗りいただくすべての瞬間に揺るぎない歓びと安心をお約束いたします。
-						</p>
-						<div class="cmp-split-actions">
-							<a href="/locations" class="cmp-btn-outline-pill">サービス拠点ネットワークを見る →</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ★NEW★ ブロック5: 【全幅 100vw ダーク帯】×【3カラム・フィーチャーカード（写真＋見出し＋文）】 -->
-		<!-- ============================================================== -->
-		<section class="cmp-band cmp-band--dark">
-			<div class="cmp-container">
-				<div class="cmp-section-heading">
-					<h2 class="cmp-heading-title">新世代モデルを彩る 3つの革新フィーチャー</h2>
-					<p class="cmp-band-lead">洗練されたデザインと妥協なき走行性能を両立した、注目のハイライトをご紹介します。</p>
-				</div>
-
-				<!-- 3カラム：写真＋写真下に見出し＋テキスト -->
-				<div class="cmp-feature-grid cmp-feature-grid--3col">
-					<!-- カード 1 -->
-					<div class="cmp-feature-card cmp-feature-card--dark">
-						<div class="cmp-feature-card__media">
-							<img src="/uploads/ix4/int-01.jpg" alt="円形OLEDセンター・ディスプレイ" loading="lazy" />
-						</div>
-						<div class="cmp-feature-card__body">
-							<h3 class="cmp-feature-card__title">業界初 直径240mm 円形OLEDセンター・ディスプレイ</h3>
-							<p class="cmp-feature-card__text">
-								極薄ベゼルと高精細有機ELを採用。ナビゲーション、エンターテインメント、車両設定のすべてを直感的に操作できる未来のコックピット。
-							</p>
-						</div>
-					</div>
-
-					<!-- カード 2 -->
-					<div class="cmp-feature-card cmp-feature-card--dark">
-						<div class="cmp-feature-card__media">
-							<img src="/uploads/2026/09/169KV_color_1er-e1789542842388.jpg" alt="進化したゴーカート・フィーリング" loading="lazy" />
-						</div>
-						<div class="cmp-feature-card__body">
-							<h3 class="cmp-feature-card__title">俊敏さを極めた 進化系ゴーカート・フィーリング</h3>
-							<p class="cmp-feature-card__text">
-								低重心設計と高剛性シャシーがもたらす極上の回頭性。意のままにコーナーを駆けぬける純粋なドライビングの歓びを日常に。
-							</p>
-						</div>
-					</div>
-
-					<!-- カード 3 -->
-					<div class="cmp-feature-card cmp-feature-card--dark">
-						<div class="cmp-feature-card__media">
-							<img src="/uploads/2026/02/MINI-新百合ヶ丘.jpg" alt="持続可能なヴィーガン・マテリアル" loading="lazy" />
-						</div>
-						<div class="cmp-feature-card__body">
-							<h3 class="cmp-feature-card__title">上質と環境を調和させる 新開発リサイクル・テキスタイル</h3>
-							<p class="cmp-feature-card__text">
-								高品質リサイクルポリエステルを用いた温かみのあるダッシュボード編み込み素材。サステナブルでありながら圧倒的なプレミアム感を演出。
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ブロック6: 【フルワイド 100vw】大迫力全画面パノラマビジュアル -->
-		<!-- ============================================================== -->
-		<section class="cmp-panorama-section">
-			<div class="cmp-panorama-wrap">
-				<img 
-					src="/uploads/2026/09/169KV_color_X3-scaled.jpg" 
-					alt="パノラマビジュアル" 
-					class="cmp-panorama-img" 
-					loading="lazy" 
-				/>
-				<div class="cmp-panorama-scrim"></div>
-				<div class="cmp-panorama-caption">
-					<div class="cmp-container">
-						<p class="cmp-panorama-text">革新が宿るステアリングを握り、未来への扉を開く特別なひとときを。</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ★NEW★ ブロック7: 【全幅 100vw ライトグレー帯】×【2カラム大判・フィーチャーカード（写真＋見出し＋文）】 -->
-		<!-- ============================================================== -->
-		<section class="cmp-band cmp-band--light">
-			<div class="cmp-container">
-				<div class="cmp-section-heading cmp-section-heading--light">
-					<h2 class="cmp-heading-title cmp-heading-title--dark">選べる2つの特別エディション ＆ パッケージ</h2>
-					<p class="cmp-band-lead cmp-band-lead--dark">ライフスタイルに合わせて選べる2つの魅力的な仕様をご用意いたしました。</p>
-				</div>
-
-				<!-- 2カラム版：2つの大判写真＋写真下に見出し＋テキスト -->
-				<div class="cmp-feature-grid cmp-feature-grid--2col">
-					<!-- 大判カード 1 -->
-					<div class="cmp-feature-card cmp-feature-card--light">
-						<div class="cmp-feature-card__media cmp-feature-card__media--large">
-							<img src="/uploads/2026/06/1P90515769_highRes_mini-crossover-highl-scaled.jpg" alt="CLASSIC PACKAGE" loading="lazy" />
-						</div>
-						<div class="cmp-feature-card__body">
-							<h3 class="cmp-feature-card__title cmp-feature-card__title--dark">クラシック・パッケージ（都会派エレガンス）</h3>
-							<p class="cmp-feature-card__text cmp-feature-card__text--dark">
-								洗練されたシルバーのコントラストルーフと専用17インチアロイホイールを装備。シンプルながら品格の漂う都会的なエッセンスを凝縮した特別パッケージです。
-							</p>
-							<div class="cmp-feature-card__footer">
-								<a href="#cmp-booking" class="cmp-btn-band-action">装備内容を問い合わせる →</a>
-							</div>
-						</div>
-					</div>
-
-					<!-- 大判カード 2 -->
-					<div class="cmp-feature-card cmp-feature-card--light">
-						<div class="cmp-feature-card__media cmp-feature-card__media--large">
-							<img src="/uploads/2026/05/P90580177_highRes_bmw-m235-xdrive-gran-scaled-e1779344456477.jpg" alt="JCW SPORT PACKAGE" loading="lazy" />
-						</div>
-						<div class="cmp-feature-card__body">
-							<h3 class="cmp-feature-card__title cmp-feature-card__title--dark">JCW スポーツ・パッケージ（ダイナミック性能）</h3>
-							<p class="cmp-feature-card__text cmp-feature-card__text--dark">
-								専用エアロダイナミクス・キット、スポーツサスペンション、パドルシフト付きJCWステアリングを標準装備。レーシングスピリットを日常で解放する最高峰の仕上がり。
-							</p>
-							<div class="cmp-feature-card__footer">
-								<a href="#cmp-booking" class="cmp-btn-band-action">装備内容を問い合わせる →</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
-		<!-- ブロック6: 【中央標準 960px】キャンペーン詳細本文 ＆ FAQ -->
-		<!-- ============================================================== -->
-		<section class="cmp-section cmp-section--standard cmp-article-section">
-			<div class="cmp-container cmp-container--standard">
-				<div class="cmp-section-heading">
-					<h2 class="cmp-heading-title">キャンペーン詳細 ＆ プログラム概要</h2>
-				</div>
-
-				{item.content ? (
+				{parsedContent && Array.isArray(parsedContent) && parsedContent.length > 0 && (
 					<div class="cmp-portable-text prose prose-invert">
-						<PortableText value={item.content} />
-					</div>
-				) : (
-					<div class="cmp-rich-article">
-						<p class="cmp-body-p">
-							Nicole Group各ショールームでは、皆様の日頃のご愛顧に感謝を込め、最新モデルの魅力を存分にご体感いただける特別なキャンペーンを開催いたしております。
-						</p>
-						<p class="cmp-body-p">
-							卓越した走行性能と最新のデジタル・テクノロジーが融合した新世代ラインナップを豊富に取り揃え、お客様一人ひとりのライフスタイルに寄り添うご提案をお届けします。ゆったりとしたプライベート空間で、心ゆくまでご試乗・ご相談をお楽しみください。
-						</p>
+						<RichPortableText value={parsedContent} />
 					</div>
 				)}
-
-				<!-- 写真ギャラリー（ミニマル・ルール準拠） -->
-				<div class="cmp-gallery-slider">
-					<div class="cmp-gallery-main-view">
-						<img 
-							id="cmpGalleryImg" 
-							src={sampleGallery[0].image} 
-							alt="" 
-							class="cmp-gallery-active-img" 
-						/>
-						<span id="cmpGalleryBadge" class="cmp-gallery-counter">1 / {sampleGallery.length}</span>
-					</div>
-					<p id="cmpGalleryCap" class="cmp-gallery-caption">{sampleGallery[0].caption}</p>
-
-					<div class="cmp-gallery-thumbs">
-						{sampleGallery.map((g, idx) => (
-							<button 
-								type="button" 
-								class={`cmp-thumb-btn ${idx === 0 ? 'is-active' : ''}`}
-								data-img={g.image}
-								data-cap={g.caption}
-								data-idx={idx + 1}
-								aria-label={`写真 ${idx + 1}`}
-							>
-								<img src={g.image} alt="" />
-							</button>
-						))}
-					</div>
-				</div>
-
-				<!-- アコーディオンFAQ -->
-				<div class="cmp-faq-block">
-					<div class="cmp-section-heading">
-						<h2 class="cmp-heading-title">よくあるご質問 ＆ ご留意事項</h2>
-					</div>
-
-					<div class="cmp-accordion-list">
-						<details class="cmp-accordion-item" open>
-							<summary class="cmp-accordion-summary">
-								<span>試乗は当日の飛び込みでも可能ですか？</span>
-								<span class="cmp-accordion-icon">＋</span>
-							</summary>
-							<div class="cmp-accordion-body">
-								<p>当日のご案内も可能ですが、フェア期間中は混雑が予想され、ご希望の試乗車が貸出中の場合もございます。Webフォームより事前予約をいただくことで、スムーズにお乗り比べいただけます。</p>
-							</div>
-						</details>
-
-						<details class="cmp-accordion-item">
-							<summary class="cmp-accordion-summary">
-								<span>記念品やプレゼントの受け取り条件はありますか？</span>
-								<span class="cmp-accordion-icon">＋</span>
-							</summary>
-							<div class="cmp-accordion-body">
-								<p>事前Web予約のうえ、対象ショールームにてご試乗・ご商談アンケートにご協力いただいたお客様を対象とさせていただきます。なお、数量限定につき、無くなり次第終了となりますので予めご了承ください。</p>
-							</div>
-						</details>
-
-						<details class="cmp-accordion-item">
-							<summary class="cmp-accordion-summary">
-								<span>他社ブランドの車両に乗っていますが、下取りは可能ですか？</span>
-								<span class="cmp-accordion-icon">＋</span>
-							</summary>
-							<div class="cmp-accordion-body">
-								<p>はい、国産車・輸入車を問わず全メーカーのお車を高価下取り査定させていただきます。車検証をお持ちいただければ、ご試乗の間に迅速に無料査定を実施いたします。</p>
-							</div>
-						</details>
-					</div>
-				</div>
 			</div>
 		</section>
 

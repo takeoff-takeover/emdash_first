@@ -1,0 +1,220 @@
+---
+// src/components/blocks/SplitMediaBlock.astro
+// 左右分割ブロック（比率変更 50:50 / 60:40 / 65:35 / 40:60 ＆ 自動ジグザグ複数段対応）
+interface SplitItem {
+	image?: string;
+	title?: string;
+	text?: string;
+	button_label?: string;
+	button_url?: string;
+	image_position?: string;
+}
+
+const props = Astro.props;
+const data = props.node || props.value || props;
+
+function resolveImg(val: any): string {
+	if (!val) return "";
+	if (typeof val === "object") return val.src || val.url || "";
+	if (typeof val === "string" && val.trim().startsWith("{")) {
+		try { return JSON.parse(val).src || ""; } catch { return ""; }
+	}
+	return String(val).trim();
+}
+
+let rows: SplitItem[] = [];
+if (Array.isArray(data.items) && data.items.length > 0) {
+	rows = data.items
+		.map((it: any) => ({
+			image: resolveImg(it.image),
+			title: (it.title || "").trim(),
+			text: (it.text || "").trim(),
+			button_label: (it.button_label || "").trim(),
+			button_url: (it.button_url || "").trim(),
+		}))
+		.filter((r: SplitItem) => r.image || r.title || r.text);
+} else {
+	const singleImg = resolveImg(data.image);
+	const singleTitle = (data.title || "").trim();
+	const singleText = (data.text || "").trim();
+	if (singleImg || singleTitle || singleText) {
+		rows.push({
+			image: singleImg,
+			title: singleTitle,
+			text: singleText,
+			button_label: (data.button_label || "").trim(),
+			button_url: (data.button_url || "").trim(),
+			image_position: data.image_position,
+		});
+	}
+}
+
+const posMode = data.image_position || "zigzag"; // "zigzag" | "left" | "right"
+const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | "40-60"
+---
+
+{rows.length > 0 && (
+	<section class={`cms-split-list cms-split-list--ratio-${ratioMode}`}>
+		{rows.map((row, idx) => {
+			let isRight = false;
+			if (row.image_position === "right") isRight = true;
+			else if (row.image_position === "left") isRight = false;
+			else if (posMode === "right") isRight = true;
+			else if (posMode === "left") isRight = false;
+			else isRight = idx % 2 === 1; // zigzag: 偶数段=左写真、奇数段=右写真
+
+			return (
+				<div class={`cms-split-card ${isRight ? "is-right" : "is-left"}`}>
+					{row.image && (
+						<div class="cms-split-card__media">
+							<img src={row.image} alt={row.title || ""} loading="lazy" />
+						</div>
+					)}
+					<div class="cms-split-card__content">
+						{row.title && <h3 class="cms-split-card__title">{row.title}</h3>}
+						{row.text && <p class="cms-split-card__desc">{row.text}</p>}
+						{row.button_label && (
+							<div class="cms-split-card__actions">
+								<a href={row.button_url || "#cmp-booking"} class="cms-split-card__btn">
+									{row.button_label}
+								</a>
+							</div>
+						)}
+					</div>
+				</div>
+			);
+		})}
+	</section>
+)}
+
+<style>
+	.cms-split-list {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		margin: 2.25rem 0 3rem 0;
+	}
+	.cms-split-card {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		background: var(--cms-card-bg, rgba(255, 255, 255, 0.04));
+		border: 1px solid var(--cms-card-border, rgba(255, 255, 255, 0.1));
+		border-radius: 14px;
+		overflow: hidden;
+	}
+
+	/* 比率バリエーション（左写真のとき：左=写真 / 右=文章） */
+	.cms-split-list--ratio-50-50 .cms-split-card.is-left {
+		grid-template-columns: 1fr 1fr;
+	}
+	.cms-split-list--ratio-60-40 .cms-split-card.is-left {
+		grid-template-columns: 1.5fr 1fr;
+	}
+	.cms-split-list--ratio-65-35 .cms-split-card.is-left {
+		grid-template-columns: 1.85fr 1fr;
+	}
+	.cms-split-list--ratio-40-60 .cms-split-card.is-left {
+		grid-template-columns: 1fr 1.5fr;
+	}
+
+	/* 比率バリエーション（右写真のとき：左=文章 / 右=写真） */
+	.cms-split-list--ratio-50-50 .cms-split-card.is-right {
+		grid-template-columns: 1fr 1fr;
+	}
+	.cms-split-list--ratio-60-40 .cms-split-card.is-right {
+		grid-template-columns: 1fr 1.5fr;
+	}
+	.cms-split-list--ratio-65-35 .cms-split-card.is-right {
+		grid-template-columns: 1fr 1.85fr;
+	}
+	.cms-split-list--ratio-40-60 .cms-split-card.is-right {
+		grid-template-columns: 1.5fr 1fr;
+	}
+
+	.cms-split-card.is-right .cms-split-card__media {
+		order: 2;
+	}
+	.cms-split-card.is-right .cms-split-card__content {
+		order: 1;
+	}
+
+	.cms-split-card__media {
+		min-height: 280px;
+		aspect-ratio: 16 / 10;
+		background: rgba(128, 128, 128, 0.12);
+		overflow: hidden;
+	}
+	.cms-split-card__media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		display: block;
+		margin: 0 !important;
+	}
+	.cms-split-card__content {
+		padding: 2.25rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	.cms-split-card__title {
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: var(--cms-card-heading, inherit);
+		margin: 0 0 0.875rem 0 !important;
+		line-height: 1.4;
+	}
+	.cms-split-card__desc {
+		font-size: 0.95rem;
+		color: var(--cms-card-text, inherit);
+		opacity: 0.86;
+		line-height: 1.8;
+		margin: 0 !important;
+		white-space: pre-line;
+	}
+	.cms-split-card__actions {
+		margin-top: 1.35rem;
+	}
+	.cms-split-card__btn {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--cms-card-heading, inherit);
+		text-decoration: none !important;
+		padding: 0.65rem 1.25rem;
+		border: 1px solid var(--cms-card-border, rgba(128, 128, 128, 0.35));
+		border-radius: 6px;
+		transition: background 0.15s ease, border-color 0.15s ease;
+	}
+	.cms-split-card__btn:hover {
+		background: rgba(128, 128, 128, 0.12);
+	}
+
+	@media (max-width: 768px) {
+		.cms-split-card,
+		.cms-split-list--ratio-50-50 .cms-split-card.is-left,
+		.cms-split-list--ratio-60-40 .cms-split-card.is-left,
+		.cms-split-list--ratio-65-35 .cms-split-card.is-left,
+		.cms-split-list--ratio-40-60 .cms-split-card.is-left,
+		.cms-split-list--ratio-50-50 .cms-split-card.is-right,
+		.cms-split-list--ratio-60-40 .cms-split-card.is-right,
+		.cms-split-list--ratio-65-35 .cms-split-card.is-right,
+		.cms-split-list--ratio-40-60 .cms-split-card.is-right {
+			grid-template-columns: 1fr;
+		}
+		.cms-split-card.is-right .cms-split-card__media {
+			order: 1;
+		}
+		.cms-split-card.is-right .cms-split-card__content {
+			order: 2;
+		}
+		.cms-split-card__media {
+			min-height: 210px;
+		}
+		.cms-split-card__content {
+			padding: 1.5rem;
+		}
+	}
+</style>

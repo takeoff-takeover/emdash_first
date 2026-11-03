@@ -1,0 +1,248 @@
+---
+// src/components/blocks/ColumnCardsBlock.astro
+// 統合マルチカラム・カードブロック（1〜4列自動調整・＋で何枚でも追加・写真有無自動判別）
+interface CardItem {
+	image?: string;
+	title?: string;
+	text?: string;
+	button_label?: string;
+	button_url?: string;
+}
+
+const props = Astro.props;
+const data = props.node || props.value || props;
+
+function resolveImg(val: any): string {
+	if (!val) return "";
+	if (typeof val === "object") return val.src || val.url || "";
+	if (typeof val === "string" && val.trim().startsWith("{")) {
+		try { return JSON.parse(val).src || ""; } catch { return ""; }
+	}
+	return String(val).trim();
+}
+
+let cards: CardItem[] = [];
+if (Array.isArray(data.items) && data.items.length > 0) {
+	cards = data.items
+		.map((it: any) => ({
+			image: resolveImg(it.image),
+			title: (it.title || "").trim(),
+			text: (it.text || "").trim(),
+			button_label: (it.button_label || "").trim(),
+			button_url: (it.button_url || "").trim(),
+		}))
+		.filter((c: CardItem) => c.image || c.title || c.text);
+} else {
+	// 旧ブロック (card1_*, card2_*, card3_*, card4_*) の後方互換サポート
+	for (let i = 1; i <= 10; i++) {
+		const image = resolveImg(data[`card${i}_image`]);
+		const title = (data[`card${i}_title`] || "").trim();
+		const text = (data[`card${i}_text`] || "").trim();
+		const button_label = (data[`card${i}_button_label`] || "").trim();
+		const button_url = (data[`card${i}_button_url`] || "").trim();
+		if (image || title || text) {
+			cards.push({ image, title, text, button_label, button_url });
+		}
+	}
+}
+
+const rawCols = String(data.columns || "auto");
+let resolvedCols = 3;
+if (rawCols === "2" || rawCols === "3" || rawCols === "4") {
+	resolvedCols = Number(rawCols);
+} else {
+	if (cards.length === 1) resolvedCols = 1;
+	else if (cards.length === 2 || cards.length === 4) resolvedCols = 2;
+	else resolvedCols = 3;
+}
+
+const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
+---
+
+{cards.length > 0 && (
+	<section class={`cms-col-cards cms-col-cards--cols-${resolvedCols} cms-col-cards--style-${cardStyle}`}>
+		<div class="cms-col-cards__grid">
+			{cards.map((c, idx) => (
+				<article class={`cms-col-card ${c.image ? "has-image" : "is-text-only"}`}>
+					{c.image && (
+						<div class="cms-col-card__media">
+							<img src={c.image} alt={c.title || ""} loading="lazy" />
+							{cardStyle === "step" && (
+								<span class="cms-col-card__step-badge is-on-media">
+									{String(idx + 1).padStart(2, "0")}
+								</span>
+							)}
+						</div>
+					)}
+					<div class="cms-col-card__body">
+						{cardStyle === "step" && !c.image && (
+							<span class="cms-col-card__step-badge">
+								{String(idx + 1).padStart(2, "0")}
+							</span>
+						)}
+						{c.title && <h3 class="cms-col-card__title">{c.title}</h3>}
+						{c.text && <p class="cms-col-card__text">{c.text}</p>}
+						{c.button_label && (
+							<div class="cms-col-card__footer">
+								<a href={c.button_url || "#cmp-booking"} class="cms-col-card__btn">
+									{c.button_label}
+								</a>
+							</div>
+						)}
+					</div>
+				</article>
+			))}
+		</div>
+	</section>
+)}
+
+<style>
+	.cms-col-cards {
+		margin: 2rem 0 3rem 0;
+	}
+	.cms-col-cards__grid {
+		display: grid;
+		gap: 1.5rem;
+		align-items: stretch;
+	}
+	.cms-col-cards--cols-1 .cms-col-cards__grid {
+		grid-template-columns: 1fr;
+		max-width: 820px;
+		margin: 0 auto;
+	}
+	.cms-col-cards--cols-2 .cms-col-cards__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.cms-col-cards--cols-3 .cms-col-cards__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+	.cms-col-cards--cols-4 .cms-col-cards__grid {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 1.25rem;
+	}
+
+	.cms-col-card {
+		display: flex;
+		flex-direction: column;
+		border-radius: 12px;
+		overflow: hidden;
+		background: var(--cms-card-bg, rgba(255, 255, 255, 0.04));
+		border: 1px solid var(--cms-card-border, rgba(255, 255, 255, 0.1));
+		transition: transform 0.2s ease, border-color 0.2s ease;
+	}
+	.cms-col-cards--style-flat .cms-col-card {
+		background: transparent;
+		border: none;
+		border-radius: 0;
+	}
+	.cms-col-cards--style-flat .cms-col-card__media {
+		border-radius: 10px;
+		overflow: hidden;
+	}
+	.cms-col-cards--style-flat .cms-col-card__body {
+		padding: 1.25rem 0.25rem 0.5rem 0.25rem;
+	}
+
+	/* どんな縦横比の写真でも自動で高さをピシッと揃える 16:10 ロック */
+	.cms-col-card__media {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		background: rgba(128, 128, 128, 0.12);
+		overflow: hidden;
+		flex-shrink: 0;
+	}
+	.cms-col-card__media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		display: block;
+		margin: 0 !important;
+	}
+
+	.cms-col-card__body {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
+	.cms-col-card__step-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 6px;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.78rem;
+		font-weight: 700;
+		background: var(--cms-step-bg, rgba(255, 255, 255, 0.12));
+		color: var(--cms-card-heading, inherit);
+		margin-bottom: 0.75rem;
+	}
+	.cms-col-card__step-badge.is-on-media {
+		position: absolute;
+		top: 0.75rem;
+		left: 0.75rem;
+		margin-bottom: 0;
+		background: rgba(0, 0, 0, 0.75);
+		color: #ffffff;
+		backdrop-filter: blur(4px);
+	}
+
+	.cms-col-card__title {
+		font-size: 1.15rem;
+		font-weight: 700;
+		line-height: 1.45;
+		margin: 0 0 0.65rem 0 !important;
+		color: var(--cms-card-heading, inherit);
+	}
+	.cms-col-card__text {
+		font-size: 0.925rem;
+		line-height: 1.75;
+		margin: 0 !important;
+		color: var(--cms-card-text, inherit);
+		opacity: 0.86;
+		white-space: pre-line;
+		flex: 1;
+	}
+	.cms-col-card__footer {
+		margin-top: 1.25rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid var(--cms-card-border, rgba(128, 128, 128, 0.2));
+	}
+	.cms-col-card__btn {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--cms-card-heading, inherit);
+		text-decoration: none !important;
+		transition: opacity 0.15s ease;
+	}
+	.cms-col-card__btn:hover {
+		opacity: 0.75;
+	}
+
+	@media (max-width: 1024px) {
+		.cms-col-cards--cols-4 .cms-col-cards__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.cms-col-cards--cols-3 .cms-col-cards__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 640px) {
+		.cms-col-cards--cols-2 .cms-col-cards__grid,
+		.cms-col-cards--cols-3 .cms-col-cards__grid,
+		.cms-col-cards--cols-4 .cms-col-cards__grid {
+			grid-template-columns: 1fr;
+			gap: 1.15rem;
+		}
+		.cms-col-card__body {
+			padding: 1.25rem;
+		}
+	}
+</style>

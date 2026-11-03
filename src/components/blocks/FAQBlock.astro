@@ -22,17 +22,12 @@ interface Props {
 
 const { node } = Astro.props;
 
-// 大見出し（titleまたはid、未指定時は「よくある質問」）
-const rawTitle = (node.title || node.id || "よくある質問").trim();
-// 見出し先頭の数字や記号（"1. ", "2. ", "【FAQ】"等）を除去してスマートに表示
+// 大見出し（通常のビジュアルエディタでH2を書く運用に合わせ、titleが明示指定されている場合のみ表示）
+const rawTitle = (node.title || "").trim();
 const mainTitle = rawTitle.replace(/^\d+[\.．\s]+/, "").replace(/^[【\[].*?[】\]]\s*/, "");
-const headingText = mainTitle || "よくある質問";
+const headingText = mainTitle;
 
-const contentRaw = node.content || "";
-const lines = contentRaw
-	.split("\n")
-	.map((l: string) => l.trim())
-	.filter((l: string) => l.length > 0);
+const isSimple = node.style === "simple" || node._type === "accordion";
 
 interface FAQItem {
 	qNum: string;
@@ -42,72 +37,94 @@ interface FAQItem {
 }
 
 const items: FAQItem[] = [];
-let currentQ = { num: "", text: "" };
-let currentA = { num: "", text: "" };
 
-for (const line of lines) {
-	// Q1: / Q: / 質問1: 等のマッチング
-	const qMatch = line.match(/^(?:Q(\d*)[:：]|質問(\d*)[:：])\s*(.*)$/i);
-	const aMatch = line.match(/^(?:A(\d*)[:：]|回答(\d*)[:：])\s*(.*)$/i);
-
-	if (qMatch) {
-		if (currentQ.text) {
+if (Array.isArray(node.items) && node.items.length > 0) {
+	node.items.forEach((it: any) => {
+		const q = String(it?.question || it?.title || "").trim();
+		const a = String(it?.answer || it?.content || "").trim();
+		if (q || a) {
 			items.push({
-				qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
-				question: currentQ.text,
-				aNum: currentA.num ? `A${currentA.num}` : "A",
-				answer: currentA.text
+				qNum: "Q",
+				question: q,
+				aNum: "A",
+				answer: a,
 			});
-			currentQ = { num: "", text: "" };
-			currentA = { num: "", text: "" };
 		}
-		const num = qMatch[1] || qMatch[2] || "";
-		currentQ = { num, text: qMatch[3].trim() };
-	} else if (aMatch) {
-		const num = aMatch[1] || aMatch[2] || "";
-		currentA = { num, text: aMatch[3].trim() };
-	} else {
-		if (currentA.text) {
-			currentA.text += "\n" + line;
-		} else if (currentQ.text) {
-			currentQ.text += " " + line;
+	});
+}
+
+if (items.length === 0) {
+	const contentRaw = node.content || "";
+	const lines = contentRaw
+		.split("\n")
+		.map((l: string) => l.trim())
+		.filter((l: string) => l.length > 0);
+
+	let currentQ = { num: "", text: "" };
+	let currentA = { num: "", text: "" };
+
+	for (const line of lines) {
+		const qMatch = line.match(/^(?:Q(\d*)[:：]|質問(\d*)[:：])\s*(.*)$/i);
+		const aMatch = line.match(/^(?:A(\d*)[:：]|回答(\d*)[:：])\s*(.*)$/i);
+
+		if (qMatch) {
+			if (currentQ.text) {
+				items.push({
+					qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
+					question: currentQ.text,
+					aNum: currentA.num ? `A${currentA.num}` : "A",
+					answer: currentA.text
+				});
+				currentQ = { num: "", text: "" };
+				currentA = { num: "", text: "" };
+			}
+			const num = qMatch[1] || qMatch[2] || "";
+			currentQ = { num, text: qMatch[3].trim() };
+		} else if (aMatch) {
+			const num = aMatch[1] || aMatch[2] || "";
+			currentA = { num, text: aMatch[3].trim() };
+		} else {
+			if (currentA.text) {
+				currentA.text += "\n" + line;
+			} else if (currentQ.text) {
+				currentQ.text += " " + line;
+			}
 		}
 	}
-}
 
-if (currentQ.text) {
-	items.push({
-		qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
-		question: currentQ.text,
-		aNum: currentA.num ? `A${currentA.num}` : "A",
-		answer: currentA.text
-	});
-}
+	if (currentQ.text) {
+		items.push({
+			qNum: currentQ.num ? `Q${currentQ.num}` : "Q",
+			question: currentQ.text,
+			aNum: currentA.num ? `A${currentA.num}` : "A",
+			answer: currentA.text
+		});
+	}
 
-// Q&Aのパースが取れなかった場合のフォールバック（行を2分割または全体表示）
-if (items.length === 0 && lines.length > 0) {
-	items.push({
-		qNum: "Q",
-		question: lines[0],
-		aNum: "A",
-		answer: lines.slice(1).join("\n") || lines[0]
-	});
+	if (items.length === 0 && lines.length > 0) {
+		items.push({
+			qNum: "Q",
+			question: node.id || lines[0],
+			aNum: "A",
+			answer: node.id ? lines.join("\n") : (lines.slice(1).join("\n") || lines[0])
+		});
+	}
 }
 
 const blockId = `faq-${node._key || Math.random().toString(36).slice(2, 9)}`;
 ---
 
-<section class="cms-faq-widget" id={blockId}>
-	<!-- 1. 一つの大きな見出し -->
-	<h2 class="faq-widget-heading">{headingText}</h2>
+<section class={`cms-faq-widget ${isSimple ? "is-simple" : "is-qa"}`} id={blockId}>
+	{headingText && (
+		<h2 class="faq-widget-heading">{headingText}</h2>
+	)}
 
-	<!-- 2. Qを常時表示し、Aをアコーディオンとするリスト -->
 	<div class="faq-accordion-list">
 		{items.map((item, idx) => (
 			<details class="faq-item" id={`${blockId}-item-${idx}`}>
 				<summary class="faq-item-summary">
 					<div class="faq-q-line">
-						<span class="faq-q-badge">{item.qNum}</span>
+						{!isSimple && <span class="faq-q-badge">{item.qNum}</span>}
 						<span class="faq-q-text">{item.question}</span>
 					</div>
 					<span class="faq-toggle-icon" aria-hidden="true">
@@ -123,7 +140,7 @@ const blockId = `faq-${node._key || Math.random().toString(36).slice(2, 9)}`;
 
 				<div class="faq-item-body">
 					<div class="faq-a-line">
-						<span class="faq-a-badge">{item.aNum}</span>
+						{!isSimple && <span class="faq-a-badge">{item.aNum}</span>}
 						<div class="faq-a-content">
 							{item.answer.split("\n").map((para) => (
 								<p>{para}</p>

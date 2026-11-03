@@ -771,7 +771,7 @@ const placeData = await getGooglePlaceReviews({
 						<!-- アクセスルート詳細（アコーディオン） -->
 						<div class="access-accordion-list" role="region" aria-label="アクセス方法一覧">
 							<!-- 1. お車でお越しの方 -->
-							{(d.access_car || d.access_car_tokyo || d.access_car_yokohama) && (
+							{d.access_car && (
 								<details class="access-acc-item" open>
 									<summary class="access-acc-header">
 										<div class="access-acc-title-group">
@@ -781,31 +781,14 @@ const placeData = await getGooglePlaceReviews({
 										<svg class="access-acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
 									</summary>
 									<div class="access-acc-body">
-										{d.access_car ? (
-											<div class="route-item">
-												<span class="route-tag">お車でのアクセスルート</span>
-												<div class="route-text">
-													{d.access_car.split('\n').map((line: string) => (
-														<p>{line}</p>
-													))}
-												</div>
-											</div>
-										) : (
-											<>
-												{d.access_car_tokyo && (
-													<div class="route-item">
-														<span class="route-tag">東京・主要方面より</span>
-														<p>{d.access_car_tokyo}</p>
-													</div>
-												)}
-												{d.access_car_yokohama && (
-													<div class="route-item">
-														<span class="route-tag">横浜・近隣方面より</span>
-														<p>{d.access_car_yokohama}</p>
-													</div>
-												)}
-											</>
-										)}
+									<div class="route-item">
+										<span class="route-tag">お車でのアクセスルート</span>
+										<div class="route-text">
+											{d.access_car.split('\n').map((line: string) => (
+												<p>{line}</p>
+											))}
+										</div>
+									</div>
 									</div>
 								</details>
 							)}

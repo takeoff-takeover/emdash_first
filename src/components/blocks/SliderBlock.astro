@@ -43,35 +43,62 @@ const captionList = captionsRaw
 	.map((c: string) => c.trim());
 
 const allImages: Array<{ image: string; caption: string }> = [];
-if (mainImg && (mainImg.startsWith("http://") || mainImg.startsWith("https://") || mainImg.startsWith("/"))) {
-	allImages.push({
-		image: mainImg,
-		caption: captionList[0] || (node.caption && !node.captions ? node.caption : "")
+if (Array.isArray(node.items) && node.items.length > 0) {
+	node.items.forEach((it: any) => {
+		const rawImg = typeof it?.image === "object" ? (it.image?.src || it.image?.url || "") : String(it?.image || "").trim();
+		if (rawImg && (rawImg.startsWith("http://") || rawImg.startsWith("https://") || rawImg.startsWith("/"))) {
+			allImages.push({
+				image: rawImg,
+				caption: String(it?.caption || "").trim(),
+			});
+		}
 	});
 }
-slotImages.forEach((url: string) => {
-	if (!allImages.some(img => img.image === url)) {
-		const capIdx = allImages.length;
+if (allImages.length === 0) {
+	if (mainImg && (mainImg.startsWith("http://") || mainImg.startsWith("https://") || mainImg.startsWith("/"))) {
 		allImages.push({
-			image: url,
-			caption: captionList[capIdx] || ""
+			image: mainImg,
+			caption: captionList[0] || (node.caption && !node.captions ? node.caption : "")
 		});
 	}
-});
-extraImgs.forEach((url: string) => {
-	if (!allImages.some(img => img.image === url)) {
-		const capIdx = allImages.length;
-		allImages.push({
-			image: url,
-			caption: captionList[capIdx] || ""
-		});
-	}
-});
+	slotImages.forEach((url: string) => {
+		if (!allImages.some(img => img.image === url)) {
+			const capIdx = allImages.length;
+			allImages.push({
+				image: url,
+				caption: captionList[capIdx] || ""
+			});
+		}
+	});
+	extraImgs.forEach((url: string) => {
+		if (!allImages.some(img => img.image === url)) {
+			const capIdx = allImages.length;
+			allImages.push({
+				image: url,
+				caption: captionList[capIdx] || ""
+			});
+		}
+	});
+}
 
+const galleryStyle = node.gallery_style || "filmstrip";
 const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 ---
 
-{allImages.length > 0 && (
+{allImages.length > 0 && galleryStyle === "grid" && (
+	<div class="cms-photo-grid">
+		{allImages.map((item, idx) => (
+			<figure class="cms-photo-grid__item">
+				<div class="cms-photo-grid__media">
+					<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading="lazy" />
+				</div>
+				{item.caption && <figcaption class="cms-photo-grid__caption">{item.caption}</figcaption>}
+			</figure>
+		))}
+	</div>
+)}
+
+{allImages.length > 0 && galleryStyle !== "grid" && (
 	<div class="cms-filmstrip-gallery" id={blockId}>
 		<!-- メインビューポート -->
 		<div class="filmstrip-viewport">
@@ -115,6 +142,39 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 )}
 
 <style>
+	.cms-photo-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1.25rem;
+		margin: 2.5rem 0;
+	}
+	.cms-photo-grid__item {
+		margin: 0 !important;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.cms-photo-grid__media {
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		border-radius: 10px;
+		background: rgba(128, 128, 128, 0.12);
+	}
+	.cms-photo-grid__media img {
+		width: 100% !important;
+		height: 100% !important;
+		object-fit: cover !important;
+		margin: 0 !important;
+		display: block !important;
+	}
+	.cms-photo-grid__caption {
+		font-size: 0.8125rem;
+		color: var(--cms-card-text, #a1a1aa);
+		opacity: 0.85;
+		line-height: 1.5;
+	}
+
 	.cms-filmstrip-gallery {
 		margin: 2.5rem 0;
 		background: transparent;

@@ -7,6 +7,16 @@ import { getEmDashCollection } from "emdash";
 import { geocodeAddress } from "../utils/geocode";
 import { protectPhrases, formatLocationNameHtml } from "../utils/locationHelper";
 
+// 管理画面の画像フィールドは {src, alt} 形式で保存されるため、文字列パスと両方に対応
+const imgSrc = (v: any): string => {
+	if (!v) return "";
+	if (typeof v === "object") return v.src || "";
+	if (typeof v === "string" && v.trim().startsWith("{")) {
+		try { return JSON.parse(v).src || ""; } catch { return ""; }
+	}
+	return v;
+};
+
 // 1. EmDash 公式APIから全拠点データを直接取得（一本化）
 let emdashEntries: any[] = [];
 try {
@@ -82,7 +92,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				postal: row.postal || "〒215-0023",
 				address: addr,
 				tel: row.sales_tel || row.tel || "044-959-1400",
-				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				image: imgSrc(row.featured_image) || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
 				lat: lat || 35.6025,
 				lng: lng || 139.4975,
 				detailUrl: '/location/nicole-bmw-shinyurigaoka',
@@ -100,7 +110,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				postal: row.postal || "〒215-0023",
 				address: addr,
 				tel: row.used_tel || "044-396-0180",
-				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				image: imgSrc(row.featured_image) || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
 				lat: lat || 35.6025,
 				lng: lng || 139.4975,
 				detailUrl: '/location/nicole-bmw-shinyurigaoka', // 詳細は共通の総合ページへ！
@@ -124,7 +134,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				postal: row.postal || "〒215-0023",
 				address: addr,
 				tel: row.sales_tel || row.tel || "044-959-3032",
-				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				image: imgSrc(row.featured_image) || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
 				lat: lat || 35.6025,
 				lng: lng || 139.4975,
 				detailUrl: '/location/mini-shinyurigaoka',
@@ -142,7 +152,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				postal: row.postal || "〒215-0023",
 				address: addr,
 				tel: row.used_tel || "044-396-0180",
-				image: row.featured_image || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
+				image: imgSrc(row.featured_image) || "/uploads/2026/02/BMW_MINI_BPS_MININEXT新百合ヶ丘2025-1-1024x682.jpg",
 				lat: lat || 35.6025,
 				lng: lng || 139.4975,
 				detailUrl: '/location/mini-shinyurigaoka', // 詳細は共通の総合ページへ！
@@ -163,7 +173,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 		postal: row.postal || "",
 		address: addr,
 		tel: row.tel || row.sales_tel || "",
-		image: row.featured_image || "/uploads/2026/01/Nicole-BMW-本社.jpg",
+		image: imgSrc(row.featured_image) || "/uploads/2026/01/Nicole-BMW-本社.jpg",
 		lat: lat || 35.54589,
 		lng: lng || 139.69708,
 		detailUrl: isOffice ? "" : `/location/${entry.id || row.slug}`,

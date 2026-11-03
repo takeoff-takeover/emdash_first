@@ -1,0 +1,95 @@
+---
+// src/components/blocks/BenefitCards3ColBlock.astro
+// 3カラム特典・プログラムカードブロック（見出し＋3枚のテキストカード）
+interface Props {
+	value?: {
+		heading?: string;
+		card1_title?: string;
+		card1_text?: string;
+		card2_title?: string;
+		card2_text?: string;
+		card3_title?: string;
+		card3_text?: string;
+	};
+	heading?: string;
+	card1_title?: string;
+	card1_text?: string;
+	card2_title?: string;
+	card2_text?: string;
+	card3_title?: string;
+	card3_text?: string;
+}
+
+const props = Astro.props;
+const data = props.node || props.value || props;
+const heading = data.heading || "";
+const cards = [
+	{ title: data.card1_title, text: data.card1_text },
+	{ title: data.card2_title, text: data.card2_text },
+	{ title: data.card3_title, text: data.card3_text },
+].filter((c) => c.title || c.text);
+---
+
+{cards.length > 0 && (
+	<section class="cmp-block-benefits">
+		{heading && (
+			<div class="cmp-block-heading">
+				<h2 class="cmp-block-heading__title">{heading}</h2>
+			</div>
+		)}
+		<div class="cmp-block-benefits__grid">
+			{cards.map((c) => (
+				<div class="cmp-block-benefit-card">
+					{c.title && <h3 class="cmp-block-benefit-card__title">{c.title}</h3>}
+					{c.text && <p class="cmp-block-benefit-card__text">{c.text}</p>}
+				</div>
+			))}
+		</div>
+	</section>
+)}
+
+<style>
+	.cmp-block-benefits {
+		margin: 3.5rem 0;
+	}
+	.cmp-block-heading {
+		margin-bottom: 1.75rem;
+	}
+	.cmp-block-heading__title {
+		font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		line-height: 1.35;
+		margin: 0;
+	}
+	.cmp-block-benefits__grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.25rem;
+	}
+	.cmp-block-benefit-card {
+		background: #141417;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 1.75rem;
+	}
+	.cmp-block-benefit-card__title {
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 0.75rem 0;
+		line-height: 1.4;
+	}
+	.cmp-block-benefit-card__text {
+		font-size: 0.9375rem;
+		color: #b4b4bc;
+		line-height: 1.75;
+		margin: 0;
+	}
+	@media (max-width: 900px) {
+		.cmp-block-benefits__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

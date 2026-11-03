@@ -1,0 +1,177 @@
+---
+// src/components/blocks/FeatureBand2ColBlock.astro
+// 全幅帯 × 2カラム大判写真カードブロック（写真＋見出し＋説明文＋任意ボタン、背景色ライト/ダーク選択可）
+interface Props {
+	value?: Record<string, any>;
+	[key: string]: any;
+}
+
+const props = Astro.props;
+const data = props.node || props.value || props;
+
+function resolveImg(val: any): string {
+	if (!val) return "";
+	if (typeof val === "object") return val.src || val.url || "";
+	if (typeof val === "string" && val.trim().startsWith("{")) {
+		try { return JSON.parse(val).src || ""; } catch { return ""; }
+	}
+	return String(val);
+}
+
+const isDark = data.theme === "dark";
+const cards = [1, 2]
+	.map((i) => ({
+		image: resolveImg(data[`card${i}_image`]),
+		title: data[`card${i}_title`] || "",
+		text: data[`card${i}_text`] || "",
+		btnLabel: data[`card${i}_button_label`] || "",
+		btnUrl: data[`card${i}_button_url`] || "#cmp-booking",
+	}))
+	.filter((c) => c.image || c.title || c.text);
+---
+
+{cards.length > 0 && (
+	<section class={`cmp-band2-block ${isDark ? "is-dark" : "is-light"}`}>
+		<div class="cmp-band2-block__inner">
+			{(data.heading || data.lead) && (
+				<div class="cmp-band2-block__header">
+					{data.heading && <h2 class="cmp-band2-block__heading">{data.heading}</h2>}
+					{data.lead && <p class="cmp-band2-block__lead">{data.lead}</p>}
+				</div>
+			)}
+			<div class="cmp-band2-block__grid">
+				{cards.map((c) => (
+					<div class="cmp-band2-card">
+						{c.image && (
+							<div class="cmp-band2-card__media">
+								<img src={c.image} alt={c.title} loading="lazy" />
+							</div>
+						)}
+						<div class="cmp-band2-card__body">
+							{c.title && <h3 class="cmp-band2-card__title">{c.title}</h3>}
+							{c.text && <p class="cmp-band2-card__text">{c.text}</p>}
+							{c.btnLabel && (
+								<div class="cmp-band2-card__footer">
+									<a href={c.btnUrl} class="cmp-band2-card__btn">{c.btnLabel}</a>
+								</div>
+							)}
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+)}
+
+<style>
+	.cmp-band2-block {
+		width: 100vw;
+		position: relative;
+		left: 50%;
+		right: 50%;
+		margin-left: -50vw;
+		margin-right: -50vw;
+		margin-top: 3.5rem;
+		margin-bottom: 3.5rem;
+		padding: 4.5rem 1.5rem;
+	}
+	.cmp-band2-block.is-light {
+		background: #f4f4f6;
+		color: #111113;
+	}
+	.cmp-band2-block.is-dark {
+		background: #121215;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+	}
+	.cmp-band2-block__inner {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+	.cmp-band2-block__header {
+		margin-bottom: 2.25rem;
+	}
+	.cmp-band2-block__heading {
+		font-size: clamp(1.4rem, 2.5vw, 1.95rem);
+		font-weight: 700;
+		margin: 0 0 0.6rem 0;
+		line-height: 1.35;
+		color: inherit;
+	}
+	.cmp-band2-block__lead {
+		font-size: 0.975rem;
+		opacity: 0.78;
+		margin: 0;
+		line-height: 1.7;
+	}
+	.cmp-band2-block__grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.75rem;
+	}
+	.cmp-band2-card {
+		border-radius: 14px;
+		overflow: hidden;
+		background: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		display: flex;
+		flex-direction: column;
+	}
+	.cmp-band2-block.is-dark .cmp-band2-card {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	.cmp-band2-card__media {
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: #0d0d0f;
+	}
+	.cmp-band2-card__media img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.cmp-band2-card__body {
+		padding: 1.75rem;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+	.cmp-band2-card__title {
+		font-size: 1.2rem;
+		font-weight: 700;
+		margin: 0 0 0.7rem 0;
+		line-height: 1.4;
+		color: inherit;
+	}
+	.cmp-band2-card__text {
+		font-size: 0.95rem;
+		line-height: 1.75;
+		opacity: 0.82;
+		margin: 0;
+		flex: 1;
+	}
+	.cmp-band2-card__footer {
+		margin-top: 1.25rem;
+	}
+	.cmp-band2-card__btn {
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: inherit;
+		text-decoration: none;
+		padding-bottom: 2px;
+		border-bottom: 1px solid currentColor;
+	}
+	@media (max-width: 860px) {
+		.cmp-band2-block {
+			padding: 3rem 1.25rem;
+		}
+		.cmp-band2-block__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

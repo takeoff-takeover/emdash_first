@@ -6,22 +6,8 @@ import { PortableText } from "emdash/ui";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
-import SliderBlock from "../../components/blocks/SliderBlock.astro";
-import AccordionBlock from "../../components/blocks/AccordionBlock.astro";
-import FAQBlock from "../../components/blocks/FAQBlock.astro";
-import NotesBlock from "../../components/blocks/NotesBlock.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import "../../styles/prose.css";
-
-const portableTextComponents = {
-	type: {
-		slider: SliderBlock,
-		accordion: AccordionBlock,
-		faq: FAQBlock,
-		accordion_faq: FAQBlock,
-		notes: NotesBlock,
-		annotation: NotesBlock,
-	},
-};
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -1347,7 +1333,7 @@ const editUrl = postDbId
 				<div class="article-main-col">
 					<!-- 本文（Portable Text） -->
 				<div class="article-rich-text prose prose-invert">
-					<PortableText value={articleContent} components={portableTextComponents} />
+					<RichPortableText value={articleContent} />
 				</div>
 
 				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->

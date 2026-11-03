@@ -33,6 +33,20 @@ const injectedCode = `
 		<script is:inline>
 			${MARKER}
 			(() => {
+				function checkLocalAutoLogin() {
+					if (
+						(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+						window.location.pathname.startsWith('/_emdash/admin/login')
+					) {
+						const params = new URLSearchParams(window.location.search);
+						const redirect = params.get('redirect') || '/_emdash/admin';
+						window.location.replace('/_emdash/api/auth/dev-bypass?redirect=' + encodeURIComponent(redirect));
+						return true;
+					}
+					return false;
+				}
+				if (checkLocalAutoLogin()) return;
+
 				const SECTION_CONFIG = [
 					{
 						id: 'sec-basic',
@@ -125,12 +139,11 @@ const injectedCode = `
 					// 既にセレクターが配置済みで正常動作中なら再生成しない
 					const existingSelector = document.getElementById('emdash-badges-selector-wrap');
 
-					const allLabels = Array.from(document.querySelectorAll('label, p, span, div'));
+					// 「【基本情報】取扱サービス」ラベル本体だけを対象にする（親要素や他項目の「取扱サービス」を含む文言に誤マッチさせない）
+					const allLabels = Array.from(document.querySelectorAll('label, p, span'));
 					const badgesLabelEl = allLabels.find(el =>
-						el.textContent && (
-							el.textContent.includes('取扱サービス') ||
-							el.textContent.includes('badges')
-						)
+						el.children.length === 0 && el.textContent &&
+						el.textContent.includes('【基本情報】') && el.textContent.includes('取扱サービス')
 					);
 					if (!badgesLabelEl) return;
 
@@ -156,8 +169,8 @@ const injectedCode = `
 						selectorWrap.style.cssText = \`
 							margin-top: 10px;
 							padding: 14px 16px;
-							background: #141517;
-							border: 1px solid #27272a;
+							background: var(--color-kumo-base);
+							border: 1px solid var(--color-kumo-line);
 							border-radius: 8px;
 							display: flex;
 							flex-direction: column;
@@ -167,8 +180,8 @@ const injectedCode = `
 						input.style.display = 'none'; // テキストボックスは隠してセレクターで操作
 
 						const guideText = document.createElement('div');
-						guideText.style.cssText = 'font-size: 12px; color: #a1a1aa; margin-bottom: 2px;';
-						guideText.textContent = '※該当する項目をクリックしてください（複数選択可。白背景が選択中）';
+						guideText.style.cssText = 'font-size: 12px; color: var(--text-color-kumo-subtle); margin-bottom: 2px;';
+						guideText.textContent = '※該当する項目をクリックしてください（複数選択可）';
 						selectorWrap.appendChild(guideText);
 
 						// グループごとにピルを描画
@@ -178,7 +191,7 @@ const injectedCode = `
 
 							const groupTitle = document.createElement('div');
 							groupTitle.textContent = grp.group;
-							groupTitle.style.cssText = 'font-size: 11px; font-weight: 700; color: #71717a; letter-spacing: 0.05em; text-transform: uppercase;';
+							groupTitle.style.cssText = 'font-size: 11px; font-weight: 700; color: var(--text-color-kumo-subtle); letter-spacing: 0.05em; text-transform: uppercase;';
 							groupRow.appendChild(groupTitle);
 
 							const pillsWrap = document.createElement('div');
@@ -196,9 +209,9 @@ const injectedCode = `
 									border-radius: 4px;
 									cursor: pointer;
 									transition: all 0.15s ease;
-									border: 1px solid #3f3f46;
-									background: #18181b;
-									color: #a1a1aa;
+									border: 1px solid var(--color-kumo-line);
+									background: var(--color-kumo-elevated);
+									color: var(--text-color-kumo-subtle);
 								\`;
 
 								pill.onclick = (e) => {
@@ -236,14 +249,14 @@ const injectedCode = `
 						const label = btn.getAttribute('data-badge-option');
 						const isSelected = values.includes(label);
 						if (isSelected) {
-							btn.style.background = '#ffffff';
-							btn.style.borderColor = '#ffffff';
-							btn.style.color = '#000000';
+							btn.style.background = 'var(--color-kumo-contrast)';
+							btn.style.borderColor = 'var(--color-kumo-contrast)';
+							btn.style.color = 'var(--color-kumo-base)';
 							btn.style.fontWeight = '700';
 						} else {
-							btn.style.background = '#18181b';
-							btn.style.borderColor = '#3f3f46';
-							btn.style.color = '#a1a1aa';
+							btn.style.background = 'var(--color-kumo-elevated)';
+							btn.style.borderColor = 'var(--color-kumo-line)';
+							btn.style.color = 'var(--text-color-kumo-subtle)';
 							btn.style.fontWeight = '500';
 						}
 					});
@@ -325,15 +338,15 @@ const injectedCode = `
 							justify-content: space-between;
 							margin-bottom: 20px;
 							padding: 10px 16px;
-							background: #141517;
-							border: 1px solid #27272a;
+							background: var(--color-kumo-base);
+							border: 1px solid var(--color-kumo-line);
 							border-radius: 8px;
 							gap: 12px;
 						\`;
 
 						const infoText = document.createElement('span');
-						infoText.style.cssText = 'font-size: 13px; color: #a1a1aa; font-weight: 500;';
-						infoText.innerHTML = '<span style="color: #ffffff; font-weight: 700;">拠点詳細設定</span>（クリックで各セクションを開閉できます）';
+						infoText.style.cssText = 'font-size: 13px; color: var(--text-color-kumo-subtle); font-weight: 500;';
+						infoText.innerHTML = '<span style="color: var(--text-color-kumo-default); font-weight: 700;">拠点詳細設定</span>（クリックで各セクションを開閉できます）';
 
 						const btnGroup = document.createElement('div');
 						btnGroup.style.cssText = 'display: flex; gap: 8px;';
@@ -345,15 +358,15 @@ const injectedCode = `
 							padding: 5px 12px;
 							font-size: 12px;
 							font-weight: 600;
-							color: #ffffff;
-							background: #27272a;
-							border: 1px solid #3f3f46;
+							color: var(--text-color-kumo-default);
+							background: var(--color-kumo-tint);
+							border: 1px solid var(--color-kumo-line);
 							border-radius: 4px;
 							cursor: pointer;
 							transition: background 0.15s ease;
 						\`;
-						expandAllBtn.onmouseenter = () => { expandAllBtn.style.background = '#3f3f46'; };
-						expandAllBtn.onmouseleave = () => { expandAllBtn.style.background = '#27272a'; };
+						expandAllBtn.onmouseenter = () => { expandAllBtn.style.background = 'var(--color-kumo-line)'; };
+						expandAllBtn.onmouseleave = () => { expandAllBtn.style.background = 'var(--color-kumo-tint)'; };
 						expandAllBtn.onclick = (e) => {
 							e.preventDefault();
 							SECTION_CONFIG.forEach(s => { openState[s.id] = true; });
@@ -367,20 +380,20 @@ const injectedCode = `
 							padding: 5px 12px;
 							font-size: 12px;
 							font-weight: 600;
-							color: #a1a1aa;
+							color: var(--text-color-kumo-subtle);
 							background: transparent;
-							border: 1px solid #3f3f46;
+							border: 1px solid var(--color-kumo-line);
 							border-radius: 4px;
 							cursor: pointer;
 							transition: all 0.15s ease;
 						\`;
 						collapseAllBtn.onmouseenter = () => {
-							collapseAllBtn.style.background = '#27272a';
-							collapseAllBtn.style.color = '#ffffff';
+							collapseAllBtn.style.background = 'var(--color-kumo-tint)';
+							collapseAllBtn.style.color = 'var(--text-color-kumo-default)';
 						};
 						collapseAllBtn.onmouseleave = () => {
 							collapseAllBtn.style.background = 'transparent';
-							collapseAllBtn.style.color = '#a1a1aa';
+							collapseAllBtn.style.color = 'var(--text-color-kumo-subtle)';
 						};
 						collapseAllBtn.onclick = (e) => {
 							e.preventDefault();
@@ -411,9 +424,9 @@ const injectedCode = `
 								margin-top: 18px;
 								margin-bottom: 12px;
 								padding: 12px 18px;
-								background: #18181b;
-								border: 1px solid #27272a;
-								border-left: 4px solid #ffffff;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
+								border-left: 4px solid var(--text-color-kumo-default);
 								border-radius: 6px;
 								cursor: pointer;
 								display: flex;
@@ -423,8 +436,8 @@ const injectedCode = `
 								transition: background 0.15s ease, border-color 0.15s ease;
 							\`;
 
-							header.onmouseenter = () => { header.style.background = '#222327'; };
-							header.onmouseleave = () => { header.style.background = '#18181b'; };
+							header.onmouseenter = () => { header.style.background = 'var(--color-kumo-tint)'; };
+							header.onmouseleave = () => { header.style.background = 'var(--color-kumo-elevated)'; };
 
 							header.onclick = (e) => {
 								e.preventDefault();
@@ -437,12 +450,12 @@ const injectedCode = `
 
 							const h3 = document.createElement('div');
 							h3.className = 'acc-title-text';
-							h3.style.cssText = 'font-size: 15px; font-weight: 700; color: #ffffff; letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px;';
+							h3.style.cssText = 'font-size: 15px; font-weight: 700; color: var(--text-color-kumo-default); letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px;';
 
 							const p = document.createElement('div');
 							p.className = 'acc-desc-text';
 							p.textContent = sec.desc;
-							p.style.cssText = 'margin: 4px 0 0 0; font-size: 12px; color: #a1a1aa; line-height: 1.4;';
+							p.style.cssText = 'margin: 4px 0 0 0; font-size: 12px; color: var(--text-color-kumo-subtle); line-height: 1.4;';
 
 							leftDiv.appendChild(h3);
 							leftDiv.appendChild(p);
@@ -453,11 +466,11 @@ const injectedCode = `
 							const countBadge = document.createElement('span');
 							countBadge.className = 'acc-badge';
 							countBadge.textContent = \`\${fields.length}項目\`;
-							countBadge.style.cssText = 'font-size: 11px; background: #27272a; color: #d4d4d8; padding: 2px 8px; border-radius: 9999px; border: 1px solid #3f3f46;';
+							countBadge.style.cssText = 'font-size: 11px; background: var(--color-kumo-tint); color: var(--text-color-kumo-default); padding: 2px 8px; border-radius: 9999px; border: 1px solid var(--color-kumo-line);';
 
 							const arrow = document.createElement('span');
 							arrow.className = 'acc-arrow';
-							arrow.style.cssText = 'font-size: 12px; font-weight: 600; color: #ffffff; transition: transform 0.2s ease;';
+							arrow.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-default); transition: transform 0.2s ease;';
 
 							rightDiv.appendChild(countBadge);
 							rightDiv.appendChild(arrow);
@@ -487,15 +500,15 @@ const injectedCode = `
 							if (arrow) {
 								arrow.textContent = isOpen ? '▲ 閉じる' : '▼ 開く';
 							}
-							header.style.borderLeftColor = isOpen ? '#ffffff' : '#52525b';
-							header.style.background = isOpen ? '#1c1d21' : '#18181b';
+							header.style.borderLeftColor = isOpen ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)';
+							header.style.background = isOpen ? 'var(--color-kumo-tint)' : 'var(--color-kumo-elevated)';
 						}
 
 						fields.forEach(fieldEl => {
 							fieldEl.style.display = isOpen ? '' : 'none';
 							if (isOpen) {
 								fieldEl.style.paddingLeft = '10px';
-								fieldEl.style.borderLeft = '2px solid #27272a';
+								fieldEl.style.borderLeft = '2px solid var(--color-kumo-tint)';
 								fieldEl.style.marginLeft = '4px';
 							}
 						});
@@ -532,8 +545,8 @@ const injectedCode = `
 								gap: 8px;
 								margin-bottom: 16px;
 								padding: 12px 16px;
-								background: #18181b;
-								border: 1px solid #27272a;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
 								border-radius: 8px;
 								overflow-x: auto;
 								z-index: 10;
@@ -541,7 +554,7 @@ const injectedCode = `
 
 							const label = document.createElement('span');
 							label.textContent = 'ブランド絞り込み:';
-							label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle); margin-right: 4px; white-space: nowrap;';
 							tabContainer.appendChild(label);
 
 							const brands = [
@@ -566,9 +579,9 @@ const injectedCode = `
 									cursor: pointer;
 									transition: all 0.2s ease;
 									white-space: nowrap;
-									border: 1px solid \${activeCampaignBrand === b.value ? '#ffffff' : '#3f3f46'};
-									background: \${activeCampaignBrand === b.value ? '#ffffff' : '#27272a'};
-									color: \${activeCampaignBrand === b.value ? '#000000' : '#d4d4d8'};
+									border: 1px solid \${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)'};
+									background: \${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)'};
+									color: \${activeCampaignBrand === b.value ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)'};
 								\`;
 
 								btn.addEventListener('click', (e) => {
@@ -594,9 +607,9 @@ const injectedCode = `
 					const btns = document.querySelectorAll('#campaign-brand-filter-bar button[data-brand-filter]');
 					btns.forEach(btn => {
 						const isSelected = btn.dataset.brandFilter === activeCampaignBrand;
-						btn.style.background = isSelected ? '#ffffff' : '#27272a';
-						btn.style.color = isSelected ? '#000000' : '#d4d4d8';
-						btn.style.borderColor = isSelected ? '#ffffff' : '#3f3f46';
+						btn.style.background = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)';
+						btn.style.color = isSelected ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)';
+						btn.style.borderColor = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)';
 					});
 				}
 
@@ -646,8 +659,8 @@ const injectedCode = `
 								gap: 8px;
 								margin-bottom: 16px;
 								padding: 12px 16px;
-								background: #18181b;
-								border: 1px solid #27272a;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
 								border-radius: 8px;
 								overflow-x: auto;
 								z-index: 10;
@@ -655,7 +668,7 @@ const injectedCode = `
 
 							const label = document.createElement('span');
 							label.textContent = '絞り込み:';
-							label.style.cssText = 'font-size: 12px; font-weight: 600; color: #a1a1aa; margin-right: 4px; white-space: nowrap;';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle); margin-right: 4px; white-space: nowrap;';
 							tabContainer.appendChild(label);
 
 							const filters = [
@@ -682,9 +695,9 @@ const injectedCode = `
 									cursor: pointer;
 									transition: all 0.2s ease;
 									white-space: nowrap;
-									border: 1px solid \${activeMagazineFilter === f.value ? '#ffffff' : '#3f3f46'};
-									background: \${activeMagazineFilter === f.value ? '#ffffff' : '#27272a'};
-									color: \${activeMagazineFilter === f.value ? '#000000' : '#d4d4d8'};
+									border: 1px solid \${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)'};
+									background: \${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)'};
+									color: \${activeMagazineFilter === f.value ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)'};
 								\`;
 
 								btn.addEventListener('click', (e) => {
@@ -710,9 +723,9 @@ const injectedCode = `
 					const btns = document.querySelectorAll('#magazine-filter-bar button[data-mag-filter]');
 					btns.forEach(btn => {
 						const isSelected = btn.dataset.magFilter === activeMagazineFilter;
-						btn.style.background = isSelected ? '#ffffff' : '#27272a';
-						btn.style.color = isSelected ? '#000000' : '#d4d4d8';
-						btn.style.borderColor = isSelected ? '#ffffff' : '#3f3f46';
+						btn.style.background = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)';
+						btn.style.color = isSelected ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)';
+						btn.style.borderColor = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)';
 					});
 				}
 
@@ -747,11 +760,793 @@ const injectedCode = `
 					});
 				}
 
+				// ─────────────────────────────────────────────────────────────
+				// 4. ブロック編集モーダル内の視覚的グループ分け＆エディタ上のブロックプレビュー強化
+				// （ReactのDOM管理を壊さないようノード移動は行わず、属性とプレビュー要素追加のみで装飾）
+				// ─────────────────────────────────────────────────────────────
+				function injectEditorialBlockStyles() {
+					if (document.getElementById('nicole-editorial-block-styles')) return;
+					const style = document.createElement('style');
+					style.id = 'nicole-editorial-block-styles';
+					style.textContent = \`
+						/* モーダル内のグループ見出しバー（各グループの最上部＝写真の上に配置） */
+						[data-nicole-group-start]::before {
+							content: attr(data-nicole-group-start);
+							display: block;
+							font-size: 13px;
+							font-weight: 700;
+							letter-spacing: 0.04em;
+							color: var(--text-color-kumo-default);
+							background: var(--color-kumo-tint);
+							border: 1px solid var(--color-kumo-line);
+							border-left: 4px solid var(--color-kumo-contrast);
+							padding: 7px 12px;
+							border-radius: 6px;
+							margin-top: 20px;
+							margin-bottom: 12px;
+							margin-left: -14px;
+						}
+						[data-nicole-group-start]:first-child::before {
+							margin-top: 2px;
+						}
+						[data-nicole-group-member] {
+							padding-left: 12px;
+							border-left: 2px solid var(--color-kumo-line);
+						}
+						/* 本文エディタ上のカスタムブロックカードを見やすく強化 */
+						.plugin-block > div > div.rounded-lg {
+							border-color: var(--color-kumo-line) !important;
+							background: var(--color-kumo-elevated) !important;
+							transition: border-color 0.15s ease, box-shadow 0.15s ease;
+						}
+						.plugin-block > div > div.rounded-lg:hover {
+							border-color: var(--text-color-kumo-subtle) !important;
+						}
+						/* 編集・削除ボタンをホバー前でも常時薄く表示して押しやすくする */
+						.plugin-block .opacity-0.group-hover\\\\:opacity-100 {
+							opacity: 0.85 !important;
+						}
+						/* プレビュー表示中はReact管理下の元の英語/生のサマリー行をCSS側で非表示にする（DOM直接書き換えによるReact不整合を防止） */
+						.plugin-block:has(.nicole-block-preview) .font-mono.truncate {
+							display: none !important;
+						}
+						.nicole-block-preview {
+							display: flex;
+							flex-direction: column;
+							gap: 8px;
+							padding: 10px 16px 12px 16px;
+							border-top: 1px solid var(--color-kumo-line);
+							background: var(--color-kumo-base);
+							border-bottom-left-radius: 8px;
+							border-bottom-right-radius: 8px;
+							cursor: pointer;
+						}
+						.nicole-block-preview__badges {
+							display: flex;
+							flex-wrap: wrap;
+							gap: 6px;
+							align-items: center;
+						}
+						.nicole-block-preview__badge {
+							font-size: 11px;
+							font-weight: 600;
+							padding: 2px 8px;
+							border-radius: 4px;
+							background: var(--color-kumo-tint);
+							color: var(--text-color-kumo-default);
+							border: 1px solid var(--color-kumo-line);
+						}
+						.nicole-block-preview__thumbs {
+							display: flex;
+							gap: 8px;
+							overflow-x: auto;
+							padding-top: 2px;
+						}
+						.nicole-block-preview__thumb {
+							width: 88px;
+							height: 56px;
+							object-fit: cover;
+							border-radius: 6px;
+							border: 1px solid var(--color-kumo-line);
+							background: var(--color-kumo-tint);
+							flex-shrink: 0;
+						}
+						.nicole-block-preview__texts {
+							display: flex;
+							flex-direction: column;
+							gap: 3px;
+							font-size: 12px;
+							color: var(--text-color-kumo-subtle);
+							line-height: 1.5;
+						}
+						.nicole-block-preview__heading {
+							font-size: 13px;
+							font-weight: 700;
+							color: var(--text-color-kumo-default);
+						}
+						.nicole-color-helper {
+							margin-top: 8px;
+							padding: 10px 12px;
+							border-radius: 8px;
+							background: var(--color-kumo-tint);
+							border: 1px solid var(--color-kumo-line);
+							display: flex;
+							flex-direction: column;
+							gap: 8px;
+						}
+						.nicole-color-helper__row {
+							display: flex;
+							align-items: center;
+							gap: 8px;
+							flex-wrap: wrap;
+						}
+						.nicole-color-picker-label {
+							display: inline-flex;
+							align-items: center;
+							gap: 8px;
+							padding: 5px 12px;
+							border-radius: 6px;
+							background: var(--color-kumo-base);
+							border: 1px solid var(--color-kumo-line);
+							font-size: 12px;
+							font-weight: 600;
+							color: var(--text-color-kumo-default);
+							cursor: pointer;
+							transition: border-color 0.15s ease;
+						}
+						.nicole-color-picker-label:hover {
+							border-color: var(--text-color-kumo-default);
+						}
+						.nicole-color-swatch-btn {
+							display: inline-flex;
+							align-items: center;
+							gap: 6px;
+							padding: 4px 9px;
+							border-radius: 999px;
+							font-size: 11px;
+							font-weight: 600;
+							background: var(--color-kumo-base);
+							color: var(--text-color-kumo-default);
+							border: 1px solid var(--color-kumo-line);
+							cursor: pointer;
+							transition: transform 0.12s ease, border-color 0.12s ease;
+						}
+						.nicole-color-swatch-btn:hover {
+							transform: translateY(-1px);
+							border-color: var(--text-color-kumo-default);
+						}
+						.nicole-color-swatch-dot {
+							width: 12px;
+							height: 12px;
+							border-radius: 50%;
+							border: 1px solid rgba(128,128,128,0.45);
+							flex-shrink: 0;
+						}
+						.nicole-url-helper {
+							display: flex;
+							flex-wrap: wrap;
+							gap: 6px;
+							margin-top: 6px;
+						}
+						.nicole-url-chip {
+							font-size: 11px;
+							font-weight: 600;
+							padding: 3px 9px;
+							border-radius: 999px;
+							background: var(--color-kumo-tint);
+							color: var(--text-color-kumo-default);
+							border: 1px solid var(--color-kumo-line);
+							cursor: pointer;
+							transition: background 0.15s ease, border-color 0.15s ease;
+						}
+						.nicole-url-chip:hover {
+							border-color: var(--text-color-kumo-default);
+							background: var(--color-kumo-elevated);
+						}
+						.nicole-bg-live-preview {
+							margin-top: 12px;
+							padding: 14px 16px;
+							border-radius: 8px;
+							border: 1px solid var(--color-kumo-line);
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							gap: 12px;
+							font-size: 12px;
+							font-weight: 700;
+							letter-spacing: 0.03em;
+						}
+						.nicole-bg-range-member {
+							position: relative;
+							border-left: 4px solid var(--nicole-band-color, #141418) !important;
+							padding-left: 12px !important;
+							margin-left: -12px !important;
+							background: linear-gradient(90deg, rgba(128,128,128,0.06), transparent 85%);
+							border-radius: 2px;
+						}
+						.nicole-move-btn {
+							display: inline-flex;
+							align-items: center;
+							justify-content: center;
+							width: 28px;
+							height: 28px;
+							border-radius: 6px;
+							border: 1px solid var(--color-kumo-line);
+							background: var(--color-kumo-base);
+							color: var(--text-color-kumo-default);
+							font-size: 12px;
+							font-weight: 700;
+							cursor: pointer;
+							transition: background 0.15s ease, border-color 0.15s ease;
+						}
+						.nicole-move-btn:hover {
+							background: var(--color-kumo-tint);
+							border-color: var(--text-color-kumo-default);
+						}
+					\`;
+					document.head.appendChild(style);
+				}
+
+				function setReactInputValue(inputEl, newValue) {
+					if (!inputEl) return;
+					const proto = inputEl.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+					const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+					if (nativeSetter) {
+						nativeSetter.call(inputEl, newValue);
+					} else {
+						inputEl.value = newValue;
+					}
+					inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+					inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+
+				function isDarkColorHex(hex) {
+					const clean = String(hex || '').replace('#', '').trim();
+					if (!/^[0-9a-fA-F]{3,6}$/.test(clean)) return true;
+					const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+					const r = parseInt(full.slice(0, 2), 16) / 255;
+					const g = parseInt(full.slice(2, 4), 16) / 255;
+					const b = parseInt(full.slice(4, 6), 16) / 255;
+					const toLinear = c => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+					const lum = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+					return lum < 0.36;
+				}
+
+				const NICOLE_COLOR_PRESETS = [
+					{ label: 'ジェットブラック', hex: '#000000' },
+					{ label: 'チャコールダーク', hex: '#141418' },
+					{ label: 'ライトグレー', hex: '#f4f4f6' },
+					{ label: 'ホワイト', hex: '#ffffff' },
+					{ label: 'ディープネイビー', hex: '#0f172a' },
+					{ label: 'ブリティッシュグリーン', hex: '#0b2922' },
+					{ label: 'ディープレッド', hex: '#6b1116' },
+				];
+
+				const NICOLE_URL_PRESETS = [
+					{ label: '▼ ページ下部の予約枠へ (#cmp-booking)', url: '#cmp-booking' },
+					{ label: '📍 店舗一覧ページへ (/locations)', url: '/locations' },
+					{ label: '✉️ お問い合わせへ (/contact)', url: '/contact' },
+				];
+
+				function enhancePluginBlockModal() {
+					injectEditorialBlockStyles();
+					const modalScroll = document.querySelector('[role="dialog"] form .overflow-y-auto');
+					if (!modalScroll) return;
+
+					// 1. グループ見出しバーの付与
+					let lastGroup = '';
+					Array.from(modalScroll.children).forEach(fieldWrap => {
+						const labelEl = fieldWrap.querySelector(':scope > label, :scope > span.font-medium, :scope > div > span.font-medium');
+						if (!labelEl) return;
+
+						const currentText = (labelEl.textContent || '').trim();
+						const m = currentText.match(/^【([^】]+)】(.*)$/);
+						if (m) {
+							fieldWrap.dataset.nicoleGroup = m[1].trim();
+							fieldWrap.dataset.nicoleCleanLabel = m[2].trim();
+						}
+
+						const groupName = fieldWrap.dataset.nicoleGroup;
+						const cleanLabel = fieldWrap.dataset.nicoleCleanLabel;
+						if (!groupName) return;
+
+						if (cleanLabel && labelEl.childNodes.length > 0 && labelEl.childNodes[0].nodeType === Node.TEXT_NODE) {
+							if (labelEl.childNodes[0].nodeValue !== cleanLabel) {
+								labelEl.childNodes[0].nodeValue = cleanLabel;
+							}
+						} else if (cleanLabel && labelEl.textContent !== cleanLabel) {
+							labelEl.textContent = cleanLabel;
+						}
+						labelEl.style.fontSize = '0.875rem';
+
+						fieldWrap.setAttribute('data-nicole-group-member', groupName);
+						if (groupName !== lastGroup) {
+							fieldWrap.setAttribute('data-nicole-group-start', groupName);
+							lastGroup = groupName;
+						} else {
+							fieldWrap.removeAttribute('data-nicole-group-start');
+						}
+					});
+
+					// 2. リピーター（＋で追加できる項目）の初期展開とボタン日本語化
+					const repeaterGroups = modalScroll.querySelectorAll('[role="group"]');
+					repeaterGroups.forEach(group => {
+						group.querySelectorAll('button').forEach(btn => {
+							const txt = (btn.textContent || '').trim();
+							if (txt.startsWith('Add ')) {
+								btn.textContent = '＋ ' + txt.slice(4) + 'を追加';
+							}
+						});
+						group.querySelectorAll('p').forEach(p => {
+							if ((p.textContent || '').trim() === 'No items yet') {
+								p.textContent = 'まだ項目がありません。下の「＋」ボタンから追加してください。';
+							}
+						});
+					});
+					if (!modalScroll.dataset.nicoleRepeaterInit) {
+						modalScroll.dataset.nicoleRepeaterInit = 'true';
+						const firstCollapsed = modalScroll.querySelector('[role="group"] button[aria-expanded="false"]');
+						const anyExpanded = modalScroll.querySelector('[role="group"] button[aria-expanded="true"]');
+						if (firstCollapsed && !anyExpanded) {
+							firstCollapsed.click();
+						}
+					}
+
+					// 3. カラーパレット＆スポイト（開始色・終了色）とURLワンクリック補助チップ
+					let startColorInput = null;
+					let endColorInput = null;
+					const allLabels = modalScroll.querySelectorAll('label');
+					allLabels.forEach(label => {
+						const lText = (label.textContent || '').trim();
+						const wrap = label.parentElement;
+						if (!wrap) return;
+						const input = wrap.querySelector('input[type="text"]');
+						if (!input) return;
+
+						const isStartColor = lText.includes('開始カラー') || lText.includes('開始色');
+						const isEndColor = lText.includes('終了カラー') || lText.includes('終了色');
+						if (isStartColor) startColorInput = input;
+						if (isEndColor) endColorInput = input;
+
+						if ((isStartColor || isEndColor) && !input.dataset.nicoleColorEnhanced) {
+							input.dataset.nicoleColorEnhanced = 'true';
+							const helper = document.createElement('div');
+							helper.className = 'nicole-color-helper';
+
+							const topRow = document.createElement('div');
+							topRow.className = 'nicole-color-helper__row';
+
+							const pickerLabel = document.createElement('label');
+							pickerLabel.className = 'nicole-color-picker-label';
+							const colorPicker = document.createElement('input');
+							colorPicker.type = 'color';
+							colorPicker.className = 'nicole-native-color-input';
+							colorPicker.value = /^#[0-9a-fA-F]{6}$/.test(input.value.trim()) ? input.value.trim() : (isStartColor ? '#141418' : '#000000');
+							colorPicker.style.cssText = 'width: 24px; height: 24px; padding: 0; border: none; background: transparent; cursor: pointer;';
+							colorPicker.addEventListener('input', () => {
+								setReactInputValue(input, colorPicker.value);
+							});
+
+							const pickerText = document.createElement('span');
+							pickerText.textContent = '🎨 カラーパレット / スポイトで色を選ぶ';
+							pickerLabel.appendChild(colorPicker);
+							pickerLabel.appendChild(pickerText);
+							topRow.appendChild(pickerLabel);
+
+							if (isEndColor) {
+								const clearBtn = document.createElement('button');
+								clearBtn.type = 'button';
+								clearBtn.className = 'nicole-color-swatch-btn';
+								clearBtn.textContent = '✕ 単色にする（終了色をクリア）';
+								clearBtn.addEventListener('click', () => {
+									setReactInputValue(input, '');
+								});
+								topRow.appendChild(clearBtn);
+							}
+
+							const presetRow = document.createElement('div');
+							presetRow.className = 'nicole-color-helper__row';
+							const presetTitle = document.createElement('span');
+							presetTitle.textContent = '推奨カラー:';
+							presetTitle.style.cssText = 'font-size: 11px; font-weight: 600; color: var(--text-color-kumo-subtle);';
+							presetRow.appendChild(presetTitle);
+
+							NICOLE_COLOR_PRESETS.forEach(preset => {
+								const chip = document.createElement('button');
+								chip.type = 'button';
+								chip.className = 'nicole-color-swatch-btn';
+								const dot = document.createElement('span');
+								dot.className = 'nicole-color-swatch-dot';
+								dot.style.background = preset.hex;
+								const name = document.createElement('span');
+								name.textContent = preset.label;
+								chip.appendChild(dot);
+								chip.appendChild(name);
+								chip.addEventListener('click', () => {
+									colorPicker.value = preset.hex;
+									setReactInputValue(input, preset.hex);
+								});
+								presetRow.appendChild(chip);
+							});
+
+							helper.appendChild(topRow);
+							helper.appendChild(presetRow);
+							wrap.appendChild(helper);
+						}
+
+						// リンク先URLのワンクリック入力チップ
+						if ((lText.includes('リンクURL') || lText.includes('リンク先URL')) && !input.dataset.nicoleUrlEnhanced) {
+							input.dataset.nicoleUrlEnhanced = 'true';
+							const urlHelper = document.createElement('div');
+							urlHelper.className = 'nicole-url-helper';
+							NICOLE_URL_PRESETS.forEach(p => {
+								const chip = document.createElement('button');
+								chip.type = 'button';
+								chip.className = 'nicole-url-chip';
+								chip.textContent = p.label;
+								chip.addEventListener('click', () => {
+									setReactInputValue(input, p.url);
+								});
+								urlHelper.appendChild(chip);
+							});
+							wrap.appendChild(urlHelper);
+						}
+					});
+
+					// 4. 背景エリア開始モーダル内のリアルタイム・グラデーション＆文字色プレビューバー
+					if (startColorInput) {
+						let liveBar = modalScroll.querySelector('.nicole-bg-live-preview');
+						if (!liveBar) {
+							liveBar = document.createElement('div');
+							liveBar.className = 'nicole-bg-live-preview';
+							modalScroll.appendChild(liveBar);
+						}
+						const c1 = (startColorInput.value || '#141418').trim() || '#141418';
+						const c2 = endColorInput ? (endColorInput.value || '').trim() : '';
+						const bgCss = (c2 && c2.toLowerCase() !== c1.toLowerCase())
+							? \`linear-gradient(135deg, \${c1} 0%, \${c2} 100%)\`
+							: c1;
+						const dark = isDarkColorHex(c1);
+						liveBar.style.background = bgCss;
+						liveBar.style.color = dark ? '#ffffff' : '#111114';
+						liveBar.innerHTML = \`
+							<span>背景プレビュー（\${c2 && c2 !== c1 ? c1 + ' → ' + c2 + ' グラデーション' : c1 + ' 単色'}）</span>
+							<span style="font-size:11px; padding:3px 8px; border-radius:4px; background:\${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)'};">
+								自動文字色：\${dark ? '白文字で表示' : '黒文字で表示'}
+							</span>
+						\`;
+					}
+				}
+
+				function getPluginBlockFiberProps(blockEl) {
+					if (!blockEl) return null;
+					const rendererEl = blockEl.closest('.react-renderer') || blockEl.parentElement;
+
+					// 1. ProseMirror の pmViewDesc / Tiptap ReactNodeView から直接取得（段落追加やReact再描画の影響を一切受けない最優先ルート）
+					const viewDesc = rendererEl?.pmViewDesc || blockEl?.pmViewDesc;
+					if (viewDesc) {
+						const spec = viewDesc.spec;
+						const pmNode = spec?.node || viewDesc.node || spec?.renderer?.props?.node;
+						if (pmNode && pmNode.attrs && pmNode.attrs.blockType) {
+							const result = {
+								node: pmNode,
+								editor: spec?.editor || spec?.renderer?.props?.editor,
+								getPos: typeof spec?.getPos === 'function' ? () => spec.getPos() : spec?.renderer?.props?.getPos
+							};
+							blockEl.__nicoleCachedBlock = result;
+							if (rendererEl) rendererEl.__nicoleCachedBlock = result;
+							return result;
+						}
+					}
+
+					// 2. React Fiber ツリーから探索（current と alternate の両方を走査）
+					const targets = [blockEl, rendererEl].filter(Boolean);
+					for (const el of targets) {
+						const fiberKey = Object.keys(el).find(k => k.startsWith('__reactFiber$'));
+						if (!fiberKey) continue;
+						let curr = el[fiberKey];
+						for (let i = 0; i < 20 && curr; i++) {
+							const candidates = [curr.alternate?.memoizedProps, curr.memoizedProps, curr.pendingProps];
+							for (const mp of candidates) {
+								if (mp && mp.node && mp.node.attrs && mp.node.attrs.blockType) {
+									blockEl.__nicoleCachedBlock = mp;
+									if (rendererEl) rendererEl.__nicoleCachedBlock = mp;
+									return mp;
+								}
+							}
+							curr = curr.return || curr.alternate?.return;
+						}
+					}
+
+					// 3. 一時的な再描画中は直前のキャッシュを返す（プレビュー消失を完全防止）
+					return blockEl.__nicoleCachedBlock || rendererEl?.__nicoleCachedBlock || null;
+				}
+
+				function movePluginBlockInEditor(blockEl, dir) {
+					try {
+						const fiberProps = getPluginBlockFiberProps(blockEl);
+						if (!fiberProps) return;
+						const { editor, getPos } = fiberProps;
+						if (!editor || typeof getPos !== 'function') return;
+						const pos = getPos();
+						if (typeof pos !== 'number') return;
+						const { doc, tr } = editor.state;
+						const $pos = doc.resolve(pos);
+						const index = $pos.index(0);
+						const targetIndex = index + dir;
+						if (targetIndex < 0 || targetIndex >= doc.childCount) return;
+						const currentNode = doc.child(index);
+						const otherNode = doc.child(targetIndex);
+						if (dir === -1) {
+							const prevPos = pos - otherNode.nodeSize;
+							tr.delete(pos, pos + currentNode.nodeSize);
+							tr.insert(prevPos, currentNode);
+						} else {
+							const nextPos = pos + currentNode.nodeSize;
+							tr.delete(nextPos, nextPos + otherNode.nodeSize);
+							tr.insert(pos, otherNode);
+						}
+						editor.view.dispatch(tr.scrollIntoView());
+					} catch (e) {
+						console.error('[patch-admin-ui] Failed to move block:', e);
+					}
+				}
+
+				function enhanceEditorPluginBlocks() {
+					injectEditorialBlockStyles();
+					const blocks = document.querySelectorAll('.plugin-block');
+					blocks.forEach(blockEl => {
+						const card = blockEl.querySelector('.rounded-lg.border');
+						if (!card) return;
+
+						const fiberProps = getPluginBlockFiberProps(blockEl);
+						const attrs = fiberProps?.node?.attrs || {};
+						const blockType = String(attrs.blockType || '');
+						const data = attrs.data || {};
+
+						// blockType が取得できない場合は既存のプレビューを絶対に消さずにスキップ
+						if (!blockType) return;
+
+						// 上下移動ボタン（↑ / ↓）の追加
+						const actionBar = card.querySelector('.flex.items-center.gap-1');
+						if (actionBar && !actionBar.querySelector('.nicole-move-btn')) {
+							const upBtn = document.createElement('button');
+							upBtn.type = 'button';
+							upBtn.className = 'nicole-move-btn';
+							upBtn.title = 'このブロックを1つ上へ移動';
+							upBtn.textContent = '↑';
+							upBtn.addEventListener('click', (e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								movePluginBlockInEditor(blockEl, -1);
+							});
+
+							const downBtn = document.createElement('button');
+							downBtn.type = 'button';
+							downBtn.className = 'nicole-move-btn';
+							downBtn.title = 'このブロックを1つ下へ移動';
+							downBtn.textContent = '↓';
+							downBtn.addEventListener('click', (e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								movePluginBlockInEditor(blockEl, 1);
+							});
+
+							actionBar.insertBefore(downBtn, actionBar.firstChild);
+							actionBar.insertBefore(upBtn, actionBar.firstChild);
+						}
+
+						const stateFingerprint = JSON.stringify({ blockType, data });
+						if (card.dataset.nicoleLastSummary === stateFingerprint && card.querySelector('.nicole-block-preview')) {
+							return;
+						}
+
+						const images = [];
+						const badges = [];
+						const texts = [];
+						const items = Array.isArray(data.items) ? data.items : [];
+
+						if (blockType.endsWith('bg_band_start')) {
+							const c1 = data.color || '#141418';
+							const c2 = data.end_color || '';
+							const gType = data.gradient_type || data.gradient_dir || 'vertical';
+							const dirMap = { vertical: '縦グラデーション', diagonal: '斜めグラデーション', spotlight: '中央スポットライト', solid: '単色塗りつぶし' };
+							const summaryLabel = c2 && c2 !== c1 && gType !== 'solid'
+								? \`\${c1} → \${c2}（\${dirMap[gType] || 'グラデーション'}）\`
+								: \`\${c1}（単色背景）\`;
+
+							const oldPreview = card.querySelector('.nicole-block-preview');
+							if (oldPreview) oldPreview.remove();
+							card.dataset.nicoleLastSummary = stateFingerprint;
+
+							const preview = document.createElement('div');
+							preview.className = 'nicole-block-preview';
+							const bgCss = (c2 && c2 !== c1 && gType !== 'solid') ? \`linear-gradient(135deg, \${c1} 0%, \${c2} 100%)\` : c1;
+							const dark = isDarkColorHex(c1);
+							preview.style.background = bgCss;
+							preview.style.color = dark ? '#ffffff' : '#111114';
+							preview.innerHTML = \`
+								<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;">
+									<span>▼ ここから下の見出し・文章・ブロックに背景色を適用（\${summaryLabel}）</span>
+									<span style="font-size:11px;opacity:0.85;">クリックして色を変更</span>
+								</div>
+							\`;
+							preview.addEventListener('click', () => {
+								const editBtn = card.querySelectorAll('button:not(.nicole-move-btn)');
+								if (editBtn.length >= 2) editBtn[editBtn.length - 2].click();
+							});
+							card.appendChild(preview);
+							return;
+						}
+
+						if (blockType.endsWith('bg_band_end')) {
+							const oldPreview = card.querySelector('.nicole-block-preview');
+							if (oldPreview) oldPreview.remove();
+							card.dataset.nicoleLastSummary = stateFingerprint;
+
+							const preview = document.createElement('div');
+							preview.className = 'nicole-block-preview';
+							preview.innerHTML = \`
+								<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-color-kumo-subtle);">
+									<span>▲ ここまでで背景色エリアを終了し、通常の背景に戻します</span>
+								</div>
+							\`;
+							card.appendChild(preview);
+							return;
+						}
+
+						if (blockType.endsWith('column_cards')) {
+							const colLabel = data.columns === '2' ? '2列固定' : data.columns === '3' ? '3列固定' : data.columns === '4' ? '4列固定' : '1〜4列自動レイアウト';
+							const styleLabel = data.card_style === 'flat' ? '枠なしフラット' : data.card_style === 'step' ? '番号ステップ（01, 02...）' : 'ボックス枠あり';
+							badges.push(colLabel, styleLabel, \`計 \${items.length} 枚\`);
+							items.forEach((it, idx) => {
+								if (it.image && typeof it.image === 'string') images.push(it.image);
+								const title = (it.title || '').trim();
+								const body = (it.text || it.body || '').trim();
+								if (title || body) texts.push(\`[\${idx + 1}] \${title}\${title && body ? ' — ' : ''}\${body}\`);
+							});
+						} else if (blockType.endsWith('split_media')) {
+							const pos = data.image_position || data.direction || 'zigzag';
+							const ratio = data.media_ratio || data.ratio || '50-50';
+							const dirLabel = pos === 'left' ? 'すべて左に写真' : pos === 'right' ? 'すべて右に写真' : '左右交互（ジグザグ配置）';
+							const ratioLabel = \`比率 \${ratio.replace('-', ':')}\`;
+							badges.push(dirLabel, ratioLabel, \`計 \${items.length || 1} 段\`);
+							items.forEach((it, idx) => {
+								if (it.image && typeof it.image === 'string') images.push(it.image);
+								const title = (it.title || '').trim();
+								const body = (it.text || it.body || '').trim();
+								if (title || body) texts.push(\`[\${idx + 1}] \${title}\${title && body ? ' — ' : ''}\${body}\`);
+							});
+						} else if (blockType.endsWith('slider')) {
+							badges.push(data.gallery_style === 'grid' ? 'グリッド一覧' : 'フィルムストリップ', \`計 \${items.length} 枚\`);
+							items.forEach((it, idx) => {
+								if (it.image && typeof it.image === 'string') images.push(it.image);
+								if (it.caption) texts.push(\`[\${idx + 1}] \${it.caption}\`);
+							});
+						} else if (blockType.endsWith('faq')) {
+							badges.push(data.style === 'simple' ? 'シンプル開閉（スペック等）' : 'Q&A形式', \`計 \${items.length} 項目\`);
+							items.forEach((it, idx) => {
+								if (it.question) texts.push(\`Q\${idx + 1}. \${it.question}\`);
+							});
+						} else if (blockType.endsWith('notes')) {
+							const noteContent = data.content || data.items || '';
+							if (noteContent) texts.push(...String(noteContent).split('\\n').filter(Boolean));
+						}
+
+						if (images.length === 0 && badges.length === 0 && texts.length === 0) return;
+
+						const oldPreview = card.querySelector('.nicole-block-preview');
+						if (oldPreview) oldPreview.remove();
+						card.dataset.nicoleLastSummary = stateFingerprint;
+
+						const preview = document.createElement('div');
+						preview.className = 'nicole-block-preview';
+						preview.title = 'クリックしてこのブロックを編集';
+
+						if (badges.length > 0) {
+							const bWrap = document.createElement('div');
+							bWrap.className = 'nicole-block-preview__badges';
+							badges.forEach(b => {
+								const span = document.createElement('span');
+								span.className = 'nicole-block-preview__badge';
+								span.textContent = b;
+								bWrap.appendChild(span);
+							});
+							preview.appendChild(bWrap);
+						}
+
+						if (images.length > 0) {
+							const tWrap = document.createElement('div');
+							tWrap.className = 'nicole-block-preview__thumbs';
+							images.slice(0, 8).forEach(src => {
+								const img = document.createElement('img');
+								img.className = 'nicole-block-preview__thumb';
+								img.src = src;
+								img.alt = '';
+								img.loading = 'lazy';
+								tWrap.appendChild(img);
+							});
+							preview.appendChild(tWrap);
+						}
+
+						if (texts.length > 0) {
+							const txWrap = document.createElement('div');
+							txWrap.className = 'nicole-block-preview__texts';
+							texts.slice(0, 4).forEach(t => {
+								const line = document.createElement('div');
+								line.textContent = '・' + (t.length > 62 ? t.slice(0, 62) + '…' : t);
+								txWrap.appendChild(line);
+							});
+							preview.appendChild(txWrap);
+						}
+
+						preview.addEventListener('click', (e) => {
+							e.preventDefault();
+							const btns = card.querySelectorAll('button:not(.nicole-move-btn)');
+							if (btns.length >= 2) {
+								const editBtn = btns[btns.length - 2];
+								if (editBtn) editBtn.click();
+							} else if (btns.length === 1) {
+								btns[0].click();
+							}
+						});
+
+						card.appendChild(preview);
+					});
+
+					// エディタキャンバス上で「背景エリア開始」〜「背景エリア終了」に挟まれた全要素を左ラインでハイライト
+					// ※ProseMirrorのDOMObserverが段落編集と競合しないよう、実際に変更が必要な時のみ属性を更新する
+					const proseMirror = document.querySelector('.ProseMirror');
+					if (proseMirror) {
+						let currentBandColor = null;
+						Array.from(proseMirror.children).forEach(child => {
+							const pBlock = child.classList.contains('plugin-block') ? child : child.querySelector('.plugin-block');
+							if (pBlock) {
+								const fp = getPluginBlockFiberProps(pBlock);
+								const bType = String(fp?.node?.attrs?.blockType || '');
+								if (bType.endsWith('bg_band_start')) {
+									currentBandColor = fp?.node?.attrs?.data?.color || '#141418';
+									if (child.dataset.nicoleBandColor !== currentBandColor) {
+										child.dataset.nicoleBandColor = currentBandColor;
+										child.classList.add('nicole-bg-range-member');
+										child.style.setProperty('--nicole-band-color', currentBandColor);
+									}
+									return;
+								}
+								if (bType.endsWith('bg_band_end')) {
+									const endColor = currentBandColor || '#141418';
+									if (child.dataset.nicoleBandColor !== endColor) {
+										child.dataset.nicoleBandColor = endColor;
+										child.classList.add('nicole-bg-range-member');
+										child.style.setProperty('--nicole-band-color', endColor);
+									}
+									currentBandColor = null;
+									return;
+								}
+							}
+							if (currentBandColor) {
+								if (child.dataset.nicoleBandColor !== currentBandColor) {
+									child.dataset.nicoleBandColor = currentBandColor;
+									child.classList.add('nicole-bg-range-member');
+									child.style.setProperty('--nicole-band-color', currentBandColor);
+								}
+							} else if (child.dataset.nicoleBandColor) {
+								delete child.dataset.nicoleBandColor;
+								child.classList.remove('nicole-bg-range-member');
+								child.style.removeProperty('--nicole-band-color');
+							}
+						});
+					}
+				}
+
 				// 定期実行とイベント監視でSPA遷移に完全追従
 				setInterval(() => {
+					try { if (checkLocalAutoLogin()) return; } catch(e){}
 					try { applyAccordion(); } catch(e){}
 					try { applyCampaignBrandFilterTabs(); } catch(e){}
 					try { applyMagazineFilterTabs(); } catch(e){}
+					try { enhancePluginBlockModal(); } catch(e){}
+					try { enhanceEditorPluginBlocks(); } catch(e){}
 				}, 350);
 				window.addEventListener('popstate', () => {
 					setTimeout(() => {
