@@ -983,18 +983,18 @@ function getTitleSegments(rawTitle: string) {
 			{ text: "航続828kmの新時代", class: "title-phrase" }
 		];
 	}
+	if (rawTitle.includes("最新スクープ") || rawTitle.includes("共存")) {
+		return [
+			{ text: "【最新スクープ】2027年登場の", class: "title-phrase" },
+			{ text: "次世代BMW 3シリーズ（ノイエ・クラッセ）は", class: "title-phrase" },
+			{ text: "BEVと直6エンジンが共存へ", class: "title-phrase" }
+		];
+	}
 	if (rawTitle.includes("新型BMW 3シリーズ") || (rawTitle.includes("3シリーズ") && rawTitle.includes("直6"))) {
 		return [
 			{ text: "【公式発表】新型BMW 3シリーズ登場。", class: "title-phrase" },
 			{ text: "完全電動『BMW i3』と", class: "title-phrase" },
 			{ text: "直6搭載『M350 xDrive』が切り拓く新時代", class: "title-phrase" }
-		];
-	}
-	if (rawTitle.includes("ノイエ・クラッセ")) {
-		return [
-			{ text: "【最新スクープ】2027年登場の", class: "title-phrase" },
-			{ text: "次世代BMW 3シリーズ（ノイエ・クラッセ）は", class: "title-phrase" },
-			{ text: "BEVと直6エンジンが共存へ", class: "title-phrase" }
 		];
 	}
 	if (rawTitle.includes("。")) {
@@ -1853,7 +1853,7 @@ const editUrl = postDbId
 		letter-spacing: 0.02em;
 	}
 
-	/* 見出し（ゴールド縦線と下地なし・クリーンタイポグラフィ） */
+	/* 見出し（クリーン・モノトーンタイポグラフィ） */
 	.article-rich-text :global(h2) {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(24px, 2.4vw, 30px);
@@ -1869,13 +1869,23 @@ const editUrl = postDbId
 	.article-rich-text :global(h3) {
 		font-size: 20px;
 		font-weight: 700;
-		color: var(--color-nicole-red, #E60012);
+		color: #ffffff;
 		margin: 44px 0 18px 0;
 		line-height: 1.4;
 	}
 
 	.article-rich-text :global(p) {
 		margin-bottom: 28px;
+	}
+
+	/* エディタで誤って生じた中身のない空要素による不要な隙間を抑止 */
+	.article-rich-text :global(h1:empty),
+	.article-rich-text :global(h2:empty),
+	.article-rich-text :global(h3:empty),
+	.article-rich-text :global(p:empty) {
+		display: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
 	}
 
 	.article-rich-text :global(img) {
@@ -1885,7 +1895,65 @@ const editUrl = postDbId
 		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
 	}
 
-	/* ギャラリー内の全画像（スライド＆サムネイル）はリッチテキストのimg装飾を完全除外 */
+	/* 2カラム本文内での背景エリア（開始〜終了）の収容（右側サイドバー貫通＆左側ズレの完全防止） */
+	.article-rich-text :global(.cms-bg-band),
+	.article-rich-text :global(.cmp-band-block),
+	.article-rich-text :global(.cmp-band2-block) {
+		width: 100% !important;
+		max-width: 100% !important;
+		position: static !important;
+		left: auto !important;
+		right: auto !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		margin-top: 2.75rem !important;
+		margin-bottom: 2.75rem !important;
+		padding: 2.75rem 2.25rem !important;
+		border-radius: 14px !important;
+		box-sizing: border-box !important;
+		overflow: hidden !important;
+	}
+	.article-rich-text :global(.cms-bg-band__inner),
+	.article-rich-text :global(.cmp-band-block__inner),
+	.article-rich-text :global(.cmp-band2-block__inner) {
+		max-width: 100% !important;
+		width: 100% !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+	@media (max-width: 768px) {
+		.article-rich-text :global(.cms-bg-band),
+		.article-rich-text :global(.cmp-band-block),
+		.article-rich-text :global(.cmp-band2-block) {
+			padding: 2rem 1.25rem !important;
+			margin-top: 2rem !important;
+			margin-bottom: 2rem !important;
+			border-radius: 12px !important;
+		}
+	}
+
+	/* 明るい背景帯（白・ライトグレー）内のテキスト・見出し色反転保証 */
+	.article-rich-text :global(.cms-bg-band.is-dark-text) {
+		border: 1px solid rgba(0, 0, 0, 0.08) !important;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+	}
+	.article-rich-text :global(.cms-bg-band.is-dark-text h2),
+	.article-rich-text :global(.cms-bg-band.is-dark-text h3),
+	.article-rich-text :global(.cms-bg-band.is-dark-text h4),
+	.article-rich-text :global(.cms-bg-band.is-dark-text strong) {
+		color: #111113 !important;
+		border-bottom-color: rgba(0, 0, 0, 0.12) !important;
+	}
+	.article-rich-text :global(.cms-bg-band.is-dark-text p),
+	.article-rich-text :global(.cms-bg-band.is-dark-text li) {
+		color: #3f3f46 !important;
+	}
+
+	/* ブロックコンポーネント内の全画像はリッチテキストの共通img装飾を完全除外 */
+	.article-rich-text :global(.cms-split-card img),
+	.article-rich-text :global(.cms-col-card img),
+	.article-rich-text :global(.cmp-band-block img),
+	.article-rich-text :global(.cmp-band2-block img),
 	.article-rich-text :global(.cms-filmstrip-gallery img),
 	.article-rich-text :global(.filmstrip-slide img),
 	.article-rich-text :global(.filmstrip-thumb img) {
@@ -1902,22 +1970,22 @@ const editUrl = postDbId
 	.article-rich-text :global(blockquote) {
 		margin: 36px 0;
 		padding: 20px 24px;
-		background: rgba(223, 186, 115, 0.05);
-		border-left: 3px solid var(--color-nicole-red, #E60012);
+		background: rgba(255, 255, 255, 0.03);
+		border-left: 3px solid rgba(255, 255, 255, 0.4);
 		border-radius: 0 8px 8px 0;
 		font-style: italic;
 		color: rgba(255, 255, 255, 0.85);
 	}
 
 	.article-rich-text :global(a) {
-		color: var(--color-nicole-red, #E60012);
+		color: #ffffff;
 		text-decoration: underline;
 		text-underline-offset: 4px;
 		transition: color 0.2s ease;
 	}
 
 	.article-rich-text :global(a:hover) {
-		color: #FFFFFF;
+		color: #d4d4d8;
 	}
 
 	/* ============================================================== */

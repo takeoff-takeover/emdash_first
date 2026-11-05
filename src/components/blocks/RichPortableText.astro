@@ -157,8 +157,46 @@ if (currentBand && currentBand.items.length > 0) {
 		margin-bottom: 3.25rem;
 		padding: 4.25rem 1.5rem;
 		box-sizing: border-box;
-		border-top: 1px solid rgba(128, 128, 128, 0.14);
-		border-bottom: 1px solid rgba(128, 128, 128, 0.14);
+		border: none;
+	}
+
+	/* 2カラムレイアウト（マガジン・ブログ記事等）内ではサイドバー貫通を防ぎカラム内に端正に収める */
+	:global(.article-rich-text) .cms-bg-band,
+	:global(.article-two-col-layout) .cms-bg-band,
+	:global(.article-main-col) .cms-bg-band {
+		width: 100% !important;
+		max-width: 100% !important;
+		position: static !important;
+		left: auto !important;
+		right: auto !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		padding: 2.75rem 2.25rem !important;
+		border-radius: 14px !important;
+		overflow: hidden !important;
+	}
+	:global(.article-rich-text) .cms-bg-band__inner,
+	:global(.article-two-col-layout) .cms-bg-band__inner,
+	:global(.article-main-col) .cms-bg-band__inner {
+		max-width: 100% !important;
+		width: 100% !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+	@media (max-width: 768px) {
+		:global(.article-rich-text) .cms-bg-band,
+		:global(.article-two-col-layout) .cms-bg-band,
+		:global(.article-main-col) .cms-bg-band {
+			padding: 2rem 1.25rem !important;
+			border-radius: 12px !important;
+		}
+	}
+	/* 背景エリアが連続する時だけ、間の余白（黒い隙間）をなくして隙間なく接続する */
+	.cms-bg-band:has(+ .cms-bg-band) {
+		margin-bottom: 0;
+	}
+	.cms-bg-band + .cms-bg-band {
+		margin-top: 0;
 	}
 	.cms-bg-band__inner {
 		max-width: 1160px;

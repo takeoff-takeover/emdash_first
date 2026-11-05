@@ -93,42 +93,45 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		flex-direction: column;
 		gap: 2rem;
 		margin: 2.25rem 0 3rem 0;
+		container-type: inline-size;
 	}
 	.cms-split-card {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		background: var(--cms-card-bg, rgba(255, 255, 255, 0.04));
 		border: 1px solid var(--cms-card-border, rgba(255, 255, 255, 0.1));
 		border-radius: 14px;
 		overflow: hidden;
+		width: 100%;
+		box-sizing: border-box;
 	}
 
-	/* 比率バリエーション（左写真のとき：左=写真 / 右=文章） */
+	/* 比率バリエーション（左写真のとき：左=写真 / 右=文章） ※minmax(0, ...)で写真の押し広がり・文字重なりを完全防止 */
 	.cms-split-list--ratio-50-50 .cms-split-card.is-left {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 	}
 	.cms-split-list--ratio-60-40 .cms-split-card.is-left {
-		grid-template-columns: 1.5fr 1fr;
+		grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
 	}
 	.cms-split-list--ratio-65-35 .cms-split-card.is-left {
-		grid-template-columns: 1.85fr 1fr;
+		grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
 	}
 	.cms-split-list--ratio-40-60 .cms-split-card.is-left {
-		grid-template-columns: 1fr 1.5fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
 	}
 
 	/* 比率バリエーション（右写真のとき：左=文章 / 右=写真） */
 	.cms-split-list--ratio-50-50 .cms-split-card.is-right {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 	}
 	.cms-split-list--ratio-60-40 .cms-split-card.is-right {
-		grid-template-columns: 1fr 1.5fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
 	}
 	.cms-split-list--ratio-65-35 .cms-split-card.is-right {
-		grid-template-columns: 1fr 1.85fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.85fr);
 	}
 	.cms-split-list--ratio-40-60 .cms-split-card.is-right {
-		grid-template-columns: 1.5fr 1fr;
+		grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
 	}
 
 	.cms-split-card.is-right .cms-split-card__media {
@@ -139,10 +142,13 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 	}
 
 	.cms-split-card__media {
-		min-height: 280px;
+		min-width: 0;
+		width: 100%;
+		height: 100%;
 		aspect-ratio: 16 / 10;
 		background: rgba(128, 128, 128, 0.12);
 		overflow: hidden;
+		position: relative;
 	}
 	.cms-split-card__media img {
 		width: 100%;
@@ -153,22 +159,26 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		margin: 0 !important;
 	}
 	.cms-split-card__content {
-		padding: 2.25rem;
+		min-width: 0;
+		padding: 1.75rem 1.75rem;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+		overflow-wrap: break-word;
+		word-break: break-word;
+		box-sizing: border-box;
 	}
 	.cms-split-card__title {
 		font-size: 1.35rem;
 		font-weight: 700;
-		color: var(--cms-card-heading, inherit);
+		color: var(--cms-card-heading, #ffffff) !important;
 		margin: 0 0 0.875rem 0 !important;
 		line-height: 1.4;
 	}
 	.cms-split-card__desc {
 		font-size: 0.95rem;
-		color: var(--cms-card-text, inherit);
-		opacity: 0.86;
+		color: var(--cms-card-text, rgba(255, 255, 255, 0.88)) !important;
+		opacity: 1;
 		line-height: 1.8;
 		margin: 0 !important;
 		white-space: pre-line;
@@ -181,7 +191,7 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		align-items: center;
 		font-size: 0.875rem;
 		font-weight: 700;
-		color: var(--cms-card-heading, inherit);
+		color: var(--cms-card-heading, #ffffff) !important;
 		text-decoration: none !important;
 		padding: 0.65rem 1.25rem;
 		border: 1px solid var(--cms-card-border, rgba(128, 128, 128, 0.35));
@@ -190,6 +200,49 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 	}
 	.cms-split-card__btn:hover {
 		background: rgba(128, 128, 128, 0.12);
+	}
+
+	/* 明るい背景（白・ライトグレー背景帯）の中にある場合のカード配色 */
+	:global(.cms-bg-band.is-dark-text) .cms-split-card {
+		background: #ffffff !important;
+		border-color: rgba(0, 0, 0, 0.08) !important;
+		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-split-card__title {
+		color: #111113 !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-split-card__desc {
+		color: #3f3f46 !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-split-card__btn {
+		color: #111113 !important;
+		border-color: rgba(0, 0, 0, 0.2) !important;
+	}
+
+	@container (max-width: 560px) {
+		.cms-split-card,
+		.cms-split-list--ratio-50-50 .cms-split-card.is-left,
+		.cms-split-list--ratio-60-40 .cms-split-card.is-left,
+		.cms-split-list--ratio-65-35 .cms-split-card.is-left,
+		.cms-split-list--ratio-40-60 .cms-split-card.is-left,
+		.cms-split-list--ratio-50-50 .cms-split-card.is-right,
+		.cms-split-list--ratio-60-40 .cms-split-card.is-right,
+		.cms-split-list--ratio-65-35 .cms-split-card.is-right,
+		.cms-split-list--ratio-40-60 .cms-split-card.is-right {
+			grid-template-columns: minmax(0, 1fr) !important;
+		}
+		.cms-split-card.is-right .cms-split-card__media {
+			order: 1 !important;
+		}
+		.cms-split-card.is-right .cms-split-card__content {
+			order: 2 !important;
+		}
+		.cms-split-card__media {
+			aspect-ratio: 16 / 9;
+		}
+		.cms-split-card__content {
+			padding: 1.5rem 1.25rem;
+		}
 	}
 
 	@media (max-width: 768px) {
@@ -202,19 +255,19 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		.cms-split-list--ratio-60-40 .cms-split-card.is-right,
 		.cms-split-list--ratio-65-35 .cms-split-card.is-right,
 		.cms-split-list--ratio-40-60 .cms-split-card.is-right {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr) !important;
 		}
 		.cms-split-card.is-right .cms-split-card__media {
-			order: 1;
+			order: 1 !important;
 		}
 		.cms-split-card.is-right .cms-split-card__content {
-			order: 2;
+			order: 2 !important;
 		}
 		.cms-split-card__media {
-			min-height: 210px;
+			aspect-ratio: 16 / 9;
 		}
 		.cms-split-card__content {
-			padding: 1.5rem;
+			padding: 1.5rem 1.25rem;
 		}
 	}
 </style>

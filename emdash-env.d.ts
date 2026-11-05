@@ -16,6 +16,7 @@ export interface Magazine {
   excerpt?: string;
   related_location?: string;
   notes?: string;
+  layout?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -146,6 +147,7 @@ export interface Post {
   excerpt?: string;
   related_location?: string;
   notes?: string;
+  layout?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

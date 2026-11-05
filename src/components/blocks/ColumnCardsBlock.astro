@@ -48,11 +48,12 @@ if (Array.isArray(data.items) && data.items.length > 0) {
 
 const rawCols = String(data.columns || "auto");
 let resolvedCols = 3;
-if (rawCols === "2" || rawCols === "3" || rawCols === "4") {
+if (cards.length === 1 || rawCols === "1") {
+	resolvedCols = 1;
+} else if (rawCols === "2" || rawCols === "3" || rawCols === "4") {
 	resolvedCols = Number(rawCols);
 } else {
-	if (cards.length === 1) resolvedCols = 1;
-	else if (cards.length === 2 || cards.length === 4) resolvedCols = 2;
+	if (cards.length === 2 || cards.length === 4) resolvedCols = 2;
 	else resolvedCols = 3;
 }
 
@@ -106,9 +107,12 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		align-items: stretch;
 	}
 	.cms-col-cards--cols-1 .cms-col-cards__grid {
-		grid-template-columns: 1fr;
-		max-width: 820px;
-		margin: 0 auto;
+		grid-template-columns: minmax(0, 1fr);
+		width: 100%;
+		max-width: 100%;
+	}
+	.cms-col-cards--cols-1 .cms-col-card__media {
+		aspect-ratio: 21 / 9;
 	}
 	.cms-col-cards--cols-2 .cms-col-cards__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -197,14 +201,13 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		font-weight: 700;
 		line-height: 1.45;
 		margin: 0 0 0.65rem 0 !important;
-		color: var(--cms-card-heading, inherit);
+		color: var(--cms-card-heading, #ffffff) !important;
 	}
 	.cms-col-card__text {
 		font-size: 0.925rem;
 		line-height: 1.75;
 		margin: 0 !important;
-		color: var(--cms-card-text, inherit);
-		opacity: 0.86;
+		color: var(--cms-card-text, rgba(255, 255, 255, 0.88)) !important;
 		white-space: pre-line;
 		flex: 1;
 	}
@@ -218,12 +221,28 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		align-items: center;
 		font-size: 0.875rem;
 		font-weight: 700;
-		color: var(--cms-card-heading, inherit);
+		color: var(--cms-card-heading, #ffffff) !important;
 		text-decoration: none !important;
 		transition: opacity 0.15s ease;
 	}
 	.cms-col-card__btn:hover {
 		opacity: 0.75;
+	}
+
+	/* 明るい背景（白・ライトグレー背景帯）の中にある場合のカード配色 */
+	:global(.cms-bg-band.is-dark-text) .cms-col-card {
+		background: #ffffff !important;
+		border-color: rgba(0, 0, 0, 0.08) !important;
+		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-col-card__title {
+		color: #111113 !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-col-card__text {
+		color: #3f3f46 !important;
+	}
+	:global(.cms-bg-band.is-dark-text) .cms-col-card__btn {
+		color: #111113 !important;
 	}
 
 	@media (max-width: 1024px) {
@@ -240,6 +259,9 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		.cms-col-cards--cols-4 .cms-col-cards__grid {
 			grid-template-columns: 1fr;
 			gap: 1.15rem;
+		}
+		.cms-col-cards--cols-1 .cms-col-card__media {
+			aspect-ratio: 16 / 10;
 		}
 		.cms-col-card__body {
 			padding: 1.25rem;

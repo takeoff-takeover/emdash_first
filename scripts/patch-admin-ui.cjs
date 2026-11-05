@@ -1012,6 +1012,45 @@ const injectedCode = `
 					return lum < 0.36;
 				}
 
+				function getBandVisual(data) {
+					const c1 = String(data?.color || '#141418').trim() || '#141418';
+					const c2 = String(data?.end_color || c1).trim();
+					const gType = data?.gradient_type || data?.gradient_dir || 'vertical';
+					const dirMap = {
+						vertical: '縦グラデーション',
+						diagonal: '斜めグラデーション',
+						spotlight: '中央スポットライト',
+						solid: '単色塗りつぶし'
+					};
+					const isGrad = c2 && c2.toLowerCase() !== c1.toLowerCase() && gType !== 'solid';
+					let bgCss = c1;
+					if (isGrad) {
+						if (gType === 'diagonal') {
+							bgCss = \`linear-gradient(135deg, \${c1} 0%, \${c2} 100%)\`;
+						} else if (gType === 'spotlight') {
+							bgCss = \`radial-gradient(circle at 50% 25%, \${c2} 0%, \${c1} 85%)\`;
+						} else {
+							bgCss = \`linear-gradient(180deg, \${c1} 0%, \${c2} 100%)\`;
+						}
+					}
+					const summaryLabel = isGrad
+						? \`\${c1} → \${c2}（\${dirMap[gType] || 'グラデーション'}）\`
+						: \`\${c1}（単色背景）\`;
+
+					const dark1 = isDarkColorHex(c1);
+					const dark2 = isDarkColorHex(c2 || c1);
+					const isDark = (dark1 && dark2) || dark1;
+					const textColor = isDark ? '#ffffff' : '#111114';
+
+					return {
+						bgCss,
+						summaryLabel,
+						textColor,
+						isDark,
+						isGrad
+					};
+				}
+
 				const NICOLE_COLOR_PRESETS = [
 					{ label: 'ジェットブラック', hex: '#000000' },
 					{ label: 'チャコールダーク', hex: '#141418' },
@@ -1082,15 +1121,19 @@ const injectedCode = `
 								p.textContent = 'まだ項目がありません。下の「＋」ボタンから追加してください。';
 							}
 						});
+						group.querySelectorAll('button[aria-expanded]').forEach(btn => {
+							if (!btn.dataset.nicoleCollapseBound) {
+								btn.dataset.nicoleCollapseBound = 'true';
+								btn.addEventListener('click', (e) => {
+									if (e.isTrusted) {
+										// ユーザーが手動クリックで閉じた場合のみ記録
+										const willCollapse = btn.getAttribute('aria-expanded') === 'true';
+										btn.dataset.nicoleUserCollapsed = willCollapse ? 'true' : 'false';
+									}
+								});
+							}
+						});
 					});
-					if (!modalScroll.dataset.nicoleRepeaterInit) {
-						modalScroll.dataset.nicoleRepeaterInit = 'true';
-						const firstCollapsed = modalScroll.querySelector('[role="group"] button[aria-expanded="false"]');
-						const anyExpanded = modalScroll.querySelector('[role="group"] button[aria-expanded="true"]');
-						if (firstCollapsed && !anyExpanded) {
-							firstCollapsed.click();
-						}
-					}
 
 					// 3. カラーパレット＆スポイト（開始色・終了色）とURLワンクリック補助チップ
 					let startColorInput = null;
@@ -1137,9 +1180,11 @@ const injectedCode = `
 								const clearBtn = document.createElement('button');
 								clearBtn.type = 'button';
 								clearBtn.className = 'nicole-color-swatch-btn';
-								clearBtn.textContent = '✕ 単色にする（終了色をクリア）';
+								clearBtn.textContent = '開始色と同じにする（単色）';
 								clearBtn.addEventListener('click', () => {
-									setReactInputValue(input, '');
+									const sv = (startColorInput && startColorInput.value ? startColorInput.value.trim() : '') || '#141418';
+									colorPicker.value = /^#[0-9a-fA-F]{6}$/.test(sv) ? sv : '#141418';
+									setReactInputValue(input, sv);
 								});
 								topRow.appendChild(clearBtn);
 							}
@@ -1203,16 +1248,15 @@ const injectedCode = `
 						}
 						const c1 = (startColorInput.value || '#141418').trim() || '#141418';
 						const c2 = endColorInput ? (endColorInput.value || '').trim() : '';
-						const bgCss = (c2 && c2.toLowerCase() !== c1.toLowerCase())
-							? \`linear-gradient(135deg, \${c1} 0%, \${c2} 100%)\`
-							: c1;
-						const dark = isDarkColorHex(c1);
-						liveBar.style.background = bgCss;
-						liveBar.style.color = dark ? '#ffffff' : '#111114';
+						const gradSelect = modalScroll.querySelector('select');
+						const gType = gradSelect ? gradSelect.value : 'vertical';
+						const visual = getBandVisual({ color: c1, end_color: c2, gradient_type: gType });
+						liveBar.style.background = visual.bgCss;
+						liveBar.style.color = visual.textColor;
 						liveBar.innerHTML = \`
-							<span>背景プレビュー（\${c2 && c2 !== c1 ? c1 + ' → ' + c2 + ' グラデーション' : c1 + ' 単色'}）</span>
-							<span style="font-size:11px; padding:3px 8px; border-radius:4px; background:\${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)'};">
-								自動文字色：\${dark ? '白文字で表示' : '黒文字で表示'}
+							<span>背景プレビュー（\${visual.summaryLabel}）</span>
+							<span style="font-size:11px; padding:3px 8px; border-radius:4px; background:\${visual.isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)'};">
+								自動文字色：\${visual.isDark ? '白文字で表示' : '黒文字で表示'}
 							</span>
 						\`;
 					}
@@ -1222,24 +1266,68 @@ const injectedCode = `
 					if (!blockEl) return null;
 					const rendererEl = blockEl.closest('.react-renderer') || blockEl.parentElement;
 
-					// 1. ProseMirror の pmViewDesc / Tiptap ReactNodeView から直接取得（段落追加やReact再描画の影響を一切受けない最優先ルート）
-					const viewDesc = rendererEl?.pmViewDesc || blockEl?.pmViewDesc;
+					// 1. ProseMirror の pmViewDesc / Tiptap ReactNodeView から直接取得（上下移動や段落追加の影響を一切受けない最優先ルート）
+					let descHost = blockEl;
+					while (descHost && !descHost.pmViewDesc && !descHost.classList?.contains('ProseMirror')) {
+						descHost = descHost.parentElement;
+					}
+					const viewDesc = descHost?.pmViewDesc || rendererEl?.pmViewDesc || blockEl?.pmViewDesc;
 					if (viewDesc) {
 						const spec = viewDesc.spec;
-						const pmNode = spec?.node || viewDesc.node || spec?.renderer?.props?.node;
+						const pmNode = viewDesc.node || spec?.node || spec?.renderer?.props?.node;
 						if (pmNode && pmNode.attrs && pmNode.attrs.blockType) {
 							const result = {
 								node: pmNode,
 								editor: spec?.editor || spec?.renderer?.props?.editor,
-								getPos: typeof spec?.getPos === 'function' ? () => spec.getPos() : spec?.renderer?.props?.getPos
+								getPos: () => {
+									try {
+										if (typeof viewDesc.posBefore === 'number') return viewDesc.posBefore;
+									} catch (_) {}
+									return typeof spec?.getPos === 'function' ? spec.getPos() : spec?.renderer?.props?.getPos?.();
+								}
 							};
+							// pmNode の attrs.data が空の場合のみ DOM属性からフォールバック
+							if (!pmNode.attrs.data || Object.keys(pmNode.attrs.data).length === 0) {
+								if (blockEl.dataset.nicoleBlockType) {
+									try {
+										result.node = {
+											attrs: {
+												...pmNode.attrs,
+												data: JSON.parse(blockEl.dataset.nicoleBlockData || '{}')
+											}
+										};
+									} catch (_) {}
+								}
+							}
 							blockEl.__nicoleCachedBlock = result;
 							if (rendererEl) rendererEl.__nicoleCachedBlock = result;
 							return result;
 						}
 					}
 
-					// 2. React Fiber ツリーから探索（current と alternate の両方を走査）
+					// 2. NodeViewWrapper の data-nicole-block-type / data-nicole-block-data 属性から直接取得
+					if (blockEl.dataset.nicoleBlockType) {
+						let parsedData = {};
+						try {
+							parsedData = JSON.parse(blockEl.dataset.nicoleBlockData || '{}');
+						} catch (_) {}
+						const fallbackEditor = blockEl.__nicoleCachedBlock?.editor || rendererEl?.__nicoleCachedBlock?.editor;
+						const fallbackGetPos = blockEl.__nicoleCachedBlock?.getPos || rendererEl?.__nicoleCachedBlock?.getPos;
+						const attrResult = {
+							node: {
+								attrs: {
+									blockType: blockEl.dataset.nicoleBlockType,
+									data: parsedData
+								}
+							},
+							editor: fallbackEditor,
+							getPos: fallbackGetPos
+						};
+						blockEl.__nicoleCachedBlock = attrResult;
+						return attrResult;
+					}
+
+					// 3. React Fiber ツリーから探索（current と alternate の両方を走査）
 					const targets = [blockEl, rendererEl].filter(Boolean);
 					for (const el of targets) {
 						const fiberKey = Object.keys(el).find(k => k.startsWith('__reactFiber$'));
@@ -1258,7 +1346,7 @@ const injectedCode = `
 						}
 					}
 
-					// 3. 一時的な再描画中は直前のキャッシュを返す（プレビュー消失を完全防止）
+					// 4. 一時的な再描画中は直前のキャッシュを返す（プレビュー消失を完全防止）
 					return blockEl.__nicoleCachedBlock || rendererEl?.__nicoleCachedBlock || null;
 				}
 
@@ -1277,16 +1365,19 @@ const injectedCode = `
 						if (targetIndex < 0 || targetIndex >= doc.childCount) return;
 						const currentNode = doc.child(index);
 						const otherNode = doc.child(targetIndex);
+						// 移動対象ブロック自身ではなく隣接ブロックを移動させることで、自身のNodeViewとプレビュー状態を維持する
 						if (dir === -1) {
 							const prevPos = pos - otherNode.nodeSize;
-							tr.delete(pos, pos + currentNode.nodeSize);
-							tr.insert(prevPos, currentNode);
+							tr.delete(prevPos, pos);
+							tr.insert(pos + currentNode.nodeSize - otherNode.nodeSize, otherNode);
 						} else {
 							const nextPos = pos + currentNode.nodeSize;
 							tr.delete(nextPos, nextPos + otherNode.nodeSize);
 							tr.insert(pos, otherNode);
 						}
 						editor.view.dispatch(tr.scrollIntoView());
+						enhanceEditorPluginBlocks();
+						requestAnimationFrame(() => enhanceEditorPluginBlocks());
 					} catch (e) {
 						console.error('[patch-admin-ui] Failed to move block:', e);
 					}
@@ -1295,7 +1386,7 @@ const injectedCode = `
 				function enhanceEditorPluginBlocks() {
 					injectEditorialBlockStyles();
 					const blocks = document.querySelectorAll('.plugin-block');
-					blocks.forEach(blockEl => {
+					blocks.forEach(blockEl => { try {
 						const card = blockEl.querySelector('.rounded-lg.border');
 						if (!card) return;
 
@@ -1336,7 +1427,27 @@ const injectedCode = `
 							actionBar.insertBefore(upBtn, actionBar.firstChild);
 						}
 
-						const stateFingerprint = JSON.stringify({ blockType, data });
+						let precedingStart = '';
+						let precedingStartData = null;
+						if (blockType.endsWith('bg_band_end')) {
+							for (const el of blocks) {
+								if (el === blockEl) break;
+								const fp = getPluginBlockFiberProps(el);
+								const t = String(fp?.node?.attrs?.blockType || el.dataset.nicoleBlockType || '');
+								if (t.endsWith('bg_band_start')) {
+									let d = fp?.node?.attrs?.data;
+									if (!d || Object.keys(d).length === 0) {
+										try { d = JSON.parse(el.dataset.nicoleBlockData || '{}'); } catch (_) {}
+									}
+									precedingStartData = d || {};
+									precedingStart = JSON.stringify(precedingStartData);
+								} else if (t.endsWith('bg_band_end')) {
+									precedingStart = '';
+									precedingStartData = null;
+								}
+							}
+						}
+						const stateFingerprint = JSON.stringify({ blockType, data, precedingStart });
 						if (card.dataset.nicoleLastSummary === stateFingerprint && card.querySelector('.nicole-block-preview')) {
 							return;
 						}
@@ -1347,27 +1458,18 @@ const injectedCode = `
 						const items = Array.isArray(data.items) ? data.items : [];
 
 						if (blockType.endsWith('bg_band_start')) {
-							const c1 = data.color || '#141418';
-							const c2 = data.end_color || '';
-							const gType = data.gradient_type || data.gradient_dir || 'vertical';
-							const dirMap = { vertical: '縦グラデーション', diagonal: '斜めグラデーション', spotlight: '中央スポットライト', solid: '単色塗りつぶし' };
-							const summaryLabel = c2 && c2 !== c1 && gType !== 'solid'
-								? \`\${c1} → \${c2}（\${dirMap[gType] || 'グラデーション'}）\`
-								: \`\${c1}（単色背景）\`;
-
+							const visual = getBandVisual(data);
 							const oldPreview = card.querySelector('.nicole-block-preview');
 							if (oldPreview) oldPreview.remove();
 							card.dataset.nicoleLastSummary = stateFingerprint;
 
 							const preview = document.createElement('div');
 							preview.className = 'nicole-block-preview';
-							const bgCss = (c2 && c2 !== c1 && gType !== 'solid') ? \`linear-gradient(135deg, \${c1} 0%, \${c2} 100%)\` : c1;
-							const dark = isDarkColorHex(c1);
-							preview.style.background = bgCss;
-							preview.style.color = dark ? '#ffffff' : '#111114';
+							preview.style.background = visual.bgCss;
+							preview.style.color = visual.textColor;
 							preview.innerHTML = \`
 								<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;">
-									<span>▼ ここから下の見出し・文章・ブロックに背景色を適用（\${summaryLabel}）</span>
+									<span>▼ ここから下の見出し・文章・ブロックに背景色を適用（\${visual.summaryLabel}）</span>
 									<span style="font-size:11px;opacity:0.85;">クリックして色を変更</span>
 								</div>
 							\`;
@@ -1386,11 +1488,30 @@ const injectedCode = `
 
 							const preview = document.createElement('div');
 							preview.className = 'nicole-block-preview';
-							preview.innerHTML = \`
-								<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-color-kumo-subtle);">
-									<span>▲ ここまでで背景色エリアを終了し、通常の背景に戻します</span>
-								</div>
-							\`;
+
+							if (precedingStartData && (precedingStartData.color || precedingStartData.end_color)) {
+								const visual = getBandVisual(precedingStartData);
+								preview.style.background = visual.bgCss;
+								preview.style.color = visual.textColor;
+								preview.innerHTML = \`
+									<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;">
+										<span>▲ ここまでで背景色エリアを終了（\${visual.summaryLabel}）</span>
+										<span style="font-size:11px;opacity:0.85;">クリックして色を変更</span>
+									</div>
+								\`;
+								preview.addEventListener('click', () => {
+									const editBtn = card.querySelectorAll('button:not(.nicole-move-btn)');
+									if (editBtn.length >= 2) editBtn[editBtn.length - 2].click();
+								});
+							} else {
+								preview.style.background = 'transparent';
+								preview.style.color = 'var(--text-color-kumo-subtle)';
+								preview.innerHTML = \`
+									<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-color-kumo-subtle);font-weight:600;">
+										<span>▲ ここまでで背景色エリアを終了し、通常の背景に戻します</span>
+									</div>
+								\`;
+							}
 							card.appendChild(preview);
 							return;
 						}
@@ -1492,12 +1613,12 @@ const injectedCode = `
 						});
 
 						card.appendChild(preview);
-					});
+					} catch (err) { console.error('[patch-admin-ui] block enhance failed:', err); } });
 
 					// エディタキャンバス上で「背景エリア開始」〜「背景エリア終了」に挟まれた全要素を左ラインでハイライト
 					// ※ProseMirrorのDOMObserverが段落編集と競合しないよう、実際に変更が必要な時のみ属性を更新する
 					const proseMirror = document.querySelector('.ProseMirror');
-					if (proseMirror) {
+					if (false && proseMirror) {
 						let currentBandColor = null;
 						Array.from(proseMirror.children).forEach(child => {
 							const pBlock = child.classList.contains('plugin-block') ? child : child.querySelector('.plugin-block');
@@ -1566,4 +1687,53 @@ if (bodyCloseIdx !== -1) {
   console.log('[patch-admin-ui] Successfully injected clean Accordion UI + Badges Selector into admin.astro.');
 } else {
   console.error('[patch-admin-ui] Could not find </body> in admin.astro.');
+}
+
+// @emdash-cms/admin バンドルおよび Vite 事前バンドルキャッシュのパッチ
+// 1. PluginBlockNodeView に data-nicole-block-type / data-nicole-block-data 属性を直接出力させる
+// 2. BlockKitRepeater の各項目を初期状態で常時展開（手動で閉じた項目のみ折りたたむ）にする
+const bundleCandidates = [
+  path.join(__dirname, '..', 'node_modules', '@emdash-cms', 'admin', 'dist', 'index.js'),
+];
+const viteDepsDir = path.join(__dirname, '..', 'node_modules', '.vite', 'deps');
+if (fs.existsSync(viteDepsDir)) {
+  for (const file of fs.readdirSync(viteDepsDir)) {
+    if (file.startsWith('dist-') && file.endsWith('.js')) {
+      bundleCandidates.push(path.join(viteDepsDir, file));
+    }
+  }
+}
+
+for (const bundlePath of bundleCandidates) {
+  if (!fs.existsSync(bundlePath)) continue;
+  let js = fs.readFileSync(bundlePath, 'utf8');
+  let modified = false;
+
+  // 1. PluginBlockNodeView: data-nicole-block-type / data-nicole-block-data の付与
+  const nodeViewTarget = 'className: "plugin-block relative my-4",\n\t\tcontentEditable: false,\n\t\t"data-drag-handle": true,';
+  const nodeViewReplacement = 'className: "plugin-block relative my-4",\n\t\tcontentEditable: false,\n\t\t"data-drag-handle": true,\n\t\t"data-nicole-block-type": blockType,\n\t\t"data-nicole-block-data": JSON.stringify(data),';
+  if (!js.includes('"data-nicole-block-type": blockType') && js.includes(nodeViewTarget)) {
+    js = js.replace(nodeViewTarget, nodeViewReplacement);
+    modified = true;
+  }
+
+  // 2. BlockKitRepeater: すべての項目をデフォルトで展開状態に保つ（expanded Set を「手動で閉じたキー」として扱う）
+  const repeaterAddTarget = 'setExpanded((prev) => {\n\t\t\tconst next = new Set(prev);\n\t\t\tnext.add(newItem._key);\n\t\t\treturn next;\n\t\t});';
+  const repeaterAddReplacement = 'setExpanded((prev) => {\n\t\t\tconst next = new Set(prev);\n\t\t\tnext.delete(newItem._key);\n\t\t\treturn next;\n\t\t});';
+  if (js.includes(repeaterAddTarget)) {
+    js = js.replace(repeaterAddTarget, repeaterAddReplacement);
+    modified = true;
+  }
+
+  const repeaterCollapseTarget = 'isCollapsed: !expanded.has(item._key),';
+  const repeaterCollapseReplacement = 'isCollapsed: expanded.has(item._key),';
+  if (js.includes(repeaterCollapseTarget)) {
+    js = js.replace(repeaterCollapseTarget, repeaterCollapseReplacement);
+    modified = true;
+  }
+
+  if (modified) {
+    fs.writeFileSync(bundlePath, js, 'utf8');
+    console.log('[patch-admin-ui] Patched admin bundle:', path.relative(path.join(__dirname, '..'), bundlePath));
+  }
 }

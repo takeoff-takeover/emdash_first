@@ -39,6 +39,24 @@
           "unique": false
         },
         {
+          "slug": "layout",
+          "label": "ページレイアウト",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "defaultValue": "2col",
+          "options": [
+            {
+              "label": "標準（2カラム・関連記事サイドバーあり）",
+              "value": "2col"
+            },
+            {
+              "label": "1カラム（特設特集・キャンペーン用）",
+              "value": "1col"
+            }
+          ]
+        },
+        {
           "slug": "content",
           "label": "本文",
           "type": "portableText",
@@ -53,56 +71,88 @@
           "unique": false
         },
         {
+          "slug": "notes",
+          "label": "注釈・免責事項（文字小・デフォルト空）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
           "slug": "related_location",
           "label": "関連拠点 (Related Showroom)",
-          "type": "select",
+          "type": "multiSelect",
           "required": false,
           "unique": false,
           "options": [
             {
-              "label": "なし（設定しない）",
-              "value": ""
+              "label": "Nicole BMW 本社（川崎）",
+              "value": "nicole-bmw-kawasaki"
             },
             {
-              "label": "Nicole BMW 本社ショールーム（川崎）",
-              "value": "nicole-bmw-kawasaki"
+              "label": "Nicole BMW 新百合ヶ丘支店 / BMW Premium Selection 新百合ヶ丘",
+              "value": "nicole-bmw-shinyurigaoka"
+            },
+            {
+              "label": "Nicole BMW 横浜港北支店",
+              "value": "nicole-bmw-kohoku"
+            },
+            {
+              "label": "Nicole BMW 青葉宮前支店",
+              "value": "nicole-bmw-aoba-miyamae"
             },
             {
               "label": "Nicole BMW 大田支店",
               "value": "nicole-bmw-ota"
             },
             {
-              "label": "Nicole BMW 青葉宮前支店",
-              "value": "nicole-bmw-aobamiyamae"
+              "label": "BMW Premium Selection 横浜港北",
+              "value": "bps-kohoku"
             },
             {
-              "label": "Nicole BMW 横浜港北支店",
-              "value": "nicole-bmw-yokohama-kohoku"
+              "label": "Nicole BMW Service Centre",
+              "value": "nicole-bmw-service-centre"
             },
             {
-              "label": "Nicole BMW 新百合ヶ丘支店",
-              "value": "nicole-bmw-shin-yurigaoka"
+              "label": "MINI 新百合ヶ丘 / MINI NEXT 新百合ヶ丘",
+              "value": "mini-shinyurigaoka"
+            },
+            {
+              "label": "MINI 港北",
+              "value": "mini-kohoku"
+            },
+            {
+              "label": "MINI 都筑",
+              "value": "mini-tsuzuki"
+            },
+            {
+              "label": "MINI NEXT 横浜港北",
+              "value": "mini-next-kohoku"
             },
             {
               "label": "ロールス・ロイス・モーター・カーズ横浜",
-              "value": "rolls-royce-yokohama"
+              "value": "rolls-royce-motor-cars-yokohama"
             },
             {
-              "label": "Nicole Competizione 青山（Ferrari）",
-              "value": "ferrari-aoyama"
+              "label": "Nicole Competizione ショールーム（Ferrari）",
+              "value": "nicole-competizione-showroom"
+            },
+            {
+              "label": "Nicole Competizione プレオウンド ショールーム（Ferrari）",
+              "value": "nicole-competizione-pre-owned"
+            },
+            {
+              "label": "Nicole Competizione サービスセンター（Ferrari）",
+              "value": "nicole-competizione-service-centre"
+            },
+            {
+              "label": "ニコル青山ショールーム（ALPINA）",
+              "value": "nicole-aoyama"
             },
             {
               "label": "ニコル世田谷ショールーム（ALPINA）",
-              "value": "alpina-setagaya"
+              "value": "nicole-setagaya"
             }
           ]
-        },
-        {
-          "slug": "notes",
-          "label": "注釈・免責事項（文字小・デフォルト空）",
-          "type": "text",
-          "required": false,
-          "unique": false
         }
       ]
     },
@@ -593,6 +643,113 @@
       ]
     },
     {
+      "slug": "campaigns",
+      "label": "キャンペーン",
+      "labelSingular": "キャンペーン記事",
+      "description": "BMW・MINI・Ferrari等の正規ディーラー限定キャンペーン・フェア管理コレクション",
+      "icon": "sparkles",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "scheduling",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "sortOrder": 3,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "タイトル",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "featured_image",
+          "label": "アイキャッチ写真 (PC用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "featured_image_sp",
+          "label": "アイキャッチ写真 (スマホ用)",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "本文",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "excerpt",
+          "label": "抜粋 / リード文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "period_text",
+          "label": "開催期間表記 (例: 2026年11月1日(日) 〜 11月30日(月))",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "target_locations",
+          "label": "対象拠点 (例: Nicole MINI 全拠点 / Nicole BMW 全支店)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "category",
+          "label": "キャンペーン種別",
+          "type": "select",
+          "required": true,
+          "unique": false,
+          "options": [
+            {
+              "label": "新車フェア・試乗会",
+              "value": "新車"
+            },
+            {
+              "label": "認定中古車特選フェア",
+              "value": "認定中古車"
+            },
+            {
+              "label": "サービス・点検・車検キャンペーン",
+              "value": "サービス"
+            },
+            {
+              "label": "イベント・オーナーズ企画",
+              "value": "イベント"
+            }
+          ]
+        },
+        {
+          "slug": "cta_label",
+          "label": "予約・申込ボタン表記 (例: フェアの試乗・来場を予約する)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "cta_url",
+          "label": "予約・申込ボタン遷移先URL",
+          "type": "string",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
       "slug": "pages",
       "label": "Pages",
       "labelSingular": "Page",
@@ -725,5 +882,5 @@
       ]
     }
   ],
-  "version": "0358d853afa6f3fc"
+  "version": "f1bbe41041ddde78"
 }

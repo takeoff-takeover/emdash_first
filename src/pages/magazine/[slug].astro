@@ -744,8 +744,15 @@ if (!post) {
 	return Astro.rewrite("/404");
 }
 
-// 関連拠点データの判定（CMSの related_location フィールドに基づく動的連携）
-const relatedLocationKey = (post.data as any).related_location || "nicole-bmw-kawasaki";
+// 関連拠点データの判定（CMSの related_location: 単一文字列 または 配列の両方に対応）
+const rawRelatedLoc = (post.data as any).related_location;
+const relatedLocationKeys: string[] = Array.isArray(rawRelatedLoc)
+	? rawRelatedLoc.filter((k: any) => typeof k === "string" && k.trim().length > 0)
+	: typeof rawRelatedLoc === "string" && rawRelatedLoc.trim().length > 0
+		? [rawRelatedLoc.trim()]
+		: [];
+const hasShowroom = relatedLocationKeys.length > 0;
+const firstLocationKey = relatedLocationKeys[0] || "nicole-bmw-kawasaki";
 
 // 拠点マスタ定義
 const showroomCatalog: Record<string, any> = {
@@ -781,7 +788,7 @@ const showroomCatalog: Record<string, any> = {
 	}
 };
 
-const relatedShowroom = showroomCatalog[relatedLocationKey] || showroomCatalog["nicole-bmw-kawasaki"];
+const relatedShowroom = showroomCatalog[firstLocationKey] || showroomCatalog["nicole-bmw-kawasaki"];
 
 // アイキャッチ画像のURL取得（EmDash R2ストレージ key および 外部URLの両方に対応）
 function getImageUrl(img: unknown): string {
@@ -814,13 +821,15 @@ function getImageUrl(img: unknown): string {
 const isIX4 = slug.includes("ix4");
 const isBMWX5 = slug.includes("bmw_x5") || slug.includes("x5");
 const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
-const isDemoArticle = isIX4 || isBMWX5 || isNeueKlasse || slug === "202608_bmw_kids_mechanic";
+const isPureBlockPage = slug === "2027_new_bmw_3series_neue_klasse";
+const layoutMode = (post.data as any).layout || "2col";
+const isOneColumn = layoutMode === "1col";
+const isDemoArticle = !isPureBlockPage && (isIX4 || isBMWX5 || isNeueKlasse || slug === "202608_bmw_kids_mechanic");
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
 
 const heroImageUrl = getImageUrl(featuredImage) || (isIX4 ? "/uploads/ix4/key-visual-v2.jpg" : (isBMWX5 ? "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg" : (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg")));
 const heroImageUrlSp = getImageUrl(featuredImageSp);
-const hasShowroom = Boolean((post.data as any).related_location);
 
 // 新型BMW X5 フォトギャラリー（BMW Group PressClub 公式高解像度写真）
 
@@ -1006,10 +1015,11 @@ const kidsGallery = [
 
 const currentGallery = isIX4 ? ix4Gallery : (isBMWX5 ? x5Gallery : (isNeueKlasse ? neueKlasseGallery : kidsGallery));
 
-// 本文内に既にスライダー／アコーディオン／FAQブロックが存在するか判定
+// 本文内に既にスライダー／アコーディオン／FAQ／注釈ブロックが存在するか判定
 const contentArray = Array.isArray(post.data.content) ? post.data.content : [];
-const hasSliderBlock = contentArray.some((b: any) => b && b._type === "slider");
-const hasAccordionBlock = contentArray.some((b: any) => b && (b._type === "accordion" || b._type === "faq" || b._type === "accordion_faq"));
+const hasSliderBlock = contentArray.some((b: any) => b && (b._type === "slider" || b._type === "editorial-tools:slider"));
+const hasAccordionBlock = contentArray.some((b: any) => b && (b._type === "accordion" || b._type === "faq" || b._type === "accordion_faq" || b._type === "editorial-tools:faq"));
+const hasNotesBlock = contentArray.some((b: any) => b && (b._type === "notes" || b._type === "editorial-tools:notes"));
 
 // 本文の数字付き見出し・タイトルを自動サニタイズ（「1. 」「2. 」等の連番を完全撤廃）
 function sanitizeContent(content: any) {
@@ -1204,18 +1214,18 @@ function getTitleSegments(rawTitle: string) {
 			{ text: "航続828kmの新時代", class: "title-phrase" }
 		];
 	}
+	if (rawTitle.includes("最新スクープ") || rawTitle.includes("共存")) {
+		return [
+			{ text: "【最新スクープ】2027年登場の", class: "title-phrase" },
+			{ text: "次世代BMW 3シリーズ（ノイエ・クラッセ）は", class: "title-phrase" },
+			{ text: "BEVと直6エンジンが共存へ", class: "title-phrase" }
+		];
+	}
 	if (rawTitle.includes("新型BMW 3シリーズ") || (rawTitle.includes("3シリーズ") && rawTitle.includes("直6"))) {
 		return [
 			{ text: "【公式発表】新型BMW 3シリーズ登場。", class: "title-phrase" },
 			{ text: "完全電動『BMW i3』と", class: "title-phrase" },
 			{ text: "直6搭載『M350 xDrive』が切り拓く新時代", class: "title-phrase" }
-		];
-	}
-	if (rawTitle.includes("ノイエ・クラッセ")) {
-		return [
-			{ text: "【最新スクープ】2027年登場の", class: "title-phrase" },
-			{ text: "次世代BMW 3シリーズ（ノイエ・クラッセ）は", class: "title-phrase" },
-			{ text: "BEVと直6エンジンが共存へ", class: "title-phrase" }
 		];
 	}
 	if (rawTitle.includes("。")) {
@@ -1243,10 +1253,10 @@ const editUrl = postDbId
 	isMagazine={true}
 	currentSlug={slug}
 >
-	<article class="modern-article-page" id="article-top">
-		<!-- ============================================================== -->
-		<!-- 1. 最上部：左右いっぱいに広がるアイキャッチ写真（フルブリード・シネマティック） -->
-		<!-- ============================================================== -->
+	<article class={`modern-article-page ${isOneColumn ? "is-one-column" : ""}`} id="article-top">
+		{/* ============================================================== */}
+		{/* 1. 最上部：左右いっぱいに広がるアイキャッチ写真（フルブリード・シネマティック） */}
+		{/* ============================================================== */}
 		<div class="article-hero-media-wrap">
 			<div class="article-hero-top-scrim" aria-hidden="true"></div>
 			<picture>
@@ -1267,7 +1277,7 @@ const editUrl = postDbId
 
 		<header class="article-header-section">
 			<div class="article-header-container">
-				<!-- パンくずナビゲーション & 編集リンク -->
+				{/* パンくずナビゲーション & 編集リンク */}
 				<div class="article-breadcrumb-row">
 					<nav class="article-breadcrumb" aria-label="Breadcrumb">
 						<a href="/" class="bc-link">HOME</a>
@@ -1277,7 +1287,7 @@ const editUrl = postDbId
 						<span class="bc-current">{post.data.title}</span>
 					</nav>
 
-					<!-- CMS管理画面（編集ページ）へのダイレクトリンク -->
+					{/* CMS管理画面（編集ページ）へのダイレクトリンク */}
 					<a href={editUrl} class="article-edit-btn" title="CMS管理画面でこの記事を編集">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="edit-icon">
 							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1287,7 +1297,7 @@ const editUrl = postDbId
 					</a>
 				</div>
 
-				<!-- 記事タイトル（自然な文節で改行） -->
+				{/* 記事タイトル（自然な文節で改行） */}
 				<h1 class="article-main-title">
 					{titleSegments.map(segment => (
 						segment.class ? (
@@ -1298,7 +1308,7 @@ const editUrl = postDbId
 					))}
 				</h1>
 
-				<!-- メタ情報バッジ群 -->
+				{/* メタ情報バッジ群 */}
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
@@ -1312,7 +1322,7 @@ const editUrl = postDbId
 					</time>
 					<span class="meta-reading-time">READING TIME: 4 MIN</span>
 
-					<!-- メタ行内のクイック編集リンク -->
+					{/* メタ行内のクイック編集リンク */}
 					<a href={editUrl} class="meta-edit-pill" title="この記事の編集画面を開く">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1324,19 +1334,19 @@ const editUrl = postDbId
 			</div>
 		</header>
 
-		<!-- ============================================================== -->
-		<!-- 2. 本文エリア（現代的エディトリアルレイアウト） -->
-		<!-- ============================================================== -->
+		{/* ============================================================== */}
+		{/* 2. 本文エリア（現代的エディトリアルレイアウト） */}
+		{/* ============================================================== */}
 		<div class="article-content-wrapper">
-			<div class="article-two-col-layout">
-				<!-- 左メインカラム：記事本文 -->
+			<div class={`article-two-col-layout ${isOneColumn ? "is-one-column" : ""}`}>
+				{/* 左メインカラム：記事本文 */}
 				<div class="article-main-col">
-					<!-- 本文（Portable Text） -->
+					{/* 本文（Portable Text） */}
 				<div class="article-rich-text prose prose-invert">
 					<RichPortableText value={articleContent} />
 				</div>
 
-				<!-- インタラクティブ・スライダー（デモ記事のみフォールバック表示） -->
+				{/* インタラクティブ・スライダー（デモ記事のみフォールバック表示） */}
 				{!hasSliderBlock && isDemoArticle && (
 					<section class="gallery-slider-block">
 						<div class="modern-slider-wrap" id="modernSlider">
@@ -1355,7 +1365,7 @@ const editUrl = postDbId
 									))}
 								</div>
 
-								<!-- ナビゲーション矢印 -->
+								{/* ナビゲーション矢印 */}
 								<button type="button" class="slider-btn slider-btn--prev" id="sliderPrev" aria-label="前の写真">
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
 								</button>
@@ -1364,7 +1374,7 @@ const editUrl = postDbId
 								</button>
 							</div>
 
-							<!-- サムネイルナビ -->
+							{/* サムネイルナビ */}
 							<div class="slider-thumbnails">
 								{currentGallery.map((item, index) => (
 									<button type="button" class={`slider-thumb-btn ${index === 0 ? 'is-active' : ''}`} data-thumb-index={index} aria-label={`写真 ${index + 1}`}>
@@ -1376,7 +1386,7 @@ const editUrl = postDbId
 					</section>
 				)}
 
-				<!-- アコーディオン（デモ記事のみフォールバック表示） -->
+				{/* アコーディオン（デモ記事のみフォールバック表示） */}
 				{!hasAccordionBlock && isDemoArticle && (
 					<section class="accordion-details-block">
 						<div class="block-header">
@@ -1508,7 +1518,7 @@ const editUrl = postDbId
 					</section>
 				)}
 
-				<!-- 関連拠点（ショールーム）カード（拠点情報がある場合のみ表示） -->
+				{/* 関連拠点（ショールーム）カード（CMSで設定されている場合に表示） */}
 				{hasShowroom && (
 				<section class="showroom-feature-block">
 					<div class="showroom-card-modern">
@@ -1550,8 +1560,8 @@ const editUrl = postDbId
 				</section>
 				)}
 
-				<!-- 記事末尾の注釈・備考エリア（設定されている場合のみ表示・中身は空がデフォルト） -->
-				{(post.data as any).notes && (post.data as any).notes.trim() && (
+				{/* 記事末尾の注釈・備考エリア（本文内にnotesブロックがなく、個別notesがある場合のみ表示） */}
+				{!hasNotesBlock && (post.data as any).notes && (post.data as any).notes.trim() && (
 					<aside class="article-notes-block" aria-label="注釈・備考">
 						<div class="notes-inner">
 							{(post.data as any).notes.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0).map((line: string) => (
@@ -1561,7 +1571,7 @@ const editUrl = postDbId
 					</aside>
 				)}
 
-				<!-- SNSシェアボタン -->
+				{/* SNSシェアボタン */}
 				<div class="article-share-bar">
 					<span class="share-label">記事をシェアする</span>
 					<div class="share-buttons">
@@ -1592,7 +1602,7 @@ const editUrl = postDbId
 					</div>
 				</div>
 
-				<!-- バックリンク & 編集リンク -->
+				{/* バックリンク & 編集リンク */}
 				<div class="article-back-nav">
 					<a href="/magazine/" class="btn-back-to-magazine">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -1608,7 +1618,8 @@ const editUrl = postDbId
 				</div>
 			</div>
 
-			<!-- 右サイドバーカラム：関連記事（シンプル・読みやすさ重視・スティッキー） -->
+			{/* 右サイドバーカラム：関連記事（1カラム指定時は非表示） */}
+			{!isOneColumn && (
 			<aside class="article-sidebar-col">
 				<div class="sidebar-sticky-panel">
 					<div class="sidebar-block">
@@ -1635,6 +1646,7 @@ const editUrl = postDbId
 					</div>
 				</div>
 			</aside>
+			)}
 		</div>
 	</div>
 	</article>
@@ -1982,6 +1994,62 @@ const editUrl = postDbId
 		gap: 64px;
 		align-items: start;
 		box-sizing: border-box;
+	}
+
+	/* 1カラムモード（特設特集・キャンペーン用：タイトルと左端を完全一致させ、写真やメディアは画面左右いっぱいにダイナミック展開） */
+	.article-two-col-layout.is-one-column {
+		grid-template-columns: 1fr;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+	}
+	.article-two-col-layout.is-one-column .article-main-col {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	/* 1カラム時：文章テキスト・見出し・注釈・FAQも含め、下のカードや画像と揃えて左右いっぱいにダイナミック展開 */
+	.modern-article-page.is-one-column .article-rich-text > :global(p),
+	.modern-article-page.is-one-column .article-rich-text > :global(h2),
+	.modern-article-page.is-one-column .article-rich-text > :global(h3),
+	.modern-article-page.is-one-column .article-rich-text > :global(h4),
+	.modern-article-page.is-one-column .article-rich-text > :global(ul),
+	.modern-article-page.is-one-column .article-rich-text > :global(ol),
+	.modern-article-page.is-one-column .article-rich-text > :global(blockquote),
+	.modern-article-page.is-one-column .article-rich-text > :global(.cms-notes-block),
+	.modern-article-page.is-one-column .article-rich-text > :global(.cms-faq-block) {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	/* 1カラム時：写真・ビジュアル系ブロックは 1440px（コンテナ幅いっぱい）までワイドに広げる */
+	.modern-article-page.is-one-column :global(.cms-split-list),
+	.modern-article-page.is-one-column :global(.cms-filmstrip-gallery),
+	.modern-article-page.is-one-column :global(.cms-col-cards),
+	.modern-article-page.is-one-column :global(.gallery-slider-block) {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	/* 1カラム時：スライダーのビューポートはワイド画面で映画のような迫力あるシネマスコープ比率・高さを実現 */
+	.modern-article-page.is-one-column :global(.filmstrip-viewport) {
+		aspect-ratio: 16 / 9;
+		max-height: 680px;
+	}
+
+	/* 1カラム時：関連ショールームカード（川崎等）も左右いっぱいに雄大に広げる */
+	.modern-article-page.is-one-column .showroom-feature-block {
+		width: 100%;
+		max-width: 100%;
+		margin: 80px 0 60px 0;
+	}
+	.modern-article-page.is-one-column .showroom-card-modern {
+		width: 100%;
+		max-width: 100%;
+		grid-template-columns: 460px 1fr;
+	}
+	.modern-article-page.is-one-column .showroom-card-media {
+		min-height: 320px;
 	}
 
 	.article-main-col {

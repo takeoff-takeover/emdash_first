@@ -15,3 +15,13 @@
 - Do NOT add redundant headings or promotional labels above galleries (e.g. "PHOTO GALLERY", "全○点", "公式プレスキットギャラリー").
 - Do NOT prepend category tags or brackets to captions (e.g. "【エクステリア】", "【インテリア】").
 - Keep gallery minimal: photos, number counter (`1 / 10`), and clean captions only.
+
+## SEO & AI Search Optimization (GEO / LLMO) Rules ※Visual Regression Zero
+- **Semantic HTML**: Maintain layout classes/Flex/Grid, but use `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<nav>`, `<footer>` appropriately. Separate headings from decoration. Keep one `h1` per page and strictly sequential heading levels (`h1` -> `h2` -> `h3`). Do not change tag level just for font size styling.
+- **AI-friendly Context**: Avoid ambiguous links like "こちら" or "詳細". Use descriptive anchor text or add `aria-label`. Use `<table>`, `<dl><dt><dd>`, `<ul>/<ol>` for specs, metrics, comparisons, and key-value pairs so LLMs can extract structured information.
+- **Structured Data & Metadata**: Provide Schema.org JSON-LD scripts (`Organization`, `WebPage`, `Article`, `FAQPage`, `BreadcrumbList`, etc.) per page type. Provide descriptive `alt` for all images (and `alt=""` for purely decorative images).
+
+## Design System & UI Reproducibility Rules
+- **No Magic Numbers**: Never hardcode margins, paddings, gaps, font sizes, colors, border-radii, or shadows in components. Always use CSS variables / design tokens from `:root` or theme files.
+- **Consistent Component Patterns**: Re-use common section wrapper classes for outer margins/paddings and max-width. Never write cards, buttons, or section headers from scratch; copy DOM structure and classes from existing components.
+- **Typography Consistency**: Adhere to global typography tokens/classes. Never override `font-family` or `font-weight` arbitrarily inside individual components.
