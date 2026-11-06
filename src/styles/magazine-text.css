@@ -1,0 +1,9 @@
+:root {
+	--magazine-text-color: #ffffff;
+}
+
+/* Keep imported theme and CMS text colors readable on the magazine's dark canvas. */
+.is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
+.is-magazine-page .article-rich-text :is(p, li, dt, dd, blockquote, figcaption, th, td, strong, em, span):not(.is-dark-text, .is-dark-text *, a[class*="btn"] *) {
+	color: var(--magazine-text-color) !important;
+}

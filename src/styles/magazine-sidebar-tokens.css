@@ -1,0 +1,5 @@
+/* NicoleLayout does not load the blog theme; keep sidebar tokens explicit. */
+:root {
+	--magazine-sidebar-label-border: #71717a;
+	--magazine-sidebar-block-gap: 1.5rem;
+}

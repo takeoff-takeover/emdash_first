@@ -1,13 +1,16 @@
 ---
 // src/pages/magazine/[slug].astro
 // Nicole Connect - マガジン記事詳細（上部に大迫力アイキャッチ写真・現代的エディトリアルレイアウト）
-import { getEmDashEntry, decodeSlug } from "emdash";
-import { PortableText } from "emdash/ui";
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries, decodeSlug } from "emdash";
+import { PortableText, Image } from "emdash/ui";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import "../../styles/magazine-text.css";
+import { isNoticeArticle, isESGArticle } from "../../lib/magazinePolicy";
 import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import "../../styles/prose.css";
+import "../../styles/magazine-sidebar-tokens.css";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -21,6 +24,7 @@ if (slug === "mini-new-generation-debut-fair") {
 
 let cmsPost: any = null;
 let cacheHint: any = null;
+let contentCollection = "magazine";
 
 // 1. 新設された 'magazine' コレクションから優先取得
 try {
@@ -37,12 +41,18 @@ if (!cmsPost) {
 		const postResult = await getEmDashEntry("posts", slug);
 		if (postResult?.entry) {
 			cmsPost = postResult.entry;
+			contentCollection = "posts";
 			cacheHint = postResult.cacheHint;
 		}
 	} catch (e) {}
 }
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
+
+// 業務連絡の旧Magazine URLは、記事を保持しているPostsへ案内する。
+if (cmsPost && isNoticeArticle(cmsPost)) {
+	return Astro.redirect(`/posts/${encodeURIComponent(slug)}/`, 302);
+}
 
 // 静的記事カタログ（CMSにまだ入っていない場合のフォールバック）
 const staticArticlesCatalog: Record<string, any> = {
@@ -1056,97 +1066,25 @@ function sanitizeContent(content: any) {
 const articleContent = sanitizeContent(post.data.content);
 
 // 関連記事データ（作成日・公開日の新しい順に動的取得）
-const staticRelatedPool = [
-	{
-		slug: "2027_new_bmw_ix4_neue_klasse",
-		title: "【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代",
-		brand: "BMW",
-		date: "2026.10.28",
-		sortDate: "2026-10-28T10:00:00.000Z",
-		image: "/uploads/ix4/key-visual-v2.jpg",
-		url: "/magazine/2027_new_bmw_ix4_neue_klasse/"
-	},
-	{
-		slug: "202610_neue_klasse_buyers_guide",
-		title: "【購入ガイド】BMW ノイエ・クラッセ完全ガイド。EV補助金・自宅充電器設置・グレード選びの要点",
-		brand: "BMW",
-		date: "2026.10.25",
-		sortDate: "2026-10-25T10:00:00.000Z",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		url: "/magazine/202610_neue_klasse_buyers_guide/"
-	},
-	{
-		slug: "2027_new_bmw_3series_neue_klasse",
-		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
-		brand: "BMW",
-		date: "2026.10.22",
-		sortDate: "2026-10-22T10:00:00.000Z",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		url: "/magazine/2027_new_bmw_3series_neue_klasse/"
-	},
-	{
-		slug: "202610_mini_united-japan-2026",
-		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
-		brand: "MINI",
-		date: "2026.10.15",
-		sortDate: "2026-10-15T10:00:00.000Z",
-		image: "/uploads/2026/10/DSC6593-1-scaled.jpg",
-		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/"
-	},
-	{
-		slug: "202608_ferrari_luce",
-		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
-		brand: "Ferrari",
-		date: "2026.08.17",
-		sortDate: "2026-08-17T10:00:00.000Z",
-		image: "/uploads/2026/08/DSC4983-3.jpg",
-		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/"
-	},
-	{
-		slug: "202607_new_bmw_x5",
-		title: "【公式発表】新型BMW X5誕生。Neue Klasseの革新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代",
-		brand: "BMW",
-		date: "2026.07.01",
-		sortDate: "2026-07-01T10:00:00.000Z",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg",
-		url: "/magazine/202607_new_bmw_x5/"
-	},
-	{
-		slug: "20260714_mini_jcw_track_style_edition",
-		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
-		brand: "MINI",
-		date: "2026.07.14",
-		sortDate: "2026-07-14T10:00:00.000Z",
-		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
-		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/"
-	},
-	{
-		slug: "alpina-heritage-story",
-		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
-		brand: "ALPINA",
-		date: "2026.05.15",
-		sortDate: "2026-05-15T10:00:00.000Z",
-		image: "/uploads/2026/07/DSC7756.jpg",
-		url: "https://nicole-automobiles.com/"
-	}
-];
 
+
+const isSidebarSample = slug === "2027_new_bmw_ix4_neue_klasse";
 let dynamicRelatedStories: any[] = [];
 try {
 	const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
-	if (fs.existsSync(DB_PATH)) {
+	if (!isSidebarSample && fs.existsSync(DB_PATH)) {
 		const db = new DatabaseSync(DB_PATH);
 		const dbRows = db.prepare(`
 			SELECT id, slug, title, featured_image, published_at, created_at,
 			       COALESCE(published_at, created_at) as sort_date
 			FROM ec_magazine
-			WHERE (status = 'published' OR status IS NULL)
+			WHERE (status = 'published' OR status IS NULL) AND deleted_at IS NULL
 			  AND slug != ?
 			UNION ALL
 			SELECT id, slug, title, featured_image, published_at, created_at,
 			       COALESCE(published_at, created_at) as sort_date
 			FROM ec_posts
-			WHERE (status = 'published' OR status IS NULL)
+			WHERE (status = 'published' OR status IS NULL) AND deleted_at IS NULL
 			  AND slug != ?
 			  AND slug NOT IN (SELECT slug FROM ec_magazine)
 			  AND title NOT LIKE '%休業%' AND title NOT LIKE '%定休日%' AND title NOT LIKE '%ドメイン%' AND title NOT LIKE '%SNS%' AND title NOT LIKE '%アカウント%'
@@ -1154,7 +1092,7 @@ try {
 			LIMIT 12
 		`).all(slug, slug) as any[];
 
-		dynamicRelatedStories = dbRows.map(r => {
+		dynamicRelatedStories = dbRows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
 			let imgSrc = "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg";
 			if (r.featured_image) {
 				try {
@@ -1191,11 +1129,8 @@ try {
 	console.error("Failed to query dynamic related stories:", e);
 }
 
-// 静的記事と動的記事を統合し、作成日・公開日の新しい順にソートして最大5件抽出
-const combinedRelated = [
-	...dynamicRelatedStories,
-	...staticRelatedPool.filter(sp => !dynamicRelatedStories.some(ds => ds.slug === sp.slug))
-]
+// CMSの記事を公開日の新しい順に並べ、最大5件を表示する。
+const combinedRelated = dynamicRelatedStories
 	.filter(s => s.slug !== slug)
 	.sort((a, b) => {
 		const dateA = a.sortDate || a.date?.replace(/\./g, '-') || "";
@@ -1203,7 +1138,57 @@ const combinedRelated = [
 		return dateB.localeCompare(dateA);
 	});
 
-const relatedStories = combinedRelated.slice(0, 5);
+let relatedStories = combinedRelated.slice(0, 5);
+let latestStories: any[] = [];
+let relatedStoriesUrl = "/magazine/";
+
+// サンプルは1記事のみ。全公開記事を取得してからブランドで絞り込み、件数を制限する。
+if (isSidebarSample) {
+	const storiesBySlug = new Map<string, any>();
+	for (const collection of ["magazine", "posts"] as const) {
+		let cursor: string | undefined;
+		do {
+			const result = await getEmDashCollection(collection as any, {
+				status: "published", orderBy: { published_at: "desc" }, limit: 100, cursor,
+			});
+			if (result.error) throw result.error;
+			if (Astro.cache?.enabled) Astro.cache.set(result.cacheHint);
+			const entries = result.entries || [];
+			const ids = entries.map((entry: any) => entry.data.id);
+			const brands = ids.length ? await getTermsForEntries(collection, ids, "brand") : new Map();
+			for (const entry of entries as any[]) {
+				if (entry.id === slug || isNoticeArticle(entry) || storiesBySlug.has(entry.id)) continue;
+				const assignedBrands = (brands.get(entry.data.id) || []).map((term: any) => term.label);
+				// 一覧と同じく、移行記事でブランド未登録の場合のみタイトル・slugから補完する。
+				if (!assignedBrands.length) {
+					const title = (entry.data.title || "").toLowerCase();
+					const entrySlug = entry.id.toLowerCase();
+					if (title.includes("mini") || entrySlug.includes("mini")) assignedBrands.push("MINI");
+					else if (title.includes("bmw") || entrySlug.includes("bmw") || /7シリーズ|3シリーズ/.test(title)) assignedBrands.push("BMW");
+					else if (title.includes("ferrari") || entrySlug.includes("ferrari")) assignedBrands.push("Ferrari");
+					else if (title.includes("rolls") || entrySlug.includes("rolls") || title.includes("ロールス")) assignedBrands.push("Rolls-Royce");
+					else if (title.includes("alpina") || entrySlug.includes("alpina") || title.includes("アルピナ")) assignedBrands.push("ALPINA");
+					else if (entry.data.related_location) assignedBrands.push("BMW");
+				}
+				const rawDate = entry.data.publishedAt || entry.data.createdAt;
+				storiesBySlug.set(entry.id, {
+					slug: entry.id, title: entry.data.title, brands: assignedBrands,
+					brand: isESGArticle(entry) ? "ESG" : assignedBrands.join(" / "),
+					isESG: isESGArticle(entry),
+					sortDate: new Date(rawDate).getTime() || 0,
+					date: rawDate ? new Date(rawDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".") : "",
+					image: entry.data.featured_image,
+					url: entry.id === "mini-new-generation-debut-fair" ? `/campaigns/${entry.id}` : `/magazine/${encodeURIComponent(entry.id)}/`,
+				});
+			}
+			cursor = result.nextCursor || undefined;
+		} while (cursor);
+	}
+	const stories = [...storiesBySlug.values()].sort((a, b) => b.sortDate - a.sortDate || a.slug.localeCompare(b.slug));
+	relatedStories = stories.filter(story => !story.isESG && story.brands.includes("BMW")).slice(0, 5);
+	latestStories = stories.slice(0, 5);
+	relatedStoriesUrl = "/magazine/?brand=BMW#magazine-archive";
+}
 
 // タイトルを自然な文節で改行・表示するためのセグメント分割
 function getTitleSegments(rawTitle: string) {
@@ -1242,9 +1227,23 @@ const titleSegments = getTitleSegments(post.data.title);
 
 // 記事編集ページURL（EmDash Admin）
 const postDbId = (post?.data as any)?.id;
+let articleBrands: string[] = [];
+let articleCategories: string[] = [];
+if (postDbId) {
+	const [brands, categories] = await Promise.all([
+		getTermsForEntries(contentCollection, [postDbId], "brand"),
+		getTermsForEntries(contentCollection, [postDbId], "category"),
+	]);
+	articleBrands = (brands.get(postDbId) || []).map(term => term.label);
+	articleCategories = (categories.get(postDbId) || []).map(term => term.label);
+}
+const articleDate = (post.data as any).publishedAt || (post.data as any).published_at;
+const formattedArticleDate = articleDate
+	? new Date(articleDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
+	: "";
 const editUrl = postDbId 
-	? `/_emdash/admin/content/posts/${postDbId}` 
-	: "/_emdash/admin/content/posts";
+	? `/_emdash/admin/content/${contentCollection}/${postDbId}`
+	: `/_emdash/admin/content/${contentCollection}`;
 ---
 
 <NicoleLayout 
@@ -1312,13 +1311,13 @@ const editUrl = postDbId
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
-						{isIX4 || isBMWX5 || isNeueKlasse ? "BMW" : "ALL BRANDS"}
+						{articleBrands.join(" / ") || (isIX4 || isBMWX5 || isNeueKlasse ? "BMW" : "ALL BRANDS")}
 					</span>
 					<span class="meta-category-pill">
-						{isIX4 ? "WORLD PREMIERE" : (isBMWX5 || isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE")}
+						{articleCategories.join(" / ") || (isIX4 ? "WORLD PREMIERE" : (isBMWX5 || isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE"))}
 					</span>
 					<time class="meta-date">
-						{isIX4 ? "2026.10.28" : (isBMWX5 ? "2026.07.01" : (isNeueKlasse ? "2026.10.22" : "2026.08.20"))}
+						{formattedArticleDate}
 					</time>
 					<span class="meta-reading-time">READING TIME: 4 MIN</span>
 
@@ -1621,29 +1620,34 @@ const editUrl = postDbId
 			{/* 右サイドバーカラム：関連記事（1カラム指定時は非表示） */}
 			{!isOneColumn && (
 			<aside class="article-sidebar-col">
-				<div class="sidebar-sticky-panel">
-					<div class="sidebar-block">
-						<h3 class="sidebar-heading">関連記事</h3>
+				<div class:list={["sidebar-sticky-panel", { "sidebar-sample": isSidebarSample }]}>
+					{(isSidebarSample ? [
+						{ heading: "関連記事", stories: relatedStories, url: relatedStoriesUrl, label: "BMWの関連記事をもっと見る" },
+						{ heading: "最新記事", stories: latestStories, url: "/magazine/?view=latest#magazine-archive", label: "すべての最新記事をもっと見る" },
+					] : [{ heading: "関連記事", stories: relatedStories, url: "/magazine/", label: "すべての記事を見る" }]).map(block => (
+					<section class="sidebar-block" aria-label={block.heading}>
+						<h2 class="sidebar-heading">{block.heading}</h2>
 						<div class="sidebar-story-list">
-							{relatedStories.map((story) => (
+							{block.stories.map((story) => (
 								<article class="sidebar-story-card">
 									<a href={story.url} class="sidebar-story-link">
 										<div class="sidebar-story-media">
-											<img src={story.image} alt={story.title} loading="lazy" />
+											{isSidebarSample ? <Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" /> : <img src={story.image} alt={story.title} loading="lazy" />}
 											<span class="sidebar-story-brand">{story.brand}</span>
 										</div>
 										<div class="sidebar-story-body">
 											<time class="sidebar-story-date">{story.date}</time>
-											<h4 class="sidebar-story-title">{story.title}</h4>
+											<h3 class="sidebar-story-title">{story.title}</h3>
 										</div>
 									</a>
 								</article>
 							))}
 						</div>
 						<div class="sidebar-footer-link">
-							<a href="/magazine/" class="sidebar-all-link">すべての記事を見る →</a>
+							<a href={block.url} class="sidebar-all-link" aria-label={block.label}>{isSidebarSample ? "もっと見る" : "すべての記事を見る"} →</a>
 						</div>
-					</div>
+					</section>
+					))}
 				</div>
 			</aside>
 			)}
@@ -1716,7 +1720,7 @@ const editUrl = postDbId
 	/* ============================================================== */
 	.modern-article-page {
 		background-color: #06070a;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", sans-serif;
 		min-height: 100vh;
 	}
@@ -1760,12 +1764,12 @@ const editUrl = postDbId
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		min-width: 0;
 	}
 
 	.bc-link {
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
@@ -1779,7 +1783,7 @@ const editUrl = postDbId
 	}
 
 	.bc-current {
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -1795,7 +1799,7 @@ const editUrl = postDbId
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 4px;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		font-size: 11.5px;
 		font-weight: 600;
 		text-decoration: none;
@@ -1808,7 +1812,7 @@ const editUrl = postDbId
 	.article-edit-btn:hover {
 		background: rgba(255, 255, 255, 0.15);
 		border-color: rgba(255, 255, 255, 0.35);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		transform: translateY(-1px);
 	}
 
@@ -1824,7 +1828,7 @@ const editUrl = postDbId
 		font-weight: 700;
 		line-height: 1.48;
 		letter-spacing: -0.01em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 16px 0;
 		max-width: 1200px;
 		word-break: normal;
@@ -1839,7 +1843,7 @@ const editUrl = postDbId
 	.article-lead-text {
 		font-size: clamp(16px, 1.4vw, 19px);
 		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		margin: 0 0 24px 0;
 		max-width: 980px;
 		padding-left: 0;
@@ -1861,7 +1865,7 @@ const editUrl = postDbId
 		gap: 6px;
 		padding: 4px 12px;
 		background: var(--color-nicole-red, #E60012);
-		color: #FFFFFF;
+		color: var(--magazine-text-color);
 		font-size: 11px;
 		font-weight: 800;
 		letter-spacing: 0.12em;
@@ -1883,14 +1887,14 @@ const editUrl = postDbId
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.12em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		backdrop-filter: blur(8px);
 	}
 
 	.meta-date,
 	.meta-reading-time {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.65);
+		color: var(--magazine-text-color);
 		letter-spacing: 0.08em;
 	}
 
@@ -1903,7 +1907,7 @@ const editUrl = postDbId
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		border-radius: 999px;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 		font-size: 11px;
 		font-weight: 600;
 		text-decoration: none;
@@ -1914,7 +1918,7 @@ const editUrl = postDbId
 	.meta-edit-pill:hover {
 		background: rgba(230, 0, 18, 0.15);
 		border-color: var(--color-nicole-red, #E60012);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		transform: translateY(-1px);
 	}
 
@@ -1960,7 +1964,7 @@ const editUrl = postDbId
 		right: 28px;
 		z-index: 3;
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 		letter-spacing: 0.04em;
 		background: rgba(0, 0, 0, 0.45);
 		backdrop-filter: blur(8px);
@@ -2069,6 +2073,15 @@ const editUrl = postDbId
 		top: 120px;
 	}
 
+	.sidebar-sample {
+		display: grid;
+		gap: var(--magazine-sidebar-block-gap);
+	}
+
+	.sidebar-sample .sidebar-heading {
+		border-bottom-color: var(--magazine-sidebar-label-border);
+	}
+
 	.sidebar-block {
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2081,7 +2094,7 @@ const editUrl = postDbId
 		font-size: 16px;
 		font-weight: 700;
 		letter-spacing: 0.04em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 20px 0;
 		padding-bottom: 12px;
 		border-bottom: 2px solid var(--color-nicole-red);
@@ -2144,7 +2157,7 @@ const editUrl = postDbId
 		top: 4px;
 		left: 4px;
 		background: rgba(0, 0, 0, 0.75);
-		color: #FFFFFF;
+		color: var(--magazine-text-color);
 		font-size: 8px;
 		font-weight: 700;
 		letter-spacing: 0.06em;
@@ -2162,7 +2175,7 @@ const editUrl = postDbId
 
 	.sidebar-story-date {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.45);
+		color: var(--magazine-text-color);
 		letter-spacing: 0.04em;
 	}
 
@@ -2170,7 +2183,7 @@ const editUrl = postDbId
 		font-size: 13.5px;
 		font-weight: 500;
 		line-height: 1.45;
-		color: rgba(255, 255, 255, 0.9);
+		color: var(--magazine-text-color);
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -2193,7 +2206,7 @@ const editUrl = postDbId
 	.sidebar-all-link {
 		font-size: 12px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
@@ -2227,7 +2240,7 @@ const editUrl = postDbId
 	.article-rich-text {
 		font-size: 17px;
 		line-height: 1.95;
-		color: #e4e6eb;
+		color: var(--magazine-text-color);
 		letter-spacing: 0.02em;
 	}
 
@@ -2236,7 +2249,7 @@ const editUrl = postDbId
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(24px, 2.4vw, 30px);
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 64px 0 24px 0;
 		padding: 0;
 		border: none;
@@ -2284,7 +2297,7 @@ const editUrl = postDbId
 		border-left: 3px solid var(--color-nicole-red, #E60012);
 		border-radius: 0 8px 8px 0;
 		font-style: italic;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 	}
 
 	.article-rich-text :global(a) {
@@ -2295,7 +2308,7 @@ const editUrl = postDbId
 	}
 
 	.article-rich-text :global(a:hover) {
-		color: #FFFFFF;
+		color: var(--magazine-text-color);
 	}
 
 	/* ============================================================== */
@@ -2326,13 +2339,13 @@ const editUrl = postDbId
 	.block-title {
 		font-size: 22px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 8px 0;
 	}
 
 	.block-sub {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.55);
+		color: var(--magazine-text-color);
 		margin: 0;
 	}
 
@@ -2378,7 +2391,7 @@ const editUrl = postDbId
 		font-family: var(--font-mono, monospace);
 		font-size: 11px;
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		letter-spacing: 0.05em;
 	}
 
@@ -2390,13 +2403,13 @@ const editUrl = postDbId
 	.slide-heading {
 		font-size: 15px;
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 4px 0;
 	}
 
 	.slide-caption {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--magazine-text-color);
 		line-height: 1.6;
 		margin: 0;
 	}
@@ -2412,7 +2425,7 @@ const editUrl = postDbId
 		border-radius: 0;
 		background: transparent;
 		border: none;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2431,7 +2444,7 @@ const editUrl = postDbId
 
 	.slider-btn:hover {
 		background: transparent;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		transform: translateY(-50%) scale(1.15);
 	}
 
@@ -2512,7 +2525,7 @@ const editUrl = postDbId
 		padding: 22px 0;
 		font-size: 16px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		cursor: pointer;
 		display: flex;
 		justify-content: space-between;
@@ -2528,7 +2541,7 @@ const editUrl = postDbId
 	.accordion-icon {
 		font-size: 18px;
 		font-weight: 400;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 		transition: transform 0.3s ease;
 	}
 
@@ -2540,7 +2553,7 @@ const editUrl = postDbId
 		padding: 0 0 24px 0;
 		font-size: 15px;
 		line-height: 1.85;
-		color: rgba(255, 255, 255, 0.8);
+		color: var(--magazine-text-color);
 	}
 
 	.accordion-content p {
@@ -2585,7 +2598,7 @@ const editUrl = postDbId
 		border-radius: 999px;
 		font-size: 10.5px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		backdrop-filter: blur(6px);
 	}
 
@@ -2599,20 +2612,20 @@ const editUrl = postDbId
 		font-size: 10px;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		margin-bottom: 6px;
 	}
 
 	.showroom-title {
 		font-size: 20px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 4px 0;
 	}
 
 	.showroom-sub {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		margin: 0 0 20px 0;
 	}
 
@@ -2637,13 +2650,13 @@ const editUrl = postDbId
 		font-size: 9.5px;
 		font-weight: 700;
 		letter-spacing: 0.15em;
-		color: rgba(255, 255, 255, 0.45);
+		color: var(--magazine-text-color);
 		width: 90px;
 		flex-shrink: 0;
 	}
 
 	.detail-val {
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 	}
 
 	.showroom-actions {
@@ -2686,7 +2699,7 @@ const editUrl = postDbId
 
 	.btn-showroom-map {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
@@ -2714,7 +2727,7 @@ const editUrl = postDbId
 		font-family: 'Inter', -apple-system, sans-serif;
 		font-size: 12.5px;
 		line-height: 1.75;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		margin: 0;
 		letter-spacing: 0.02em;
 	}
@@ -2739,7 +2752,7 @@ const editUrl = postDbId
 		font-size: 12px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 	}
 
 	.share-buttons {
@@ -2759,7 +2772,7 @@ const editUrl = postDbId
 		border-radius: 999px;
 		font-size: 12px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		cursor: pointer;
 		transition: all 0.25s ease;
@@ -2772,7 +2785,7 @@ const editUrl = postDbId
 
 	.share-btn:hover {
 		background: rgba(255, 255, 255, 0.15);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		border-color: rgba(255, 255, 255, 0.35);
 	}
 
@@ -2792,7 +2805,7 @@ const editUrl = postDbId
 		padding: 12px 28px;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.18);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		border-radius: 999px;
 		font-size: 13px;
 		font-weight: 600;
@@ -2825,7 +2838,7 @@ const editUrl = postDbId
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 999px;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		font-size: 13px;
 		font-weight: 600;
 		letter-spacing: 0.04em;
@@ -2836,7 +2849,7 @@ const editUrl = postDbId
 	.btn-edit-article-admin:hover {
 		background: rgba(230, 0, 18, 0.15);
 		border-color: var(--color-nicole-red, #E60012);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		transform: translateY(-2px);
 	}
 
@@ -2882,13 +2895,13 @@ const editUrl = postDbId
 	.rec-title {
 		font-size: 24px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0;
 	}
 
 	.rec-all-link {
 		font-size: 12.5px;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
@@ -2953,7 +2966,7 @@ const editUrl = postDbId
 		border-radius: 999px;
 		font-size: 10px;
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		backdrop-filter: blur(6px);
 	}
 
@@ -2976,14 +2989,14 @@ const editUrl = postDbId
 
 	.rec-meta-sep {
 		opacity: 0.4;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--magazine-text-color);
 	}
 
 	.rec-card-title {
 		font-size: 14.5px;
 		font-weight: 600;
 		line-height: 1.45;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -3095,7 +3108,7 @@ const editUrl = postDbId
 		font-family: var(--font-heading, inherit);
 		font-size: 1.25rem;
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin-bottom: 16px;
 		letter-spacing: -0.01em;
 	}
@@ -3111,12 +3124,12 @@ const editUrl = postDbId
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 0.875rem;
-		color: #d4d4d8;
+		color: var(--magazine-text-color);
 		text-align: left;
 	}
 	.monotone-spec-table th {
 		background: #18181f;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-weight: 600;
 		padding: 14px 18px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -3135,10 +3148,10 @@ const editUrl = postDbId
 	}
 	.monotone-spec-table .model-name {
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 	.monotone-spec-table .range-strong {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-weight: 700;
 	}
 	.monotone-spec-table .highlight-row {
@@ -3169,7 +3182,7 @@ const editUrl = postDbId
 		font-size: 0.8125rem !important;
 		line-height: 1.55 !important;
 		background: #0b0b0e !important;
-		color: #e4e4e7 !important;
+		color: var(--magazine-text-color) !important;
 		margin: 0 !important;
 	}
 	:global(.emdash-table thead),
@@ -3181,7 +3194,7 @@ const editUrl = postDbId
 	:global(.article-rich-text table th),
 	:global(.prose table th) {
 		background: #141419 !important;
-		color: #ffffff !important;
+		color: var(--magazine-text-color) !important;
 		font-weight: 600 !important;
 		padding: 14px 10px !important;
 		border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -3200,7 +3213,7 @@ const editUrl = postDbId
 	:global(.emdash-table th p),
 	:global(.article-rich-text table th p),
 	:global(.prose table th p) {
-		color: #ffffff !important;
+		color: var(--magazine-text-color) !important;
 		margin: 0 !important;
 		font-weight: 600 !important;
 		line-height: 1.4 !important;
@@ -3218,7 +3231,7 @@ const editUrl = postDbId
 	:global(.article-rich-text table td),
 	:global(.prose table td) {
 		background: transparent !important;
-		color: #d4d4d8 !important;
+		color: var(--magazine-text-color) !important;
 		padding: 14px 10px !important;
 		border: 1px solid rgba(255, 255, 255, 0.12) !important;
 		vertical-align: middle !important;
@@ -3233,13 +3246,13 @@ const editUrl = postDbId
 	:global(.prose table td:first-child) {
 		text-align: left !important;
 		font-weight: 600 !important;
-		color: #ffffff !important;
+		color: var(--magazine-text-color) !important;
 		padding-left: 14px !important;
 	}
 	:global(.emdash-table td p),
 	:global(.article-rich-text table td p),
 	:global(.prose table td p) {
-		color: #d4d4d8 !important;
+		color: var(--magazine-text-color) !important;
 		margin: 0 !important;
 		line-height: 1.55 !important;
 	}
@@ -3256,11 +3269,11 @@ const editUrl = postDbId
 	:global(.emdash-table tbody tr:hover td),
 	:global(.article-rich-text table tbody tr:hover td),
 	:global(.prose table tbody tr:hover td) {
-		color: #ffffff !important;
+		color: var(--magazine-text-color) !important;
 	}
 	:global(.emdash-table tbody tr:hover td p),
 	:global(.article-rich-text table tbody tr:hover td p),
 	:global(.prose table tbody tr:hover td p) {
-		color: #ffffff !important;
+		color: var(--magazine-text-color) !important;
 	}
 </style>

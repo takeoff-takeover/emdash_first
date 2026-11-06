@@ -160,10 +160,38 @@ if (currentBand && currentBand.items.length > 0) {
 		border: none;
 	}
 
+	/* 画面幅の背景帯による横スクロールを1カラム記事の端で防ぐ。 */
+	:global(.modern-article-page.is-one-column) {
+		overflow-x: clip;
+	}
+
+	/* 1カラムの中身は通常本文と同じ幅を使い、背景だけを画面端まで描く。 */
+	:global(.article-two-col-layout.is-one-column) .cms-bg-band {
+		width: 100%;
+		left: auto;
+		right: auto;
+		margin-inline: 0;
+		padding-inline: 0;
+		isolation: isolate;
+	}
+	:global(.article-two-col-layout.is-one-column) .cms-bg-band::before {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		left: 50%;
+		width: 100vw;
+		transform: translateX(-50%);
+		background: inherit;
+		z-index: -1;
+		pointer-events: none;
+	}
+	:global(.article-two-col-layout.is-one-column) .cms-bg-band__inner {
+		width: 100%;
+		max-width: none;
+	}
+
 	/* 2カラムレイアウト（マガジン・ブログ記事等）内ではサイドバー貫通を防ぎカラム内に端正に収める */
-	:global(.article-rich-text) .cms-bg-band,
-	:global(.article-two-col-layout) .cms-bg-band,
-	:global(.article-main-col) .cms-bg-band {
+	:global(.article-two-col-layout:not(.is-one-column)) .cms-bg-band {
 		width: 100% !important;
 		max-width: 100% !important;
 		position: static !important;
@@ -175,18 +203,14 @@ if (currentBand && currentBand.items.length > 0) {
 		border-radius: 14px !important;
 		overflow: hidden !important;
 	}
-	:global(.article-rich-text) .cms-bg-band__inner,
-	:global(.article-two-col-layout) .cms-bg-band__inner,
-	:global(.article-main-col) .cms-bg-band__inner {
+	:global(.article-two-col-layout:not(.is-one-column)) .cms-bg-band__inner {
 		max-width: 100% !important;
 		width: 100% !important;
 		margin: 0 !important;
 		padding: 0 !important;
 	}
 	@media (max-width: 768px) {
-		:global(.article-rich-text) .cms-bg-band,
-		:global(.article-two-col-layout) .cms-bg-band,
-		:global(.article-main-col) .cms-bg-band {
+		:global(.article-two-col-layout:not(.is-one-column)) .cms-bg-band {
 			padding: 2rem 1.25rem !important;
 			border-radius: 12px !important;
 		}

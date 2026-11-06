@@ -3,6 +3,8 @@
 // Nicole Connect - Web Magazine（Apple風の巨大写真ヒーロー＆エディトリアル・マガジンカバー）
 import { getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import "../../styles/magazine-text.css";
+import { isNoticeArticle, isESGArticle } from "../../lib/magazinePolicy";
 
 // CMS（magazineコレクション および postsコレクション）から記事を取得
 let cmsMagazines: any[] = [];
@@ -33,256 +35,7 @@ try {
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 
-// 静的アーカイブ記事データ（Nicole Connect公式マガジン記事マスタ）
-const staticArticles = [
-	{
-		id: "2027_new_bmw_ix4_neue_klasse",
-		slug: "2027_new_bmw_ix4_neue_klasse",
-		title: "【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代",
-		brand: "BMW",
-		topic: "Feature",
-		date: "2026.10.28",
-		views: "15,820",
-		image: "/uploads/ix4/key-visual-v2.jpg",
-		lead: "BMW公式プレスリリースより完全電動スポーツ・アクティビティ・クーペ『BMW iX4』が世界初公開。Cd値0.23の流麗なファストバック、最大出力612馬力のM60 xDrive、航続最大828kmの新時代。",
-		url: "/magazine/2027_new_bmw_ix4_neue_klasse/",
-		isFeatured: true
-	},
-	{
-		id: "campaign_mini_new_generation_debut_fair",
-		slug: "mini-new-generation-debut-fair",
-		title: "MINI THE NEW GENERATION デビュー・フェア開催。新世代ファミリーが集結する特別な試乗週間",
-		brand: "MINI",
-		topic: "Campaign",
-		date: "2026.11.07",
-		views: "3,890",
-		image: "/uploads/2026/08/169P90635275_highRes_mini-family-04-2026-scaled.jpg",
-		lead: "新世代MINIファミリーが一堂に集結。個性あふれるデザインと進化したゴーカート・フィーリングを各ショールームでご体感いただける特別フェアを開催。",
-		url: "/campaigns/mini-new-generation-debut-fair",
-		isFeatured: true
-	},
-	{
-		id: "202607_new_bmw_x5",
-		slug: "202607_new_bmw_x5",
-		title: "【公式発表】新型BMW X5誕生。Neue Klasseの革新デザインと、初の完全電動『iX5』を含む5つの動力源が拓く新時代",
-		brand: "BMW",
-		topic: "Feature",
-		date: "2026.07.01",
-		views: "9,420",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg",
-		lead: "プレミアムSAVのパイオニアが第5世代（G65）へ進化。Neue Klasseデザイン言語、BMWパノラミックiDrive、そしてBEV・水素・PHEV・ガソリン・ディーゼルの5つの動力源を揃えた最高峰SAV。",
-		url: "/magazine/202607_new_bmw_x5/",
-		isFeatured: true
-	},
-	{
-		id: "2027_new_bmw_3series_neue_klasse",
-		slug: "2027_new_bmw_3series_neue_klasse",
-		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
-		brand: "BMW",
-		topic: "Feature",
-		date: "2026.10.22",
-		views: "8,150",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
-		lead: "次世代EVプラットフォーム『ノイエ・クラッセ』を初採用。歴代最高のドライビング・ダイナミクスと革新のデジタル・キャビン。",
-		url: "/magazine/2027_new_bmw_3series_neue_klasse/",
-		isFeatured: false
-	},
-	{
-		id: "202610_mini_united-japan-2026",
-		slug: "202610_mini_united-japan-2026",
-		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
-		brand: "MINI",
-		topic: "Feature",
-		date: "2026.10.15",
-		views: "1,240",
-		image: "/uploads/2026/10/DSC6593-1-scaled.jpg",
-		lead: "全国のMINIオーナーが集い、笑顔と情熱を分かち合った特別なファンミーティングの模様をレポート。",
-		url: "https://www.nicole.co.jp/magazine/202610_mini_united-japan-2026/",
-		isFeatured: true
-	},
-	{
-		id: "202608_ferrari_luce",
-		slug: "202608_ferrari_luce",
-		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
-		brand: "Ferrari",
-		topic: "Feature",
-		date: "2026.08.17",
-		views: "1,505",
-		image: "/uploads/2026/08/DSC4983-3.jpg",
-		lead: "跳ね馬の血統を受け継ぐエレクトリック・スーパーカー。マラネッロの情熱が宿る未踏のパフォーマンス。",
-		url: "https://www.nicole.co.jp/magazine/202608_ferrari_luce/",
-		isFeatured: true
-	},
-	{
-		id: "202608_bmw_kids_mechanic",
-		slug: "202608_bmw_kids_mechanic",
-		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
-		brand: "BMW",
-		topic: "People",
-		date: "2026.08.20",
-		views: "960",
-		image: "/uploads/2026/08/DSC5134.jpg",
-		lead: "未来のエンジニアたちへ。整備工場の本物のツールを使って自動車の構造と安全を学ぶNicole特別体験プログラム。",
-		url: "/magazine/202608_bmw_kids_mechanic/",
-		isFeatured: false
-	},
-	{
-		id: "20260714_mini_jcw_track_style_edition",
-		slug: "20260714_mini_jcw_track_style_edition",
-		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
-		brand: "MINI",
-		topic: "Feature",
-		date: "2026.07.14",
-		views: "483",
-		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
-		lead: "ゴーカート・フィーリングの極致。モータースポーツのDNAを濃縮した特別な限定車を全国独占デリバリー。",
-		url: "https://www.nicole.co.jp/magazine/20260714_mini_jcw_track_style_edition/",
-		isFeatured: false
-	},
-	{
-		id: "20260707_ferrari_challenge_invitation",
-		slug: "20260707_ferrari_challenge_invitation",
-		title: "跳ね馬の本能を呼び覚ます。フェラーリ・チャレンジへの招待",
-		brand: "Ferrari",
-		topic: "Feature",
-		date: "2026.07.07",
-		views: "890",
-		image: "/uploads/2026/07/DSC7756.jpg",
-		lead: "サーキットを疾走する純粋な興奮。オーナー限定ワンメイクレースシリーズの世界へ。",
-		url: "https://www.nicole.co.jp/magazine/20260707_ferrari_challenge_invitation/",
-		isFeatured: false
-	},
-	{
-		id: "202608_ferrari_marketing",
-		slug: "202608_ferrari_marketing",
-		title: "フェラーリスタの心を揺さぶる体験。その世界観を支えるマーケターの視点",
-		brand: "Ferrari",
-		topic: "People",
-		date: "2026.08.10",
-		views: "640",
-		image: "/uploads/2026/08/DSC4983-3.jpg",
-		lead: "最高峰のクラブライフをプロデュースする、Nicole Competizioneマーケターが語る美学と情熱。",
-		url: "https://www.nicole.co.jp/magazine/202608_ferrari_marketing/",
-		isFeatured: false
-	},
-	{
-		id: "202607_mini_evlife",
-		slug: "202607_mini_evlife",
-		title: "MINIの電気自動車で叶える、愛犬との特別なドライブ",
-		brand: "MINI",
-		topic: "People",
-		date: "2026.07.25",
-		views: "720",
-		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
-		lead: "静粛性とスムースな加速がもたらす、ペットにも優しい新時代のドッグフレンドリー・カーライフ。",
-		url: "https://www.nicole.co.jp/magazine/202607_mini_evlife/",
-		isFeatured: false
-	},
-	{
-		id: "202605_mini_ev_no1_sales",
-		slug: "202605_mini_ev_no1_sales",
-		title: "燃料代は5分の1に。MINI EV販売全国1位のセールスが明かす、不安を「納得」へと変えるメソッド",
-		brand: "MINI",
-		topic: "People",
-		date: "2026.05.20",
-		views: "1,830",
-		image: "/uploads/2026/06/mini_lineup_2026.jpg",
-		lead: "航続距離や充電インフラへの疑問を解消し、お客様のライフスタイルに最適なEVを提案するプロの眼差し。",
-		url: "https://www.nicole.co.jp/magazine/202605_mini_ev_no1_sales/",
-		isFeatured: false
-	},
-	{
-		id: "202604_bmw_meister_interview",
-		slug: "202604_bmw_meister_interview",
-		title: "BMW一筋20年。熟練マイスターのプライドと素顔",
-		brand: "BMW",
-		topic: "People",
-		date: "2026.04.18",
-		views: "2,450",
-		image: "/uploads/2026/04/DSC3210.jpg",
-		lead: "ミリ単位の精度を追求するクラフトマンシップ。お客様の信頼に応え続けるメカニックの哲学。",
-		url: "https://www.nicole.co.jp/magazine/202604_bmw_meister_interview/",
-		isFeatured: false
-	},
-	{
-		id: "guide-bmw-used-cars-select",
-		slug: "guide-bmw-used-cars-select",
-		title: "失敗しない認定中古車の選び方｜BMW Premium Selection 完全ガイド",
-		brand: "BMW",
-		topic: "Guide",
-		date: "2026.07.10",
-		views: "3,210",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657685/P90657685-the-new-bmw-3-series-interior-2250px.jpg",
-		lead: "100項目点検、走行無制限保証、充実のアフターケア。ディーラー認定中古車ならではの安心と賢い購入術。",
-		url: "#",
-		isFeatured: false
-	},
-	{
-		id: "guide-paint-protection-film",
-		slug: "guide-paint-protection-film",
-		title: "愛車の輝きを10年守るプロテクションフィルム（PPF）のすべて｜施工価格・耐久性・メリット",
-		brand: "Ferrari",
-		topic: "Guide",
-		date: "2026.06.25",
-		views: "2,780",
-		image: "/uploads/2026/07/DSC7756.jpg",
-		lead: "飛び石や紫外線から塗装を守る最新XPELフィルム。スーパーカーオーナーが選ぶボディ保護の最適解。",
-		url: "#",
-		isFeatured: false
-	},
-	{
-		id: "guide-ev-subsidy-2026",
-		slug: "guide-ev-subsidy-2026",
-		title: "2026年版 EV補助金・充電インフラ完全ガイド｜CEV補助金・自宅充電・V2Hまで整理",
-		brand: "BMW",
-		topic: "Guide",
-		date: "2026.05.30",
-		views: "4,120",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657728/P90657728-the-new-bmw-320-exterior-09-26-2250px.jpg",
-		lead: "国や自治体からの最新補助金制度と、戸建て・集合住宅における充電器設置ステップを分かりやすく解説。",
-		url: "#",
-		isFeatured: false
-	},
-	{
-		id: "alpina-heritage-story",
-		slug: "alpina-heritage-story",
-		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
-		brand: "ALPINA",
-		topic: "Feature",
-		date: "2026.05.15",
-		views: "3,890",
-		image: "/uploads/2026/07/DSC7756.jpg",
-		lead: "1965年から2025年まで、日本総輸入元としてアルピナの魅力を伝え続けてきた歴史と、未来へ受け継ぐメンテナンス体制。",
-		url: "https://nicole-automobiles.com/",
-		isFeatured: false
-	},
-	{
-		id: "rolls-royce-bespoke-world",
-		slug: "rolls-royce-bespoke-world",
-		title: "唯一無二を仕立てる。ロールス・ロイス・ビスポークの世界と横浜ショールームの誇り",
-		brand: "Rolls-Royce",
-		topic: "Feature",
-		date: "2026.04.28",
-		views: "1,940",
-		image: "/uploads/2026/01/大田支店.jpg",
-		lead: "4万4000色以上のパレットと無限の素材。オーナーの夢を形にするロールス・ロイスの最高峰クラフト。",
-		url: "https://www.nicole.co.jp/corporate/nicole-motorcars/",
-		isFeatured: false
-	},
-	{
-		id: "esg-sdgs-activities",
-		slug: "esg-sdgs-activities",
-		title: "地域とともに走る。多摩川美化活動と災害時帰宅支援ステーション協定の歩み",
-		brand: "ALL",
-		topic: "ESG / SDGs",
-		date: "2026.04.10",
-		views: "520",
-		image: "/uploads/2026/08/DSC5134.jpg",
-		lead: "地域社会への貢献とサステナビリティ。ニコル・グループが取り組むSDGsアクションレポート。",
-		url: "https://www.nicole.co.jp/corporate/esg_sdgs/",
-		isFeatured: false
-	}
-];
+
 
 // 本文からリード文（2〜3行の冒頭テキスト）を自動抽出するヘルパー
 function extractLead(p: any): string {
@@ -391,6 +144,7 @@ try {
 } catch (e) {}
 
 const cmsArticles = allCmsEntries.map((p: any) => {
+	const publishedAt = new Date(p.data.publishedAt ?? p.data.createdAt ?? 0).getTime() || 0;
 	const featImg = p.data.featured_image;
 	const imgUrl = resolveMediaUrl(
 		featImg,
@@ -399,7 +153,7 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	const entryDbId = p.data?.id || p.id;
 	const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
 	const inferredCat = determineArticleCategory(p);
-	const cat = (inferredCat === "Campaign")
+	const cat = isESGArticle(p) ? "ESG" : (inferredCat === "Campaign")
 		? "Campaign"
 		: (assignedCategories.length > 0 ? assignedCategories[0] : inferredCat);
 
@@ -428,7 +182,8 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 		brand: b,
 		topic: cat,
 		category: cat,
-		date: p.data.published_at ? new Date(p.data.published_at).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.11.07",
+		date: new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, "."),
+		publishedAt,
 		views: "NEW",
 		image: imgUrl,
 		lead: extractLead(p),
@@ -437,85 +192,22 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	};
 });
 
-// お知らせ（News / Corporate Notices / 休業日・アカウント案内等）判定ヘルパー
-// マガジン（Stories & Essays）ではなく、店舗・コーポレートの「お知らせ」に該当するものを除外
-const isNoticeArticle = (p: any): boolean => {
-	const slug = (p.slug || p.id || "").toLowerCase();
-	const title = (p.title || p.data?.title || "").toLowerCase();
-	
-	const specificNoticeSlugs = [
-		"202512_web_sns_account_change",
-		"202512_setagaya_aoyama_closedday",
-		"202609_nicole_sns-announcement",
-		"202610_nicole_used-car_url-information",
-		"gw-holiday-2026",
-		"holiday",
-		"closedday"
-	];
-	if (specificNoticeSlugs.some(s => slug.includes(s))) return true;
-
-	if (
-		title.includes("休業") ||
-		title.includes("定休日") ||
-		title.includes("ドメイン") ||
-		title.includes("snsアカウント") ||
-		title.includes("アカウント名変更") ||
-		title.includes("lineアカウント") ||
-		title.includes("夏季休業") ||
-		title.includes("年末年始") ||
-		title.includes("営業時間")
-	) {
-		return true;
-	}
-
-	return false;
-};
-
-// 全記事リスト（CMS記事を最優先し、CMSにない記事のみ静的フォールバックから補充）
+// 公式Magazineから取り込んだCMS記事と、編集部で作成したCMS記事を掲載する。
 // お知らせ（休業日案内・ドメインSNS変更等）はマガジンから除外
-const allArticles = [
-	...cmsArticles,
-	...staticArticles.filter(sa => !cmsArticles.some(ca => ca.slug === sa.slug || ca.id === sa.id))
-].filter(a => !isNoticeArticle(a));
-
-// ESG / SDGs 記事判定ヘルパー（管理画面の「カテゴリー」設定があれば最優先）
-const isESGArticle = (p: any): boolean => {
-	if (p.category && ["Cars", "People", "ESG", "Buyer's Guide", "Campaign"].includes(p.category)) {
-		return p.category === "ESG";
-	}
-	const slug = (p.slug || p.id || "").toLowerCase();
-	const topic = (p.topic || "").toLowerCase();
-	const title = (p.title || "").toLowerCase();
-	const esgSlugs = [
-		"tamagawa", "shinyurigaoka_cleanup", "japanesenight", "inspire_hub",
-		"traffic-safety", "food-for-community", "sustainable-marche",
-		"emergency-home-support", "kids-mechanic-event", "haruhinofes",
-		"work-experience", "junior_high_shool_experience", "fire-department-award",
-		"international-employee-meetup", "mochitsuki", "norimonofes",
-		"sdgs_partner", "summerconference", "esg-sdgs-activities", "esg", "sdgs"
-	];
-	if (esgSlugs.some(s => slug.includes(s))) return true;
-	if (topic.includes("esg") || topic.includes("sdgs")) return true;
-	if (title.includes("美化活動") || title.includes("クリーンアップ") || title.includes("sdgs") || title.includes("交通安全") || title.includes("防災") || title.includes("寄付") || title.includes("職場体験") || title.includes("サステナブル") || title.includes("餅つき") || title.includes("インター会") || title.includes("交流会") || title.includes("感謝状") || title.includes("のりものフェスタ")) return true;
-	return false;
-};
+const allArticles = cmsArticles.filter(a => !isNoticeArticle(a));
 
 // ユーザー指示（A案）：通常一覧からESG記事を完全に除外し、最下部の専用ブロックへ集約
 const mainArticles = allArticles.filter(a => !isESGArticle(a));
 const esgArticles = allArticles.filter(a => isESGArticle(a)).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
-// 一番目玉の記事（Cover Story）および注目ハイライト（MINIフェア）を先頭に固定
+// CMSの公開記事を公開日時順に掲載し、静的アーカイブはその後に補充する。
+const cmsArticleIds = new Set(cmsArticles.map(article => article.id));
 mainArticles.sort((a, b) => {
-	const aSlug = a.slug || a.id || "";
-	const bSlug = b.slug || b.id || "";
-
-	if (aSlug.includes("2027_new_bmw_ix4_neue_klasse")) return -1;
-	if (bSlug.includes("2027_new_bmw_ix4_neue_klasse")) return 1;
-
-	if (aSlug.includes("mini-new-generation")) return -1;
-	if (bSlug.includes("mini-new-generation")) return 1;
-
-	return 0;
+	const sourceOrder = Number(cmsArticleIds.has(b.id)) - Number(cmsArticleIds.has(a.id));
+	if (sourceOrder) return sourceOrder;
+	const aDate = a.publishedAt;
+	const bDate = b.publishedAt;
+	return (bDate || 0) - (aDate || 0) || a.id.localeCompare(b.id);
 });
 
 // 一番目玉の記事（Cover Story）
@@ -531,6 +223,9 @@ const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
 const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
+const archiveArticles = Astro.url.searchParams.get("view") === "latest"
+	? [...allArticles].sort((a, b) => b.publishedAt - a.publishedAt || a.id.localeCompare(b.id))
+	: mainArticles;
 ---
 
 <NicoleLayout 
@@ -712,7 +407,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 
 				<!-- 記事グリッド（JSフィルタリング対象） -->
 				<div class="articles-grid" id="articles-grid">
-					{mainArticles.map((art) => (
+					{archiveArticles.map((art) => (
 						<article 
 							class="article-item" 
 							data-id={art.id}
@@ -854,7 +549,11 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		const INITIAL_COUNT = 9;
 		const LOAD_STEP = 9;
 		let visibleCount = INITIAL_COUNT;
-		let currentBrand = 'ALL';
+		const archiveParams = new URLSearchParams(window.location.search);
+		const requestedBrand = archiveParams.get('brand');
+		const allowedBrands = ['BMW', 'MINI', 'Ferrari', 'Rolls-Royce', 'ALPINA'];
+		let currentBrand = allowedBrands.includes(requestedBrand || '') ? requestedBrand : 'ALL';
+		let showLatestArchive = archiveParams.get('view') === 'latest';
 		let currentTopic = 'ALL';
 		let currentSort = 'latest';
 		let searchQuery = '';
@@ -877,7 +576,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 			}
 
 			// 絞り込み（ブランド/カテゴリー/検索/ソート）が行われているか
-			const isFiltered = (currentBrand !== 'ALL') || (currentTopic !== 'ALL') || (searchQuery.length > 0) || (currentSort !== 'latest');
+			const isFiltered = showLatestArchive || (currentBrand !== 'ALL') || (currentTopic !== 'ALL') || (searchQuery.length > 0) || (currentSort !== 'latest');
 
 			const matchedArticles = [];
 
@@ -971,6 +670,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		}
 
 		// 初期ロード時の実行（初期9件表示）
+		brandPills.forEach(pill => pill.classList.toggle('is-active', pill.getAttribute('data-value') === currentBrand));
 		applyFilters(true);
 
 		// 「もっと見る」ボタンクリックで古い記事を9件ずつ追加表示
@@ -1021,6 +721,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		if (resetBtn) {
 			resetBtn.addEventListener('click', () => {
 				currentBrand = 'ALL';
+				showLatestArchive = false;
 				currentTopic = 'ALL';
 				currentSort = 'latest';
 				searchQuery = '';
@@ -1089,7 +790,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	/* ============================================================== */
 	.apple-magazine-main {
 		background-color: #040507;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
 		position: relative;
@@ -1196,7 +897,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-weight: 800;
 		letter-spacing: -0.04em;
 		line-height: 0.96;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 16px 0;
 		text-shadow: 0 6px 32px rgba(0, 0, 0, 0.95);
 	}
@@ -1207,7 +908,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-weight: 500;
 		letter-spacing: 0.04em;
 		line-height: 1.45;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		max-width: 720px;
 		margin: 0;
 		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
@@ -1227,7 +928,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.16em;
-		color: #a1a1aa;
+		color: var(--magazine-text-color);
 		text-transform: uppercase;
 		margin-bottom: 10px;
 		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
@@ -1239,7 +940,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-weight: 700;
 		letter-spacing: -0.015em;
 		line-height: 1.35;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 14px 0;
 		text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95);
 	}
@@ -1248,7 +949,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: clamp(14px, 1.2vw, 15.5px);
 		line-height: 1.65;
 		font-weight: 400;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		max-width: 640px;
 		margin: 0 0 24px 0;
 		display: -webkit-box;
@@ -1302,7 +1003,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 
 	.apple-cta-btn--secondary {
 		background: rgba(255, 255, 255, 0.12);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		border: 1px solid rgba(255, 255, 255, 0.3);
 		backdrop-filter: blur(16px);
 		-webkit-backdrop-filter: blur(16px);
@@ -1331,12 +1032,12 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		align-items: center;
 		gap: 8px;
 		text-decoration: none;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		transition: color 0.3s ease;
 	}
 
 	.apple-hero__scroll-cue:hover {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	.scroll-cue-text {
@@ -1380,7 +1081,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.2em;
-		color: #a0a0aa;
+		color: var(--magazine-text-color);
 		margin-bottom: 10px;
 	}
 
@@ -1396,14 +1097,14 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
 		letter-spacing: -0.01em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		line-height: 1.2;
 		margin: 0 0 12px 0;
 	}
 
 	.toc-sub {
 		font-size: 15px;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		margin: 0;
 	}
 
@@ -1473,7 +1174,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 10.5px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		backdrop-filter: blur(8px);
 	}
 
@@ -1489,12 +1190,12 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		align-items: center;
 		gap: 6px;
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		margin-bottom: 8px;
 	}
 
 	.toc-meta-topic {
-		color: #a0a0aa;
+		color: var(--magazine-text-color);
 		font-weight: 600;
 	}
 
@@ -1502,7 +1203,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 20px;
 		font-weight: 600;
 		line-height: 1.4;
-		color: rgba(255, 255, 255, 0.88);
+		color: var(--magazine-text-color);
 		margin: 0 0 12px 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -1512,25 +1213,24 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	}
 
 	.toc-card:hover .toc-card__title {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
 	}
 
 	.toc-card__lead {
 		font-size: 14px;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		line-height: 1.6;
 		margin: 0 0 20px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		flex-grow: 1;
+		display: block;
+		overflow: visible;
+		overflow-wrap: anywhere;
+		flex: none;
 		transition: color 0.3s ease;
 	}
 
 	.toc-card:hover .toc-card__lead {
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 	}
 
 	.toc-card__arrow {
@@ -1539,13 +1239,13 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		gap: 6px;
 		font-size: 13px;
 		font-weight: 700;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--magazine-text-color);
 		margin-top: auto;
 		transition: color 0.3s ease, transform 0.3s ease;
 	}
 
 	.toc-card:hover .toc-card__arrow {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	.toc-card__arrow svg {
@@ -1598,7 +1298,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 13px;
 		font-weight: 700;
 		letter-spacing: 0.05em;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--magazine-text-color);
 		background: none;
 		border: none;
 		flex-shrink: 0;
@@ -1616,7 +1316,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	.filter-pill {
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: rgba(255, 255, 255, 0.8);
+		color: var(--magazine-text-color);
 		padding: 6px 16px;
 		border-radius: 999px;
 		font-size: 12px;
@@ -1628,7 +1328,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 
 	.filter-pill:hover {
 		background: rgba(255, 255, 255, 0.14);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		border-color: rgba(255, 255, 255, 0.35);
 	}
 
@@ -1636,7 +1336,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	.filter-pill.is-active {
 		background: #e50012;
 		border-color: #e50012;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-weight: 700;
 		box-shadow: 0 2px 14px rgba(229, 0, 18, 0.45);
 	}
@@ -1654,7 +1354,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		box-sizing: border-box;
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.18);
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		padding: 0 14px;
 		border-radius: 8px;
 		font-size: 12.5px;
@@ -1671,7 +1371,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 
 	.topic-dropdown option {
 		background: #111419;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	.filter-search-box {
@@ -1705,14 +1405,14 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	.filter-search-box input {
 		background: none;
 		border: none;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-size: 12.5px;
 		width: 100%;
 		outline: none;
 	}
 
 	.filter-search-box input::placeholder {
-		color: rgba(255, 255, 255, 0.35);
+		color: var(--magazine-text-color);
 	}
 
 	/* ============================================================== */
@@ -1735,7 +1435,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 		font-size: 11px;
 		font-weight: 700;
-		color: #a0a0aa;
+		color: var(--magazine-text-color);
 		letter-spacing: 0.2em;
 		display: block;
 		margin-bottom: 4px;
@@ -1745,7 +1445,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0;
 		letter-spacing: -0.01em;
 		line-height: 1.2;
@@ -1753,11 +1453,11 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 
 	.count-display {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 	}
 
 	.count-display span {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		font-weight: 700;
 	}
 
@@ -1827,7 +1527,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 10.5px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		backdrop-filter: blur(8px);
 	}
 
@@ -1843,7 +1543,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		align-items: center;
 		gap: 8px;
 		font-size: 11.5px;
-		color: rgba(255, 255, 255, 0.45);
+		color: var(--magazine-text-color);
 		margin-bottom: 8px;
 	}
 
@@ -1852,7 +1552,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	}
 
 	.meta-topic {
-		color: #a0a0aa;
+		color: var(--magazine-text-color);
 		font-weight: 600;
 	}
 
@@ -1860,31 +1560,30 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 16px;
 		font-weight: 600;
 		line-height: 1.45;
-		color: rgba(255, 255, 255, 0.88);
+		color: var(--magazine-text-color);
 		margin: 0 0 10px 0;
 		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
 	}
 
 	.article-item:hover .article-item__title {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		text-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
 	}
 
 	.article-item__lead {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.65);
+		color: var(--magazine-text-color);
 		line-height: 1.6;
 		margin: 0 0 18px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		flex-grow: 1;
+		display: block;
+		overflow: visible;
+		overflow-wrap: anywhere;
+		flex: none;
 		transition: color 0.3s ease;
 	}
 
 	.article-item:hover .article-item__lead {
-		color: rgba(255, 255, 255, 0.82);
+		color: var(--magazine-text-color);
 	}
 
 	.article-item__footer {
@@ -1898,17 +1597,17 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	}
 
 	.article-item__more {
-		color: rgba(255, 255, 255, 0.65);
+		color: var(--magazine-text-color);
 		font-weight: 600;
 		transition: color 0.25s ease, transform 0.25s ease;
 	}
 
 	.article-item:hover .article-item__more {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	.article-item__views {
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--magazine-text-color);
 	}
 
 	/* ============================================================== */
@@ -1928,7 +1627,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		gap: 10px;
 		font-size: 13.5px;
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 9999px;
@@ -1969,7 +1668,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		width: 56px;
 		height: 56px;
 		margin: 0 auto 20px auto;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--magazine-text-color);
 	}
 
 	.no-articles-icon svg {
@@ -1981,12 +1680,12 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 18px;
 		font-weight: 600;
 		margin: 0 0 8px 0;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	.no-articles-desc {
 		font-size: 14px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--magazine-text-color);
 		margin: 0 0 24px 0;
 	}
 
@@ -2183,7 +1882,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		.esg-section__heading-sub {
 			font-size: 13px;
 			font-weight: 500;
-			color: rgba(255, 255, 255, 0.6);
+			color: var(--magazine-text-color);
 		}
 
 		.articles-grid {
@@ -2250,7 +1949,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-family: var(--font-mono, monospace);
 		font-size: 11px;
 		letter-spacing: 0.16em;
-		color: #8e95a5;
+		color: var(--magazine-text-color);
 		text-transform: uppercase;
 		margin-bottom: 8px;
 	}
@@ -2260,7 +1959,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
 		letter-spacing: -0.01em;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		margin: 0 0 12px;
 		line-height: 1.2;
 		display: flex;
@@ -2272,13 +1971,13 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	.esg-section__heading-sub {
 		font-size: 15px;
 		font-weight: 500;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--magazine-text-color);
 		letter-spacing: 0.02em;
 	}
 
 	.esg-section__desc {
 		font-size: 13.5px;
-		color: #9aa1b2;
+		color: var(--magazine-text-color);
 		line-height: 1.6;
 		margin: 0;
 		word-break: keep-all;
@@ -2299,7 +1998,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		gap: 8px;
 		font-size: 13px;
 		font-weight: 500;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		text-decoration: none;
 		padding: 10px 20px;
 		border-radius: 9999px;
@@ -2386,7 +2085,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		border-radius: 4px;
 		background: rgba(0, 0, 0, 0.72);
 		backdrop-filter: blur(4px);
-		color: #e2e8f0;
+		color: var(--magazine-text-color);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 	}
 
@@ -2400,7 +2099,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	.esg-card__date {
 		font-family: var(--font-mono, monospace);
 		font-size: 11px;
-		color: #7a8294;
+		color: var(--magazine-text-color);
 		margin-bottom: 6px;
 	}
 
@@ -2408,7 +2107,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		font-size: 13.5px;
 		font-weight: 500;
 		line-height: 1.48;
-		color: #f1f5f9;
+		color: var(--magazine-text-color);
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -2418,7 +2117,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 	}
 
 	.esg-card:hover .esg-card__title {
-		color: #ffffff;
+		color: var(--magazine-text-color);
 	}
 
 	/* もっと見るボタン */
@@ -2434,7 +2133,7 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		gap: 8px;
 		font-size: 13px;
 		font-weight: 600;
-		color: #ffffff;
+		color: var(--magazine-text-color);
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 9999px;
@@ -2458,6 +2157,23 @@ const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 		.esg-cards-grid {
 			grid-template-columns: repeat(2, 1fr);
 			gap: 16px;
+		}
+	}
+
+	/* Keep mobile alignment after desktop rules so flex-end/baseline cannot override it. */
+	@media (max-width: 768px) {
+		.esg-section__header {
+			align-items: stretch;
+		}
+
+		.esg-section__titles {
+			width: 100%;
+			text-align: left;
+		}
+
+		.esg-section__heading {
+			align-items: flex-start;
+			text-align: left;
 		}
 	}
 </style>
