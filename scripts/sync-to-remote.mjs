@@ -3,6 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { execSync } from 'node:child_process';
+import { syncCmsMedia } from './sync-cms-media.mjs';
 
 // 1. 環境変数の読み込み (.env)
 if (fs.existsSync('.env')) {
@@ -350,6 +351,7 @@ async function syncArticles() {
 // 実行
 (async () => {
   try {
+    await syncCmsMedia({ apply: true });
     await syncMedia();
     await syncArticles();
     console.log('\n🌟 すべての同期処理が完了しました！');
