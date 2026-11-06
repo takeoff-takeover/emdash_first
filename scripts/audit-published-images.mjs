@@ -44,6 +44,7 @@ for (const [t, prefix] of [['ec_posts', 'posts'], ['ec_pages', 'pages'], ['ec_ma
   for (const row of remote[t]) if (!row.deleted_at && row.status === 'published' && row.slug) routes.add(`/${prefix}/${encodeURIComponent(row.slug)}/`);
 }
 const images = new Map();
+const stylesheets = new Set();
 const pages = [];
 function add(value, page) {
   if (!value || /^(data:|blob:|#|about:)/i.test(value)) return;
@@ -63,16 +64,33 @@ await pool([...routes], 4, async (route, i) => {
     if (!r.ok) return;
     const walk = node => {
       const attrs = Object.fromEntries((node.attrs || []).map(a => [a.name, a.value]));
+      if (node.tagName === 'link' && attrs.rel?.split(/\s+/).includes('stylesheet') && attrs.href) {
+        const css = new URL(attrs.href, base + route);
+        if (css.origin === base) stylesheets.add(css.href);
+      }
       if (node.tagName === 'img' || node.tagName === 'source' && !attrs.type?.startsWith('video/')) {
         for (const k of ['src', 'data-src', 'data-lazy-src']) add(attrs[k], route);
         for (const k of ['srcset', 'data-srcset', 'data-lazy-srcset']) if (attrs[k]) for (const v of attrs[k].split(',')) add(v.trim().split(/\s+/)[0], route);
       }
       for (const m of (attrs.style || '').matchAll(/url\(["']?([^"')]+)["']?\)/g)) add(m[1], route);
+      if (node.tagName === 'style') for (const child of node.childNodes || []) {
+        for (const m of (child.value || '').matchAll(/url\(["']?([^"')]+)["']?\)/g)) if (/\.(jpe?g|png|webp|avif|gif|svg)(?:[?#]|$)/i.test(m[1])) add(m[1], route);
+      }
       for (const child of node.childNodes || []) walk(child);
     };
     walk(parse(html));
   } catch (e) { pages.push({ route, error: e.message }); }
   if ((i + 1) % 25 === 0) console.log(`Scanned ${i + 1}/${routes.size} pages`);
+});
+await pool([...stylesheets], 4, async cssUrl => {
+  try {
+    const response = await fetch(cssUrl, { signal: AbortSignal.timeout(20000) });
+    if (!response.ok) return;
+    const css = await response.text();
+    for (const match of css.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+      if (/\.(jpe?g|png|webp|avif|gif|svg)(?:[?#]|$)/i.test(match[1])) add(new URL(match[1], cssUrl).href, `(stylesheet: ${new URL(cssUrl).pathname})`);
+    }
+  } catch (error) { console.log(`Stylesheet check failed: ${cssUrl}: ${error.message}`); }
 });
 // Also inspect every locally registered upload, including images selected through the CMS.
 for (const row of localMedia) if (row.mime_type?.startsWith('image/') && row.storage_key) add('/_emdash/api/media/file/' + row.storage_key, '(local media library)');
