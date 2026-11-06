@@ -48,7 +48,6 @@ export interface Location {
   gallery_caption_5?: string;
   gallery_image_6?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   gallery_caption_6?: string;
-  sales_title?: string;
   sales_subtitle?: string;
   sales_tel?: string;
   sales_fax?: string;
@@ -57,7 +56,6 @@ export interface Location {
   sales_desc?: string;
   sales_cta_label?: string;
   sales_cta_url?: string;
-  used_title?: string;
   used_subtitle?: string;
   used_tel?: string;
   used_fax?: string;
@@ -66,7 +64,6 @@ export interface Location {
   used_desc?: string;
   used_cta_label?: string;
   used_cta_url?: string;
-  service_title?: string;
   service_subtitle?: string;
   service_tel?: string;
   service_fax?: string;
@@ -90,8 +87,6 @@ export interface Location {
   access_train?: string;
   google_maps_url?: string;
   google_place_id?: string;
-  google_rating_override?: string;
-  google_reviews_count_override?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

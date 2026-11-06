@@ -6,6 +6,15 @@ import GoogleRatingBadge from "../components/GoogleRatingBadge.astro";
 import { getEmDashCollection } from "emdash";
 import { geocodeAddress } from "../utils/geocode";
 import { protectPhrases, formatLocationNameHtml } from "../utils/locationHelper";
+import { getGooglePlaceReviews } from "../utils/google-places";
+import { env } from "cloudflare:workers";
+
+const googleApiKey = (typeof env !== "undefined" && (env as any)?.GOOGLE_PLACES_API_KEY)
+	|| (typeof process !== "undefined" && process.env?.GOOGLE_PLACES_API_KEY)
+	|| (import.meta.env?.GOOGLE_PLACES_API_KEY)
+	|| (typeof env !== "undefined" && (env as any)?.GOOGLE_MAPS_API_KEY)
+	|| (typeof process !== "undefined" && process.env?.GOOGLE_MAPS_API_KEY)
+	|| (import.meta.env?.GOOGLE_MAPS_API_KEY);
 
 // 管理画面の画像フィールドは {src, alt} 形式で保存されるため、文字列パスと両方に対応
 const imgSrc = (v: any): string => {
@@ -56,7 +65,7 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 
 	// 見本用のサンプルGoogle評価（将来はAPIまたは管理画面から取得）
 	const sampleRatingMap: Record<string, { rating: number; count: number }> = {
-		'nicole-bmw-kawasaki': { rating: 4.1, count: 186 },
+		'nicole-bmw-kawasaki': { rating: 4.1, count: 111 },
 		'nicole-bmw-kohoku': { rating: 4.3, count: 215 },
 		'nicole-bmw-aoba-miyamae': { rating: 4.2, count: 98 },
 		'nicole-bmw-shinyurigaoka': { rating: 4.2, count: 142 },
@@ -75,9 +84,25 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 		'nicole-aoyama': { rating: 4.3, count: 38 }
 	};
 
+	// Google Places API連携（プレイスIDとAPIキーが存在する場合、最新の評価・件数をリアルタイム取得）
+	let apiPlaceData = null;
+	if (row.google_place_id && googleApiKey && !isOffice) {
+		apiPlaceData = await getGooglePlaceReviews({
+			placeId: row.google_place_id,
+			apiKey: googleApiKey,
+		});
+	}
+
 	const currentSample = sampleRatingMap[row.slug] || null;
-	const finalRating = row.google_rating_override ? parseFloat(row.google_rating_override) : (currentSample?.rating || null);
-	const finalCount = row.google_reviews_count_override ? parseInt(row.google_reviews_count_override, 10) : (currentSample?.count || null);
+	const parsedOverrideRating = row.google_rating_override ? parseFloat(row.google_rating_override) : NaN;
+	const parsedOverrideCount = row.google_reviews_count_override ? parseInt(row.google_reviews_count_override, 10) : NaN;
+
+	const finalRating = (!isNaN(parsedOverrideRating) && parsedOverrideRating > 0)
+		? parsedOverrideRating
+		: (apiPlaceData?.rating || currentSample?.rating || null);
+	const finalCount = (!isNaN(parsedOverrideCount) && parsedOverrideCount > 0)
+		? parsedOverrideCount
+		: (apiPlaceData?.user_ratings_total || currentSample?.count || null);
 
 	// 新百合ヶ丘（BMW）複合拠点：一覧では「新車窓口」と「認定中古車窓口」を別々の独立行として一覧表示し、詳細URLは共通の総合ハブ（/location/nicole-bmw-shinyurigaoka）へ接続
 	if (row.slug === 'nicole-bmw-shinyurigaoka') {
@@ -97,8 +122,8 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				lng: lng || 139.4975,
 				detailUrl: '/location/nicole-bmw-shinyurigaoka',
 				mapQuery: encodeURIComponent(`Nicole BMW 新百合ヶ丘支店 ${addr}`),
-				rating: 4.2,
-				reviewCount: 142
+				rating: finalRating,
+				reviewCount: finalCount
 			},
 			{
 				id: 'bps-shinyurigaoka',
@@ -115,8 +140,8 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				lng: lng || 139.4975,
 				detailUrl: '/location/nicole-bmw-shinyurigaoka', // 詳細は共通の総合ページへ！
 				mapQuery: encodeURIComponent(`BMW Premium Selection 新百合ヶ丘 ${addr}`),
-				rating: 4.2,
-				reviewCount: 142
+				rating: finalRating,
+				reviewCount: finalCount
 			}
 		];
 	}
@@ -139,8 +164,8 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				lng: lng || 139.4975,
 				detailUrl: '/location/mini-shinyurigaoka',
 				mapQuery: encodeURIComponent(`MINI 新百合ヶ丘 ${addr}`),
-				rating: 4.3,
-				reviewCount: 105
+				rating: finalRating,
+				reviewCount: finalCount
 			},
 			{
 				id: 'mini-next-shinyurigaoka',
@@ -157,8 +182,50 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 				lng: lng || 139.4975,
 				detailUrl: '/location/mini-shinyurigaoka', // 詳細は共通の総合ページへ！
 				mapQuery: encodeURIComponent(`MINI NEXT 新百合ヶ丘 ${addr}`),
-				rating: 4.3,
-				reviewCount: 105
+				rating: finalRating,
+				reviewCount: finalCount
+			}
+		];
+	}
+
+	// Nicole Competizione（フェラーリ）複合拠点：一覧では「プレオウンド ショールーム」と「サービスセンター」を別々の独立行として一覧表示し、詳細URLは共通の総合ハブ（/location/nicole-competizione-preowned-service-centre）へ接続
+	if (row.slug === 'nicole-competizione-preowned-service-centre' || row.slug === 'nicole-competizione-pre-owned') {
+		return [
+			{
+				id: 'nicole-competizione-pre-owned',
+				name: 'Nicole Competizione プレオウンド ショールーム',
+				brand: 'Ferrari',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['Ferrari 認定中古車'],
+				postal: row.postal || "〒224-0044",
+				address: addr,
+				tel: row.used_tel || row.tel || "045-577-3817",
+				image: imgSrc(row.featured_image) || "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-2-1024x683.jpg",
+				lat: lat || 35.51655,
+				lng: lng || 139.58922,
+				detailUrl: '/location/nicole-competizione-preowned-service-centre',
+				mapQuery: encodeURIComponent(`Nicole Competizione プレオウンド ショールーム ${addr}`),
+				rating: finalRating,
+				reviewCount: finalCount
+			},
+			{
+				id: 'nicole-competizione-service-centre',
+				name: 'Nicole Competizione サービスセンター',
+				brand: 'Ferrari',
+				facilityType: 'ショールーム',
+				areaGroup,
+				services: ['Ferrari サービス'],
+				postal: row.postal || "〒224-0044",
+				address: addr,
+				tel: row.service_tel || "045-577-3824",
+				image: "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-1-1024x683.jpg",
+				lat: lat || 35.51655,
+				lng: lng || 139.58922,
+				detailUrl: '/location/nicole-competizione-preowned-service-centre', // 詳細は共通の総合ページへ！
+				mapQuery: encodeURIComponent(`Nicole Competizione サービスセンター ${addr}`),
+				rating: finalRating,
+				reviewCount: finalCount
 			}
 		];
 	}
@@ -176,7 +243,11 @@ const rawLocationsDataNested = await Promise.all(emdashEntries.map(async (entry)
 		image: imgSrc(row.featured_image) || "/uploads/2026/01/Nicole-BMW-本社.jpg",
 		lat: lat || 35.54589,
 		lng: lng || 139.69708,
-		detailUrl: isOffice ? "" : `/location/${entry.id || row.slug}`,
+		detailUrl: isOffice
+			? ""
+			: (row.slug === 'nicole-competizione-service-centre'
+				? '/location/nicole-competizione-preowned-service-centre'
+				: `/location/${entry.id || row.slug}`),
 		mapQuery: encodeURIComponent(`${row.title} ${addr}`),
 		rating: finalRating,
 		reviewCount: finalCount
@@ -220,9 +291,10 @@ const SPECIFIC_SLUG_ORDER: Record<string, number> = {
 	'rolls-royce-motor-cars-yokohama': 301, // ロールス・ロイス・モーター・カーズ横浜
 
 	// ─── 5. フェラーリ ───
-	'nicole-competizione-showroom': 401,        // Nicole Competizione ショールーム
-	'nicole-competizione-pre-owned': 402,       // Nicole Competizione プレオウンド ショールーム
-	'nicole-competizione-service-centre': 403,  // Nicole Competizione サービスセンター
+	'nicole-competizione-showroom': 401,                        // Nicole Competizione ショールーム
+	'nicole-competizione-preowned-service-centre': 402,         // Nicole Competizione プレオウンドショールーム / サービスセンター
+	'nicole-competizione-pre-owned': 402,                       // （旧URL互換）
+	'nicole-competizione-service-centre': 403,                  // Nicole Competizione サービスセンター
 
 	// ─── 6. ニコル（アルピナ） ───
 	'nicole-setagaya': 501,          // ニコル世田谷ショールーム

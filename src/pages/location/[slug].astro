@@ -19,6 +19,10 @@ if (slug === 'bps-shinyurigaoka') {
 if (slug === 'mini-next-shinyurigaoka') {
 	return Astro.redirect('/location/mini-shinyurigaoka', 301);
 }
+// Nicole Competizione プレオウンドショールーム / サービスセンター（新URLへの301恒久転送）
+if (slug === 'nicole-competizione-pre-owned' || slug === 'nicole-competizione-service-centre') {
+	return Astro.redirect('/location/nicole-competizione-preowned-service-centre', 301);
+}
 
 if (!slug) {
 	return Astro.rewrite("/404");
@@ -95,6 +99,7 @@ const galleryList: Array<{ src: string; caption?: string; alt?: string }> = cust
 
 // 2. 部門窓口リスト（個別フィールド sales_*, used_*, service_* を優先、なければ従来の departments JSON）
 const isOfficeLocation = d.facility_type === '本社・オフィス' || slug === 'office-kawasaki' || slug === 'office-yokohama' || d.slug === 'office-kawasaki' || d.slug === 'office-yokohama';
+const isMiniShinyurigaoka = d.slug === 'mini-shinyurigaoka' || slug === 'mini-shinyurigaoka';
 
 const customDepartments: Array<{
 	id: string;
@@ -130,21 +135,15 @@ if (isOfficeLocation) {
 } else {
 	// 新車部門
 	const isSalesEnabled = d.sales_enabled !== 0 && d.sales_enabled !== '0';
-	if (d.sales_title || (isSalesEnabled && (d.sales_tel || d.tel))) {
-		let autoSubtitle = d.sales_subtitle;
-		if (!autoSubtitle) {
-			if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'MINI 新百合ヶ丘';
-			else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW 本社';
-			else autoSubtitle = d.title;
-		}
+	if (isSalesEnabled && (d.sales_tel || d.tel || d.sales_subtitle)) {
 		customDepartments.push({
 			id: 'dept-sales',
 			brand: d.brand || 'BMW',
 			type: 'sales',
-			title: d.sales_title || `${d.brand || 'BMW'} 新車ショールーム`,
-			subtitle: autoSubtitle,
+			title: `${d.brand || 'BMW'} 新車ショールーム`,
+			subtitle: d.sales_subtitle || '',
 			tel: d.sales_tel || d.tel || '',
-			fax: d.sales_fax || '',
+			fax: d.sales_fax || d.fax || '',
 			hours: d.sales_hours || '10:00 〜 18:00',
 			closed: d.sales_closed || '水曜日（祝日を除く）',
 			desc: d.sales_desc || '',
@@ -154,21 +153,14 @@ if (isOfficeLocation) {
 	}
 
 	// 認定中古車部門
-	const isMiniShinyurigaoka = d.slug === 'mini-shinyurigaoka' || slug === 'mini-shinyurigaoka';
-	const isUsedEnabled = isMiniShinyurigaoka || d.used_enabled === 1 || d.used_enabled === '1';
-	if (d.used_title || isMiniShinyurigaoka || (isUsedEnabled && d.used_title)) {
-		let autoSubtitle = d.used_subtitle;
-		if (!autoSubtitle) {
-			if (isMiniShinyurigaoka) autoSubtitle = 'MINI NEXT 新百合ヶ丘';
-			else if (d.title?.includes('新百合')) autoSubtitle = 'BMW Premium Selection 新百合ヶ丘';
-			else autoSubtitle = d.title;
-		}
+	const isUsedEnabled = isMiniShinyurigaoka || d.used_enabled === 1 || d.used_enabled === '1' || !!d.used_subtitle;
+	if (isUsedEnabled) {
 		customDepartments.push({
 			id: 'dept-used',
 			brand: isMiniShinyurigaoka ? 'MINI' : (d.brand || 'BMW'),
 			type: 'used',
-			title: d.used_title || (isMiniShinyurigaoka ? 'MINI NEXT 新百合ヶ丘' : '認定中古車'),
-			subtitle: autoSubtitle,
+			title: isMiniShinyurigaoka ? 'MINI NEXT 新百合ヶ丘' : '認定中古車',
+			subtitle: d.used_subtitle || '',
 			tel: d.used_tel || (isMiniShinyurigaoka ? '044-396-0180' : (d.tel || '')),
 			fax: d.used_fax || '',
 			hours: d.used_hours || '10:00 〜 18:00',
@@ -195,6 +187,7 @@ interface ServiceHubInfo {
 }
 
 // 指定サービス工場（自社工場を併設していない店舗の場合、CMSで設定された指定工場データを利用）
+const currentFacilityDisplayName = d.sales_subtitle || d.used_subtitle || d.title || '当拠点';
 const externalServiceHub: ServiceHubInfo | null = d.external_service_name ? {
 	factoryName: d.external_service_name,
 	factorySlug: d.external_service_slug || '',
@@ -205,25 +198,19 @@ const externalServiceHub: ServiceHubInfo | null = d.external_service_name ? {
 	factoryHours: d.external_service_hours || '10:00 〜 18:00',
 	factoryClosed: d.external_service_closed || '水曜日',
 	factoryGmapUrl: `https://maps.google.com/?q=${encodeURIComponent(`${d.external_service_name} ${d.external_service_address || ''}`)}`,
-	noticeDesc: d.external_service_desc || `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${d.external_service_name}」にて承ります。`
+	noticeDesc: (d.external_service_desc || `※${currentFacilityDisplayName}にはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${d.external_service_name}」にて承ります。`).replaceAll('当ショールーム', currentFacilityDisplayName)
 } : null;
 
 // サービス整備部門
 if (!isOfficeLocation) {
 	const isServiceEnabled = d.service_enabled !== 0 && d.service_enabled !== '0';
-	if (d.service_title || (isServiceEnabled && (d.service_tel || d.tel))) {
-		let autoSubtitle = d.service_subtitle;
-		if (!autoSubtitle) {
-			if (d.slug === 'mini-shinyurigaoka') autoSubtitle = 'Nicole BMW 新百合ヶ丘支店';
-			else if (d.title?.includes('川崎')) autoSubtitle = 'Nicole BMW Service Centre';
-			else autoSubtitle = d.title;
-		}
+	if (isServiceEnabled && (d.service_tel || d.tel || d.service_subtitle)) {
 		customDepartments.push({
 			id: 'dept-service',
 			brand: d.brand || 'BMW',
 			type: 'service',
-			title: d.service_title || `${d.brand || 'BMW'} サービスセンター`,
-			subtitle: autoSubtitle,
+			title: `${d.brand || 'BMW'} サービスセンター`,
+			subtitle: d.service_subtitle || '',
 			tel: d.service_tel || d.tel || '',
 			fax: d.service_fax || '',
 			hours: d.service_hours || '09:00 〜 18:00',
@@ -243,7 +230,7 @@ if (!isOfficeLocation) {
 			tel: externalServiceHub.factoryTel,
 			hours: externalServiceHub.factoryHours,
 			closed: externalServiceHub.factoryClosed,
-			desc: `※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「${externalServiceHub.factoryName}」にて承ります。`,
+			desc: externalServiceHub.noticeDesc,
 			ctaLabel: '指定工場を見る',
 			ctaUrl: externalServiceHub.factoryUrl
 		});
@@ -444,10 +431,17 @@ function getOpenStatus(hoursStr?: string, closedStr?: string): { isOpen: boolean
 const displayTitle = protectPhrases(d.title);
 const displayRelatedHubTitle = protectPhrases(cleanRelatedHubTitle);
 
-// Server secret (.dev.vars locally); never expose the key in HTML.
+// Server secret (.dev.vars or .env locally); never expose the key in HTML.
+const googleApiKey = (typeof env !== "undefined" && (env as any)?.GOOGLE_PLACES_API_KEY)
+	|| (typeof process !== "undefined" && process.env?.GOOGLE_PLACES_API_KEY)
+	|| (import.meta.env?.GOOGLE_PLACES_API_KEY)
+	|| (typeof env !== "undefined" && (env as any)?.GOOGLE_MAPS_API_KEY)
+	|| (typeof process !== "undefined" && process.env?.GOOGLE_MAPS_API_KEY)
+	|| (import.meta.env?.GOOGLE_MAPS_API_KEY);
+
 const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 	placeId: d.google_place_id,
-	apiKey: (env as { GOOGLE_PLACES_API_KEY?: string }).GOOGLE_PLACES_API_KEY,
+	apiKey: googleApiKey,
 });
 ---
 
@@ -948,7 +942,7 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 						{externalServiceHub && (
 							<div class="sidebar-workshop-notice">
 								<p class="workshop-notice-text">
-									※当ショールームにはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「<a href={externalServiceHub.factoryUrl} class="workshop-notice-link">{externalServiceHub.factoryName}</a>」にて承ります。
+									※{currentFacilityDisplayName}にはサービス工場が併設されておりません。定期点検・車検・メンテナンスは、指定工場「<a href={externalServiceHub.factoryUrl} class="workshop-notice-link">{externalServiceHub.factoryName}</a>」にて承ります。
 								</p>
 							</div>
 						)}

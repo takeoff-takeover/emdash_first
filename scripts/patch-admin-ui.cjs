@@ -64,19 +64,19 @@ const injectedCode = `
 						id: 'sec-sales',
 						prefix: '【新車窓口】',
 						title: '新車窓口',
-						desc: '新車窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、展示案内、予約ボタン'
+						desc: '店舗名称、直通電話、FAX、営業時間、定休日、展示案内、予約ボタン'
 					},
 					{
 						id: 'sec-used',
 						prefix: '【中古車窓口】',
 						title: '認定中古車窓口',
-						desc: '中古車窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、在庫案内、在庫ボタン'
+						desc: '店舗名称、直通電話、FAX、営業時間、定休日、在庫案内、在庫ボタン'
 					},
 					{
 						id: 'sec-service',
 						prefix: '【サービス窓口】',
 						title: 'サービス窓口',
-						desc: 'サービス窓口見出し、店舗名称、直通電話、FAX、営業時間、定休日、整備案内、予約ボタン'
+						desc: '店舗名称、直通電話、FAX、営業時間、定休日、整備案内、予約ボタン'
 					},
 					{
 						id: 'sec-external-service',
@@ -263,6 +263,49 @@ const injectedCode = `
 				}
 
 				function applyAccordion() {
+					// 専用CSSの注入（ホバーや開閉スタイルをCSSで完結させ、JSのタイマー上書きによるチカチカ・点滅を完全防止）
+					if (!document.getElementById('emdash-accordion-styles')) {
+						const styleEl = document.createElement('style');
+						styleEl.id = 'emdash-accordion-styles';
+						styleEl.textContent = \`
+							[data-accordion-header] {
+								margin-top: 18px;
+								margin-bottom: 12px;
+								padding: 12px 18px;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
+								border-left: 4px solid var(--color-kumo-line);
+								border-radius: 6px;
+								cursor: pointer;
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								user-select: none;
+								transition: background 0.15s ease, border-color 0.15s ease;
+							}
+							[data-accordion-header][data-is-open="true"] {
+								background: var(--color-kumo-tint);
+								border-left-color: var(--color-kumo-contrast);
+							}
+							[data-accordion-header]:hover {
+								background: var(--color-kumo-tint) !important;
+								border-color: var(--color-kumo-line) !important;
+							}
+							.emdash-sec-field-open {
+								padding-left: 10px !important;
+								border-left: 2px solid var(--color-kumo-tint) !important;
+								margin-left: 4px !important;
+							}
+							#emdash-accordion-toolbar button {
+								transition: background 0.15s ease, color 0.15s ease;
+							}
+							#emdash-accordion-toolbar button:hover {
+								background: var(--color-kumo-line) !important;
+							}
+						\`;
+						document.head.appendChild(styleEl);
+					}
+
 					// 画面内にプレフィックスが存在するか判定
 					const allElements = Array.from(document.querySelectorAll('label, p, span, h3, h4'));
 					const hasLocationsField = allElements.some(el =>
@@ -286,6 +329,13 @@ const injectedCode = `
 
 					// 取扱サービスセレクターの生成
 					applyBadgesSelectorUI();
+
+					// すでにツールバーと全ヘッダーが正常に挿入済みの場合は重い全走査をスキップして高速化
+					const existingToolbar = document.getElementById('emdash-accordion-toolbar');
+					const existingHeaders = document.querySelectorAll('[data-accordion-header]');
+					if (existingToolbar && existingHeaders.length >= 5 && document.body.contains(existingToolbar)) {
+						return;
+					}
 
 					// 各プレフィックスに該当するフィールドラッパー要素をグループ化
 					const sectionElements = {};
@@ -363,10 +413,7 @@ const injectedCode = `
 							border: 1px solid var(--color-kumo-line);
 							border-radius: 4px;
 							cursor: pointer;
-							transition: background 0.15s ease;
 						\`;
-						expandAllBtn.onmouseenter = () => { expandAllBtn.style.background = 'var(--color-kumo-line)'; };
-						expandAllBtn.onmouseleave = () => { expandAllBtn.style.background = 'var(--color-kumo-tint)'; };
 						expandAllBtn.onclick = (e) => {
 							e.preventDefault();
 							SECTION_CONFIG.forEach(s => { openState[s.id] = true; });
@@ -385,16 +432,7 @@ const injectedCode = `
 							border: 1px solid var(--color-kumo-line);
 							border-radius: 4px;
 							cursor: pointer;
-							transition: all 0.15s ease;
 						\`;
-						collapseAllBtn.onmouseenter = () => {
-							collapseAllBtn.style.background = 'var(--color-kumo-tint)';
-							collapseAllBtn.style.color = 'var(--text-color-kumo-default)';
-						};
-						collapseAllBtn.onmouseleave = () => {
-							collapseAllBtn.style.background = 'transparent';
-							collapseAllBtn.style.color = 'var(--text-color-kumo-subtle)';
-						};
 						collapseAllBtn.onclick = (e) => {
 							e.preventDefault();
 							SECTION_CONFIG.forEach(s => { openState[s.id] = false; });
@@ -420,24 +458,6 @@ const injectedCode = `
 						if (!header) {
 							header = document.createElement('div');
 							header.setAttribute('data-accordion-header', sec.id);
-							header.style.cssText = \`
-								margin-top: 18px;
-								margin-bottom: 12px;
-								padding: 12px 18px;
-								background: var(--color-kumo-elevated);
-								border: 1px solid var(--color-kumo-line);
-								border-left: 4px solid var(--text-color-kumo-default);
-								border-radius: 6px;
-								cursor: pointer;
-								display: flex;
-								align-items: center;
-								justify-content: space-between;
-								user-select: none;
-								transition: background 0.15s ease, border-color 0.15s ease;
-							\`;
-
-							header.onmouseenter = () => { header.style.background = 'var(--color-kumo-tint)'; };
-							header.onmouseleave = () => { header.style.background = 'var(--color-kumo-elevated)'; };
 
 							header.onclick = (e) => {
 								e.preventDefault();
@@ -496,20 +516,33 @@ const injectedCode = `
 						const isOpen = !!openState[sec.id];
 
 						if (header) {
+							const currentIsOpenAttr = header.getAttribute('data-is-open');
+							const targetIsOpenStr = isOpen ? 'true' : 'false';
+							if (currentIsOpenAttr !== targetIsOpenStr) {
+								header.setAttribute('data-is-open', targetIsOpenStr);
+							}
 							const arrow = header.querySelector('.acc-arrow');
 							if (arrow) {
-								arrow.textContent = isOpen ? '▲ 閉じる' : '▼ 開く';
+								const targetArrowText = isOpen ? '▲ 閉じる' : '▼ 開く';
+								if (arrow.textContent !== targetArrowText) {
+									arrow.textContent = targetArrowText;
+								}
 							}
-							header.style.borderLeftColor = isOpen ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)';
-							header.style.background = isOpen ? 'var(--color-kumo-tint)' : 'var(--color-kumo-elevated)';
 						}
 
 						fields.forEach(fieldEl => {
-							fieldEl.style.display = isOpen ? '' : 'none';
+							const targetDisplay = isOpen ? '' : 'none';
+							if (fieldEl.style.display !== targetDisplay) {
+								fieldEl.style.display = targetDisplay;
+							}
 							if (isOpen) {
-								fieldEl.style.paddingLeft = '10px';
-								fieldEl.style.borderLeft = '2px solid var(--color-kumo-tint)';
-								fieldEl.style.marginLeft = '4px';
+								if (!fieldEl.classList.contains('emdash-sec-field-open')) {
+									fieldEl.classList.add('emdash-sec-field-open');
+								}
+							} else {
+								if (fieldEl.classList.contains('emdash-sec-field-open')) {
+									fieldEl.classList.remove('emdash-sec-field-open');
+								}
 							}
 						});
 					});
