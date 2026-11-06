@@ -1,0 +1,28 @@
+# Nicole Group (ニコル・グループ)
+
+> 東京・神奈川エリアを中心に、BMW、MINI、Rolls-Royce、Ferrariなどの正規ディーラーおよび認定サービス工場を展開するプレミアムカーディーラーグループ。
+
+## 概要 (Overview)
+ニコル・グループ（Nicole Group）は、半世紀にわたり欧州最高峰の自動車文化を日本に届けてきた正規輸入・販売代理店グループです。新車販売、認定中古車（Certified Pre-Owned）、正規サービスセンターによる整備・車検・レストレーション、および高年式・希少車の買取・委託販売を取り扱っています。
+
+## 取り扱いブランド (Brands Handled)
+- **BMW** (正規ディーラー: Nicole BMW / 各ショールーム・Nicole BMW Service Centre)
+- **MINI** (正規ディーラー: MINI Nicole)
+- **Rolls-Royce** (正規販売代理店: Rolls-Royce Motor Cars Yokohama)
+- **Ferrari** (正規ディーラー: Nicole Competizione)
+- **BMW ALPINA** (歴代輸入総代理店としての知見とメンテナンス)
+
+## 公式主要ページ (Main Sections)
+- ホーム: /
+- Webマガジン (Nicole Connect): /magazine/
+  - 下取り・買取・委託販売完全ガイド: /magazine/bmw-mini-rolls-royce-ferrari-resale-guide
+  - 新型BMW iX4 詳細解説: /magazine/bmw-ix4-debut
+  - ニコル・レーシング・ジャパン歴史とDNA: /magazine/nicole-racing-dna
+  - アルピナの哲学とクラフトマンシップ: /magazine/alpina-philosophy
+- 拠点・サービスセンター一覧 (Locations): /locations
+- 企業情報 (Corporate): /corporate
+- お問い合わせ・オンライン査定相談 (Contact): /contact
+
+## お問い合わせとサービス基準 (Services & Contact)
+- 車両売却・査定・委託販売相談: 専任の査定士およびサービスアドバイザーが対応
+- 正規工場整備: メーカー指定の特殊ツール、純正部品、最新オンライン診断システムを完備

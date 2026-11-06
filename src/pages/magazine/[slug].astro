@@ -1244,6 +1244,56 @@ const formattedArticleDate = articleDate
 const editUrl = postDbId 
 	? `/_emdash/admin/content/${contentCollection}/${postDbId}`
 	: `/_emdash/admin/content/${contentCollection}`;
+
+const pageUrl = `https://my-emdash-site.kaz130.workers.dev/magazine/${slug}`;
+const articleJsonLd: any = [
+	{
+		"@context": "https://schema.org",
+		"@type": "Article",
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": pageUrl
+		},
+		"headline": post.data.title,
+		"description": post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Connect公式記事。",
+		"image": heroImageUrl ? [heroImageUrl.startsWith("http") ? heroImageUrl : `https://my-emdash-site.kaz130.workers.dev${heroImageUrl}`] : [],
+		"datePublished": (post.data as any).publishedAt || (post.data as any).published_at || new Date().toISOString(),
+		"dateModified": (post.data as any).updatedAt || (post.data as any).updated_at || (post.data as any).publishedAt || new Date().toISOString(),
+		"author": {
+			"@type": "Organization",
+			"name": "ニコル・グループ (Nicole Group)",
+			"url": "https://my-emdash-site.kaz130.workers.dev"
+		},
+		"publisher": {
+			"@type": "Organization",
+			"name": "ニコル・グループ",
+			"logo": {
+				"@type": "ImageObject",
+				"url": "https://my-emdash-site.kaz130.workers.dev/uploads/2026/01/NICOLE_N_LOGO_neg.svg"
+			}
+		}
+	}
+];
+
+// If content has FAQ block, construct FAQPage JSON-LD
+if (Array.isArray(post.data?.content)) {
+	const faqBlock = post.data.content.find((b: any) => b._type === "editorial-tools:faq");
+	if (faqBlock && Array.isArray(faqBlock.items) && faqBlock.items.length > 0) {
+		articleJsonLd.push({
+			"@context": "https://schema.org",
+			"@type": "FAQPage",
+			"mainEntity": faqBlock.items.map((item: any) => ({
+				"@type": "Question",
+				"name": item.question,
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": item.answer
+				}
+			}))
+		});
+	}
+}
+
 ---
 
 <NicoleLayout 
@@ -1251,6 +1301,7 @@ const editUrl = postDbId
 	description={post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Connect公式記事。"}
 	isMagazine={true}
 	currentSlug={slug}
+	jsonLd={articleJsonLd}
 >
 	<article class={`modern-article-page ${isOneColumn ? "is-one-column" : ""}`} id="article-top">
 		{/* ============================================================== */}
@@ -2079,7 +2130,7 @@ const editUrl = postDbId
 	}
 
 	.sidebar-sample .sidebar-heading {
-		border-bottom-color: var(--magazine-sidebar-label-border);
+		border-bottom-color: var(--color-nicole-red);
 	}
 
 	.sidebar-block {

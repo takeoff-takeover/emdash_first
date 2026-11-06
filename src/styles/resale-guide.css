@@ -1,0 +1,101 @@
+/* Values follow the site's canonical token scale; only resale diagrams use them. */
+:root {
+  --resale-space-xs: 0.5rem;
+  --resale-space-sm: 0.75rem;
+  --resale-space: 1rem;
+  --resale-space-lg: 1.5rem;
+  --resale-space-section: 2rem;
+  --resale-icon-size: 2.5rem;
+  --resale-text-sm: 0.875rem;
+  --resale-text-lg: 1.25rem;
+  --resale-number-size: 2rem;
+  --resale-leading: 1.5;
+  --resale-radius: 0.75rem;
+  --resale-ink: #ffffff;
+  --resale-surface: #141418;
+  --resale-border: #383842;
+}
+.resale-visual {
+  margin-block: var(--resale-space-section);
+  color: var(--resale-ink);
+}
+.resale-visual .cms-col-cards__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--resale-space);
+}
+.resale-visual .cms-col-card,
+.resale-flow-row,
+.resale-equation {
+  background: var(--resale-surface);
+  border: thin solid var(--resale-border);
+  border-radius: var(--resale-radius);
+}
+.resale-visual .cms-col-card__body {
+  padding: var(--resale-space-lg);
+}
+.resale-visual h3 {
+  font-size: var(--resale-text-lg);
+  margin-block: var(--resale-space-xs) var(--resale-space-sm) !important;
+}
+.resale-visual p {
+  margin: 0 !important;
+  font-size: var(--resale-text-sm);
+  line-height: var(--resale-leading);
+}
+.resale-visual img.resale-icon {
+  display: block;
+  width: var(--resale-icon-size);
+  height: var(--resale-icon-size);
+  margin: 0;
+  object-fit: contain;
+}
+.resale-flow-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--resale-space);
+  padding: var(--resale-space);
+  margin-block: var(--resale-space-sm);
+}
+.resale-flow-row h3 { margin-top: 0 !important; }
+.resale-flow-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--resale-space-xs);
+  line-height: var(--resale-leading);
+  font-size: var(--resale-text-sm);
+}
+.resale-flow-path span { white-space: nowrap; }
+.resale-flow-row p { margin-top: var(--resale-space-xs) !important; }
+.resale-equation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--resale-space);
+  padding: var(--resale-space-lg);
+}
+.resale-equation div { text-align: center; }
+.resale-equation dt { font-size: var(--resale-text-sm); }
+.resale-equation dd { margin: 0; font-size: var(--resale-number-size); }
+.resale-equation .resale-symbol { font-size: var(--resale-text-lg); }
+.resale-visual figcaption { margin-top: var(--resale-space-sm); font-size: var(--resale-text-sm); }
+.resale-visual .resale-prep-image { width: 100%; height: auto; border-radius: var(--resale-radius); }
+@media (max-width: 640px) {
+  .resale-equation {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--resale-space-sm);
+  }
+  .resale-equation dd { font-size: var(--resale-text-lg); }
+  .resale-equation > div:nth-child(4) { display: none; }
+  .resale-equation > div:last-child {
+    grid-column: 1 / -1;
+    padding-top: var(--resale-space-sm);
+    border-top: thin solid var(--resale-border);
+  }
+  .resale-equation > div:last-child dt::before { content: "＝ "; }
+  .resale-equation > div:last-child dd { font-size: var(--resale-number-size); }
+}

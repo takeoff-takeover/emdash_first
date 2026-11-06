@@ -1,0 +1,72 @@
+自宅作業への引き継ぎ（2026年11月6日・日本時間）
+
+現在の状態
+・作業ブランチ：main
+・GitHub：https://github.com/takeoff-takeover/emdash_first
+・Cloudflareへの本番デプロイはこのチャットでは実施していない。
+・記事データはローカルCMSに保存し、最新DBを seed/backup.sqlite にバックアップした。
+
+このチャットで完了したこと
+1. BMW Groupの2026年11月3日付公式発表を参照し、BMW ALPINA初の量産モデルのナルド高速テストを日本語記事として追加。
+2. 公式提供写真5枚を public/uploads/bmw-alpina-nardo/ に保存。アイキャッチと切り替えギャラリーを既存の2カラム記事レイアウトに配置。
+3. ALPINA / Cars の分類を設定。マガジントップのカバーストーリーとして表示されることを確認。
+4. PC・スマートフォン表示、画像5枚の読み込み、ギャラリーの切り替えを確認。
+5. 途中で依頼された「ラベルを青・写真を2枚・出典欄を削除」は、その後の取り消し指示で元に戻した。
+   最終状態は「赤いALPINAラベル・写真5枚・出典・写真欄あり」。青への変更を再適用しないこと。
+6. 引き継ぎ時の型検査で見つかったサイトマップの型エラー2件を修正。
+
+確認用URL（自宅で開発サーバーを起動した後）
+・記事：http://localhost:4321/magazine/bmw-alpina-nardo-high-speed-testing/
+・マガジン一覧：http://localhost:4321/magazine/
+・管理画面への直接アクセス：
+  http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin
+・公式出典：
+  https://newsroom.bmwgroup.com/global/first-bmw-alpina-production-model-undergoes-high-speed-testing-in-nardo-italy/
+
+自宅での再開手順
+1. 自宅のリポジトリに未保存変更があれば、先に別途保存する。
+2. mainで git pull --ff-only origin main を実行する。
+   初回は git clone https://github.com/takeoff-takeover/emdash_first.git を実行し、そのフォルダーへ移動する。
+3. Node.js 24系とnpmが利用できる状態で npm ci を実行する。
+   この作業環境はNode.js v24.22.1。Node標準のSQLiteを使用している。
+4. 初回環境ではインストール時に seed/backup.sqlite からローカルDBが自動復元される。
+   すでに自宅で起動済みの場合、自動復元は既存DBを上書きしない。
+   最新の記事が出ない場合は、開発サーバーを停止し、自宅側の .wrangler/state/v3/d1 フォルダーを別の場所へバックアップしてから、
+   .wrangler/state/v3/d1/miniflare-D1DatabaseObject 内のDB・WAL・SHMを一式退避する。
+   続いて npm run db:restore を実行し、この引き継ぎの seed/backup.sqlite を復元する。
+   自宅側で追加したCMS記事がある場合は、DBを置き換える前に差分を保存・確認すること。
+5. npm run dev を実行し、上記URLを開く。
+6. 記事の写真が5枚であること、赤いALPINAラベル、「出典・写真」欄を確認する。
+
+引き継ぐ既存の未コミット変更
+以下はこのチャット開始時点ですでに作業ツリーにあった変更。失わないよう今回の保存対象に含める。
+・下取り・買取ガイドの図解、画像、スタイルとRichPortableTextへの読み込み。
+・NicoleLayoutとマガジン記事のJSON-LD、robots.txt、llms.txt、サイトマップ。
+・Google Places API (New)による実データ取得、取得できない場合の非表示、投稿者リンク等。
+・関連する検証・変換・公開用スクリプト。
+これら全体の制作経緯・本番反映状況は、このチャットだけでは確認していない。
+
+積み残し・注意点と次回の具体的作業
+・アルピナ記事の今回の依頼は完了。追加変更は新しい指示に従う。
+・本番反映は未実施。ユーザーの明示的なデプロイ指示が出た場合のみ対応する。
+・Google Placesの実データ確認には、自宅環境の .dev.vars に GOOGLE_PLACES_API_KEY が必要。
+  秘密ファイルはGitHubには保存していない。必要なら自宅の安全な設定から用意する。
+  キー・Place IDがない、またはAPIが取得できない場合、レビュー欄は非表示となる。
+・.wrangler内のローカルR2データと .env / .dev.vars はGit管理外。
+  今回のALPINA写真は public/uploads 配下なのでGitHubから再現できるが、ほかの記事のローカルR2画像は別途確認する。
+・scripts/visualize-resale-guide.mjs 等の過去の作業用スクリプトには、scratch/内の一時ファイルを前提とするものがある。
+  scratch/はGit管理外のため、通常の再開時にこれらのスクリプトを再実行する必要はない。
+・scripts/publish-resale-guide-d1.mjs は本番DBを更新するスクリプト。今回の準備では実行していない。通常のローカル再開では実行しない。
+・scripts/create-alpina-nardo.mjs は初回作成用。既存記事の本文を更新する用途ではない。
+  既存記事の編集は管理画面か、事前取得した最新リビジョンを指定するCLI更新を使う。
+
+重要な保存ファイル
+・seed/backup.sqlite：この引き継ぎ時点のCMS全体
+・seed/db-filename.txt：復元先DBのファイル名
+・seed/article-bmw-alpina-nardo.json：ALPINA記事本文の再現用データ
+・public/uploads/bmw-alpina-nardo/sources.json：写真の提供元・利用用途・説明
+
+確認結果
+・Google Placesの既存テスト：1件成功。
+・git diff --check：問題なし（Windowsの改行変換通知あり）。
+・型検査の最終結果は HANDOVER-2026-11-06-checks.txt を参照。

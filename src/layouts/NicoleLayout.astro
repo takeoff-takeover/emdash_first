@@ -4,14 +4,34 @@ interface Props {
 	description?: string;
 	isMagazine?: boolean;
 	currentSlug?: string;
+	jsonLd?: Record<string, any> | Array<Record<string, any>>;
 }
 
 const {
 	title = "HOME - ニコル・グループ",
 	description = "東京・神奈川エリアを中心に、世界のプレミアムブランドを通じて最高の喜びをお届けするカーディーラー・グループ。",
 	isMagazine = false,
-	currentSlug
+	currentSlug,
+	jsonLd
 } = Astro.props;
+
+const organizationSchema = {
+	"@context": "https://schema.org",
+	"@type": "AutoDealer",
+	"name": "ニコル・グループ (Nicole Group)",
+	"alternateName": "Nicole Group",
+	"url": "https://my-emdash-site.kaz130.workers.dev",
+	"logo": "https://my-emdash-site.kaz130.workers.dev/uploads/2026/01/NICOLE_N_LOGO_neg.svg",
+	"description": "東京・神奈川エリアを中心にBMW、MINI、Rolls-Royce、Ferrariなどの正規ディーラーおよび認定サービス工場を展開するプレミアムカーディーラーグループ。",
+	"brand": [
+		{ "@type": "Brand", "name": "BMW" },
+		{ "@type": "Brand", "name": "MINI" },
+		{ "@type": "Brand", "name": "Rolls-Royce" },
+		{ "@type": "Brand", "name": "Ferrari" },
+		{ "@type": "Brand", "name": "BMW ALPINA" }
+	],
+	"areaServed": ["東京都", "神奈川県"]
+};
 
 import NicoleHeader from "../components/NicoleHeader.astro";
 import NicoleFooter from "../components/NicoleFooter.astro";
@@ -79,6 +99,10 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<!-- Core scripts in head (Self-hosted) -->
 	<script is:inline src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
 	<script is:inline src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
+	<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+	{jsonLd && (
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	)}
 	<slot name="head" />
 </head>
 

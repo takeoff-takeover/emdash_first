@@ -7,6 +7,7 @@ import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import GoogleRatingBadge from "../../components/GoogleRatingBadge.astro";
 import { getGooglePlaceReviews } from "../../utils/google-places";
+import { env } from "cloudflare:workers";
 import { protectPhrases, formatTitleHtml } from "../../utils/locationHelper";
 
 const slug = decodeSlug(Astro.params.slug);
@@ -443,12 +444,10 @@ function getOpenStatus(hoursStr?: string, closedStr?: string): { isOpen: boolean
 const displayTitle = protectPhrases(d.title);
 const displayRelatedHubTitle = protectPhrases(cleanRelatedHubTitle);
 
-// Google Places API またはフォールバックモックから評価・レビューを取得
-const placeData = await getGooglePlaceReviews({
+// Server secret (.dev.vars locally); never expose the key in HTML.
+const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 	placeId: d.google_place_id,
-	locationTitle: d.title,
-	ratingOverride: d.google_rating_override,
-	countOverride: d.google_reviews_count_override
+	apiKey: (env as { GOOGLE_PLACES_API_KEY?: string }).GOOGLE_PLACES_API_KEY,
 });
 ---
 
@@ -823,12 +822,12 @@ const placeData = await getGooglePlaceReviews({
 					</section>
 
 					<!-- Googleマップ評価・お客様のクチコミ（オフィスは車両を扱わないため非表示） -->
-					{!isOfficeLocation && (
+					{!isOfficeLocation && placeData && (
 						<section class="sr-section sr-section--reviews" id="reviews">
 							<div class="reviews-header-wrap">
 								<div>
 									<h2 class="section-title">Googleマップの評価・クチコミ</h2>
-									<p class="section-desc">実際にご来場・ご利用いただいたお客様からの声をご紹介いたします。</p>
+									<p class="section-desc">Googleマップに投稿されたクチコミを関連度順にご紹介します。</p>
 								</div>
 							</div>
 
@@ -856,7 +855,7 @@ const placeData = await getGooglePlaceReviews({
 											<path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
 											<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
 										</svg>
-										<span>Google 評価{placeData.is_live_api ? '（公式連携）' : ''}</span>
+										<span>Google Maps</span>
 									</div>
 								</div>
 							</div>
@@ -869,10 +868,9 @@ const placeData = await getGooglePlaceReviews({
 											<div class="review-card__author">
 												<div class="review-author-avatar">{rev.author_avatar || rev.author_name.slice(0, 1)}</div>
 												<div class="review-author-meta">
-													<strong class="review-author-name">{rev.author_name}</strong>
+												<strong class="review-author-name">{rev.author_url ? <a href={rev.author_url} target="_blank" rel="noopener noreferrer">{rev.author_name}</a> : rev.author_name}</strong>
 													<span class="review-date">
 														{rev.relative_time_description}
-														{rev.category_tag ? `（${rev.category_tag}）` : ''}
 													</span>
 												</div>
 											</div>

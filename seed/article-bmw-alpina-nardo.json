@@ -1,0 +1,167 @@
+{
+  "title": "BMW ALPINA、ナルドで300km/h超の高速テスト。初の量産モデルが見せる新章",
+  "excerpt": "2026年11月3日、BMW Groupが開発の様子を公開。速さと快適性を両立するBMW ALPINA初の量産モデルが、イタリア・ナルドの高速コースを駆け抜けました。",
+  "featured_image": {
+    "src": "/uploads/bmw-alpina-nardo/DI26_000480863.jpg",
+    "alt": "ナルドのテストコースを走る、カモフラージュ姿のBMW ALPINA。"
+  },
+  "layout": "2col",
+  "content": [
+    {
+      "_type": "block",
+      "_key": "alpina-1",
+      "style": "h2",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-1",
+          "text": "速さと快適性を、ひとつの走りに",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-2",
+      "style": "normal",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-2",
+          "text": "BMW Groupは2026年11月3日、BMW ALPINA初の量産モデルの高速テストを公開しました。舞台は南イタリア・ナルドの全長12.6kmのコース。偽装姿の開発車両が300km/hを超えて加速する様子を紹介しています。",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "editorial-tools:slider",
+      "_key": "alpina-nardo-gallery",
+      "id": "/uploads/bmw-alpina-nardo/DI26_000480863.jpg",
+      "images": "/uploads/bmw-alpina-nardo/DI26_000480868.jpg\n/uploads/bmw-alpina-nardo/DI26_000480864.jpg\n/uploads/bmw-alpina-nardo/DI26_000480867.jpg\n/uploads/bmw-alpina-nardo/DI26_000480866.jpg",
+      "captions": "ナルドのテストコースを走る、カモフラージュ姿のBMW ALPINA。\n広い高速テストコースで、車両全体の調和を確かめる。\n開発車両を正面から捉えた一枚。ボディはまだ偽装に覆われている。\n高速域での落ち着いた走りを追求するBMW ALPINAのテスト車両。\nサイドから見た開発車両。ナルドで走行テストを重ねる。",
+      "gallery_style": "filmstrip"
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-3",
+      "style": "h2",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-3",
+          "text": "最高速だけでは語れない、ALPINAの流儀",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-4",
+      "style": "normal",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-4",
+          "text": "掲げるのは「Speed, not Sport」。V8エンジンの力強さに、快適な足回りと空力性能を調和させ、高速域でも自然で安定した走りを目指します。長距離を余裕をもって移動するための性能です。",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-5",
+      "style": "h2",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-5",
+          "text": "伝統のディテールを、次の時代へ",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-6",
+      "style": "normal",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-6",
+          "text": "20本スポークの軽合金ホイールには専用タイヤを組み合わせ、タイヤ内部の追加フォーム層で快適性と精度を追求。楕円形の4本出しテールパイプも継承します。エンジンと変速機の制御を専用に調整し、滑らかな力の引き出し方を磨いています。",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-7",
+      "style": "normal",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-7",
+          "text": "今回の発表は開発段階の紹介です。正式なモデル名や日本での発売時期・価格は、このリリースでは公表されていません。",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-8",
+      "style": "h2",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-8",
+          "text": "出典・写真",
+          "marks": []
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-source",
+      "style": "normal",
+      "markDefs": [
+        {
+          "_type": "link",
+          "_key": "source-link",
+          "href": "https://newsroom.bmwgroup.com/global/first-bmw-alpina-production-model-undergoes-high-speed-testing-in-nardo-italy/"
+        }
+      ],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "source-text",
+          "text": "BMW Group公式発表：初のBMW ALPINA量産モデル、ナルドで高速テスト（2026年11月3日）",
+          "marks": [
+            "source-link"
+          ]
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_key": "alpina-9",
+      "style": "normal",
+      "markDefs": [],
+      "children": [
+        {
+          "_type": "span",
+          "_key": "span-9",
+          "text": "本文は公式発表をもとに日本語で要約・編集。写真：BMW Group。報道・編集用途で提供された公式写真を使用しています。",
+          "marks": []
+        }
+      ]
+    }
+  ]
+}
