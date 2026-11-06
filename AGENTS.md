@@ -43,9 +43,15 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 - **Color policy rule**: デザインは徹底して「黒・白・グレー（モノトーン）」を基調とし、無駄な多色使いを禁ずる。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトなど「ここぞという時」にのみ限定して使用する。日常的なテキストや通常の装飾に赤色を乱用しない。
 - **Gallery format rule**: ギャラリーには「PHOTO GALLERY」「全○点」などの冗長な見出しや宣伝ラベル、キャプション先頭の「【エクステリア】」などの不要なテキストを入れない。写真、番号カウント、シンプルな説明文のみでミニマルに表示する。
-- **Handover & Wrap-up rule**: ユーザーから「引き継ぎ」「まとめて」などの指示があった際は、以下の2点をワンストップで一括実行すること：
-  1. **引き継ぎ書の作成（アーティファクト）**: 当日完了した内容、積み残しタスクの背景・原因、次回の具体的作業手順を網羅した引き継ぎ書を作成する。
-  2. **GitHubへのアップロード**: 作業ツリーを整理し、最新の変更を `git commit & push origin main` する。
+- **Development Setup rule（「準備して」「開発準備して」等の指示時）**: ユーザーから「開発準備して」「準備して」「自宅（会社）に戻ったので準備して」などの開始指示があった際は、ローカルで最新版の作業が即座にできるよう、以下のステップをワンストップで一括実行すること：
+  1. *Git最新版の確認と同期*: `git fetch origin` を実行し、リモート（GitHub）に新しいコミットがあれば `git pull origin main` で最新コードをローカルに取り込む。
+  2. *ローカルDBの整合性確認と復元*: リモートから更新された `seed/backup.sqlite` があれば、既存のローカルD1をバックアップ退避した上で `npm run db:restore` を実行し、CMSの最新記事・コンテンツデータをローカルDBに反映する。
+  3. *開発サーバーの起動と稼働確認*: `npm run dev` でローカルサーバーを起動し、HTTP 200で応答するか確認する。
+  4. *アクセスリンクと最新状況の案内*: 最新のコミット内容と、フロントサイトおよび管理画面（認証バイパス直通リンク）のMarkdownリンクを提示する。
+- **Handover & Wrap-up / Online PUT rule（「明日のための準備して」「自宅（会社）で作業するから準備して」「引き継ぎ」「まとめて」等の指示時）**: ユーザーから「明日のための準備をして」「自宅（会社）で作業するから準備して」「引き継ぎ」「まとめて」などの終了・場所移動の指示があった際は、現状の作業状態を確実にオンライン（GitHub）にPUTして最新状態を維持するため、以下のステップをワンストップで一括実行すること：
+  1. *データベースのバックアップ*: 最新のローカルCMS状態を `npm run db:backup` で `seed/backup.sqlite` に保存・コミット対象にする。
+  2. *引き継ぎ書の作成（アーティファクト / テキスト）*: 当日・今回のセッションで完了した内容、積み残しタスクの背景・注意点、次回環境での具体的作業手順を網羅した引き継ぎ書を作成する。
+  3. *GitHubへのアップロード（PUT）*: 作業ツリーを整理し、最新の変更（コード、アセット、DBバックアップ、引き継ぎ書）を漏れなく `git commit & push origin main` して、リモートを最新状態にする。
   ※ Cloudflareへの本番デプロイは指示がない限り行わない。
 - **Deploy rule**: Cloudflareへのデプロイ・本番アップロード（`wrangler deploy`）は、ユーザーから明示的に指示があった場合のみ実行すること。ユーザーの指示がない限り勝手に本番へアップロードせず、ローカル環境（`http://localhost:4321`）での確認にとどめること。
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。

@@ -25,3 +25,14 @@
 - **No Magic Numbers**: Never hardcode margins, paddings, gaps, font sizes, colors, border-radii, or shadows in components. Always use CSS variables / design tokens from `:root` or theme files.
 - **Consistent Component Patterns**: Re-use common section wrapper classes for outer margins/paddings and max-width. Never write cards, buttons, or section headers from scratch; copy DOM structure and classes from existing components.
 - **Typography Consistency**: Adhere to global typography tokens/classes. Never override `font-family` or `font-weight` arbitrarily inside individual components.
+
+## Work Session Lifecycle Rules
+- **Development Setup rule ("開発準備して" / "準備して")**: When user asks to prepare or set up development (e.g. "準備して", "自宅に戻ったので準備して"):
+  1. Check remote git (`git fetch origin`) and pull latest (`git pull origin main`).
+  2. Restore local D1 database from updated `seed/backup.sqlite` (`npm run db:restore`) if needed.
+  3. Ensure dev server is running (`npm run dev`) and healthy (HTTP 200).
+  4. Present clickable direct links for site and Admin UI dev bypass.
+- **Handover & Online PUT rule ("明日のための準備して" / "自宅/会社で作業するから準備して" / "引き継ぎ")**: When user asks to prepare for handover or online push:
+  1. Backup CMS database to `seed/backup.sqlite` (`npm run db:backup`).
+  2. Generate clear handover summary artifact / note.
+  3. Commit and push all changes to GitHub (`git commit & push origin main`). No Cloudflare deploy unless explicitly asked.
