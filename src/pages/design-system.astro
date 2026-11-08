@@ -1,0 +1,1644 @@
+---
+// src/pages/design-system.astro
+// Nicole Group Luxury Design System & Component Guidelines (Internal Master)
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="robots" content="noindex, nofollow, noarchive" />
+	<title>Nicole Design System — Internal Guidelines</title>
+	
+	<!-- Fonts: Inter & JetBrains Mono -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+	<link rel="icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
+
+	<!-- Core Tokens & Theme -->
+	<link rel="stylesheet" href="/src/styles/tokens.css" />
+	<link rel="stylesheet" href="/src/styles/theme.css" />
+</head>
+<body class="ds-body">
+	<!-- ヘッダー -->
+	<header class="ds-nav">
+		<div class="ds-nav__inner">
+			<div class="ds-nav__brand">
+				<a href="/" class="ds-logo-link" title="トップへ戻る">
+					<img src="/uploads/2026/01/Nicole_Group_LOGO_neg.svg" alt="Nicole Group" class="ds-logo-img" />
+				</a>
+				<div class="ds-brand-divider"></div>
+				<span class="ds-badge-spec">DESIGN SYSTEM v1.1</span>
+			</div>
+			<nav class="ds-nav__menu">
+				<a href="#principles" class="ds-menu-item">Principles</a>
+				<a href="#colors" class="ds-menu-item">Color Palette</a>
+				<a href="#typography" class="ds-menu-item">Typography</a>
+				<a href="#spacing" class="ds-menu-item">Spacing & Radii</a>
+				<a href="#components" class="ds-menu-item">Components</a>
+				<a href="#rules" class="ds-menu-item">Rules</a>
+			</nav>
+			<div class="ds-nav__status">
+				<span class="ds-status-dot"></span>
+				<span class="ds-status-text">INTERNAL SPEC</span>
+			</div>
+		</div>
+	</header>
+
+	<main class="ds-content">
+		<!-- ヒーローセクション -->
+		<section class="ds-hero">
+			<div class="ds-container">
+				<div class="ds-hero__eyebrow">NICOLE GROUP EDITORIAL SPECIFICATION</div>
+				<h1 class="ds-hero__title">The Aesthetics of Precision.</h1>
+				<p class="ds-hero__lead">
+					妥協なきクラフトマンシップと洗練された品格をWeb上で再現するための公式デザインガイドライン。<br class="pc-only" />
+					漆黒のキャンバス、研ぎ澄まされたモノトーン階調、勝負所の赤、そしてOS連携のための機能色（青・緑）の運用規約を体系化しています。
+				</p>
+			</div>
+		</section>
+
+		<!-- 01: 設計原則 -->
+		<section id="principles" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">01 / PRINCIPLES</span>
+					<h2 class="ds-section-heading">基本設計思想</h2>
+					<p class="ds-section-lead">すべての画面・コンポーネントが共有すべき絶対的な判断基準です。</p>
+				</div>
+
+				<div class="ds-principles-grid">
+					<div class="ds-principle-card">
+						<span class="ds-principle-index">01</span>
+						<h3 class="ds-principle-title">モノトーンの品格</h3>
+						<p class="ds-principle-body">
+							Nicole Groupが扱う世界最高峰ブランドの威厳を支えるため、余計な多色使いや派手な装飾グラデーションを排除。黒・白・グレーの緻密な階調のみで奥行きを表現します。
+						</p>
+					</div>
+					<div class="ds-principle-card">
+						<span class="ds-principle-index">02</span>
+						<h3 class="ds-principle-title">勝負所の赤（限定運用）</h3>
+						<p class="ds-principle-body">
+							アクセントレッド（<code>var(--color-accent-red)</code>）は、最重要CTAや成約ハイライトにのみ限定。日常的なテキストや汎用装飾に赤色を散らさず、視線誘導の決定打として機能させます。
+						</p>
+					</div>
+					<div class="ds-principle-card">
+						<span class="ds-principle-index">03</span>
+						<h3 class="ds-principle-title">機能連携色（青・緑の限定認可）</h3>
+						<p class="ds-principle-body">
+							OSやハードウェアと直接連携する「電話発信（青）」および「地図ルート案内（緑）」に限り、即時認知のための機能色（Utility Color）としての使用を公式に認可・規定しています。
+						</p>
+					</div>
+					<div class="ds-principle-card">
+						<span class="ds-principle-index">04</span>
+						<h3 class="ds-principle-title">トークン強制（マジックナンバー禁止）</h3>
+						<p class="ds-principle-body">
+							制作者によって見た目が揺らぐことを防ぐため、ピクセル直書き数値を禁じ、定義済みのCSSデザイントークン変数（<code>var(--spacing-*)</code>等）のみを用いて実装します。
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 02: カラーパレット -->
+		<section id="colors" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">02 / COLOR PALETTE</span>
+					<h2 class="ds-section-heading">カラーパレット体系</h2>
+					<p class="ds-section-lead">
+						深淵な漆黒をベースとした高級感あふれる階調。カードをクリックするとCSS変数名を即座にコピーできます。
+					</p>
+				</div>
+
+				<!-- 背景・サーフェス -->
+				<div class="ds-color-group">
+					<h3 class="ds-group-title">Base Surfaces & Backgrounds（背景・面）</h3>
+					<div class="ds-swatches-grid">
+						<div class="ds-swatch" data-copy="var(--color-bg)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-bg); border: 1px solid var(--color-border-strong);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Canvas Background</div>
+								<div class="ds-swatch__token">--color-bg</div>
+								<div class="ds-swatch__hex">#0a0a0c</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-surface)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-surface); border: 1px solid var(--color-border);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Card Surface</div>
+								<div class="ds-swatch__token">--color-surface</div>
+								<div class="ds-swatch__hex">#141418</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-fill)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-fill);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Fill / Sub-Button</div>
+								<div class="ds-swatch__token">--color-fill</div>
+								<div class="ds-swatch__hex">#1e1e24</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-fill-strong)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-fill-strong);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Hover Active Fill</div>
+								<div class="ds-swatch__token">--color-fill-strong</div>
+								<div class="ds-swatch__hex">#2a2a32</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- テキスト・境界線 -->
+				<div class="ds-color-group">
+					<h3 class="ds-group-title">Typography & Borders（テキスト・境界線）</h3>
+					<div class="ds-swatches-grid">
+						<div class="ds-swatch" data-copy="var(--color-text)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-text);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Text Primary</div>
+								<div class="ds-swatch__token">--color-text</div>
+								<div class="ds-swatch__hex">#f4f4f6</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-text-secondary)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-text-secondary);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Text Secondary</div>
+								<div class="ds-swatch__token">--color-text-secondary</div>
+								<div class="ds-swatch__hex">#a0a0aa</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-muted)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-muted);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Text Muted</div>
+								<div class="ds-swatch__token">--color-muted</div>
+								<div class="ds-swatch__hex">#71717a</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-border)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-border);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Dividers & Rails</div>
+								<div class="ds-swatch__token">--color-border</div>
+								<div class="ds-swatch__hex">#222228</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ブランド＆アクセントレッド -->
+				<div class="ds-color-group">
+					<h3 class="ds-group-title">Brand Accents & Strategic Highlight（ブランド＆勝負所の赤）</h3>
+					<div class="ds-swatches-grid">
+						<div class="ds-swatch" data-copy="var(--color-brand)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-brand);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Platinum Brand</div>
+								<div class="ds-swatch__token">--color-brand</div>
+								<div class="ds-swatch__hex">#ffffff</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-brand-hover)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-brand-hover);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Brand Hover</div>
+								<div class="ds-swatch__token">--color-brand-hover</div>
+								<div class="ds-swatch__hex">#e4e4e7</div>
+							</div>
+						</div>
+						<div class="ds-swatch ds-swatch--accent" data-copy="var(--color-accent-red)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-accent-red); box-shadow: 0 0 20px rgba(225, 29, 72, 0.4);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Strategic Accent Red ★</div>
+								<div class="ds-swatch__token">--color-accent-red</div>
+								<div class="ds-swatch__hex">#e11d48 (最重要CTA専用)</div>
+							</div>
+						</div>
+						<div class="ds-swatch" data-copy="var(--color-accent-red-hover)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-accent-red-hover);"></div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Accent Red Hover</div>
+								<div class="ds-swatch__token">--color-accent-red-hover</div>
+								<div class="ds-swatch__hex">#be123c</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 機能アクション色（青・緑） -->
+				<div class="ds-color-group">
+					<h3 class="ds-group-title">Utility Action Colors（OS・ハード連携専用の機能色）</h3>
+					<p class="ds-group-caption">装飾目的の使用を禁止し、タップで即時発信・地図起動する機能ボタンに限定して適用します。</p>
+					<div class="ds-swatches-grid">
+						<div class="ds-swatch ds-swatch--utility-blue" data-copy="var(--color-utility-blue)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-utility-blue-bg); border: 1px solid var(--color-utility-blue-border);">
+								<div class="ds-swatch-center-icon" style="color: var(--color-utility-blue);">📞 TEL ACTION</div>
+							</div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Utility Blue (電話発信専用)</div>
+								<div class="ds-swatch__token">--color-utility-blue</div>
+								<div class="ds-swatch__hex">#60a5fa (rgba 8% bg)</div>
+							</div>
+						</div>
+						<div class="ds-swatch ds-swatch--utility-green" data-copy="var(--color-utility-green)">
+							<div class="ds-swatch__preview" style="background-color: var(--color-utility-green-bg); border: 1px solid var(--color-utility-green-border);">
+								<div class="ds-swatch-center-icon" style="color: var(--color-utility-green);">📍 MAP ROUTE</div>
+							</div>
+							<div class="ds-swatch__meta">
+								<div class="ds-swatch__name">Utility Green (ルート案内専用)</div>
+								<div class="ds-swatch__token">--color-utility-green</div>
+								<div class="ds-swatch__hex">#6ee7b7 (rgba 8% bg)</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 03: タイポグラフィ -->
+		<section id="typography" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">03 / TYPOGRAPHY</span>
+					<h2 class="ds-section-heading">タイポグラフィ体系</h2>
+					<p class="ds-section-lead">
+						欧文は <strong>Inter</strong>、コード・メタラベルは <strong>JetBrains Mono</strong> を厳格に適用。
+					</p>
+				</div>
+
+				<div class="ds-type-list">
+					<!-- Display -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">H1 / DISPLAY</div>
+							<div class="ds-type-card__val">clamp(36px, 56px)</div>
+							<div class="ds-type-card__token">--font-size-display</div>
+							<div class="ds-type-card__specs">Weight: 600 / Line-height: 1.1 / Tracking: -0.035em</div>
+						</div>
+						<div class="ds-type-card__render ds-render-display">
+							Precision in Motion.
+						</div>
+					</div>
+
+					<!-- 3XL -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">H2 / SECTION</div>
+							<div class="ds-type-card__val">32px (2.0rem)</div>
+							<div class="ds-type-card__token">--font-size-3xl</div>
+							<div class="ds-type-card__specs">Weight: 600 / Line-height: 1.3 / Tracking: -0.02em</div>
+						</div>
+						<div class="ds-type-card__render ds-render-3xl">
+							妥協なきクラフトマンシップ
+						</div>
+					</div>
+
+					<!-- 2XL -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">H3 / SUBSECTION</div>
+							<div class="ds-type-card__val">24px (1.5rem)</div>
+							<div class="ds-type-card__token">--font-size-2xl</div>
+							<div class="ds-type-card__specs">Weight: 600 / Line-height: 1.3</div>
+						</div>
+						<div class="ds-type-card__render ds-render-2xl">
+							正規ディーラー認定サービス工場の誇り
+						</div>
+					</div>
+
+					<!-- XL -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">H4 / CARD TITLE</div>
+							<div class="ds-type-card__val">20px (1.25rem)</div>
+							<div class="ds-type-card__token">--font-size-xl</div>
+							<div class="ds-type-card__specs">Weight: 600 / Line-height: 1.4</div>
+						</div>
+						<div class="ds-type-card__render ds-render-xl">
+							BMW 3シリーズ セダン M Sport
+						</div>
+					</div>
+
+					<!-- Large -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">LEAD TEXT</div>
+							<div class="ds-type-card__val">18px (1.125rem)</div>
+							<div class="ds-type-card__token">--font-size-lg</div>
+							<div class="ds-type-card__specs">Weight: 400 / Line-height: 1.7</div>
+						</div>
+						<div class="ds-type-card__render ds-render-lg">
+							Nicole Groupは、創業以来40年以上にわたり、日本のプレミアムカー市場において卓越したサービスと歓びを提供し続けています。
+						</div>
+					</div>
+
+					<!-- Base -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">BODY BASE</div>
+							<div class="ds-type-card__val">16px (1.0rem)</div>
+							<div class="ds-type-card__token">--font-size-base</div>
+							<div class="ds-type-card__specs">Weight: 400 / Line-height: 1.6 / Color: #f4f4f6</div>
+						</div>
+						<div class="ds-type-card__render ds-render-base">
+							長文記事やスペック詳細文など、サイト全体の標準テキストとして適用されます。適度な行間を確保することで、長時間の読書でも疲れにくいコントラストと視認性を実現しています。
+						</div>
+					</div>
+
+					<!-- Small -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">SECONDARY</div>
+							<div class="ds-type-card__val">14px (0.875rem)</div>
+							<div class="ds-type-card__token">--font-size-sm</div>
+							<div class="ds-type-card__specs">Weight: 400 / Line-height: 1.5 / Color: #a0a0aa</div>
+						</div>
+						<div class="ds-type-card__render ds-render-sm">
+							補足情報、ボタンテキスト、メタデータ、公開日、執筆者バイラインなどに使用します。
+						</div>
+					</div>
+
+					<!-- Label (Mono) -->
+					<div class="ds-type-card">
+						<div class="ds-type-card__info">
+							<div class="ds-type-card__badge">MONO LABEL</div>
+							<div class="ds-type-card__val">12px (0.75rem)</div>
+							<div class="ds-type-card__token">--font-size-label</div>
+							<div class="ds-type-card__specs">Font: JetBrains Mono / Tracking: 0.08em / Uppercase</div>
+						</div>
+						<div class="ds-type-card__render ds-render-mono">
+							CERTIFIED OFFICIAL SPECIFICATION / NICOLE AUTOMOBILES
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 04: 余白・角丸・幾何学比率 -->
+		<section id="spacing" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">04 / SPACING & RADII</span>
+					<h2 class="ds-section-heading">幾何学レイアウトと余白比率</h2>
+					<p class="ds-section-lead">
+						計算され尽くした余白比率と、カード内外の角丸が織りなす「同心円の幾何学美」。
+					</p>
+				</div>
+
+				<div class="ds-geometry-grid">
+					<!-- 同心円ビジュアルカード -->
+					<div class="ds-concentric-visual">
+						<div class="ds-concentric-outer">
+							<div class="ds-concentric-measure-card">Outer Radius: 18px (var(--radius-xl))</div>
+							<div class="ds-concentric-media">
+								<div class="ds-concentric-measure-media">Media Radius: 12px (var(--radius-lg))</div>
+								<div class="ds-concentric-center-label">CONCENTRIC CORNERS</div>
+							</div>
+							<div class="ds-concentric-measure-pad">Inset Padding: 6px (var(--card-padding))</div>
+						</div>
+						<div class="ds-concentric-caption">
+							<h4>数学的に美しい同心円の証明</h4>
+							<p>外側の角丸（18px）から内部のパディング（6px）を差し引くことで、内側の画像角丸（12px）と円弧の中心点が完璧に一致し、不快な余白の歪みが発生しません。</p>
+						</div>
+					</div>
+
+					<!-- 余白スケール -->
+					<div class="ds-spacing-spec">
+						<h3 class="ds-group-title">8-Point Spacing Scale（トークン基準）</h3>
+						<div class="ds-spacing-bars">
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-1</span>
+								<span class="ds-spacing-val">4px</span>
+								<div class="ds-spacing-indicator"><div style="width: 4px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-2</span>
+								<span class="ds-spacing-val">8px</span>
+								<div class="ds-spacing-indicator"><div style="width: 8px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-3</span>
+								<span class="ds-spacing-val">12px</span>
+								<div class="ds-spacing-indicator"><div style="width: 12px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-4</span>
+								<span class="ds-spacing-val">16px</span>
+								<div class="ds-spacing-indicator"><div style="width: 16px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-6</span>
+								<span class="ds-spacing-val">24px</span>
+								<div class="ds-spacing-indicator"><div style="width: 24px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-8</span>
+								<span class="ds-spacing-val">32px</span>
+								<div class="ds-spacing-indicator"><div style="width: 32px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-12</span>
+								<span class="ds-spacing-val">48px</span>
+								<div class="ds-spacing-indicator"><div style="width: 48px;"></div></div>
+							</div>
+							<div class="ds-spacing-item">
+								<span class="ds-spacing-token">--spacing-16</span>
+								<span class="ds-spacing-val">64px</span>
+								<div class="ds-spacing-indicator"><div style="width: 64px;"></div></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- レイアウト最大幅 -->
+				<div class="ds-layout-cards">
+					<div class="ds-lcard">
+						<span class="ds-lcard__label">FRAME WIDTH</span>
+						<span class="ds-lcard__num">1200px</span>
+						<p class="ds-lcard__desc">サイト全体のコンテンツ最大幅（<code>var(--wide-width)</code>）。これ以上横に広げず視界の心地よい密度を保つ。</p>
+					</div>
+					<div class="ds-lcard">
+						<span class="ds-lcard__label">CONTENT WIDTH</span>
+						<span class="ds-lcard__num">680px</span>
+						<p class="ds-lcard__desc">日本語の文章が最もスムーズに読める1行あたり約35〜40文字を維持する最適幅（<code>var(--content-width)</code>）。</p>
+					</div>
+					<div class="ds-lcard">
+						<span class="ds-lcard__label">HEADER HEIGHT</span>
+						<span class="ds-lcard__num">64px</span>
+						<p class="ds-lcard__desc">固定ヘッダーナビゲーションの高さ（<code>var(--nav-height)</code>）。コンテンツに被らないようオフセットを同期。</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 05: UIコンポーネント -->
+		<section id="components" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">05 / UI COMPONENTS</span>
+					<h2 class="ds-section-heading">共通UIコンポーネント実物展示</h2>
+					<p class="ds-section-lead">実サイトで運用されている完成形コンポーネントの挙動とスタイルです。</p>
+				</div>
+
+				<!-- ボタン -->
+				<div class="ds-comp-block">
+					<h3 class="ds-group-title">ボタン体系（Button Variants）</h3>
+					<div class="ds-buttons-row">
+						<button type="button" class="ds-btn-ui ds-btn-ui--brand">
+							Platinum Primary
+						</button>
+						<button type="button" class="ds-btn-ui ds-btn-ui--secondary">
+							Secondary Fill
+						</button>
+						<button type="button" class="ds-btn-ui ds-btn-ui--accent">
+							★ Strategic Accent Red
+						</button>
+						<a href="tel:0445413011" class="ds-btn-ui ds-btn-ui--tel">
+							📞 044-541-3011 (Utility Blue)
+						</a>
+						<a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="ds-btn-ui ds-btn-ui--route">
+							📍 ルート案内 (Utility Green)
+						</a>
+						<button type="button" class="ds-btn-ui ds-btn-ui--outline">
+							Outline Minimal
+						</button>
+						<button type="button" class="ds-btn-ui ds-btn-ui--disabled" disabled>
+							Disabled
+						</button>
+					</div>
+				</div>
+
+				<!-- バッジ・タグ -->
+				<div class="ds-comp-block">
+					<h3 class="ds-group-title">タグ＆バッジ（Chips & Status Badges）</h3>
+					<div class="ds-chips-row">
+						<span class="ds-chip-ui">BMW ALPINA</span>
+						<span class="ds-chip-ui">Rolls-Royce Motor Cars</span>
+						<span class="ds-chip-ui ds-chip-ui--active">Active Filter</span>
+						<span class="ds-badge-mono">OFFICIAL SPECIFICATION</span>
+						<span class="ds-badge-mono ds-badge-mono--blue">TEL CONNECTED</span>
+						<span class="ds-badge-mono ds-badge-mono--green">OPEN TODAY</span>
+					</div>
+				</div>
+
+				<!-- ラグジュアリーテーブル -->
+				<div class="ds-comp-block">
+					<h3 class="ds-group-title">ラグジュアリー・モノトーンテーブル（Tables）</h3>
+					<p class="ds-table-lead">白背景を完全撤廃し、漆黒背景と均等な極細ボーダー、視認性の高いゼブラストライプを施した公式仕様（1列目は左揃え、他列は中央揃え）。</p>
+					
+					<div class="table-wrapper">
+						<table class="cms-table">
+							<thead>
+								<tr>
+									<th>拠点正式名称（マスタ準拠）</th>
+									<th>取り扱いブランド</th>
+									<th>所在地エリア</th>
+									<th>営業時間</th>
+									<th>施設種別</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Nicole BMW Head Showroom</td>
+									<td>BMW</td>
+									<td>神奈川県川崎市幸区</td>
+									<td>10:00 - 18:00</td>
+									<td>新車ショールーム</td>
+								</tr>
+								<tr>
+									<td>Nicole BMW Service Centre</td>
+									<td>BMW</td>
+									<td>神奈川県川崎市幸区</td>
+									<td>09:30 - 18:00</td>
+									<td>指定サービス工場</td>
+								</tr>
+								<tr>
+									<td>MINI Shinyurigaoka</td>
+									<td>MINI</td>
+									<td>神奈川県川崎市麻生区</td>
+									<td>10:00 - 18:00</td>
+									<td>新車ショールーム</td>
+								</tr>
+								<tr>
+									<td>Nicole RACING JAPAN</td>
+									<td>BMW ALPINA</td>
+									<td>神奈川県川崎市幸区</td>
+									<td>10:00 - 18:00</td>
+									<td>日本総代理店</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 06: 設計・実装ルール（Good / Bad） -->
+		<section id="rules" class="ds-section">
+			<div class="ds-container">
+				<div class="ds-section-intro">
+					<span class="ds-section-num">06 / RULES</span>
+					<h2 class="ds-section-heading">設計・実装ルール（Good vs Bad）</h2>
+					<p class="ds-section-lead">品格を損なわないための厳格な制作ガイドラインです。</p>
+				</div>
+
+				<div class="ds-rules-list">
+					<!-- 対比1: 見出し表現 -->
+					<div class="ds-rule-item">
+						<div class="ds-rule-box ds-rule-box--good">
+							<div class="ds-rule-label ds-rule-label--good">✔ RECOMMENDED (推奨)</div>
+							<h4 class="ds-rule-title">品格のある自然な日本語見出し</h4>
+							<div class="ds-rule-mock">
+								<h3>妥協なきクラフトマンシップ</h3>
+								<p>厳選された素材と熟練の職人技による至高の仕立て。</p>
+							</div>
+							<p class="ds-rule-explanation">飾り立てず、日本語テキスト本来の美しさと重厚感のみで端正に構成する。</p>
+						</div>
+						<div class="ds-rule-box ds-rule-box--bad">
+							<div class="ds-rule-label ds-rule-label--bad">✖ NOT RECOMMENDED (禁止)</div>
+							<h4 class="ds-rule-title">安易な英字アイブロウの装飾</h4>
+							<div class="ds-rule-mock">
+								<span class="ds-mock-eyebrow-bad">EXCLUSIVE CRAFTSMANSHIP / 01</span>
+								<h3>妥協なきクラフトマンシップ</h3>
+							</div>
+							<p class="ds-rule-explanation">「SPECIAL HIGHLIGHTS」「01 / 02」といったAI特有のわざとらしい英字添えは禁止。</p>
+						</div>
+					</div>
+
+					<!-- 対比2: 拠点表記 -->
+					<div class="ds-rule-item">
+						<div class="ds-rule-box ds-rule-box--good">
+							<div class="ds-rule-label ds-rule-label--good">✔ RECOMMENDED (推奨)</div>
+							<h4 class="ds-rule-title">公式マスタ準拠の正式英語表記</h4>
+							<div class="ds-rule-mock">
+								<code class="ds-mock-code-good">Nicole BMW Service Centre</code>
+							</div>
+							<p class="ds-rule-explanation">拠点名はデータベース・マスタに登録された公式の英語表記を厳格に使用。</p>
+						</div>
+						<div class="ds-rule-box ds-rule-box--bad">
+							<div class="ds-rule-label ds-rule-label--bad">✖ NOT RECOMMENDED (禁止)</div>
+							<h4 class="ds-rule-title">略称やカタカナの独自表記</h4>
+							<div class="ds-rule-mock">
+								<code class="ds-mock-code-bad">ニコル川崎サービスセンター / Nicole SC</code>
+							</div>
+							<p class="ds-rule-explanation">表記揺れや直打ちの略称表記はブランド統一感を損なうため禁止。</p>
+						</div>
+					</div>
+
+					<!-- 対比3: 色使いと機能色の分離 -->
+					<div class="ds-rule-item">
+						<div class="ds-rule-box ds-rule-box--good">
+							<div class="ds-rule-label ds-rule-label--good">✔ RECOMMENDED (推奨)</div>
+							<h4 class="ds-rule-title">勝負所の赤 ＆ 機能色（青・緑）の限定運用</h4>
+							<div class="ds-rule-mock" style="display: flex; gap: var(--spacing-3); flex-wrap: wrap;">
+								<span class="ds-btn-ui ds-btn-ui--accent" style="padding: var(--spacing-2) var(--spacing-4); font-size: var(--font-size-xs);">
+									Web商談予約 (最重要CTA)
+								</span>
+								<span class="ds-btn-ui ds-btn-ui--tel" style="padding: var(--spacing-2) var(--spacing-4); font-size: var(--font-size-xs);">
+									📞 電話をかける (機能青)
+								</span>
+							</div>
+							<p class="ds-rule-explanation">成約用CTAは赤、即時発信は青と明確に役割を分離し、通常装飾での多色使いを禁ずる。</p>
+						</div>
+						<div class="ds-rule-box ds-rule-box--bad">
+							<div class="ds-rule-label ds-rule-label--bad">✖ NOT RECOMMENDED (禁止)</div>
+							<h4 class="ds-rule-title">日常テキストや汎用装飾での多色乱用</h4>
+							<div class="ds-rule-mock">
+								<p style="color: #ef4444; font-size: var(--font-size-sm); margin: 0 0 var(--spacing-2);">※赤文字で強調された通常テキストや赤ボーダー</p>
+								<p style="color: #3b82f6; font-size: var(--font-size-sm); margin: 0;">※電話以外の通常のリンクテキストを青文字にするなど</p>
+							</div>
+							<p class="ds-rule-explanation">多色が画面に散らばると品格が損なわれ、視線誘導の優先度が崩壊する。</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- フッター -->
+	<footer class="ds-footer">
+		<div class="ds-container">
+			<div class="ds-footer__inner">
+				<div class="ds-footer__copy">
+					© Nicole Group. Internal Master Specification.
+				</div>
+				<a href="/" class="ds-footer__link">← Back to Nicole Group Portal</a>
+			</div>
+		</div>
+	</footer>
+
+	<!-- トースト通知 -->
+	<div id="ds-toast" class="ds-toast">Copied to clipboard</div>
+
+	<script>
+		// クリップボードコピー
+		const swatches = document.querySelectorAll<HTMLElement>(".ds-swatch");
+		const toast = document.getElementById("ds-toast");
+
+		swatches.forEach((swatch) => {
+			swatch.addEventListener("click", async () => {
+				const val = swatch.getAttribute("data-copy");
+				if (val && navigator.clipboard) {
+					await navigator.clipboard.writeText(val);
+					if (toast) {
+						toast.textContent = `Copied: ${val}`;
+						toast.classList.add("is-active");
+						setTimeout(() => {
+							toast.classList.remove("is-active");
+						}, 1800);
+					}
+				}
+			});
+		});
+	</script>
+</body>
+</html>
+
+<style is:global>
+	/* ==============================================================
+	   Independent Luxury Minimal Master Styles
+	   (完全デザイントークン準拠：マジックナンバーの完全撤廃)
+	   ============================================================== */
+	html {
+		box-sizing: border-box;
+		scroll-behavior: smooth;
+		background-color: var(--color-bg);
+	}
+
+	*, *:before, *:after {
+		box-sizing: inherit;
+		margin: 0;
+		padding: 0;
+	}
+
+	body.ds-body {
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: var(--font-body);
+		font-size: var(--font-size-base);
+		line-height: var(--leading-normal);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		overflow-x: hidden;
+	}
+
+	.ds-container {
+		width: 100%;
+		max-width: var(--wide-width);
+		margin-inline: auto;
+		padding-inline: var(--spacing-8);
+	}
+
+	@media (max-width: 768px) {
+		.ds-container {
+			padding-inline: var(--spacing-5);
+		}
+	}
+
+	/* Navigation */
+	.ds-nav {
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+		background: rgba(10, 10, 12, 0.85);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border-bottom: 1px solid var(--color-border);
+		height: var(--nav-height);
+	}
+
+	.ds-nav__inner {
+		max-width: var(--wide-width);
+		height: 100%;
+		margin-inline: auto;
+		padding-inline: var(--spacing-8);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.ds-nav__brand {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-4);
+	}
+
+	.ds-logo-link {
+		display: flex;
+		align-items: center;
+	}
+
+	.ds-logo-img {
+		height: 28px;
+		width: auto;
+		object-fit: contain;
+	}
+
+	.ds-brand-divider {
+		width: 1px;
+		height: 18px;
+		background: var(--color-border-strong);
+	}
+
+	.ds-badge-spec {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		font-weight: 500;
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-nav__menu {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-6);
+	}
+
+	@media (max-width: 900px) {
+		.ds-nav__menu {
+			display: none;
+		}
+	}
+
+	.ds-menu-item {
+		color: var(--color-text-secondary);
+		text-decoration: none;
+		font-size: var(--font-size-xs);
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		transition: color var(--transition-fast);
+	}
+
+	.ds-menu-item:hover {
+		color: #ffffff;
+	}
+
+	.ds-nav__status {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-2);
+	}
+
+	.ds-status-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: var(--radius-full);
+		background: var(--color-utility-green);
+		box-shadow: 0 0 10px var(--color-utility-green);
+	}
+
+	.ds-status-text {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-muted);
+	}
+
+	/* Hero */
+	.ds-hero {
+		padding: var(--spacing-24) 0 var(--spacing-20);
+		border-bottom: 1px solid var(--color-border);
+		background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+	}
+
+	.ds-hero__eyebrow {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		font-weight: 500;
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-5);
+	}
+
+	.ds-hero__title {
+		font-size: var(--font-size-display);
+		font-weight: 700;
+		letter-spacing: var(--tracking-tight);
+		color: #ffffff;
+		line-height: var(--leading-tight);
+		margin-bottom: var(--spacing-6);
+	}
+
+	.ds-hero__lead {
+		font-size: var(--font-size-lg);
+		color: var(--color-text-secondary);
+		line-height: var(--leading-relaxed);
+		max-width: 840px;
+	}
+
+	/* Section Commons */
+	.ds-section {
+		padding: var(--spacing-24) 0;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.ds-section-intro {
+		margin-bottom: var(--spacing-12);
+	}
+
+	.ds-section-num {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-muted);
+		display: block;
+		margin-bottom: var(--spacing-2);
+	}
+
+	.ds-section-heading {
+		font-size: var(--font-size-3xl);
+		font-weight: var(--font-weight-heading);
+		letter-spacing: var(--tracking-snug);
+		color: #ffffff;
+		margin-bottom: var(--spacing-3);
+	}
+
+	.ds-section-lead {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		max-width: var(--content-width);
+	}
+
+	.ds-group-title {
+		font-size: var(--font-size-base);
+		font-weight: 600;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		margin-bottom: var(--spacing-4);
+	}
+
+	.ds-group-caption {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-4);
+	}
+
+	/* 01 Principles */
+	.ds-principles-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: var(--spacing-6);
+	}
+
+	.ds-principle-card {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-8) var(--spacing-6);
+		position: relative;
+		transition: border-color var(--transition-fast);
+	}
+
+	.ds-principle-card:hover {
+		border-color: var(--color-border-strong);
+	}
+
+	.ds-principle-index {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		color: var(--color-muted);
+		display: block;
+		margin-bottom: var(--spacing-6);
+	}
+
+	.ds-principle-title {
+		font-size: var(--font-size-lg);
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: var(--spacing-3);
+		letter-spacing: -0.01em;
+	}
+
+	.ds-principle-body {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		line-height: var(--leading-relaxed);
+	}
+
+	.ds-principle-body code {
+		font-family: var(--font-mono);
+		color: #ffffff;
+		background: var(--color-fill);
+		padding: 2px 6px;
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-label);
+	}
+
+	/* 02 Swatches */
+	.ds-color-group {
+		margin-bottom: var(--spacing-12);
+	}
+
+	.ds-color-group:last-child {
+		margin-bottom: 0;
+	}
+
+	.ds-swatches-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: var(--spacing-4);
+	}
+
+	.ds-swatch {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		padding: var(--card-padding);
+		cursor: pointer;
+		transition: all var(--transition-fast);
+	}
+
+	.ds-swatch:hover {
+		border-color: rgba(255, 255, 255, 0.3);
+		transform: translateY(-2px);
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+	}
+
+	.ds-swatch--accent {
+		border-color: rgba(225, 29, 72, 0.4);
+	}
+
+	.ds-swatch--utility-blue {
+		border-color: var(--color-utility-blue-border);
+	}
+
+	.ds-swatch--utility-green {
+		border-color: var(--color-utility-green-border);
+	}
+
+	.ds-swatch__preview {
+		height: 96px;
+		border-radius: calc(var(--radius-lg) - var(--card-padding));
+		margin-bottom: var(--spacing-3);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ds-swatch-center-icon {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: 0.04em;
+	}
+
+	.ds-swatch__meta {
+		padding: var(--spacing-1) var(--spacing-2) var(--spacing-2);
+	}
+
+	.ds-swatch__name {
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: 4px;
+	}
+
+	.ds-swatch__token {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		color: var(--color-text-secondary);
+		margin-bottom: 2px;
+	}
+
+	.ds-swatch__hex {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		color: var(--color-muted);
+	}
+
+	/* 03 Typography Cards */
+	.ds-type-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-4);
+	}
+
+	.ds-type-card {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-6) var(--spacing-8);
+		display: grid;
+		grid-template-columns: 280px 1fr;
+		gap: var(--spacing-8);
+		align-items: center;
+	}
+
+	@media (max-width: 860px) {
+		.ds-type-card {
+			grid-template-columns: 1fr;
+			gap: var(--spacing-4);
+			padding: var(--spacing-5);
+		}
+	}
+
+	.ds-type-card__info {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.ds-type-card__badge {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		font-weight: 600;
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-muted);
+	}
+
+	.ds-type-card__val {
+		font-size: var(--font-size-base);
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.ds-type-card__token {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-type-card__specs {
+		font-size: var(--font-size-label);
+		color: var(--color-muted);
+		margin-top: 4px;
+	}
+
+	.ds-type-card__render {
+		color: #ffffff;
+		word-break: break-word;
+	}
+
+	.ds-render-display {
+		font-size: var(--font-size-display);
+		font-weight: var(--font-weight-display);
+		letter-spacing: var(--tracking-tight);
+		line-height: var(--leading-tight);
+	}
+
+	.ds-render-3xl {
+		font-size: var(--font-size-3xl);
+		font-weight: var(--font-weight-heading);
+		letter-spacing: var(--tracking-snug);
+		line-height: var(--leading-snug);
+	}
+
+	.ds-render-2xl {
+		font-size: var(--font-size-2xl);
+		font-weight: var(--font-weight-heading);
+		line-height: var(--leading-snug);
+	}
+
+	.ds-render-xl {
+		font-size: var(--font-size-xl);
+		font-weight: 600;
+		line-height: var(--leading-normal);
+	}
+
+	.ds-render-lg {
+		font-size: var(--font-size-lg);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-render-base {
+		font-size: var(--font-size-base);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text);
+	}
+
+	.ds-render-sm {
+		font-size: var(--font-size-sm);
+		line-height: var(--leading-normal);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-render-mono {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: var(--tracking-wider);
+		color: #ffffff;
+	}
+
+	/* 04 Geometry & Spacing */
+	.ds-geometry-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-8);
+		margin-bottom: var(--spacing-8);
+	}
+
+	@media (max-width: 860px) {
+		.ds-geometry-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.ds-concentric-visual {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-8);
+	}
+
+	.ds-concentric-outer {
+		background: var(--color-fill);
+		border: 2px dashed rgba(255, 255, 255, 0.25);
+		border-radius: var(--radius-xl); /* 外枠18px */
+		padding: var(--card-padding); /* パディング6px */
+		position: relative;
+		margin-bottom: var(--spacing-6);
+	}
+
+	.ds-concentric-media {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--radius-lg); /* 画像12px */
+		height: 180px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--spacing-2);
+	}
+
+	.ds-concentric-center-label {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		letter-spacing: var(--tracking-wide);
+		color: #ffffff;
+		font-weight: 600;
+	}
+
+	.ds-concentric-measure-card,
+	.ds-concentric-measure-media,
+	.ds-concentric-measure-pad {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-concentric-measure-pad {
+		text-align: right;
+		padding: var(--spacing-1) var(--spacing-2) 0;
+	}
+
+	.ds-concentric-caption h4 {
+		font-size: var(--font-size-base);
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: var(--spacing-2);
+	}
+
+	.ds-concentric-caption p {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		line-height: var(--leading-normal);
+	}
+
+	/* Spacing Bars */
+	.ds-spacing-spec {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-8);
+	}
+
+	.ds-spacing-bars {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-3);
+	}
+
+	.ds-spacing-item {
+		display: grid;
+		grid-template-columns: 140px 60px 1fr;
+		align-items: center;
+		gap: var(--spacing-4);
+	}
+
+	.ds-spacing-token {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-spacing-val {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		color: var(--color-muted);
+		text-align: right;
+	}
+
+	.ds-spacing-indicator {
+		background: var(--color-fill);
+		border-radius: var(--radius-sm);
+		height: 12px;
+	}
+
+	.ds-spacing-indicator div {
+		height: 100%;
+		background: #ffffff;
+		border-radius: 3px;
+	}
+
+	/* Layout Cards */
+	.ds-layout-cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: var(--spacing-5);
+	}
+
+	.ds-lcard {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-6);
+	}
+
+	.ds-lcard__label {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: var(--tracking-wider);
+		color: var(--color-muted);
+		display: block;
+		margin-bottom: var(--spacing-2);
+	}
+
+	.ds-lcard__num {
+		font-size: var(--font-size-3xl);
+		font-weight: 700;
+		color: #ffffff;
+		display: block;
+		margin-bottom: var(--spacing-2);
+		letter-spacing: var(--tracking-snug);
+	}
+
+	.ds-lcard__desc {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		line-height: var(--leading-normal);
+	}
+
+	/* 05 UI Components */
+	.ds-comp-block {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-8);
+		margin-bottom: var(--spacing-6);
+	}
+
+	.ds-buttons-row,
+	.ds-chips-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-4);
+	}
+
+	.ds-btn-ui {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-sm);
+		font-weight: 600;
+		border-radius: var(--radius-full);
+		border: 1px solid transparent;
+		cursor: pointer;
+		transition: all var(--transition-fast);
+		text-decoration: none;
+	}
+
+	.ds-btn-ui--brand {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+	}
+	.ds-btn-ui--brand:hover {
+		background: var(--color-brand-hover);
+		transform: translateY(-1px);
+	}
+
+	.ds-btn-ui--secondary {
+		background: var(--color-fill);
+		color: #ffffff;
+		border-color: var(--color-border);
+	}
+	.ds-btn-ui--secondary:hover {
+		background: var(--color-fill-strong);
+		border-color: var(--color-border-strong);
+	}
+
+	.ds-btn-ui--accent {
+		background: var(--color-accent-red);
+		color: var(--color-on-accent-red);
+		box-shadow: 0 4px 18px rgba(225, 29, 72, 0.4);
+	}
+	.ds-btn-ui--accent:hover {
+		background: var(--color-accent-red-hover);
+		box-shadow: 0 6px 24px rgba(225, 29, 72, 0.6);
+		transform: translateY(-1px);
+	}
+
+	/* 機能色ボタン（青・緑） */
+	.ds-btn-ui--tel {
+		background: var(--color-utility-blue-bg);
+		color: var(--color-utility-blue);
+		border-color: var(--color-utility-blue-border);
+		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+	}
+	.ds-btn-ui--tel:hover {
+		background: rgba(59, 130, 246, 0.18);
+		color: var(--color-utility-blue-hover);
+		border-color: rgba(59, 130, 246, 0.55);
+		transform: translateY(-1px);
+	}
+
+	.ds-btn-ui--route {
+		background: var(--color-utility-green-bg);
+		color: var(--color-utility-green);
+		border-color: var(--color-utility-green-border);
+		box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+	}
+	.ds-btn-ui--route:hover {
+		background: rgba(16, 185, 129, 0.18);
+		color: var(--color-utility-green-hover);
+		border-color: rgba(16, 185, 129, 0.55);
+		transform: translateY(-1px);
+	}
+
+	.ds-btn-ui--outline {
+		background: transparent;
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+	.ds-btn-ui--outline:hover {
+		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.ds-btn-ui--disabled {
+		background: var(--color-fill);
+		color: var(--color-muted);
+		cursor: not-allowed;
+	}
+
+	/* Chips */
+	.ds-chip-ui {
+		font-size: var(--font-size-xs);
+		padding: 6px var(--spacing-4);
+		background: var(--color-fill);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-secondary);
+		border-radius: var(--radius-full);
+	}
+
+	.ds-chip-ui--active {
+		background: #ffffff;
+		color: #0a0a0c;
+		font-weight: 600;
+		border-color: #ffffff;
+	}
+
+	.ds-badge-mono {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: var(--tracking-wider);
+		padding: 4px 8px;
+		background: var(--color-fill);
+		color: #ffffff;
+		border-radius: var(--radius-sm);
+	}
+
+	.ds-badge-mono--blue {
+		background: var(--color-utility-blue-bg);
+		color: var(--color-utility-blue);
+		border: 1px solid var(--color-utility-blue-border);
+	}
+
+	.ds-badge-mono--green {
+		background: var(--color-utility-green-bg);
+		color: var(--color-utility-green);
+		border: 1px solid var(--color-utility-green-border);
+	}
+
+	.ds-table-lead {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-4);
+	}
+
+	/* 06 Rules (Good vs Bad) */
+	.ds-rules-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-8);
+	}
+
+	.ds-rule-item {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-6);
+	}
+
+	@media (max-width: 768px) {
+		.ds-rule-item {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.ds-rule-box {
+		background: var(--color-surface);
+		border-radius: var(--radius-xl);
+		padding: var(--spacing-8);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-4);
+	}
+
+	.ds-rule-box--good {
+		border: 1px solid rgba(34, 197, 94, 0.3);
+		background: linear-gradient(180deg, rgba(34, 197, 94, 0.02) 0%, var(--color-surface) 100%);
+	}
+
+	.ds-rule-box--bad {
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		background: linear-gradient(180deg, rgba(239, 68, 68, 0.02) 0%, var(--color-surface) 100%);
+	}
+
+	.ds-rule-label {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		font-weight: 600;
+		letter-spacing: var(--tracking-wider);
+	}
+
+	.ds-rule-label--good {
+		color: #22c55e;
+	}
+
+	.ds-rule-label--bad {
+		color: #ef4444;
+	}
+
+	.ds-rule-title {
+		font-size: var(--font-size-base);
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.ds-rule-mock {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-5);
+	}
+
+	.ds-rule-mock h3 {
+		font-size: var(--font-size-lg);
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: 6px;
+	}
+
+	.ds-rule-mock p {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+	}
+
+	.ds-mock-eyebrow-bad {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		letter-spacing: 0.1em;
+		color: var(--color-accent-red);
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.ds-mock-code-good {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		color: #ffffff;
+	}
+
+	.ds-mock-code-bad {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		color: #ef4444;
+	}
+
+	.ds-rule-explanation {
+		font-size: var(--font-size-xs);
+		color: var(--color-muted);
+		line-height: var(--leading-normal);
+	}
+
+	/* Footer */
+	.ds-footer {
+		padding: var(--spacing-12) 0;
+		border-top: 1px solid var(--color-border);
+		background: var(--color-bg);
+	}
+
+	.ds-footer__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	@media (max-width: 600px) {
+		.ds-footer__inner {
+			flex-direction: column;
+			gap: var(--spacing-4);
+			text-align: center;
+		}
+	}
+
+	.ds-footer__copy {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-label);
+		color: var(--color-muted);
+	}
+
+	.ds-footer__link {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		text-decoration: none;
+		transition: color var(--transition-fast);
+	}
+
+	.ds-footer__link:hover {
+		color: #ffffff;
+	}
+
+	/* Toast */
+	.ds-toast {
+		position: fixed;
+		bottom: var(--spacing-8);
+		right: var(--spacing-8);
+		background: #ffffff;
+		color: #0a0a0c;
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		border-radius: var(--radius-full);
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+		opacity: 0;
+		transform: translateY(12px);
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		pointer-events: none;
+		z-index: 9999;
+	}
+
+	.ds-toast.is-active {
+		opacity: 1;
+		transform: translateY(0);
+	}
+</style>

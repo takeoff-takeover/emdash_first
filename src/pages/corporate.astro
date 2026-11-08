@@ -220,6 +220,11 @@ const jsonLd = {
 			body:has(.corporate-magazine-main) .ast-container {
 				background-color: #040507 !important;
 				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
 			}
 		</style>
 	</Fragment>
@@ -567,55 +572,105 @@ const jsonLd = {
 	/* Nicole Corporate - 黒背景エディトリアルマガジンデザインルール */
 	/* ============================================================== */
 	.corporate-magazine-main {
-		background-color: #040507;
-		color: #ffffff;
-		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		/* デザイントークン完全定義（Design System & UI Reproducibility rule 準拠） */
+		--spacing-1: 0.25rem;   /* 4px */
+		--spacing-2: 0.5rem;    /* 8px */
+		--spacing-3: 0.75rem;   /* 12px */
+		--spacing-4: 1rem;      /* 16px */
+		--spacing-5: 1.25rem;   /* 20px */
+		--spacing-6: 1.5rem;    /* 24px */
+		--spacing-8: 2rem;      /* 32px */
+		--spacing-10: 2.5rem;   /* 40px */
+		--spacing-12: 3rem;     /* 48px */
+		--spacing-16: 4rem;     /* 64px */
+		--spacing-20: 5rem;     /* 80px */
+		--spacing-24: 6rem;     /* 96px */
+
+		--font-size-label: 0.75rem;  /* 12px */
+		--font-size-xs: 0.8125rem;   /* 13px */
+		--font-size-sm: 0.875rem;    /* 14px */
+		--font-size-base: 1rem;      /* 16px */
+		--font-size-lg: 1.125rem;    /* 18px */
+		--font-size-xl: 1.25rem;     /* 20px */
+		--font-size-2xl: 1.5rem;     /* 24px */
+		--font-size-3xl: 2rem;       /* 32px */
+
+		--leading-tight: 1.2;
+		--leading-snug: 1.35;
+		--leading-normal: 1.6;
+		--leading-relaxed: 1.8;
+
+		--radius-sm: 6px;
+		--radius-md: 10px;
+		--radius-lg: 14px;
+		--radius-xl: 18px;
+		--radius-full: 9999px;
+
+		--color-bg: #040507;
+		--color-surface: rgba(255, 255, 255, 0.03);
+		--color-surface-hover: rgba(255, 255, 255, 0.05);
+		--color-border: rgba(255, 255, 255, 0.08);
+		--color-border-hover: rgba(255, 255, 255, 0.22);
+		--color-text: #ffffff;
+		--color-text-secondary: rgba(255, 255, 255, 0.65);
+		--color-muted: rgba(255, 255, 255, 0.45);
+		--color-accent: #E60012;
+
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
 		position: relative;
 		overflow-x: hidden;
-		padding-top: 80px; /* NicoleHeader分の余白 */
+		padding-top: 0;
 	}
 
 	.corp-container {
 		width: 100%;
 		max-width: 1440px;
 		margin: 0 auto;
-		padding: 0 40px;
+		padding: 0 var(--spacing-10);
 		box-sizing: border-box;
 	}
 
 	@media (max-width: 1024px) {
 		.corp-container {
-			padding: 0 24px;
+			padding: 0 var(--spacing-6);
 		}
 	}
 
 	@media (max-width: 480px) {
 		.corp-container {
-			padding: 0 16px;
+			padding: 0 var(--spacing-4);
 		}
 	}
 
 	/* ============================================================== */
-	/* 共通セクション設定 */
+	/* 共通セクション設定（見出し・セクション間の余白リズム） */
 	/* ============================================================== */
 	.corp-section {
-		padding: 90px 0;
+		padding: var(--spacing-24) 0;
 		position: relative;
 	}
 
 	.corp-section--bordered {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 1px solid var(--color-border);
 	}
 
 	@media (max-width: 768px) {
 		.corp-section {
-			padding: 60px 0;
+			padding: var(--spacing-16) 0;
 		}
 	}
 
 	.corp-section-header {
-		margin-bottom: 48px;
+		margin-bottom: var(--spacing-10);
+	}
+
+	@media (max-width: 768px) {
+		.corp-section-header {
+			margin-bottom: var(--spacing-6);
+		}
 	}
 
 	.corp-section-header--center {
@@ -623,34 +678,35 @@ const jsonLd = {
 	}
 
 	.corp-section-title {
-		font-size: clamp(26px, 3.2vw, 38px);
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: -0.01em;
-		line-height: 1.3;
-		margin: 0 0 14px 0;
-		text-wrap: balance;
+		font-size: clamp(26px, 3.2vw, 38px) !important;
+		font-weight: 700 !important;
+		color: #ffffff !important;
+		letter-spacing: -0.01em !important;
+		line-height: var(--leading-tight) !important;
+		margin: 0 0 var(--spacing-3) 0 !important;
+		text-wrap: balance !important;
+		clear: both !important;
 	}
 
 	.corp-section-subtitle {
-		font-size: 15px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.65);
-		margin: 0;
-		max-width: 760px;
+		font-size: var(--font-size-sm) !important;
+		line-height: var(--leading-relaxed) !important;
+		color: var(--color-text-secondary) !important;
+		margin: 0 !important;
+		max-width: 760px !important;
 	}
 
 	.corp-section-header--center .corp-section-subtitle {
-		margin-left: auto;
-		margin-right: auto;
+		margin-left: auto !important;
+		margin-right: auto !important;
 	}
 
 	.corp-section-lead {
-		font-size: clamp(16px, 1.8vw, 20px);
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
-		line-height: 1.5;
-		margin: 0;
+		font-size: clamp(16px, 1.8vw, 20px) !important;
+		font-weight: 500 !important;
+		color: rgba(255, 255, 255, 0.9) !important;
+		line-height: var(--leading-normal) !important;
+		margin: 0 !important;
 	}
 
 	/* ============================================================== */
@@ -661,8 +717,8 @@ const jsonLd = {
 		min-height: 540px;
 		display: flex;
 		align-items: flex-end;
-		padding: 120px 0 60px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 130px 0 60px 0;
+		border-bottom: 1px solid var(--color-border);
 		overflow: hidden;
 		background: #000000;
 	}
@@ -670,7 +726,7 @@ const jsonLd = {
 	@media (max-width: 768px) {
 		.corp-hero {
 			min-height: 440px;
-			padding: 90px 0 40px 0;
+			padding: 100px 0 40px 0;
 		}
 	}
 
@@ -944,6 +1000,10 @@ const jsonLd = {
 		font-size: 12px;
 		color: rgba(255, 255, 255, 0.4);
 		margin-top: 1px;
+	}
+
+	.corp-message-content .corp-section-header {
+		margin-bottom: var(--spacing-6);
 	}
 
 	.corp-message-body p {
@@ -1491,12 +1551,12 @@ const jsonLd = {
 	}
 
 	/* ============================================================== */
-	/* 8. 会社基本データ（テーブル崩れ完全修正） */
+	/* 8. 会社基本データ（テーブル崩れ完全修正・セマンティックデザイン） */
 	/* ============================================================== */
 	.corp-profile-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
 		overflow: hidden;
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
@@ -1505,6 +1565,7 @@ const jsonLd = {
 	/* AstraおよびElementorのテーブル線汚染を完全リセット */
 	.corp-profile-card table.corp-profile-table {
 		width: 100% !important;
+		table-layout: fixed !important;
 		border-collapse: collapse !important;
 		border-spacing: 0 !important;
 		border: none !important;
@@ -1519,7 +1580,7 @@ const jsonLd = {
 
 	.corp-profile-card table.corp-profile-table tr {
 		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+		border-bottom: 1px solid var(--color-border) !important;
 		background: transparent !important;
 	}
 
@@ -1540,21 +1601,22 @@ const jsonLd = {
 
 	.corp-profile-card table.corp-profile-table th {
 		width: 240px !important;
-		padding: 22px 30px !important;
-		font-size: 14px !important;
+		padding: var(--spacing-5) var(--spacing-6) !important;
+		font-size: var(--font-size-sm) !important;
 		font-weight: 600 !important;
-		color: rgba(255, 255, 255, 0.65) !important;
+		color: var(--color-text-secondary) !important;
 		background: rgba(255, 255, 255, 0.02) !important;
 		vertical-align: top !important;
 		text-align: left !important;
 		white-space: nowrap !important;
+		line-height: var(--leading-normal) !important;
 	}
 
 	.corp-profile-card table.corp-profile-table td {
-		padding: 22px 30px !important;
-		font-size: 14.5px !important;
-		color: rgba(255, 255, 255, 0.9) !important;
-		line-height: 1.8 !important;
+		padding: var(--spacing-5) var(--spacing-6) !important;
+		font-size: var(--font-size-sm) !important;
+		color: var(--color-text) !important;
+		line-height: var(--leading-relaxed) !important;
 		background: transparent !important;
 		vertical-align: top !important;
 		text-align: left !important;
@@ -1573,16 +1635,16 @@ const jsonLd = {
 		}
 
 		.corp-profile-card table.corp-profile-table tr {
-			border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-			padding: 16px 20px !important;
+			border-bottom: 1px solid var(--color-border) !important;
+			padding: var(--spacing-4) var(--spacing-5) !important;
 		}
 
 		.corp-profile-card table.corp-profile-table th {
 			width: 100% !important;
-			padding: 0 0 6px 0 !important;
+			padding: 0 0 var(--spacing-2) 0 !important;
 			background: transparent !important;
-			color: rgba(255, 255, 255, 0.5) !important;
-			font-size: 12px !important;
+			color: var(--color-muted) !important;
+			font-size: var(--font-size-xs) !important;
 			font-weight: 600 !important;
 			white-space: normal !important;
 		}
@@ -1590,9 +1652,9 @@ const jsonLd = {
 		.corp-profile-card table.corp-profile-table td {
 			width: 100% !important;
 			padding: 0 !important;
-			color: rgba(255, 255, 255, 0.92) !important;
-			font-size: 14px !important;
-			line-height: 1.7 !important;
+			color: var(--color-text) !important;
+			font-size: var(--font-size-sm) !important;
+			line-height: var(--leading-relaxed) !important;
 		}
 	}
 
@@ -1602,32 +1664,33 @@ const jsonLd = {
 		margin: 0 !important;
 		display: flex !important;
 		flex-direction: column !important;
-		gap: 10px !important;
+		gap: var(--spacing-2) !important;
 	}
 
 	.corp-sub-companies-list li {
 		color: rgba(255, 255, 255, 0.85) !important;
 		margin: 0 !important;
 		padding: 0 !important;
-		line-height: 1.6 !important;
+		line-height: var(--leading-normal) !important;
+		font-size: var(--font-size-sm) !important;
 	}
 
 	.corp-sub-comp-name {
 		color: #ffffff;
 		font-weight: 700;
-		margin-right: 4px;
+		margin-right: var(--spacing-1);
 	}
 
 	.corp-sub-comp-role {
-		color: rgba(255, 255, 255, 0.65);
-		font-size: 13.5px;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-xs);
 	}
 
 	.corp-related-links {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 10px;
+		gap: var(--spacing-2) var(--spacing-3);
 	}
 
 	.corp-inline-link {

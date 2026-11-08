@@ -1,0 +1,52 @@
+================================================================================
+引き継ぎサマリー: 2026-11-09
+================================================================================
+
+1. 今回のセッションで完了したこと
+   - デザインシステム基本仕様の策定とドキュメント化:
+     * DESIGN_MANUAL.md を新規策定（4大原則：モノトーン基調、勝負所の赤の限定運用、幾何学的同心円、トークン強制）。
+     * 社内確認用スタイルガイドページ（/design-system / src/pages/design-system.astro）を実装（トークン一覧、カラーワンクリックコピー機能等）。
+   - 主要ページのデザイントークン連動化（フェーズ1完了）:
+     * 拠点詳細（location/[slug].astro）：電話（--color-action-call）・ルート案内（--color-action-route）ボタンのトークン化。
+     * キャンペーン詳細（campaigns/[slug].astro）：最重要CTAボタン（勝負所の赤 --color-accent-red）の整備。
+     * トップページ（NicoleHomeMain.astro）：余白・タイポグラフィ・カード比率のトークン連動。
+     * 会社概要（corporate.astro）：深黒背景・テーブル構造化・トークン化。
+     * 共通コンポーネント・レイアウト（theme.css, RichPortableText.astro, Base.astro 等）のスタイル統一。
+   - SEO / GEO / AI検索対策（LLMO）の監査と強化:
+     * robots.txt、public/llms.txt、public/llms-full.txt を整備し、AIクローラー（GPTBot, ClaudeBot等）向けマークダウン参照を最適化。
+     * 検索除外制御ミドルウェア（src/middleware.ts）を実装（PUBLIC_ALLOW_INDEXING による X-Robots-Tag 制御）。
+     * サイトマップ（sitemap.xml.ts）および404ページ（404.astro）の構造化更新。
+   - 作業ツリー整理と型検査（astro check）:
+     * src/ 配下に散在していた一時バックアップファイル群（*.backup.astro）を backup/ ディレクトリへ集約整理。
+     * src/pages/api/views.ts の型エラーを修正し、npm run typecheck（88ファイル）を 0 errors 完全クリア。
+   - 運用スキル体系の標準化:
+     * 作業開始用 dev-setup、作業終了・引き継ぎ用 handover-wrapup、SEO診断用 seo-geo-audit スキルを .agents/skills/ 配下に配備。
+     * 次期タスク管理表 TODO.md を作成。
+   - ローカルD1データベースの最新エクスポート:
+     * npm run db:backup を実行し、seed/backup.sqlite および seed/db-filename.txt を最新同期。
+
+2. 現在のステータス & 積み残しタスク
+   - 現在のステータス:
+     * 全ファイルの型検査（typecheck）0 errors 正常通過。
+     * D1データベース最新バックアップ済み（seed/backup.sqlite）。
+     * Cloudflareへの本番デプロイ（wrangler deploy）はルールに従い未実施（指示待ち）。
+   - 次回着手タスク（TODO.md 参照）:
+     * 【固定ページのモダンAstro構造への順次移行】
+       旧WordPress/Elementorコード（elementorHtml）のままとなっている固定ページ（/philosophy、/esg_sdgs、/customer-policy、/privacystatement、事業会社個別ページ /pages/nicole-*）を順次 /corporate と同等の黒背景エディトリアル＆デザイントークン連動コンポーネントへ再構築。
+     * 【サイト全体のマジックナンバー点検・リファクタリング】
+       各コンポーネント内に残る細かな直書き数値を DESIGN_MANUAL.md 記載のCSS変数へ順次統一。
+   - 注意点・検討事項:
+     * 本番公開（wrangler deploy）はユーザーから明示的な指示があった場合のみ実行すること。
+     * Google Places APIの実データ確認には、会社環境の .dev.vars に GOOGLE_PLACES_API_KEY が必要（未設定時はレビュー欄自動非表示）。
+
+3. 次回環境（会社PC）での再開手順
+   - プロジェクトフォルダに移動:
+     cd ~/dev/my-emdash-site
+   - AIチャットに以下のように指示するだけで、git pull、DB復元（npm run db:restore）、開発サーバー起動、管理画面・確認用URL案内が一括実行されます：
+     「開発準備して」
+   - 確認URL:
+     * サイトトップ: http://localhost:4321/
+     * デザインシステム（スタイルガイド）: http://localhost:4321/design-system
+     * 管理画面直接アクセス（バイパスログイン）:
+       http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin
+================================================================================

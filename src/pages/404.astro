@@ -1,203 +1,208 @@
 ---
-import Base from "../layouts/Base.astro";
+// src/pages/404.astro
+// Nicole Group 公式 404 エラーページ
+import NicoleLayout from "../layouts/NicoleLayout.astro";
 ---
 
-<Base title="Page not found">
-	<section class="band not-found">
-		<div class="not-found__backdrop" aria-hidden="true"></div>
-		<div class="frame not-found__inner">
-			<p class="eyebrow not-found__code">Error 404</p>
-			<h1 class="intro__title">Page not found</h1>
-			<p class="intro__lead">
-				The page you’re looking for doesn’t exist or may have moved.
+<NicoleLayout 
+	title="お探しのページが見つかりませんでした (404 Not Found) | Nicole Group 公式" 
+	description="アクセスされたページは削除されたか、URLが変更された可能性があります。"
+>
+	<main class="nicole-404-main">
+		<div class="nicole-404-container">
+			<div class="nicole-404-badge">404 NOT FOUND</div>
+			<h1 class="nicole-404-title">ページが見つかりませんでした</h1>
+			<p class="nicole-404-lead">
+				申し訳ございません。お探しのページは移動または削除されたか、<br class="pc-only" />
+				URLが正しく入力されていない可能性があります。
 			</p>
-			<div class="not-found__actions">
-				<a href="/" class="btn">Go home</a>
-				<a href="/posts" class="btn btn--ghost">Browse posts</a>
+
+			<div class="nicole-404-nav-grid">
+				<a href="/" class="nicole-404-card">
+					<span class="nicole-404-card__title">ホーム</span>
+					<span class="nicole-404-card__desc">ニコル・グループ トップページ</span>
+					<span class="nicole-404-card__arrow">→</span>
+				</a>
+				<a href="/locations" class="nicole-404-card">
+					<span class="nicole-404-card__title">拠点一覧</span>
+					<span class="nicole-404-card__desc">東京・神奈川のショールーム・サービス工場</span>
+					<span class="nicole-404-card__arrow">→</span>
+				</a>
+				<a href="/magazine/" class="nicole-404-card">
+					<span class="nicole-404-card__title">マガジン</span>
+					<span class="nicole-404-card__desc">Nicole Connect 最新ストーリー</span>
+					<span class="nicole-404-card__arrow">→</span>
+				</a>
+				<a href="/news" class="nicole-404-card">
+					<span class="nicole-404-card__title">お知らせ</span>
+					<span class="nicole-404-card__desc">最新ニュース・営業日のご案内</span>
+					<span class="nicole-404-card__arrow">→</span>
+				</a>
 			</div>
-			<form
-				method="get"
-				action="/search"
-				role="search"
-				aria-label="Posts"
-				class="not-found__search"
-			>
-				<label for="not-found-query" class="sr-only">Search posts</label>
-				<svg
-					class="not-found__search-icon"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.75"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-					><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"
-					></path></svg
-				>
-				<input
-					id="not-found-query"
-					class="not-found__search-input"
-					type="search"
-					name="q"
-					placeholder="Or search posts"
-				/>
-				<button
-					type="submit"
-					class="btn not-found__search-submit"
-					aria-label="Search"
-				>
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.75"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<path d="M5 12h14"></path>
-						<path d="m12 5 7 7-7 7"></path>
-					</svg>
-				</button>
-			</form>
+
+			<div class="nicole-404-cta">
+				<a href="/" class="nicole-404-btn-primary">トップページへ戻る</a>
+				<a href="/contact" class="nicole-404-btn-sub">お問い合わせはこちら</a>
+			</div>
 		</div>
-	</section>
-</Base>
+	</main>
+</NicoleLayout>
 
 <style>
-	.not-found {
-		padding-block: clamp(4rem, 2.5rem + 6vw, 8rem);
-	}
-
-	.not-found__backdrop {
-		position: absolute;
-		inset: 0;
-		background-image: radial-gradient(
-			circle,
-			var(--color-border-strong) 1px,
-			transparent 1.5px
-		);
-		background-position: center;
-		background-size: 16px 16px;
-		mask-image: radial-gradient(
-			ellipse 46% 58% at 50% 50%,
-			#000 15%,
-			transparent 75%
-		);
-		pointer-events: none;
-	}
-
-	.not-found__inner {
-		position: relative;
+	.nicole-404-main {
+		background: #0f1115;
+		color: #ffffff;
+		min-height: 70vh;
 		display: flex;
-		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+		padding: 6rem 1.5rem;
+		position: relative;
+	}
+
+	.nicole-404-container {
+		max-width: 760px;
+		width: 100%;
+		margin: 0 auto;
 		text-align: center;
 	}
 
-	.not-found__code {
+	.nicole-404-badge {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.8125rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.45);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		padding: 0.35rem 0.85rem;
+		border-radius: 9999px;
+		margin-bottom: 1.5rem;
+	}
+
+	.nicole-404-title {
+		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		margin: 0 0 1rem;
+		color: #ffffff;
+	}
+
+	.nicole-404-lead {
+		font-size: 1rem;
+		line-height: 1.8;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 3rem;
+	}
+
+	.nicole-404-nav-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+		margin-bottom: 3rem;
+		text-align: left;
+	}
+
+	@media (max-width: 640px) {
+		.nicole-404-nav-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.nicole-404-card {
+		display: block;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 8px;
+		padding: 1.25rem 1.5rem;
+		text-decoration: none;
+		position: relative;
+		transition: all 0.2s ease;
+	}
+
+	.nicole-404-card:hover {
+		background: rgba(255, 255, 255, 0.07);
+		border-color: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
+
+	.nicole-404-card__title {
+		display: block;
+		font-size: 1rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: 0.25rem;
+	}
+
+	.nicole-404-card__desc {
+		display: block;
+		font-size: 0.8125rem;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.nicole-404-card__arrow {
+		position: absolute;
+		right: 1.25rem;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 1.125rem;
+		color: rgba(255, 255, 255, 0.3);
+		transition: transform 0.2s ease, color 0.2s ease;
+	}
+
+	.nicole-404-card:hover .nicole-404-card__arrow {
+		transform: translate(3px, -50%);
+		color: #ffffff;
+	}
+
+	.nicole-404-cta {
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	.nicole-404-btn-primary {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--spacing-2);
-		min-height: 28px;
-		padding: 2px 12px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface);
-		box-shadow:
-			inset 0 0 0 1px var(--color-border),
-			var(--shadow-sm);
-		color: var(--color-text-secondary);
-	}
-
-	.not-found__code::before {
-		content: "";
-		width: 6px;
-		height: 6px;
-		border-radius: var(--radius-full);
-		background: var(--color-muted);
-	}
-
-	.not-found__inner .intro__lead {
-		max-width: 40ch;
-		text-wrap: balance;
-	}
-
-	.not-found__actions {
-		display: flex;
-		flex-wrap: wrap;
 		justify-content: center;
-		gap: var(--spacing-3);
-		margin-top: var(--spacing-8);
+		padding: 0.875rem 2rem;
+		background: #ffffff;
+		color: #000000;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		border-radius: 4px;
+		text-decoration: none;
+		transition: background 0.2s ease, opacity 0.2s ease;
 	}
 
-	.not-found__search {
-		position: relative;
-		width: min(100%, 340px);
-		margin-top: var(--spacing-6);
+	.nicole-404-btn-primary:hover {
+		opacity: 0.9;
 	}
 
-	.not-found__search-icon {
-		position: absolute;
-		inset-inline-start: 16px;
-		top: 50%;
-		width: 16px;
-		height: 16px;
-		translate: 0 -50%;
-		color: var(--color-muted);
-		pointer-events: none;
+	.nicole-404-btn-sub {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.875rem 2rem;
+		background: transparent;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		border-radius: 4px;
+		text-decoration: none;
+		transition: all 0.2s ease;
 	}
 
-	.not-found__search-input {
-		display: block;
-		width: 100%;
-		height: 44px;
-		padding-block: 0;
-		padding-inline: 42px 48px;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-full);
-		background: var(--color-surface);
-		color: var(--color-text);
-		font: inherit;
-		font-size: var(--font-size-base);
-		-webkit-appearance: none;
-		appearance: none;
-		transition:
-			border-color var(--transition-fast),
-			box-shadow var(--transition-fast);
+	.nicole-404-btn-sub:hover {
+		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.05);
 	}
 
-	.not-found__search-input::placeholder {
-		color: var(--color-muted);
-	}
-
-	.not-found__search-input::-webkit-search-cancel-button {
-		filter: grayscale(1);
-		cursor: pointer;
-	}
-
-	.not-found__search-input:hover {
-		border-color: var(--color-border-strong);
-	}
-
-	/* Transparent rather than none so forced-colors mode still draws a ring */
-	.not-found__search-input:focus {
-		outline: 2px solid transparent;
-		border-color: var(--color-muted);
-		box-shadow: 0 0 0 3px var(--color-brand-ring);
-	}
-
-	.not-found__search-submit {
-		position: absolute;
-		top: 6px;
-		inset-inline-end: 6px;
-		width: 32px;
-		height: 32px;
-		min-height: 0;
-		padding: 0;
-	}
-
-	.not-found__search-submit svg:dir(rtl) {
-		scale: -1 1;
+	@media (max-width: 768px) {
+		.pc-only {
+			display: none;
+		}
 	}
 </style>

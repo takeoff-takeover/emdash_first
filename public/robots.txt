@@ -1,26 +1,11 @@
+# Robots.txt for Nicole Group
 User-agent: *
-Allow: /
+Disallow: /_emdash/
+Disallow: /admin
+Disallow: /api/
 
-# AI Crawlers & Answer Engines
-User-agent: Google-Extended
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
+# Production indexing policy
+# Note: In development/staging, keep Disallow: / or control via PUBLIC_ALLOW_INDEXING
+# Allow: /
 
 Sitemap: https://my-emdash-site.kaz130.workers.dev/sitemap.xml

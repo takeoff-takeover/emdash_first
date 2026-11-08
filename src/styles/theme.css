@@ -29,6 +29,21 @@
 	--color-accent-red-hover: #be123c;
 	--color-on-accent-red: #ffffff;
 
+	/* Utility Action Colors (Hardware & OS Linkage: Phone & Maps) */
+	--color-utility-blue: #60a5fa;
+	--color-utility-blue-bg: rgba(59, 130, 246, 0.1);
+	--color-utility-blue-bg-hover: rgba(59, 130, 246, 0.2);
+	--color-utility-blue-border: rgba(59, 130, 246, 0.35);
+	--color-utility-blue-border-hover: rgba(59, 130, 246, 0.55);
+	--color-utility-blue-hover: #93c5fd;
+
+	--color-utility-green: #34d399;
+	--color-utility-green-bg: rgba(16, 185, 129, 0.1);
+	--color-utility-green-bg-hover: rgba(16, 185, 129, 0.2);
+	--color-utility-green-border: rgba(16, 185, 129, 0.35);
+	--color-utility-green-border-hover: rgba(16, 185, 129, 0.55);
+	--color-utility-green-hover: #6ee7b7;
+
 	/* Premium subtle shadows */
 	--shadow-card: 0 0 0 1px var(--color-ring), 0 4px 20px -2px rgba(0, 0, 0, 0.7);
 	--shadow-card-hover: 0 0 0 1px rgba(255, 255 255, 0.18), 0 12px 32px -4px rgba(0, 0, 0, 0.9);

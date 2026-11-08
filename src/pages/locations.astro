@@ -765,7 +765,6 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 		<!-- 5. フッターCTA -->
 		<section class="locs-cta">
 			<div class="locs-container locs-cta__container">
-				<span class="locs-eyebrow">CUSTOMER SUPPORT</span>
 				<h2 class="locs-cta__title">お車に関するあらゆるご相談を承ります。</h2>
 				<p class="locs-cta__desc">
 					新車・認定中古車のご購入相談から、点検・整備・車検のお見積もりまで。お近くのNicole Group各拠点へお気軽にお問い合わせください。
@@ -1441,6 +1440,27 @@ const officeLocations = locationsData.filter(l => l.facilityType === "本社・�
 				}
 			});
 		});
+
+		// URLハッシュまたはクエリパラメータによる初期フィルター反映
+		const initHash = (window.location.hash || '').replace('#', '').toLowerCase();
+		const hashToBrand = {
+			'bmw': 'BMW',
+			'mini': 'MINI',
+			'rolls-royce': 'Rolls-Royce',
+			'rollsroyce': 'Rolls-Royce',
+			'ferrari': 'Ferrari',
+			'alpina': 'ALPINA'
+		};
+		if (hashToBrand[initHash]) {
+			const targetBrand = hashToBrand[initHash];
+			const targetBtn = document.querySelector(`#brand-filters [data-filter="${targetBrand}"]`);
+			if (targetBtn) {
+				brandBtns.forEach(b => b.classList.remove('is-active'));
+				targetBtn.classList.add('is-active');
+				currentBrand = targetBrand;
+				applyFilters();
+			}
+		}
 	});
 </script>
 

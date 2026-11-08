@@ -1,0 +1,22 @@
+---
+/**
+ * CustomHtmlBlock.astro
+ * EmDash Portable Text カスタムブロック：RAW HTML レンダラー
+ * WordPress等から移行されたテーブルや埋め込みHTMLを完全に保持・忠実描画する
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		html?: string;
+		content?: string;
+		code?: string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+const rawHtml = (node.html || node.content || node.code || "").trim();
+---
+
+{rawHtml && <Fragment set:html={rawHtml} />}

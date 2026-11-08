@@ -1142,6 +1142,56 @@ let relatedStories = combinedRelated.slice(0, 5);
 let latestStories: any[] = [];
 let relatedStoriesUrl = "/magazine/";
 
+// 人気記事ランキング（上位5件）の取得
+let popularStories: any[] = [];
+try {
+	const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
+	if (fs.existsSync(DB_PATH)) {
+		const db = new DatabaseSync(DB_PATH);
+		const rows = db.prepare(`
+			SELECT m.slug, m.title, m.featured_image, COALESCE(v.views, 0) as views,
+			       COALESCE(m.published_at, m.created_at) as sort_date
+			FROM ec_magazine m
+			LEFT JOIN article_views v ON m.slug = v.slug
+			WHERE (m.status = 'published' OR m.status IS NULL) AND m.deleted_at IS NULL
+			  AND m.slug != ?
+			ORDER BY views DESC, sort_date DESC
+			LIMIT 5
+		`).all(slug) as any[];
+
+		popularStories = rows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
+			let imgSrc = "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg";
+			if (r.featured_image) {
+				try {
+					const parsed = JSON.parse(r.featured_image);
+					imgSrc = parsed.src || parsed.previewUrl || imgSrc;
+				} catch {
+					if (typeof r.featured_image === 'string' && r.featured_image.startsWith('/')) {
+						imgSrc = r.featured_image;
+					}
+				}
+			}
+			let brand = "BMW";
+			const t = (r.title || "").toLowerCase();
+			if (t.includes("mini")) brand = "MINI";
+			else if (t.includes("ferrari") || t.includes("フェラーリ")) brand = "Ferrari";
+			else if (t.includes("alpina") || t.includes("アルピナ")) brand = "ALPINA";
+			else if (t.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
+
+			return {
+				slug: r.slug,
+				title: r.title,
+				brand,
+				views: typeof r.views === 'number' ? r.views : 0,
+				image: imgSrc,
+				url: `/magazine/${r.slug}/`
+			};
+		});
+	}
+} catch (e) {
+	console.error("Failed to query popular stories for sidebar:", e);
+}
+
 // サンプルは1記事のみ。全公開記事を取得してからブランドで絞り込み、件数を制限する。
 if (isSidebarSample) {
 	const storiesBySlug = new Map<string, any>();
@@ -1371,6 +1421,14 @@ if (Array.isArray(post.data?.content)) {
 						{formattedArticleDate}
 					</time>
 					<span class="meta-reading-time">READING TIME: 4 MIN</span>
+					<span class="meta-views" id="metaViewsBadge" title="閲覧数" style="display: none;">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="meta-views-icon" aria-hidden="true">
+							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+							<circle cx="12" cy="12" r="3"></circle>
+						</svg>
+						<span id="metaViewsCount">0</span>
+						<span class="meta-views-unit">views</span>
+					</span>
 
 					{/* メタ行内のクイック編集リンク */}
 					<a href={editUrl} class="meta-edit-pill" title="この記事の編集画面を開く">
@@ -1699,6 +1757,38 @@ if (Array.isArray(post.data?.content)) {
 						</div>
 					</section>
 					))}
+
+					{/* 人気の記事（ランキング） */}
+					{popularStories.length > 0 && (
+						<section class="sidebar-block" aria-label="人気の記事">
+							<h2 class="sidebar-heading">人気の記事</h2>
+							<div class="sidebar-story-list">
+								{popularStories.map((story, idx) => (
+									<article class="sidebar-story-card">
+										<a href={story.url} class="sidebar-story-link">
+											<div class="sidebar-story-media">
+												<img src={story.image} alt={story.title} loading="lazy" />
+												<span class={`sidebar-rank-badge ${idx < 3 ? 'is-top' : ''}`}>{idx + 1}</span>
+											</div>
+											<div class="sidebar-story-body">
+												<div class="sidebar-story-meta-row">
+													<span class="sidebar-story-brand">{story.brand}</span>
+													<span class="sidebar-story-views">
+														<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+														<span>{story.views.toLocaleString()} views</span>
+													</span>
+												</div>
+												<h3 class="sidebar-story-title">{story.title}</h3>
+											</div>
+										</a>
+									</article>
+								))}
+							</div>
+							<div class="sidebar-footer-link">
+								<a href="/magazine/#popular-stories" class="sidebar-all-link" aria-label="人気の記事をもっと見る">ランキングをもっと見る →</a>
+							</div>
+						</section>
+					)}
 				</div>
 			</aside>
 			)}
@@ -1943,10 +2033,30 @@ if (Array.isArray(post.data?.content)) {
 	}
 
 	.meta-date,
-	.meta-reading-time {
+	.meta-reading-time,
+	.meta-views {
 		font-size: 12px;
 		color: var(--magazine-text-color);
 		letter-spacing: 0.08em;
+	}
+
+	.meta-views {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		opacity: 0.85;
+	}
+
+	.meta-views-icon {
+		width: 14px;
+		height: 14px;
+		stroke-width: 1.8;
+		opacity: 0.7;
+	}
+
+	.meta-views-unit {
+		font-size: 11px;
+		opacity: 0.8;
 	}
 
 	.meta-edit-pill {
@@ -2217,11 +2327,53 @@ if (Array.isArray(post.data?.content)) {
 		backdrop-filter: blur(4px);
 	}
 
+	.sidebar-rank-badge {
+		position: absolute;
+		top: 4px;
+		left: 4px;
+		width: 18px;
+		height: 18px;
+		border-radius: 2px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--font-mono, monospace);
+		font-size: 10px;
+		font-weight: 700;
+		background: rgba(0, 0, 0, 0.75);
+		color: var(--magazine-text-color);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(4px);
+		z-index: 2;
+	}
+
+	.sidebar-rank-badge.is-top {
+		background: #ffffff;
+		color: #000000;
+		border-color: #ffffff;
+	}
+
 	.sidebar-story-body {
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
 		min-width: 0;
+	}
+
+	.sidebar-story-meta-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 10.5px;
+		color: var(--magazine-text-color);
+	}
+
+	.sidebar-story-views {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+		opacity: 0.75;
+		margin-left: auto;
 	}
 
 	.sidebar-story-date {
@@ -3328,3 +3480,44 @@ if (Array.isArray(post.data?.content)) {
 		color: var(--magazine-text-color) !important;
 	}
 </style>
+
+<script define:vars={{ articleSlug: slug }}>
+	(function() {
+		if (!articleSlug) return;
+		try {
+			const storageKey = 'nicole_viewed_' + articleSlug;
+			const hasViewedRecently = sessionStorage.getItem(storageKey);
+
+			const badge = document.getElementById('metaViewsBadge');
+			const countEl = document.getElementById('metaViewsCount');
+
+			// 同一セッション内で閲覧済みの場合はGETで現在の閲覧数を取得、初回閲覧時のみPOSTでカウント加算
+			const isFirstVisit = !hasViewedRecently;
+			const url = isFirstVisit ? '/api/views' : `/api/views?slug=${encodeURIComponent(articleSlug)}`;
+			const fetchOptions = isFirstVisit
+				? {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ slug: articleSlug, collection: 'magazine' })
+				}
+				: { method: 'GET' };
+
+			fetch(url, fetchOptions)
+				.then(res => res.json())
+				.then(data => {
+					if (data && data.ok && typeof data.views === 'number') {
+						if (isFirstVisit) {
+							sessionStorage.setItem(storageKey, '1');
+						}
+						if (countEl && badge) {
+							countEl.textContent = data.views.toLocaleString();
+							badge.style.display = 'inline-flex';
+						}
+					}
+				})
+				.catch(() => {});
+		} catch (e) {
+			// LocalStorage/SessionStorage disabled fallback
+		}
+	})();
+</script>

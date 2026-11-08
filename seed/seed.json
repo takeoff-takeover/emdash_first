@@ -722,8 +722,10 @@
     },
     {
       "slug": "posts",
-      "label": "Posts",
-      "labelSingular": "Post",
+      "label": "お知らせ",
+      "labelSingular": "お知らせ記事",
+      "description": "ニコル・グループ公式のお知らせ・ニュース・営業案内管理コレクション",
+      "icon": "newspaper",
       "supports": [
         "drafts",
         "revisions",
@@ -732,7 +734,7 @@
         "search",
         "seo"
       ],
-      "urlPattern": "/posts/{slug}",
+      "urlPattern": "/news/{slug}",
       "commentsEnabled": true,
       "fields": [
         {
@@ -83539,7 +83541,7 @@
           "service_cta_url": "https://secure-p2.mini.jp/mini/jsf/service/index.jsf",
           "sales_subtitle": "MINI 新百合ヶ丘",
           "used_subtitle": "MINI NEXT 新百合ヶ丘",
-          "service_subtitle": "Nicole BMW 新百合ヶ丘支店",
+          "service_subtitle": "Nicole BMW 新百合ヶ丘支店 サービス",
           "sales_fax": "044-959-3033",
           "used_fax": "044-959-3033",
           "service_fax": "044-959-3033",
@@ -83685,7 +83687,7 @@
           "service_cta_url": "https://form.bmw.co.jp/form/service/dealer/03110/index.html",
           "sales_subtitle": "Nicole BMW 新百合ヶ丘支店",
           "used_subtitle": "BMW Premium Selection 新百合ヶ丘",
-          "service_subtitle": "Nicole BMW 新百合ヶ丘支店",
+          "service_subtitle": "Nicole BMW 新百合ヶ丘支店 サービス",
           "sales_fax": "044-959-1401",
           "used_fax": "044-959-1401",
           "service_fax": "044-959-1401",
@@ -83818,7 +83820,7 @@
           "service_cta_url": "https://form.bmw.co.jp/form/service/dealer/03110/index.html",
           "sales_subtitle": "Nicole BMW 本社",
           "used_subtitle": "",
-          "service_subtitle": "Nicole BMW サービスセンター",
+          "service_subtitle": "Nicole BMW 本社 サービス",
           "sales_fax": "044-544-0100",
           "used_fax": "",
           "service_fax": "044-544-0100",

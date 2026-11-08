@@ -1,13 +1,12 @@
 ---
+// src/pages/tag/[slug].astro
+// Nicole Group 公式 タグ別アーカイブ
 import {
 	getTaxonomyTermsWithCacheHint,
 	getEmDashCollection,
-	getTermsForEntries,
 	decodeSlug,
 } from "emdash";
-import Base from "../../layouts/Base.astro";
-import PostCard from "../../components/PostCard.astro";
-import Pagination from "../../components/Pagination.astro";
+import NicoleLayout from "../../layouts/NicoleLayout.astro";
 
 const slug = decodeSlug(Astro.params.slug);
 const termsResult = await getTaxonomyTermsWithCacheHint("tag", {
@@ -36,107 +35,193 @@ if (Astro.cache?.enabled) {
 	Astro.cache.set(cacheHint);
 }
 
-// Single batched query for tags on every post tagged with this term,
-// rather than calling getEntryTerms() per post.
-const tagsByEntry = await getTermsForEntries(
-	"posts",
-	posts.map((p) => p.data.id),
-	"tag",
-);
-const filteredPosts = posts.map((post) => ({
-	post,
-	tags: (tagsByEntry.get(post.data.id) ?? []).filter(
-		(t) => t.slug !== term.slug,
-	),
-}));
+const pageTitle = `タグ「${term.label}」のお知らせ・記事一覧 | Nicole Group 公式`;
 ---
 
-<Base
-	title={`Posts tagged "${term.label}"`}
-	description={`All posts tagged with ${term.label}`}
->
-	<header class="band intro">
-		<div class="frame archive-intro">
-			<div class="archive-intro__text">
-				<p class="eyebrow">Tag</p>
-				<h1 class="intro__title">{term.label}</h1>
-				<p class="intro__lead">
-					{term.description || `Posts tagged ${term.label}, newest first.`}
-				</p>
-			</div>
-			<a href="/posts" class="arrow-link">
-				All posts
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="1.75"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<path d="M5 12h14"></path>
-					<path d="m12 5 7 7-7 7"></path>
-				</svg>
-			</a>
-		</div>
-	</header>
+<NicoleLayout title={pageTitle} description={term.description || `タグ「${term.label}」に関するNicole Groupの最新情報一覧です。`}>
+	<main class="nicole-archive-main">
+		<div class="nicole-archive-container">
+			<header class="nicole-archive-header">
+				<span class="nicole-archive-badge">TAG</span>
+				<h1 class="nicole-archive-title">#{term.label}</h1>
+				{term.description && <p class="nicole-archive-lead">{term.description}</p>}
+			</header>
 
-	<section class="band section">
-		<div class="frame">
-			{
-				filteredPosts.length > 0 ? (
-					<>
-						<div class="post-grid">
-							{filteredPosts.map(({ post, tags }) => (
-								<PostCard
-									post={post}
-									tags={tags.map((t) => ({ slug: t.slug, label: t.label }))}
-								/>
-							))}
-						</div>
-						<Pagination
-							basePath={`/tag/${term.slug}`}
-							cursor={cursor}
-							nextCursor={nextCursor}
-						/>
-					</>
-				) : (
-					<div class="empty-state">
-						<h2 class="empty-state__title">
-							{cursor ? "No more posts" : "Nothing here yet"}
-						</h2>
-						<p class="empty-state__text">
-							{cursor
-								? "This page is past the last post."
-								: `No posts have been tagged ${term.label} so far.`}
-						</p>
-						<div class="empty-state__actions">
-							<a
-								href={cursor ? `/tag/${term.slug}` : "/posts"}
-								class="btn btn--ghost"
-							>
-								{cursor ? "Back to the first page" : "Browse all posts"}
+			{posts.length > 0 ? (
+				<div class="nicole-archive-list">
+					{posts.map((post) => (
+						<article class="nicole-archive-card">
+							<a href={`/news/${post.id}`} class="nicole-archive-card__link">
+								<div class="nicole-archive-card__meta">
+									<time class="nicole-archive-card__date">
+										{post.data.publishedAt 
+											? new Date(post.data.publishedAt).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" }).replaceAll("/", ".")
+											: ""}
+									</time>
+									<span class="nicole-archive-card__cat">#{term.label}</span>
+								</div>
+								<h2 class="nicole-archive-card__title">{post.data.title}</h2>
+								{post.data.excerpt && (
+									<p class="nicole-archive-card__excerpt">{post.data.excerpt}</p>
+								)}
 							</a>
-						</div>
-					</div>
-				)
-			}
+						</article>
+					))}
+				</div>
+			) : (
+				<div class="nicole-archive-empty">
+					<p>現在、該当するお知らせはありません。</p>
+					<a href="/news" class="nicole-btn-outline">お知らせ一覧へ戻る</a>
+				</div>
+			)}
+
+			<div class="nicole-archive-footer-nav">
+				<a href="/news" class="nicole-btn-outline">← お知らせトップ</a>
+				<a href="/magazine/" class="nicole-btn-outline">マガジントップ →</a>
+			</div>
 		</div>
-	</section>
-</Base>
+	</main>
+</NicoleLayout>
 
 <style>
-	.archive-intro {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-end;
-		align-items: last baseline;
-		justify-content: space-between;
-		gap: var(--spacing-5) var(--spacing-10);
+	.nicole-archive-main {
+		background: #0f1115;
+		color: #ffffff;
+		min-height: 80vh;
+		padding: 5rem 1.5rem 8rem;
 	}
 
-	.archive-intro__text {
-		min-width: 0;
+	.nicole-archive-container {
+		max-width: 860px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	.nicole-archive-header {
+		margin-bottom: 3.5rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding-bottom: 2rem;
+	}
+
+	.nicole-archive-badge {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		letter-spacing: 0.15em;
+		color: rgba(255, 255, 255, 0.45);
+		margin-bottom: 0.75rem;
+	}
+
+	.nicole-archive-title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		margin: 0 0 1rem;
+		color: #ffffff;
+	}
+
+	.nicole-archive-lead {
+		font-size: 1rem;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0;
+		line-height: 1.7;
+	}
+
+	.nicole-archive-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		margin-bottom: 4rem;
+	}
+
+	.nicole-archive-card {
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 8px;
+		transition: all 0.2s ease;
+	}
+
+	.nicole-archive-card:hover {
+		background: rgba(255, 255, 255, 0.06);
+		border-color: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
+
+	.nicole-archive-card__link {
+		display: block;
+		padding: 1.75rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.nicole-archive-card__meta {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.nicole-archive-card__date {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.8125rem;
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.nicole-archive-card__cat {
+		font-size: 0.75rem;
+		background: rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.7);
+		padding: 0.15rem 0.5rem;
+		border-radius: 3px;
+	}
+
+	.nicole-archive-card__title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		line-height: 1.5;
+		margin: 0 0 0.5rem;
+		color: #ffffff;
+	}
+
+	.nicole-archive-card__excerpt {
+		font-size: 0.875rem;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0;
+	}
+
+	.nicole-archive-empty {
+		text-align: center;
+		padding: 4rem 1rem;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px dashed rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		margin-bottom: 3rem;
+	}
+
+	.nicole-archive-footer-nav {
+		display: flex;
+		gap: 1rem;
+		justify-content: space-between;
+		padding-top: 2rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.nicole-btn-outline {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.75rem 1.5rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+		color: #ffffff;
+		text-decoration: none;
+		font-size: 0.875rem;
+		font-weight: 600;
+		transition: all 0.2s ease;
+	}
+
+	.nicole-btn-outline:hover {
+		border-color: #ffffff;
+		background: rgba(255, 255, 255, 0.08);
 	}
 </style>

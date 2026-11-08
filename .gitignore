@@ -5,6 +5,10 @@ dist
 /uploads
 data.db
 data.db-*
+*.sqlite-shm
+*.sqlite-wal
+seed/*.sqlite-shm
+seed/*.sqlite-wal
 .wrangler
 
 # Keep public assets and uploads tracked for reproduction

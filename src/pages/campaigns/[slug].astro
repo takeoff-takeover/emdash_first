@@ -1212,26 +1212,26 @@ const parsedContent = typeof item.content === "string"
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: var(--spacing-2);
 		width: 100%;
 		padding: 16px 28px;
-		background: #dc2626;
-		border: 1px solid #ef4444;
-		border-radius: 6px;
-		font-size: 1rem;
+		background: var(--color-accent-red);
+		border: 1px solid var(--color-accent-red);
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-base);
 		font-weight: 700;
 		letter-spacing: 0.05em;
-		color: #ffffff;
+		color: var(--color-on-accent-red);
 		text-decoration: none;
-		transition: all 0.2s ease;
-		box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
+		transition: all var(--transition-fast);
+		box-shadow: 0 4px 16px rgba(225, 29, 72, 0.35);
 		box-sizing: border-box;
 	}
 
 	.cmp-btn-cta-primary:hover {
-		background: #b91c1c;
-		border-color: #dc2626;
-		box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+		background: var(--color-accent-red-hover);
+		border-color: var(--color-accent-red-hover);
+		box-shadow: 0 6px 20px rgba(225, 29, 72, 0.5);
 		transform: translateY(-1px);
 	}
 

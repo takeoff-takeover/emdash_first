@@ -2,6 +2,9 @@
 interface Props {
 	title?: string;
 	description?: string;
+	image?: string;
+	canonical?: string;
+	type?: "website" | "article";
 	isMagazine?: boolean;
 	currentSlug?: string;
 	jsonLd?: Record<string, any> | Array<Record<string, any>>;
@@ -10,18 +13,30 @@ interface Props {
 const {
 	title = "HOME - ニコル・グループ",
 	description = "東京・神奈川エリアを中心に、世界のプレミアムブランドを通じて最高の喜びをお届けするカーディーラー・グループ。",
+	image,
+	canonical,
+	type = "website",
 	isMagazine = false,
 	currentSlug,
 	jsonLd
 } = Astro.props;
 
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : (import.meta.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev").replace(/\/$/, "");
+const canonicalUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
+const ogImageUrl = image 
+	? (image.startsWith("http") ? image : `${siteUrl}${image.startsWith("/") ? "" : "/"}${image}`)
+	: `${siteUrl}/uploads/2026/01/Nicole_Group_LOGO_neg.svg`;
+
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
+
 const organizationSchema = {
 	"@context": "https://schema.org",
 	"@type": "AutoDealer",
+	"@id": `${siteUrl}/#organization`,
 	"name": "ニコル・グループ (Nicole Group)",
 	"alternateName": "Nicole Group",
-	"url": "https://my-emdash-site.kaz130.workers.dev",
-	"logo": "https://my-emdash-site.kaz130.workers.dev/uploads/2026/01/NICOLE_N_LOGO_neg.svg",
+	"url": siteUrl,
+	"logo": `${siteUrl}/uploads/2026/01/NICOLE_N_LOGO_neg.svg`,
 	"description": "東京・神奈川エリアを中心にBMW、MINI、Rolls-Royce、Ferrariなどの正規ディーラーおよび認定サービス工場を展開するプレミアムカーディーラーグループ。",
 	"brand": [
 		{ "@type": "Brand", "name": "BMW" },
@@ -31,6 +46,22 @@ const organizationSchema = {
 		{ "@type": "Brand", "name": "BMW ALPINA" }
 	],
 	"areaServed": ["東京都", "神奈川県"]
+};
+
+const websiteSchema = {
+	"@context": "https://schema.org",
+	"@type": "WebSite",
+	"@id": `${siteUrl}/#website`,
+	"url": siteUrl,
+	"name": "ニコル・グループ (Nicole Group)",
+	"publisher": {
+		"@id": `${siteUrl}/#organization`
+	},
+	"potentialAction": {
+		"@type": "SearchAction",
+		"target": `${siteUrl}/search?q={search_term_string}`,
+		"query-input": "required name=search_term_string"
+	}
 };
 
 import NicoleHeader from "../components/NicoleHeader.astro";
@@ -43,8 +74,31 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	{allowIndexing ? (
+		<meta name="robots" content="index, follow" />
+	) : (
+		<meta name="robots" content="noindex, nofollow, noarchive" />
+		<meta name="googlebot" content="noindex, nofollow, noarchive" />
+	)}
 	<title>{title}</title>
 	<meta name="description" content={description} />
+	<link rel="canonical" href={canonicalUrl} />
+
+	<!-- OGP / Open Graph Protocol -->
+	<meta property="og:title" content={title} />
+	<meta property="og:description" content={description} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:type" content={type} />
+	<meta property="og:site_name" content="ニコル・グループ (Nicole Group)" />
+	<meta property="og:locale" content="ja_JP" />
+	<meta property="og:image" content={ogImageUrl} />
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={title} />
+	<meta name="twitter:description" content={description} />
+	<meta name="twitter:image" content={ogImageUrl} />
+
 	<link rel="icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
 	<link rel="apple-touch-icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
 
@@ -96,10 +150,15 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 		}
 	</style>
 
+	{image && (
+		<link rel="preload" as="image" href={ogImageUrl} />
+	)}
+
 	<!-- Core scripts in head (Self-hosted) -->
 	<script is:inline src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
 	<script is:inline src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
 	<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+	<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
 	{jsonLd && (
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	)}

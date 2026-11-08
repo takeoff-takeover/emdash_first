@@ -7,7 +7,7 @@ const brands = [
 		name: "ALPINA", 
 		corp: "Nicole Automobiles", 
 		logo: "/brands/alpina.png", 
-		url: "/pages/nicole-automobiles",
+		url: "/corporate/nicole-automobiles",
 		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学"
 	},
 	{ 
@@ -35,12 +35,13 @@ const brands = [
 		name: "Ferrari", 
 		corp: "Nicole Competizione", 
 		logo: "/brands/ferrari.svg", 
-		url: "/pages/nicole-competizione",
+		url: "/corporate/nicole-competizione",
 		desc: "跳ね馬の情熱とレーシングスピリットを横浜から体現"
 	}
 ];
 
 const corporateLinks = [
+	{ title: "お知らせ", desc: "最新ニュース・営業日のご案内", url: "/news" },
 	{ title: "会社概要", desc: "ニコル・グループの沿革と概要", url: "/corporate" },
 	{ title: "グループ構成", desc: "各正規ディーラー法人と組織構造", url: "/corporate#structure" },
 	{ title: "企業データ", desc: "資本金、拠点数、主要役員データ", url: "/corporate#corporatedata" },
@@ -78,7 +79,6 @@ const corporateLinks = [
 					<div class="dropdown-menu dropdown-menu--brands" id="dropdown-brands">
 						<div class="dropdown-inner">
 							<div class="dropdown-header">
-								<span class="dropdown-eyebrow">AUTHORISED DEALERSHIPS</span>
 								<h3 class="dropdown-title">取り扱いブランド</h3>
 							</div>
 							<div class="brands-dropdown-grid">
@@ -112,7 +112,6 @@ const corporateLinks = [
 					<div class="dropdown-menu dropdown-menu--corporate" id="dropdown-corporate">
 						<div class="dropdown-inner">
 							<div class="dropdown-header">
-								<span class="dropdown-eyebrow">COMPANY PROFILE</span>
 								<h3 class="dropdown-title">企業情報</h3>
 							</div>
 							<div class="corporate-dropdown-list">
@@ -179,7 +178,6 @@ const corporateLinks = [
 	<div id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
 		<div class="mobile-drawer__inner">
 			<div class="mobile-drawer__section">
-				<span class="drawer-eyebrow">NAVIGATION</span>
 				<ul class="mobile-nav-list">
 					<!-- Brands アコーディオン -->
 					<li class="mobile-nav-item">

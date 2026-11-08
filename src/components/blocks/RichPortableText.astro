@@ -11,6 +11,7 @@ import ColumnCardsBlock from "./ColumnCardsBlock.astro";
 import SplitMediaBlock from "./SplitMediaBlock.astro";
 import FeatureBand3ColBlock from "./FeatureBand3ColBlock.astro";
 import FeatureBand2ColBlock from "./FeatureBand2ColBlock.astro";
+import CustomHtmlBlock from "./CustomHtmlBlock.astro";
 
 interface Props {
 	value: any[];
@@ -37,6 +38,10 @@ const portableTextComponents = {
 		notes: NotesBlock,
 		"editorial-tools:notes": NotesBlock,
 		annotation: NotesBlock,
+		custom_html: CustomHtmlBlock,
+		raw_html: CustomHtmlBlock,
+		html: CustomHtmlBlock,
+		"editorial-tools:custom_html": CustomHtmlBlock,
 	},
 };
 

@@ -443,12 +443,114 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 	placeId: d.google_place_id,
 	apiKey: googleApiKey,
 });
+
+// 拠点種別に応じた構造化データ（JSON-LD）とパンくずリスト（BreadcrumbList）の生成
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : (import.meta.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev").replace(/\/$/, "");
+const pageUrl = `${siteUrl}/location/${slug}`;
+
+const schemaType = isOfficeLocation 
+	? "LocalBusiness" 
+	: (d.facility_type?.includes("サービス") || d.facility_type?.includes("工場") || d.title?.includes("Service Centre") || d.title?.includes("サービスセンター"))
+		? ["AutoDealer", "AutoRepair"]
+		: "AutoDealer";
+
+const locationSchema: Record<string, any> = {
+	"@context": "https://schema.org",
+	"@type": schemaType,
+	"@id": pageUrl,
+	"name": d.title,
+	"url": pageUrl,
+	"image": featuredImageSrc ? (featuredImageSrc.startsWith("http") ? featuredImageSrc : `${siteUrl}${featuredImageSrc.startsWith("/") ? "" : "/"}${featuredImageSrc}`) : undefined,
+	"telephone": d.sales_tel || d.service_tel || d.tel || undefined,
+	"address": {
+		"@type": "PostalAddress",
+		"streetAddress": d.address || "",
+		"postalCode": (d.postal || "").replace(/[^0-9-]/g, ""),
+		"addressCountry": "JP",
+		"addressRegion": d.area || "神奈川県"
+	},
+	"parentOrganization": {
+		"@type": "AutoDealer",
+		"name": "ニコル・グループ (Nicole Group)",
+		"url": siteUrl
+	}
+};
+
+if (d.lat && d.lng) {
+	locationSchema.geo = {
+		"@type": "GeoCoordinates",
+		"latitude": Number(d.lat),
+		"longitude": Number(d.lng)
+	};
+}
+
+if (d.hours) {
+	locationSchema.openingHours = d.hours;
+}
+
+if (placeData && placeData.rating && placeData.user_ratings_total) {
+	locationSchema.aggregateRating = {
+		"@type": "AggregateRating",
+		"ratingValue": placeData.rating,
+		"reviewCount": placeData.user_ratings_total,
+		"bestRating": "5",
+		"worstRating": "1"
+	};
+}
+
+const breadcrumbSchema = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": [
+		{
+			"@type": "ListItem",
+			"position": 1,
+			"name": "ホーム",
+			"item": siteUrl
+		},
+		{
+			"@type": "ListItem",
+			"position": 2,
+			"name": "拠点一覧",
+			"item": `${siteUrl}/locations`
+		},
+		{
+			"@type": "ListItem",
+			"position": 3,
+			"name": d.title,
+			"item": pageUrl
+		}
+	]
+};
+
+const locationJsonLd = [locationSchema, breadcrumbSchema];
 ---
 
 <NicoleLayout
 	title={`${d.title}｜正規ディーラー｜Nicole Group`}
 	description={`${d.title}の店舗情報。住所: ${d.postal || ''} ${d.address || ''}、電話番号: ${d.sales_tel || d.tel || ''}。新車・認定中古車・車検整備・サービス工場の詳細をご案内します。`}
+	jsonLd={locationJsonLd}
 >
+	<Fragment slot="head">
+		<style is:global>
+			body:has(.showroom-page),
+			body:has(.showroom-page) #page,
+			body:has(.showroom-page) #content,
+			body:has(.showroom-page) .site-content,
+			body:has(.showroom-page) #primary,
+			body:has(.showroom-page) .content-area,
+			body:has(.showroom-page) .ast-container {
+				background-color: #08090a !important;
+				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
+			}
+		</style>
+	</Fragment>
+
 	<div class="showroom-page">
 		<!-- ヒーローヘッダー -->
 		<header class="sr-hero">
@@ -458,11 +560,19 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 			</div>
 
 			<div class="sr-hero__content">
+				<nav class="sr-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="sr-breadcrumbs__list">
+						<li class="sr-breadcrumbs__item"><a href="/" class="sr-breadcrumbs__link">HOME</a></li>
+						<li class="sr-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="sr-breadcrumbs__item"><a href="/locations" class="sr-breadcrumbs__link">拠点一覧</a></li>
+						<li class="sr-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="sr-breadcrumbs__item" aria-current="page">{d.title}</li>
+					</ol>
+				</nav>
+
 				<h1 class="sr-hero__title">
 					<Fragment set:html={formatTitleHtml(d.title)} />
 				</h1>
-
-
 			</div>
 		</header>
 
@@ -1100,19 +1210,39 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 
 <style>
 	.showroom-page {
+		/* ユーティリティカラー・デザイントークン定義 */
+		--color-utility-blue: #60a5fa;
+		--color-utility-blue-bg: rgba(37, 99, 235, 0.22);
+		--color-utility-blue-bg-hover: rgba(37, 99, 235, 0.38);
+		--color-utility-blue-border: rgba(96, 165, 250, 0.55);
+		--color-utility-blue-border-hover: rgba(147, 197, 253, 0.85);
+		--color-utility-blue-hover: #bfdbfe;
+
+		--color-utility-green: #34d399;
+		--color-utility-green-bg: rgba(16, 185, 129, 0.20);
+		--color-utility-green-bg-hover: rgba(16, 185, 129, 0.36);
+		--color-utility-green-border: rgba(52, 211, 153, 0.55);
+		--color-utility-green-border-hover: rgba(110, 231, 183, 0.85);
+		--color-utility-green-hover: #a7f3d0;
+
+		--radius-sm: 6px;
+		--radius-md: 10px;
+		--radius-lg: 14px;
+		--radius-xl: 18px;
+
 		background: #08090a;
 		color: #e5e5e5;
 		min-height: 100vh;
 		font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
 	}
 
-	/* ヒーローセクション（スリム＆コンパクトに圧縮） */
+	/* ヒーローセクション（固定ヘッダーとの重なりを完全回避） */
 	.sr-hero {
 		position: relative;
 		min-height: 380px;
 		display: flex;
 		align-items: flex-end;
-		padding: 56px 0 28px;
+		padding: 120px 0 36px;
 		overflow: hidden;
 		background: #08090a;
 	}
@@ -1147,6 +1277,37 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 		box-sizing: border-box;
 	}
 
+	/* パンくずリスト */
+	.sr-breadcrumbs {
+		margin-bottom: 16px;
+	}
+
+	.sr-breadcrumbs__list {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.sr-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.sr-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.sr-breadcrumbs__separator {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
 	.sr-hero__title {
 		font-size: clamp(2rem, 4.5vw, 3.25rem);
 		font-weight: 800;
@@ -1160,60 +1321,6 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 	:global(.u-nowrap) {
 		white-space: nowrap;
 		display: inline-block;
-	}
-
-	.sr-hero__actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		margin-top: 24px;
-	}
-
-	.btn-hero {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 13px 24px;
-		border-radius: 6px;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s ease;
-	}
-
-	.btn-hero--route {
-		background: rgba(16, 185, 129, 0.1);
-		color: #34d399;
-		border: 1px solid rgba(16, 185, 129, 0.35);
-		box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
-	}
-
-	.btn-hero--route:hover {
-		background: rgba(16, 185, 129, 0.2);
-		color: #6ee7b7;
-		border-color: rgba(16, 185, 129, 0.55);
-		box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
-		transform: translateY(-1px);
-	}
-
-	.btn-hero--tel {
-		background: rgba(59, 130, 246, 0.1);
-		color: #60a5fa;
-		border: 1px solid rgba(59, 130, 246, 0.35);
-		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
-	}
-
-	.btn-hero--tel:hover {
-		background: rgba(59, 130, 246, 0.2);
-		color: #93c5fd;
-		border-color: rgba(59, 130, 246, 0.55);
-		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
-		transform: translateY(-1px);
-	}
-
-	.btn-hero-icon {
-		width: 17px;
-		height: 17px;
 	}
 
 	/* 拠点提供サービス・機能ステータスバー（ヒーロー直下） */
@@ -1970,14 +2077,16 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 
 	.d-tel {
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-		font-size: 1rem;
-		font-weight: 700;
-		color: #ffffff;
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: #e0e0e0;
 		text-decoration: none;
 		letter-spacing: 0.02em;
+		transition: color 0.2s ease;
 	}
 
 	.d-tel:hover {
+		color: #ffffff;
 		text-decoration: underline;
 	}
 
@@ -2004,23 +2113,23 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 		flex: 1;
 		min-width: 200px;
 		padding: 13px 18px;
-		background: rgba(59, 130, 246, 0.08);
-		color: #60a5fa;
-		border: 1px solid rgba(59, 130, 246, 0.3);
-		border-radius: 6px;
+		background: linear-gradient(135deg, rgba(37, 99, 235, 0.26) 0%, rgba(30, 64, 175, 0.42) 100%) !important;
+		color: #ffffff !important;
+		border: 1px solid var(--color-utility-blue-border) !important;
+		border-radius: var(--radius-sm);
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-weight: 700;
 		font-size: 0.9375rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+		box-shadow: 0 4px 16px rgba(37, 99, 235, 0.22);
 		transition: all 0.2s ease;
 	}
 
 	.btn-dept-call:hover {
-		background: rgba(59, 130, 246, 0.18);
-		border-color: rgba(59, 130, 246, 0.55);
-		color: #93c5fd;
-		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.22);
+		background: linear-gradient(135deg, rgba(37, 99, 235, 0.42) 0%, rgba(30, 64, 175, 0.58) 100%) !important;
+		border-color: var(--color-utility-blue-border-hover) !important;
+		color: #ffffff !important;
+		box-shadow: 0 6px 22px rgba(37, 99, 235, 0.45);
 		transform: translateY(-1px);
 	}
 
@@ -2028,6 +2137,7 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 		width: 18px;
 		height: 18px;
 		flex-shrink: 0;
+		color: var(--color-utility-blue);
 	}
 
 	.btn-dept-cta {
@@ -2434,22 +2544,22 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 3px;
-		padding: 12px 14px;
-		background: rgba(59, 130, 246, 0.08);
-		color: #60a5fa;
-		border: 1px solid rgba(59, 130, 246, 0.3);
-		border-radius: 6px;
+		gap: 5px;
+		padding: 13px 14px;
+		background: linear-gradient(135deg, rgba(37, 99, 235, 0.28) 0%, rgba(30, 64, 175, 0.44) 100%) !important;
+		color: #ffffff !important;
+		border: 1px solid var(--color-utility-blue-border) !important;
+		border-radius: var(--radius-sm);
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+		box-shadow: 0 4px 16px rgba(37, 99, 235, 0.22);
 		transition: all 0.2s ease;
 		text-align: center;
 	}
 
 	.btn-sidebar-tel:hover {
-		background: rgba(59, 130, 246, 0.18);
-		border-color: rgba(59, 130, 246, 0.55);
-		box-shadow: 0 6px 18px rgba(59, 130, 246, 0.22);
+		background: linear-gradient(135deg, rgba(37, 99, 235, 0.44) 0%, rgba(30, 64, 175, 0.60) 100%) !important;
+		border-color: var(--color-utility-blue-border-hover) !important;
+		box-shadow: 0 6px 22px rgba(37, 99, 235, 0.45);
 		transform: translateY(-1px);
 	}
 
@@ -2462,15 +2572,15 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 	}
 
 	.btn-sidebar-tel__header .btn-icon {
-		width: 13px;
-		height: 13px;
-		color: #60a5fa;
+		width: 15px;
+		height: 15px;
+		color: var(--color-utility-blue);
 		flex-shrink: 0;
 	}
 
 	.btn-sidebar-tel__name {
-		font-size: 0.78125rem;
-		font-weight: 500;
+		font-size: 0.8125rem;
+		font-weight: 600;
 		color: #93c5fd;
 		line-height: 1.3;
 		white-space: nowrap;
@@ -2495,23 +2605,27 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 		justify-content: center;
 		gap: 8px;
 		padding: 13px 18px;
-		background: rgba(16, 185, 129, 0.1);
-		color: #34d399;
-		border: 1px solid rgba(16, 185, 129, 0.35);
-		border-radius: 6px;
+		background: linear-gradient(135deg, rgba(16, 185, 129, 0.24) 0%, rgba(5, 150, 105, 0.38) 100%) !important;
+		color: #ffffff !important;
+		border: 1px solid var(--color-utility-green-border) !important;
+		border-radius: var(--radius-sm);
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-weight: 700;
 		font-size: 0.875rem;
 		text-decoration: none;
-		box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+		box-shadow: 0 4px 16px rgba(16, 185, 129, 0.22);
 		transition: all 0.2s ease;
 	}
 
+	.btn-sidebar-route .btn-icon {
+		color: var(--color-utility-green);
+	}
+
 	.btn-sidebar-route:hover {
-		background: rgba(16, 185, 129, 0.2);
-		color: #6ee7b7;
-		border-color: rgba(16, 185, 129, 0.55);
-		box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+		background: linear-gradient(135deg, rgba(16, 185, 129, 0.38) 0%, rgba(5, 150, 105, 0.52) 100%) !important;
+		color: #ffffff !important;
+		border-color: var(--color-utility-green-border-hover) !important;
+		box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
 		transform: translateY(-1px);
 	}
 
@@ -2645,7 +2759,7 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 
 		.sr-hero {
 			min-height: 320px;
-			padding: 48px 0 22px;
+			padding: 104px 0 28px;
 		}
 
 		.sr-hero__content {
@@ -2672,7 +2786,7 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 
 		.sr-hero {
 			min-height: 250px;
-			padding: 36px 0 18px;
+			padding: 92px 0 24px;
 		}
 
 		.sr-hero__content {
@@ -2684,20 +2798,6 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 			line-height: 1.25;
 			word-break: keep-all;
 			overflow-wrap: break-word;
-		}
-
-		.sr-hero__actions {
-			flex-direction: column;
-			gap: 8px;
-			width: 100%;
-			margin-top: 18px;
-		}
-
-		.btn-hero {
-			width: 100%;
-			justify-content: center;
-			padding: 11px 18px;
-			font-size: 0.875rem;
 		}
 
 		.facility-feature-bar {

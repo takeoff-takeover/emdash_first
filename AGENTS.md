@@ -27,6 +27,9 @@ Agent skills are in `.agents/skills/`. Load them when working on specific tasks:
 - **building-emdash-site** -- Querying content, rendering Portable Text, schema design, seed files, site features (menus, widgets, search, SEO, comments, bylines). Start here.
 - **creating-plugins** -- Building EmDash plugins with hooks, storage, admin UI, API routes, and Portable Text block types.
 - **emdash-cli** -- CLI commands for content management, seeding, type generation, and visual editing flow.
+- **dev-setup** -- 「準備して」「開発準備して」等の開始合図でGit最新同期・DB復元・ローカル起動・URL案内を一括実行するスキル。
+- **handover-wrapup** -- 「明日のための準備して」「引き継ぎ」「まとめて」等の終了合図でDBバックアップ・引き継ぎ書作成・GitHub同期を一括実行するスキル。
+- **seo-geo-audit** -- 見た目を維持したままHTML構造、JSON-LD、alt属性、AI検索（GEO）最適化を点検・適用するスキル。
 
 ## Documentation
 
@@ -41,33 +44,16 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - `entry.id` is the slug (for URLs). `entry.data.id` is the database ULID (for API calls like `getEntryTerms`).
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
-- **Color policy rule**: デザインは徹底して「黒・白・グレー（モノトーン）」を基調とし、無駄な多色使いを禁ずる。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトなど「ここぞという時」にのみ限定して使用する。日常的なテキストや通常の装飾に赤色を乱用しない。
-- **Gallery format rule**: ギャラリーには「PHOTO GALLERY」「全○点」などの冗長な見出しや宣伝ラベル、キャプション先頭の「【エクステリア】」などの不要なテキストを入れない。写真、番号カウント、シンプルな説明文のみでミニマルに表示する。
-- **Development Setup rule（「準備して」「開発準備して」等の指示時）**: ユーザーから「開発準備して」「準備して」「自宅（会社）に戻ったので準備して」などの開始指示があった際は、ローカルで最新版の作業が即座にできるよう、以下のステップをワンストップで一括実行すること：
-  1. *Git最新版の確認と同期*: `git fetch origin` を実行し、リモート（GitHub）に新しいコミットがあれば `git pull origin main` で最新コードをローカルに取り込む。
-  2. *ローカルDBの整合性確認と復元*: リモートから更新された `seed/backup.sqlite` があれば、既存のローカルD1をバックアップ退避した上で `npm run db:restore` を実行し、CMSの最新記事・コンテンツデータをローカルDBに反映する。
-  3. *開発サーバーの起動と稼働確認*: `npm run dev` でローカルサーバーを起動し、HTTP 200で応答するか確認する。
-  4. *アクセスリンクと最新状況の案内*: 最新のコミット内容と、フロントサイトおよび管理画面（認証バイパス直通リンク）のMarkdownリンクを提示する。
-- **Handover & Wrap-up / Online PUT rule（「明日のための準備して」「自宅（会社）で作業するから準備して」「引き継ぎ」「まとめて」等の指示時）**: ユーザーから「明日のための準備をして」「自宅（会社）で作業するから準備して」「引き継ぎ」「まとめて」などの終了・場所移動の指示があった際は、現状の作業状態を確実にオンライン（GitHub）にPUTして最新状態を維持するため、以下のステップをワンストップで一括実行すること：
-  1. *データベースのバックアップ*: 最新のローカルCMS状態を `npm run db:backup` で `seed/backup.sqlite` に保存・コミット対象にする。
-  2. *引き継ぎ書の作成（アーティファクト / テキスト）*: 当日・今回のセッションで完了した内容、積み残しタスクの背景・注意点、次回環境での具体的作業手順を網羅した引き継ぎ書を作成する。
-  3. *GitHubへのアップロード（PUT）*: 作業ツリーを整理し、最新の変更（コード、アセット、DBバックアップ、引き継ぎ書）を漏れなく `git commit & push origin main` して、リモートを最新状態にする。
-  ※ Cloudflareへの本番デプロイは指示がない限り行わない。
+- **Design principles (デザイン基本原則)**:
+  1. *モノトーン基調＋アクセントレッド*: 「黒・白・グレー」を基調とし、日常テキストや通常の装飾に赤色を乱用しない。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトのみに限定。
+  2. *品格のある自然なテキスト（不要な装飾の排除）*: 「SPECIAL BENEFITS」等のAI特有の英字ラベルや、ギャラリーの「PHOTO GALLERY」「全○点」「【エクステリア】」等の冗長な宣伝文句は入れず、シンプルで品格ある日本語表現にする。
+  3. *最適な幅・余白と情報密度*: 無理に画面いっぱいに広げて無駄な余白を作らず、コンテンツに応じた幅を選択する。スマートフォン表示でも要素が無駄に縦延びせず、左右バランス良く密度の高い洗練されたレイアウトにする。
+- **Workflows (Skills)**: 開発開始時は `dev-setup`、作業終了・引き継ぎ時は `handover-wrapup`、SEO/AI検索診断時は `seo-geo-audit` スキルを実行すること（詳細は `.agents/skills/` を参照）。
 - **Deploy rule**: Cloudflareへのデプロイ・本番アップロード（`wrangler deploy`）は、ユーザーから明示的に指示があった場合のみ実行すること。ユーザーの指示がない限り勝手に本番へアップロードせず、ローカル環境（`http://localhost:4321`）での確認にとどめること。
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。
 - **Clickable URL rule**: チャット上でユーザーにWebページのURLや管理画面リンクを提示する際は、インラインコードやプレーンテキストで囲まず、必ずワンクリックで直接遷移できるMarkdownリンク形式（例: `[表示名](URL)` または `[URL](URL)`）で記述すること。テキストをコピー＆ペーストさせないこと。
-- **Official location naming rule**: 拠点名や指定工場の表記には、拠点マスタ（データベース・一覧）に登録されている正式表記（例: カタカナ「サービスセンター」ではなく、正式英語表記「`Nicole BMW Service Centre`」等）を常に厳格に用いること。ユーザーがチャット上でカタカナや略称で指定した場合でも、コードおよびUI上の表示テキストには必ずマスタ準拠の正式表記を適用すること。
-- **Mobile layout density rule**: スマートフォン表示において、要素が無駄に改行・段落（行）化して縦に間延びすることや、変に左揃えになって右側に無駄な余白・隙間が空くことを厳禁とする。空いているスペース（ヘッダー右上など）を有効活用し、左右バランス良く密度の高い洗練されたレイアウトを設計すること。
-- **No artificial English eyebrow rule**: 「SPECIAL BENEFITS」「EXCLUSIVE EXPERIENCE」「KEY HIGHLIGHTS」「01 / 02」といった、日本語見出しの上やカードに添えるAI特有のわざとらしい英字装飾ラベル（アイブロウ）や連番は一切入れない。ユーザーから明示的な指定がない限り、飾り立てず自然で品格のある日本語見出し・テキストのみでシンプルかつ洗練された構成にすること。
-- **Content-aware layout & optimal width rule**: CTAに限らずあらゆるコンポーネントにおいて、無理に画面左右いっぱいに広げて無駄な余白・隙間を作らないこと。コンテンツの内容や役割（読ませる文章、カード一覧、アクション、スペック等）に応じた最適な幅（フルワイド / ワイド / 中央 / スリム）を選択し、無駄な余白を排した洗練された美しいレイアウトと心地よい情報密度を常に意識して設計すること。
-- **SEO & AI Search Optimization (GEO / LLMO) rule**: 既存のビジュアル・レイアウトに一切影響を与えず（見た目変更厳禁・Visual Regression Zero）、HTML構造とメタデータのみを最適化すること。
-  1. *セマンティックHTMLの厳格化*: スタイリング用のクラス名やFlexbox/Gridの構造は維持したまま、意味のある塊には `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<nav>`, `<footer>` を適切に割り当てること。装飾目的の要素と構造上の見出し（`h1`〜`h3`）を明確に分離し、1ページにつき `h1` は1つ、以降は `h2` → `h3` と階層を飛ばさず順序通りに記述すること（見た目のサイズはクラスで制御し、タグの階層で見出しサイズを調整しない）。
-  2. *AIクローラー（LLM）が解釈しやすい文脈記述*: リンクやボタンのテキストに「こちら」「詳細」などの曖昧な単一語を使わず、リンク先の内容が分かるテキストにするか、`aria-label` で具体的な文脈を補完すること。数値、スペック、比較情報、定義リストなどは単なる `div` の羅列ではなく `<table>`, `<dl><dt><dd>`, `<ul>/<ol>` を用いて、AIが構造化データとして直接引用しやすいマークアップにすること。
-  3. *構造化データ（JSON-LD）とメタデータの標準実装*: ページ種別に応じた Schema.org の構造化データ（`Organization`, `WebPage`, `Article`, `FAQPage`, `BreadcrumbList` 等）を `<script type="application/ld+json">` で出力すること。すべての画像（`<img>`）に、単なるファイル名ではなく「何が写っているか・文脈上の意味」を説明する具体的な `alt` 属性を記述すること（純粋な装飾画像は `alt=""`）。
-- **Design System & UI Reproducibility rule**: 誰が作っても同じ見た目になるよう、感覚的な数値指定（マジックナンバー）を一切禁止すること。
-  1. *マジックナンバーの完全禁止（トークン強制）*: 余白（`margin`, `padding`, `gap`）、フォントサイズ、カラーコード、角丸（`border-radius`）、シャドウをコンポーネント内で直接数値指定（例: `padding: 37px` や `#333333` の直書き）することを禁ずる。必ず既存の `:root`（またはテーマ設定）に定義されたCSS変数（デザイントークン）のみを組み合わせてスタイリングすること。
-  2. *コンポーネント単位の設計パターン固定*: セクションの上下余白、インナーコンテナの最大幅（`max-width`）と左右パディングは、既存ページの共通ラッパークラスを100%使い回すこと。カード、ボタン、見出しブロックを新規作成する際は、ゼロからCSSを書かず、必ず作成済みの既存コンポーネントのDOM階層とクラス構成をコピーしてベースにすること。
-  3. *タイポグラフィと行長の固定*: グローバルフォント規則（`[Group/Weight]_[EnglishName]-[G/M]_[JapaneseName]`）のクラス／変数をそのまま適用し、個別のコンポーネントで `font-family` や `font-weight` を上書きしないこと。
+- **Official location naming rule**: 拠点名や指定工場の表記には、拠点マスタ（データベース・一覧）に登録されている正式表記（例: カタカナ「サービスセンター」ではなく、正式英語表記「`Nicole BMW Service Centre`」等）を常に厳格に用いること。
+- **Magazine Editorial & SEO/AIO Content rule**: オウンドメディア・マガジン記事（`src/pages/magazine/`、CMSコレクション `magazine`）の執筆・作成時は、即答性（Direct Answerability）・データとスペックの構造化（Table & DL）・FAQ/JSON-LD連動・一次情報（E-E-A-T）を順守すること。
 
 ## This Template
 

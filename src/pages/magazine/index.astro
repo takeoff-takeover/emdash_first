@@ -2,6 +2,9 @@
 // src/pages/magazine/index.astro
 // Nicole Connect - Web Magazine（Apple風の巨大写真ヒーロー＆エディトリアル・マガジンカバー）
 import { getEmDashCollection, getTermsForEntries } from "emdash";
+import { env } from "cloudflare:workers";
+import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import "../../styles/magazine-text.css";
 import { isNoticeArticle, isESGArticle } from "../../lib/magazinePolicy";
@@ -34,6 +37,46 @@ try {
 } catch (e) {}
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
+
+// 記事閲覧数マップを一括取得
+const viewsMap = new Map<string, number>();
+try {
+	let db: any = null;
+	try {
+		db = (env as any)?.DB;
+	} catch (e) {}
+
+	if (db) {
+		const rows = await db.prepare("SELECT slug, views FROM article_views").all();
+		for (const r of (rows.results || [])) {
+			if (r.slug && typeof r.views === "number") {
+				viewsMap.set(r.slug, r.views);
+			}
+		}
+	} else {
+		const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
+		let dbPath = "";
+		if (fs.existsSync(d1Dir)) {
+			const files = fs.readdirSync(d1Dir);
+			const f = files.find((name: string) => name.endsWith(".sqlite") && !name.includes("metadata") && !name.includes("bak"));
+			if (f) dbPath = `${d1Dir}/${f}`;
+		}
+		if (!dbPath && fs.existsSync("seed/backup.sqlite")) {
+			dbPath = "seed/backup.sqlite";
+		}
+		if (dbPath) {
+			const localDb = new DatabaseSync(dbPath);
+			const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
+			for (const r of rows) {
+				if (r.slug && typeof r.views === "number") {
+					viewsMap.set(r.slug, r.views);
+				}
+			}
+		}
+	}
+} catch (e) {
+	// DB取得エラー時はフォールバック
+}
 
 
 
@@ -175,6 +218,8 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 		? `/campaigns/${p.id}`
 		: `/magazine/${p.id}/`;
 
+	const viewsCount = viewsMap.get(p.id) || 0;
+
 	return {
 		id: p.id || p.data.id,
 		slug: p.id,
@@ -184,7 +229,8 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 		category: cat,
 		date: new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, "."),
 		publishedAt,
-		views: "NEW",
+		viewsCount,
+		views: `${viewsCount.toLocaleString()} views`,
 		image: imgUrl,
 		lead: extractLead(p),
 		url: articleUrl,
@@ -215,6 +261,11 @@ const coverArticle = mainArticles[0];
 
 // 特集ハイライト記事（最新記事 2枠）
 const highlightStories = mainArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
+
+// 人気の記事ランキング（閲覧数の多い順、同数の場合は公開日時の新しい順に上位5件）
+const popularArticles = [...mainArticles]
+	.sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0) || (b.publishedAt || 0) - (a.publishedAt || 0))
+	.slice(0, 5);
 
 // トップ最新3記事のIDセット（Cover Story 1件 + LATEST STORIES 2件）
 const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.id)]);
@@ -265,7 +316,6 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 					<!-- 2. 画面左側に並ぶ最新記事情報（文字サイズ縮小・エディトリアル左揃え） -->
 					<div class="hero-featured-story">
-						<span class="hero-story-eyebrow">COVER STORY / LATEST ISSUE</span>
 						<h2 class="hero-story-title">
 							{coverArticle.id === "2027_new_bmw_ix4_neue_klasse" || coverArticle.slug === "2027_new_bmw_ix4_neue_klasse" 
 								? "THE ALL-NEW BMW iX4." 
@@ -320,6 +370,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 										<span class="toc-meta-topic">{story.topic}</span>
 										<span class="toc-meta-sep">/</span>
 										<time class="toc-meta-date">{story.date}</time>
+										<span class="toc-meta-sep">/</span>
+										<span class="toc-meta-views" title="閲覧数">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toc-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+											<span>{story.views}</span>
+										</span>
 									</div>
 									<h3 class="toc-card__title">{story.title}</h3>
 									{story.lead && <p class="toc-card__lead">{story.lead}</p>}
@@ -336,7 +391,46 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 3. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
+		<!-- 3. 人気の記事ランキング（アクセス数の多い上位ストーリー） -->
+		<!-- ============================================================== -->
+		<section class="popular-section is-dark-text" id="popular-stories">
+			<div class="mag-container">
+				<div class="popular-header">
+					<h2 class="popular-heading">人気の記事</h2>
+					<p class="popular-sub">読者の皆様に今最も多く読まれている注目のストーリー。</p>
+				</div>
+
+				<div class="popular-grid">
+					{popularArticles.map((story, index) => (
+						<article class="popular-card">
+							<a href={story.url} class="popular-card__link">
+								<div class="popular-card__media">
+									<img src={story.image} alt={story.title} loading="lazy" class="popular-card__img" />
+									<div class="popular-card__overlay"></div>
+									<span class={`popular-rank-badge ${index < 3 ? 'is-top' : ''}`}>
+										{index + 1}
+									</span>
+								</div>
+								<div class="popular-card__body">
+									<div class="popular-card__meta">
+										<span class="popular-meta-brand">{story.brand}</span>
+										<span class="popular-meta-sep">/</span>
+										<span class="popular-meta-views" title="閲覧数">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+											<span>{story.views}</span>
+										</span>
+									</div>
+									<h3 class="popular-card__title">{story.title}</h3>
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 4. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
 		<!-- ============================================================== -->
 		<section class="filter-sticky-bar" id="magazine-archive">
 			<div class="mag-container">
@@ -433,7 +527,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 									{art.lead && <p class="article-item__lead">{art.lead}</p>}
 									<div class="article-item__footer">
 										<span class="article-item__more">記事を読む</span>
-										<span class="article-item__views">👁 {art.views}</span>
+										<span class="article-item__views" title="閲覧数">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+											<span>{art.views}</span>
+										</span>
 									</div>
 								</div>
 							</a>
@@ -464,11 +561,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		<!-- ============================================================== -->
 		<!-- 5. ESG / SDGs 専用ブロック（SUSTAINABILITY & COMMUNITY） -->
 		<!-- ============================================================== -->
-		<section class="magazine-esg-section" id="esg-section">
+		<section class="magazine-esg-section is-dark-text" id="esg-section">
 			<div class="mag-container">
 				<div class="esg-section__header">
 					<div class="esg-section__titles">
-						<span class="esg-section__eyebrow">SUSTAINABILITY & COMMUNITY</span>
 						<h2 class="esg-section__heading">
 							ESG / SDGs
 							<span class="esg-section__heading-sub">持続可能な未来への取り組み</span>
@@ -491,7 +587,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 									<span class="esg-card__badge">ESG / SDGs</span>
 								</div>
 								<div class="esg-card__body">
-									<time class="esg-card__date">{art.date}</time>
+									<div class="esg-card__meta">
+										<time class="esg-card__date">{art.date}</time>
+										<span class="esg-meta-sep">/</span>
+										<span class="esg-meta-views" title="閲覧数">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toc-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+											<span>{art.views}</span>
+										</span>
+									</div>
 									<h3 class="esg-card__title">{art.title}</h3>
 								</div>
 							</a>
@@ -638,7 +741,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			const totalCount = matchedArticles.length;
 
 			// visibleCount までの記事を表示し、それ以降は非表示
+			// 先頭の記事（idx === 0）には雑誌見開き風のアシンメトリークラス（is-featured-lead）を付与
 			matchedArticles.forEach((article, idx) => {
+				if (idx === 0) {
+					article.classList.add('is-featured-lead');
+				} else {
+					article.classList.remove('is-featured-lead');
+				}
+
 				if (idx < visibleCount) {
 					article.style.display = '';
 				} else {
@@ -789,8 +899,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	/* Nicole Connect - Apple風大判写真エディトリアルマガジン */
 	/* ============================================================== */
 	.apple-magazine-main {
+		/* 4色のエディトリアル・タイポグラフィ体系（ダークテーマ） */
+		--mag-color-heading: #f2f3f6;     /* 1. 見出し・タイトル（白に近い上品なソフトホワイト） */
+		--mag-color-lead: #9ea3ae;        /* 2. リード文・本文（圧迫感を減らし読みやすいミディアムグレー） */
+		--mag-color-meta: #6b707d;        /* 3. 日付・タグ・閲覧数（補助的なシックグレー） */
+		--mag-color-border: rgba(255, 255, 255, 0.1); /* 4. 境界線・区切り */
+
 		background-color: #040507;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-lead);
 		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
 		position: relative;
@@ -928,7 +1044,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.16em;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		text-transform: uppercase;
 		margin-bottom: 10px;
 		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
@@ -940,7 +1056,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-weight: 700;
 		letter-spacing: -0.015em;
 		line-height: 1.35;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading) !important;
 		margin: 0 0 14px 0;
 		text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95);
 	}
@@ -949,7 +1065,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-size: clamp(14px, 1.2vw, 15.5px);
 		line-height: 1.65;
 		font-weight: 400;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-lead);
 		max-width: 640px;
 		margin: 0 0 24px 0;
 		display: -webkit-box;
@@ -1190,12 +1306,26 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: center;
 		gap: 6px;
 		font-size: 11px;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		margin-bottom: 8px;
 	}
 
+	.toc-meta-views {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		opacity: 0.85;
+	}
+
+	.toc-views-icon {
+		width: 12px;
+		height: 12px;
+		stroke-width: 1.8;
+		opacity: 0.85;
+	}
+
 	.toc-meta-topic {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		font-weight: 600;
 	}
 
@@ -1203,7 +1333,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-size: 20px;
 		font-weight: 600;
 		line-height: 1.4;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading) !important;
 		margin: 0 0 12px 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -1213,24 +1343,25 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.toc-card:hover .toc-card__title {
-		color: var(--magazine-text-color);
+		color: #ffffff !important;
 		text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
 	}
 
 	.toc-card__lead {
 		font-size: 14px;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-lead);
 		line-height: 1.6;
 		margin: 0 0 20px 0;
-		display: block;
-		overflow: visible;
-		overflow-wrap: anywhere;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 		flex: none;
 		transition: color 0.3s ease;
 	}
 
 	.toc-card:hover .toc-card__lead {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 	}
 
 	.toc-card__arrow {
@@ -1239,13 +1370,13 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		gap: 6px;
 		font-size: 13px;
 		font-weight: 700;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 		margin-top: auto;
 		transition: color 0.3s ease, transform 0.3s ease;
 	}
 
 	.toc-card:hover .toc-card__arrow {
-		color: var(--magazine-text-color);
+		color: #ffffff;
 	}
 
 	.toc-card__arrow svg {
@@ -1259,7 +1390,197 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* ============================================================== */
-	/* 3. インタラクティブ・フィルターバー */
+	/* 3. 人気の記事ランキング（POPULAR STORIES）- 明暗アクセント帯 */
+	/* ============================================================== */
+	.popular-section {
+		padding: 76px 0 68px 0;
+		background: #f4f5f8;
+		color: #111114;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.popular-header {
+		margin-bottom: 32px;
+	}
+
+	.popular-heading {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: clamp(26px, 2.8vw, 34px);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: #111114 !important;
+		line-height: 1.25;
+		margin: 0 0 8px 0;
+	}
+
+	.popular-sub {
+		font-size: 14px;
+		color: #55555c !important;
+		margin: 0;
+	}
+
+	.popular-grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 18px;
+	}
+
+	.popular-card {
+		background: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.popular-card:hover {
+		transform: translateY(-4px);
+		border-color: rgba(0, 0, 0, 0.18);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+	}
+
+	.popular-card__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: #111114;
+	}
+
+	.popular-card__media {
+		position: relative;
+		height: 140px;
+		overflow: hidden;
+		background: #000000;
+	}
+
+	.popular-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.popular-card:hover .popular-card__img {
+		transform: scale(1.05);
+	}
+
+	.popular-card__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%);
+	}
+
+	.popular-rank-badge {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		width: 24px;
+		height: 24px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--font-mono, monospace);
+		font-size: 11.5px;
+		font-weight: 700;
+		background: #f0f0f3;
+		color: #44444c !important;
+		border: 1px solid rgba(0, 0, 0, 0.12);
+		z-index: 2;
+	}
+
+	.popular-rank-badge.is-top {
+		background: #111114;
+		color: #ffffff !important;
+		border-color: #111114;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+	}
+
+	.popular-card__body {
+		padding: 14px 14px 16px 14px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.popular-card__meta {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		color: #666672 !important;
+		margin-bottom: 8px;
+	}
+
+	.popular-meta-brand {
+		font-weight: 700;
+		color: #111114 !important;
+	}
+
+	.popular-meta-sep {
+		opacity: 0.4;
+		color: #9999a4 !important;
+	}
+
+	.popular-meta-views {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		color: #666672 !important;
+	}
+
+	.popular-meta-views svg {
+		stroke: #666672;
+	}
+
+	.popular-card__title {
+		font-size: 13.5px;
+		font-weight: 600;
+		line-height: 1.45;
+		color: #111114 !important;
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.3s ease;
+	}
+
+	.popular-card:hover .popular-card__title {
+		color: #000000 !important;
+	}
+
+	@media (max-width: 1024px) {
+		.popular-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.popular-section {
+			padding: 48px 0 40px 0;
+		}
+
+		.popular-grid {
+			display: flex;
+			overflow-x: auto;
+			gap: 14px;
+			padding-bottom: 12px;
+			scroll-snap-type: x mandatory;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.popular-card {
+			flex: 0 0 220px;
+			scroll-snap-align: start;
+		}
+	}
+
+	/* ============================================================== */
+	/* 4. インタラクティブ・フィルターバー */
 	/* ============================================================== */
 	.filter-sticky-bar {
 		position: sticky;
@@ -1268,67 +1589,92 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		background: rgba(6, 7, 10, 0.94);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-		padding: 16px 0;
+		padding: 24px 0;
 		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+	}
+
+	/* すぐ下の1ピクセルの線：モニタ全幅ではなく、ページレイアウト最大幅（コンテンツ端）と完全に一致 */
+	.filter-sticky-bar .mag-container {
+		position: relative;
+	}
+
+	.filter-sticky-bar .mag-container::after {
+		content: "";
+		position: absolute;
+		bottom: -24px;
+		left: 40px;
+		right: 40px;
+		height: 1px;
+		background: var(--mag-color-border);
+		pointer-events: none;
 	}
 
 	.filter-wrap {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
 		gap: 20px;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
+		width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+
+	.filter-wrap::-webkit-scrollbar {
+		display: none;
 	}
 
 	.filter-group {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 		flex-shrink: 0;
+	}
+
+	.filter-group--topic {
+		padding-left: 20px;
+		border-left: 1px solid var(--mag-color-border);
 	}
 
 	.filter-group__label {
 		display: inline-flex;
 		align-items: center;
-		justify-content: flex-start;
-		width: 78px;
-		box-sizing: border-box;
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Kaku Gothic ProN", sans-serif;
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: 700;
-		letter-spacing: 0.05em;
-		color: var(--magazine-text-color);
+		letter-spacing: 0.08em;
+		color: var(--mag-color-meta);
 		background: none;
 		border: none;
 		flex-shrink: 0;
-		text-align: left;
 		white-space: nowrap;
+		margin-right: 2px;
 	}
 
 	.filter-pills {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		flex-wrap: wrap;
+		gap: 6px;
+		flex-wrap: nowrap;
 	}
 
 	.filter-pill {
 		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: var(--magazine-text-color);
-		padding: 6px 16px;
+		border: 1px solid var(--mag-color-border);
+		color: var(--mag-color-lead);
+		padding: 5px 13px;
 		border-radius: 999px;
-		font-size: 12px;
+		font-size: 11.5px;
 		font-weight: 600;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.04em;
 		cursor: pointer;
+		white-space: nowrap;
 		transition: all 0.25s ease;
 	}
 
 	.filter-pill:hover {
 		background: rgba(255, 255, 255, 0.14);
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 		border-color: rgba(255, 255, 255, 0.35);
 	}
 
@@ -1336,7 +1682,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.filter-pill.is-active {
 		background: #e50012;
 		border-color: #e50012;
-		color: var(--magazine-text-color);
+		color: #ffffff;
 		font-weight: 700;
 		box-shadow: 0 2px 14px rgba(229, 0, 18, 0.45);
 	}
@@ -1344,34 +1690,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.filter-controls-right {
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		gap: 20px;
 		flex-wrap: nowrap;
 		flex-shrink: 0;
-	}
-
-	.topic-dropdown {
-		height: 40px;
-		box-sizing: border-box;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		color: var(--magazine-text-color);
-		padding: 0 14px;
-		border-radius: 8px;
-		font-size: 12.5px;
-		outline: none;
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		transition: border-color 0.25s ease;
-	}
-
-	.topic-dropdown:focus {
-		border-color: #ffffff;
-	}
-
-	.topic-dropdown option {
-		background: #111419;
-		color: var(--magazine-text-color);
+		margin-left: auto;
 	}
 
 	.filter-search-box {
@@ -1379,40 +1701,41 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		height: 40px;
+		height: 34px;
 		box-sizing: border-box;
 		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		border-radius: 8px;
+		border: 1px solid var(--mag-color-border);
+		border-radius: 999px;
 		padding: 0 14px;
-		width: 200px;
+		width: 170px;
 		flex-shrink: 0;
-		transition: border-color 0.25s ease, box-shadow 0.25s ease;
+		transition: border-color 0.25s ease, box-shadow 0.25s ease, width 0.3s ease;
 	}
 
 	.filter-search-box:focus-within {
-		border-color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.5);
 		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+		width: 210px;
 	}
 
 	.search-icon {
-		width: 14px;
-		height: 14px;
-		stroke: rgba(255, 255, 255, 0.4);
+		width: 13px;
+		height: 13px;
+		stroke: var(--mag-color-meta);
 		flex-shrink: 0;
 	}
 
 	.filter-search-box input {
 		background: none;
 		border: none;
-		color: var(--magazine-text-color);
-		font-size: 12.5px;
+		color: var(--mag-color-heading);
+		font-size: 12px;
 		width: 100%;
 		outline: none;
 	}
 
 	.filter-search-box input::placeholder {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 	}
 
 	/* ============================================================== */
@@ -1428,14 +1751,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: flex-end;
 		margin-bottom: 36px;
 		padding-bottom: 16px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid var(--mag-color-border);
 	}
 
 	.section-num {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 		font-size: 11px;
 		font-weight: 700;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		letter-spacing: 0.2em;
 		display: block;
 		margin-bottom: 4px;
@@ -1445,7 +1768,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(32px, 3.4vw, 42px);
 		font-weight: 700;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading) !important;
 		margin: 0;
 		letter-spacing: -0.01em;
 		line-height: 1.2;
@@ -1453,11 +1776,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.count-display {
 		font-size: 13px;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 	}
 
 	.count-display span {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 		font-weight: 700;
 	}
 
@@ -1469,7 +1792,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.article-item {
 		background: #090b0e;
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: 1px solid var(--mag-color-border);
 		border-radius: 12px;
 		overflow: hidden;
 		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
@@ -1527,7 +1850,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-size: 10.5px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 		backdrop-filter: blur(8px);
 	}
 
@@ -1543,7 +1866,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: center;
 		gap: 8px;
 		font-size: 11.5px;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		margin-bottom: 8px;
 	}
 
@@ -1552,7 +1875,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.meta-topic {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-meta);
 		font-weight: 600;
 	}
 
@@ -1560,30 +1883,31 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-size: 16px;
 		font-weight: 600;
 		line-height: 1.45;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading) !important;
 		margin: 0 0 10px 0;
 		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
 	}
 
 	.article-item:hover .article-item__title {
-		color: var(--magazine-text-color);
+		color: #ffffff !important;
 		text-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
 	}
 
 	.article-item__lead {
 		font-size: 13px;
-		color: var(--magazine-text-color);
+		color: var(--mag-color-lead);
 		line-height: 1.6;
 		margin: 0 0 18px 0;
-		display: block;
-		overflow: visible;
-		overflow-wrap: anywhere;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 		flex: none;
 		transition: color 0.3s ease;
 	}
 
 	.article-item:hover .article-item__lead {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 	}
 
 	.article-item__footer {
@@ -1592,22 +1916,96 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: center;
 		font-size: 11.5px;
 		padding-top: 14px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		border-top: 1px solid var(--mag-color-border);
 		margin-top: auto;
 	}
 
 	.article-item__more {
-		color: var(--magazine-text-color);
+		color: var(--mag-color-heading);
 		font-weight: 600;
 		transition: color 0.25s ease, transform 0.25s ease;
 	}
 
 	.article-item:hover .article-item__more {
-		color: var(--magazine-text-color);
+		color: #ffffff;
 	}
 
 	.article-item__views {
-		color: var(--magazine-text-color);
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		color: var(--mag-color-meta);
+		font-size: 11px;
+		opacity: 0.85;
+		letter-spacing: 0.04em;
+	}
+
+	.card-views-icon {
+		width: 12px;
+		height: 12px;
+		stroke-width: 1.8;
+		opacity: 0.85;
+	}
+
+	/* ============================================================== */
+	/* 雑誌見開き風・先頭アシンメトリー特大カード（ダークモード対応） */
+	/* ============================================================== */
+	@media (min-width: 1024px) {
+		.article-item.is-featured-lead {
+			grid-column: span 2;
+			background: #0c0f14;
+			border-color: rgba(255, 255, 255, 0.18);
+			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+		}
+
+		.article-item.is-featured-lead .article-item__link {
+			display: grid;
+			grid-template-columns: 1.15fr 1fr;
+			height: 100%;
+		}
+
+		.article-item.is-featured-lead .article-item__media {
+			height: 100%;
+			min-height: 320px;
+		}
+
+		.article-item.is-featured-lead .article-item__body {
+			padding: 34px 36px 30px 36px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		.article-item.is-featured-lead .article-item__meta {
+			font-size: 12px;
+			margin-bottom: 12px;
+		}
+
+		.article-item.is-featured-lead .article-item__title {
+			font-size: clamp(20px, 1.8vw, 24px);
+			line-height: 1.4;
+			font-weight: 700;
+			margin-bottom: 14px;
+			display: -webkit-box;
+			-webkit-line-clamp: 3;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.article-item.is-featured-lead .article-item__lead {
+			font-size: 13.5px;
+			line-height: 1.7;
+			margin-bottom: 22px;
+			display: -webkit-box;
+			-webkit-line-clamp: 4;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.article-item.is-featured-lead .article-item__footer {
+			margin-top: auto;
+			padding-top: 16px;
+		}
 	}
 
 	/* ============================================================== */
@@ -1723,11 +2121,26 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		.mag-container {
 			padding: 0 24px;
 		}
+
+		.filter-sticky-bar .mag-container::after {
+			left: 24px;
+			right: 24px;
+		}
 	}
 
 	@media (max-width: 768px) {
 		.mag-container {
 			padding: 0 20px;
+		}
+
+		.filter-sticky-bar {
+			padding: 18px 0;
+		}
+
+		.filter-sticky-bar .mag-container::after {
+			bottom: -18px;
+			left: 20px;
+			right: 20px;
 		}
 
 		.apple-hero {
@@ -1800,6 +2213,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			flex-direction: column;
 			align-items: stretch;
 			gap: 12px;
+			overflow-x: visible;
 		}
 
 		.filter-group {
@@ -1808,6 +2222,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			gap: 10px;
 			width: 100%;
 			overflow: hidden;
+		}
+
+		.filter-group--topic {
+			padding-left: 0;
+			border-left: none;
 		}
 
 		.filter-group__label {
@@ -1889,6 +2308,21 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			grid-template-columns: 1fr;
 		}
 
+		.editorial-quote-band {
+			padding: 64px 0;
+		}
+
+		.quote-sign {
+			font-size: 44px;
+			margin-bottom: 8px;
+		}
+
+		.quote-text {
+			font-size: 18px;
+			line-height: 1.75;
+			margin-bottom: 20px;
+		}
+
 		.magazine-esg-section {
 			padding: 60px 0 80px;
 		}
@@ -1923,12 +2357,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* ============================================================== */
-	/* 5. ESG / SDGs 専用ブロック（SUSTAINABILITY & COMMUNITY） */
+	/* 5. ESG / SDGs 専用ブロック（SUSTAINABILITY & COMMUNITY）- 明暗アクセント帯 */
 	/* ============================================================== */
 	.magazine-esg-section {
 		padding: 88px 0 110px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 100%);
+		background: #f4f5f8;
+		color: #111114;
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 	}
 
 	.esg-section__header {
@@ -1949,17 +2385,17 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		font-family: var(--font-mono, monospace);
 		font-size: 11px;
 		letter-spacing: 0.16em;
-		color: var(--magazine-text-color);
+		color: #777782 !important;
 		text-transform: uppercase;
 		margin-bottom: 8px;
 	}
 
 	.esg-section__heading {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: clamp(32px, 3.4vw, 42px);
+		font-size: clamp(30px, 3.2vw, 40px);
 		font-weight: 700;
 		letter-spacing: -0.01em;
-		color: var(--magazine-text-color);
+		color: #111114 !important;
 		margin: 0 0 12px;
 		line-height: 1.2;
 		display: flex;
@@ -1971,13 +2407,13 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.esg-section__heading-sub {
 		font-size: 15px;
 		font-weight: 500;
-		color: var(--magazine-text-color);
+		color: #666672 !important;
 		letter-spacing: 0.02em;
 	}
 
 	.esg-section__desc {
 		font-size: 13.5px;
-		color: var(--magazine-text-color);
+		color: #44444c !important;
 		line-height: 1.6;
 		margin: 0;
 		word-break: keep-all;
@@ -1997,13 +2433,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: center;
 		gap: 8px;
 		font-size: 13px;
-		font-weight: 500;
-		color: var(--magazine-text-color);
+		font-weight: 600;
+		color: #111114 !important;
 		text-decoration: none;
-		padding: 10px 20px;
+		padding: 10px 22px;
 		border-radius: 9999px;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.15);
+		background: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 		transition: all 0.25s ease;
 	}
 
@@ -2011,18 +2448,19 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		width: 14px;
 		height: 14px;
 		transition: transform 0.2s ease;
+		stroke: #111114;
 	}
 
 	.esg-section__portal-link:hover {
-		background: rgba(255, 255, 255, 0.14);
-		border-color: rgba(255, 255, 255, 0.35);
+		background: #f0f0f3;
+		border-color: rgba(0, 0, 0, 0.28);
 	}
 
 	.esg-section__portal-link:hover svg {
 		transform: translate(2px, -2px);
 	}
 
-	/* ESG 4カラム・コンパクトカードグリッド（他のカードより一回り小さく） */
+	/* ESG 4カラム・コンパクトカードグリッド */
 	.esg-cards-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -2031,9 +2469,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.esg-card {
 		border-radius: 10px;
-		background: #0d0f14;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.08);
 		overflow: hidden;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 		transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 	}
 
@@ -2043,8 +2482,8 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.esg-card:hover {
 		transform: translateY(-3px);
-		border-color: rgba(255, 255, 255, 0.25);
-		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+		border-color: rgba(0, 0, 0, 0.18);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 	}
 
 	.esg-card__link {
@@ -2052,7 +2491,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		flex-direction: column;
 		height: 100%;
 		text-decoration: none;
-		color: inherit;
+		color: #111114;
 	}
 
 	.esg-card__media {
@@ -2060,7 +2499,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		width: 100%;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		background: #141720;
+		background: #000000;
 	}
 
 	.esg-card__img {
@@ -2079,14 +2518,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		top: 8px;
 		left: 8px;
 		font-size: 10px;
-		font-weight: 600;
+		font-weight: 700;
 		letter-spacing: 0.05em;
 		padding: 2px 7px;
 		border-radius: 4px;
-		background: rgba(0, 0, 0, 0.72);
+		background: rgba(10, 10, 12, 0.85);
 		backdrop-filter: blur(4px);
-		color: var(--magazine-text-color);
-		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
 	.esg-card__body {
@@ -2096,18 +2535,42 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		flex-grow: 1;
 	}
 
+	.esg-card__meta {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		color: #777782 !important;
+		margin-bottom: 6px;
+	}
+
+	.esg-meta-sep {
+		opacity: 0.4;
+		color: #9999a4 !important;
+	}
+
+	.esg-meta-views {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		color: #777782 !important;
+	}
+
+	.esg-meta-views svg {
+		stroke: #777782;
+	}
+
 	.esg-card__date {
 		font-family: var(--font-mono, monospace);
 		font-size: 11px;
-		color: var(--magazine-text-color);
-		margin-bottom: 6px;
+		color: #777782 !important;
 	}
 
 	.esg-card__title {
 		font-size: 13.5px;
-		font-weight: 500;
+		font-weight: 600;
 		line-height: 1.48;
-		color: var(--magazine-text-color);
+		color: #111114 !important;
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -2117,7 +2580,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.esg-card:hover .esg-card__title {
-		color: var(--magazine-text-color);
+		color: #000000 !important;
 	}
 
 	/* もっと見るボタン */
@@ -2132,25 +2595,29 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		align-items: center;
 		gap: 8px;
 		font-size: 13px;
-		font-weight: 600;
-		color: var(--magazine-text-color);
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.18);
+		font-weight: 700;
+		color: #111114 !important;
+		background: #ffffff;
+		border: 1px solid rgba(0, 0, 0, 0.15);
 		border-radius: 9999px;
 		padding: 11px 28px;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		transition: all 0.25s ease;
 	}
 
 	.btn-esg-more:hover {
-		background: rgba(255, 255, 255, 0.14);
-		border-color: rgba(255, 255, 255, 0.35);
+		background: #f0f0f3;
+		border-color: rgba(0, 0, 0, 0.28);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 	}
 
 	.btn-esg-more__icon {
 		width: 14px;
 		height: 14px;
 		transition: transform 0.25s ease;
+		stroke: #111114;
 	}
 
 	@media (max-width: 1024px) {
