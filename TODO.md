@@ -47,3 +47,13 @@
 
 #### 2. サイト全体の直書き数値（マジックナンバー）点検・リファクタリング
 - [ ] 各種Astroコンポーネント内に残る細かな直書きピクセル・カラーコードを、`DESIGN_MANUAL.md` 記載のCSS変数へ順次統一。
+
+---
+
+## 🖥 開発環境（会社のWindows）
+
+- [ ] **Claude Codeでスキルとルールが読み込まれるか確認・修正**
+  - `.claude/skills` と `.claude/rules` は `.agents/` へのシンボリックリンクのため、WindowsのGit標準設定では小さなテキストファイルになり、読み込まれない可能性がある（2026年11月9日時点で未確認）
+  - 会社のPCのClaude Codeで最初に「`.claude/skills` と `.claude/rules` のリンクがWindowsで動くように直して」と依頼する
+  - Windowsの「開発者モード」が必要になる場合あり。会社の管理設定でオンにできない場合は別の方法を検討する
+  - 修正後、`npm run dev` と `npm run db:restore` がWindowsで動くことも確認する
