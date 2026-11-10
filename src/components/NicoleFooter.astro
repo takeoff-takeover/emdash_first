@@ -353,6 +353,26 @@ footer.elementor-12887 {
 	background-color: #000000 !important;
 }
 
+/* フッター内テキスト＆リンクの視認性担保（黒背景との同化防止） */
+footer.elementor-12887 #breadcrumbs,
+footer.elementor-12887 #breadcrumbs * {
+	color: rgba(255, 255, 255, 0.7) !important;
+	font-size: 13px !important;
+}
+
+footer.elementor-12887 .elementor-icon-list-item a,
+footer.elementor-12887 .elementor-icon-list-text {
+	color: rgba(255, 255, 255, 0.75) !important;
+	font-size: 13px !important;
+	transition: color 0.2s ease !important;
+	white-space: nowrap !important;
+}
+
+footer.elementor-12887 .elementor-icon-list-item a:hover,
+footer.elementor-12887 .elementor-icon-list-item a:hover .elementor-icon-list-text {
+	color: #ffffff !important;
+}
+
 /* フッター上部パンくず行 */
 footer.elementor-12887 .elementor-element.elementor-element-8f091e6 {
 	padding-left: 0 !important;
