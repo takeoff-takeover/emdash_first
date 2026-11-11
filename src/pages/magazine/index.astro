@@ -501,41 +501,52 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 				<!-- 記事グリッド（JSフィルタリング対象） -->
 				<div class="articles-grid" id="articles-grid">
-					{archiveArticles.map((art) => (
-						<article 
-							class="article-item" 
-							data-id={art.id}
-							data-is-top3={top3ArticleIds.has(art.id) ? "true" : "false"}
-							data-brand={art.brand} 
-							data-topic={art.topic}
-							data-title={art.title.toLowerCase()}
-							data-lead={art.lead ? art.lead.toLowerCase() : ''}
-						>
-							<a href={art.url} class="article-item__link">
-								<div class="article-item__media">
-									<img src={art.image} alt={art.title} loading="lazy" class="article-item__img" />
-									<div class="article-item__overlay"></div>
-									<span class="article-brand-pill">{art.brand}</span>
-								</div>
-								<div class="article-item__body">
-									<div class="article-item__meta">
-										<time class="meta-date">{art.date}</time>
-										<span class="meta-divider">/</span>
-										<span class="meta-topic">{art.topic}</span>
+					{archiveArticles.map((art, idx) => {
+						const cycle = idx % 10;
+						let featuredClass = '';
+						if (cycle === 0) featuredClass = 'is-featured-lead';
+						else if (cycle === 5) featuredClass = 'is-featured-reverse';
+
+						return (
+							<article 
+								class={`article-item ${featuredClass}`} 
+								data-id={art.id}
+								data-is-top3={top3ArticleIds.has(art.id) ? "true" : "false"}
+								data-brand={art.brand} 
+								data-topic={art.topic}
+								data-title={art.title.toLowerCase()}
+								data-lead={art.lead ? art.lead.toLowerCase() : ''}
+							>
+								<a href={art.url} class="article-item__link">
+									<div class="article-item__media">
+										<img src={art.image} alt={art.title} loading="lazy" class="article-item__img" />
+										<div class="article-item__overlay"></div>
+										<span class="article-brand-pill">{art.brand}</span>
 									</div>
-									<h3 class="article-item__title">{art.title}</h3>
-									{art.lead && <p class="article-item__lead">{art.lead}</p>}
-									<div class="article-item__footer">
-										<span class="article-item__more">記事を読む</span>
-										<span class="article-item__views" title="閲覧数">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-											<span>{art.views}</span>
-										</span>
+									<div class="article-item__body">
+										<div class="article-item__meta">
+											<time class="meta-date">{art.date}</time>
+											<span class="meta-divider">/</span>
+											<span class="meta-topic">{art.topic}</span>
+										</div>
+										<h3 class="article-item__title">{art.title}</h3>
+										{art.lead ? (
+											<p class="article-item__lead">{art.lead}</p>
+										) : (
+											<div class="article-item__lead is-empty" aria-hidden="true"></div>
+										)}
+										<div class="article-item__footer">
+											<span class="article-item__more">記事を読む</span>
+											<span class="article-item__views" title="閲覧数">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+												<span>{art.views}</span>
+											</span>
+										</div>
 									</div>
-								</div>
-							</a>
-						</article>
-					))}
+								</a>
+							</article>
+						);
+					})}
 				</div>
 
 				<!-- 「もっと見る」ボタン（初期9件、クリックで古い記事を順次展開） -->
@@ -647,10 +658,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		}
 
 		// ==============================================================
-		// 2. インタラクティブ・フィルタリング＆「もっと見る」制御（初期9件、古い記事を展開）
+		// 2. インタラクティブ・フィルタリング＆「もっと見る」制御（PC3列・タブレット2列の両方で余りが出ない10件サイクル）
 		// ==============================================================
-		const INITIAL_COUNT = 9;
-		const LOAD_STEP = 9;
+		const INITIAL_COUNT = 10;
+		const LOAD_STEP = 10;
 		let visibleCount = INITIAL_COUNT;
 		const archiveParams = new URLSearchParams(window.location.search);
 		const requestedBrand = archiveParams.get('brand');
@@ -741,12 +752,15 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			const totalCount = matchedArticles.length;
 
 			// visibleCount までの記事を表示し、それ以降は非表示
-			// 先頭の記事（idx === 0）には雑誌見開き風のアシンメトリークラス（is-featured-lead）を付与
+			// 10件サイクルで雑誌見開き風のアシンメトリーリズムを付与（0番目: 左ワイド、5番目: 2つ目のワイド）
+			// これにより、PC（3列×4行＝12枠）でもタブレット（2列×6行＝12枠）でも余り・端数が出ません
 			matchedArticles.forEach((article, idx) => {
-				if (idx === 0) {
+				const cycle = idx % 10;
+				article.classList.remove('is-featured-lead', 'is-featured-reverse');
+				if (cycle === 0) {
 					article.classList.add('is-featured-lead');
-				} else {
-					article.classList.remove('is-featured-lead');
+				} else if (cycle === 5) {
+					article.classList.add('is-featured-reverse');
 				}
 
 				if (idx < visibleCount) {
@@ -1796,6 +1810,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border-radius: 12px;
 		overflow: hidden;
 		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 
 	.article-item:hover {
@@ -1855,10 +1872,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.article-item__body {
-		padding: 22px;
+		padding: 22px 22px 22px 22px;
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
+		box-sizing: border-box;
 	}
 
 	.article-item__meta {
@@ -1885,6 +1903,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		line-height: 1.45;
 		color: var(--mag-color-heading) !important;
 		margin: 0 0 10px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		min-height: 2.9em;
 		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
 	}
 
@@ -1902,8 +1925,15 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
+		min-height: 3.2em;
 		flex: none;
 		transition: color 0.3s ease;
+	}
+
+	.article-item__lead.is-empty {
+		min-height: 3.2em;
+		margin: 0 0 18px 0;
+		display: block;
 	}
 
 	.article-item:hover .article-item__lead {
@@ -1948,63 +1978,141 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* ============================================================== */
-	/* 雑誌見開き風・先頭アシンメトリー特大カード（ダークモード対応） */
+	/* 雑誌見開き風・アシンメトリー特集カード（左ワイド＆右ワイド） */
 	/* ============================================================== */
 	@media (min-width: 1024px) {
-		.article-item.is-featured-lead {
+		.article-item.is-featured-lead,
+		.article-item.is-featured-reverse {
 			grid-column: span 2;
 			background: #0c0f14;
 			border-color: rgba(255, 255, 255, 0.18);
 			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 		}
 
+		/* 0番目（左ワイド）：テキスト幅を上下カード（2列目）と完全一致させ、写真を大きく広げて箱パディング（22px）と揃える */
 		.article-item.is-featured-lead .article-item__link {
 			display: grid;
-			grid-template-columns: 1.15fr 1fr;
+			grid-template-columns: calc((100% + 28px) / 2) calc((100% - 28px) / 2);
+			column-gap: 0;
 			height: 100%;
 		}
 
 		.article-item.is-featured-lead .article-item__media {
 			height: 100%;
-			min-height: 320px;
+			min-height: 280px;
 		}
 
-		.article-item.is-featured-lead .article-item__body {
-			padding: 34px 36px 30px 36px;
+		/* 5番目（右ワイド）：テキスト幅を上下カード（1列目）と完全一致させ、写真を大きく広げて箱パディング（22px）と揃える */
+		.article-item.is-featured-reverse .article-item__link {
+			display: grid;
+			grid-template-columns: calc((100% - 28px) / 2) calc((100% + 28px) / 2);
+			column-gap: 0;
+			height: 100%;
+		}
+
+		.article-item.is-featured-reverse .article-item__media {
+			order: 2;
+			height: 100%;
+			min-height: 280px;
+		}
+
+		.article-item.is-featured-reverse .article-item__body {
+			order: 1;
+		}
+
+		/* ワイドカード共通のテキストエリア設定（通常カードと全く同じpadding: 22pxで「記」の開始位置・距離を完全同期） */
+		.article-item.is-featured-lead .article-item__body,
+		.article-item.is-featured-reverse .article-item__body {
+			padding: 22px;
 			display: flex;
 			flex-direction: column;
-			justify-content: center;
+			justify-content: flex-start;
+			height: 100%;
+			box-sizing: border-box;
 		}
 
-		.article-item.is-featured-lead .article-item__meta {
-			font-size: 12px;
-			margin-bottom: 12px;
+		.article-item.is-featured-lead .article-item__meta,
+		.article-item.is-featured-reverse .article-item__meta {
+			font-size: 11.5px;
+			margin-bottom: 8px;
 		}
 
-		.article-item.is-featured-lead .article-item__title {
-			font-size: clamp(20px, 1.8vw, 24px);
-			line-height: 1.4;
-			font-weight: 700;
-			margin-bottom: 14px;
+		.article-item.is-featured-lead .article-item__title,
+		.article-item.is-featured-reverse .article-item__title {
+			font-size: 17px;
+			line-height: 1.42;
+			font-weight: 600;
+			margin-bottom: 10px;
+			min-height: 2.9em;
 			display: -webkit-box;
-			-webkit-line-clamp: 3;
+			-webkit-line-clamp: 2;
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 		}
 
-		.article-item.is-featured-lead .article-item__lead {
-			font-size: 13.5px;
-			line-height: 1.7;
-			margin-bottom: 22px;
+		.article-item.is-featured-lead .article-item__lead,
+		.article-item.is-featured-reverse .article-item__lead {
+			font-size: 13px;
+			line-height: 1.6;
+			margin-bottom: 18px;
+			min-height: 3.2em;
 			display: -webkit-box;
-			-webkit-line-clamp: 4;
+			-webkit-line-clamp: 2;
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 		}
 
-		.article-item.is-featured-lead .article-item__footer {
+		/* フッターの位置と境界線を通常カードと完全に一致させる */
+		.article-item.is-featured-lead .article-item__footer,
+		.article-item.is-featured-reverse .article-item__footer {
 			margin-top: auto;
-			padding-top: 16px;
+			padding-top: 14px;
+			border-top: 1px solid var(--mag-color-border);
+		}
+	}
+
+	@media (max-width: 1023px) and (min-width: 768px) {
+		.article-item.is-featured-lead,
+		.article-item.is-featured-reverse {
+			grid-column: span 2;
+		}
+
+		.article-item.is-featured-lead .article-item__link {
+			display: grid;
+			grid-template-columns: calc((100% + 28px) / 2) calc((100% - 28px) / 2);
+			column-gap: 0;
+			height: 100%;
+		}
+
+		.article-item.is-featured-reverse .article-item__link {
+			display: grid;
+			grid-template-columns: calc((100% - 28px) / 2) calc((100% + 28px) / 2);
+			column-gap: 0;
+			height: 100%;
+		}
+
+		.article-item.is-featured-reverse .article-item__media {
+			order: 2;
+		}
+
+		.article-item.is-featured-reverse .article-item__body {
+			order: 1;
+		}
+
+		.article-item.is-featured-lead .article-item__body,
+		.article-item.is-featured-reverse .article-item__body {
+			padding: 22px;
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+			box-sizing: border-box;
+		}
+
+		.article-item.is-featured-lead .article-item__footer,
+		.article-item.is-featured-reverse .article-item__footer {
+			margin-top: auto;
+			padding-top: 14px;
+			border-top: 1px solid var(--mag-color-border);
 		}
 	}
 
