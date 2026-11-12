@@ -13,7 +13,7 @@
     "build": "node scripts/patch-admin-ui.cjs && node scripts/restore-db.mjs && astro build",
     "preview": "astro preview",
     "db:backup": "node scripts/backup-db.mjs",
-    "db:restore": "node scripts/restore-db.mjs",
+    "db:restore": "node scripts/restore-db.mjs --force",
     "sync": "node scripts/sync-to-remote.mjs",
     "sync:media": "node scripts/sync-to-remote.mjs --media-only",
     "deploy": "node scripts/sync-to-remote.mjs && astro build && wrangler deploy",

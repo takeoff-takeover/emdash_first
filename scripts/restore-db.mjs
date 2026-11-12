@@ -17,10 +17,12 @@ const targetDb = path.join(targetDir, dbFilename);
 
 fs.mkdirSync(targetDir, { recursive: true });
 
-// Always restore or keep in sync if not exists
-if (!fs.existsSync(targetDb)) {
+const force = process.argv.includes('--force');
+
+// Always restore if force flag is given or file does not exist
+if (!fs.existsSync(targetDb) || force) {
   fs.copyFileSync(seedDb, targetDb);
   console.log(`[Restore] Copied D1 database to ${targetDb} (${fs.statSync(targetDb).size} bytes)`);
 } else {
-  console.log(`[Restore] Existing D1 database found at ${targetDb}, skipping overwrite.`);
+  console.log(`[Restore] Existing D1 database found at ${targetDb}, skipping overwrite (use --force to overwrite).`);
 }
