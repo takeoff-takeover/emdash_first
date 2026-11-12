@@ -11,10 +11,30 @@
     - Crucial badges/alerts.
   - Never use red casually on routine text, regular links, or secondary elements.
 
-## Gallery Formatting Rules
-- Do NOT add redundant headings or promotional labels above galleries (e.g. "PHOTO GALLERY", "全○点", "公式プレスキットギャラリー").
-- Do NOT prepend category tags or brackets to captions (e.g. "【エクステリア】", "【インテリア】").
-- Keep gallery minimal: photos, number counter (`1 / 10`), and clean captions only.
+## Gallery & Vehicle Photography Rules
+- **Minimal & Standardized Gallery Format**:
+  - Do NOT add redundant headings or promotional labels above galleries (e.g. "PHOTO GALLERY", "全○点", "公式プレスキットギャラリー").
+  - Do NOT prepend category tags or brackets to captions (e.g. "【エクステリア】", "【インテリア】").
+  - Keep gallery minimal: photos, number counter (`1 / 10`), and clean captions only.
+- **Vehicle Photography Aspect Ratio & Cropping Prohibition**:
+  - Never crop vehicle exterior / 3/4 view photos awkwardly so that bumpers, wheels, roof, or ends get chopped off.
+  - Intentional close-ups of details (emblems, lights, wheels, steering wheel) are completely fine.
+  - If ~80% of a vehicle is showing, clipping the rest is STRICTLY PROHIBITED. Always ensure the full vehicle silhouette is fully and beautifully visible (`object-fit: contain` or appropriate unclipped layout).
+- **Photo-First Layout & "No Image" Placeholder Rule**:
+  - For visual features that need photos to be understood (headlights, interiors, wheels, upholstery), always use photo-oriented layout blocks (e.g. `split_media`, photo cards).
+  - If actual photos are not available at creation/generation time, NEVER drop back to plain text. Always place the standard placeholder image (`/images/no-image.svg`) so human editors have a clear target to replace later in Admin UI.
+- **Mobile & Tablet Responsive Table Cardification Rule**:
+  - Always verify mobile view (375px〜768px) and tablet view (768px〜1024px).
+  - NO horizontal scrolling for tables. Automatically transform tables into spec cards (`<dl><dt><dd>` layouts) on screens <= 1024px (2-column card grid on tablets, 1-column on mobile).
+  - NEVER use pseudo-element hacks (`::before { content: attr(data-label); }`) that cause double table headers/labels. Keep headers completely separate from cards.
+- **Natural Heading Line Break & Phrasal Wrapping Rule**:
+  - NEVER allow words or phrases to break awkwardly in the middle (e.g. 「メリッ/ト」「注/意点」) in headings (H1, H2, H3, H4) or cards.
+  - Apply CSS `word-break: auto-phrase !important; line-break: strict !important;` to all headings.
+  - In article main titles (H1), segment into natural semantic phrases wrapped in `<span class="title-phrase">` (`display: inline-block`) so line breaks only happen at meaningful phrase boundaries.
+- **Section Block & Heading Spacing Rule**:
+  - Treat "heading until the next heading begins" as a cohesive section block.
+  - Maintain generous breathing room between section blocks: H2 `margin-top: clamp(80px, 8.5vw, 116px)` and H3 `margin-top: clamp(56px, 6vw, 76px)` so readers clearly perceive chapter transitions. Keep consecutive headings tighter (`h2 + h3` at ~28px).
+  - STRICT PROHIBITION: Never allow section margins to leak into cards, widgets, or components. Card titles (`.cms-col-card__title`, `.cms-split-card__title`, `.cms-spec-card__title`) must strictly maintain compact, zero-top margins (`margin-top: 0 !important;`) to preserve card design balance.
 
 ## SEO & AI Search Optimization (GEO / LLMO) Rules ※Visual Regression Zero
 - **Semantic HTML**: Maintain layout classes/Flex/Grid, but use `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<nav>`, `<footer>` appropriately. Separate headings from decoration. Keep one `h1` per page and strictly sequential heading levels (`h1` -> `h2` -> `h3`). Do not change tag level just for font size styling.
@@ -25,6 +45,19 @@
 - **No Magic Numbers**: Never hardcode margins, paddings, gaps, font sizes, colors, border-radii, or shadows in components. Always use CSS variables / design tokens from `:root` or theme files.
 - **Consistent Component Patterns**: Re-use common section wrapper classes for outer margins/paddings and max-width. Never write cards, buttons, or section headers from scratch; copy DOM structure and classes from existing components.
 - **Typography Consistency**: Adhere to global typography tokens/classes. Never override `font-family` or `font-weight` arbitrarily inside individual components.
+
+## Block-First Article Authoring Rules (ブロックファースト記事作成・手動編集担保)
+- **Manual Editability for Humans & Any AI**:
+  - Whenever articles (e.g. `magazine` collection) are created or updated, they must be composed of **structured Portable Text blocks** so that human editors can directly edit, rearrange, and modify them in the EmDash Admin UI.
+  - **Raw HTML Prohibition**: Never dump large raw HTML snippets or `<table>` tags into `CustomHtmlBlock` or raw blocks.
+  - **Component Mapping**:
+    - Specs, comparison tables, and pricing lists -> `table` (TableBlock) so cells can be edited in Admin.
+    - Call to action -> `cta` (CTABlock) with editable label, url, subtitle, style, and shape.
+    - Notes and annotations -> `notes` (NotesBlock) or paragraph style `note` (12.5px, line-height 1.45).
+    - Features, multi-column cards -> `columnCards` / `benefitCards3Col`.
+    - FAQs / Q&A -> `accordion` / `faq`.
+    - Galleries -> `slider` (SliderBlock).
+  - When batch-inserting or fixing articles via scripts, always generate proper JSON schemas for blocks and sync all revisions (`live`, `draft`). See `.agents/rules/article-block-rules.md`.
 
 ## Work Session Lifecycle Rules
 - **Development Setup rule ("開発準備して" / "準備して")**: When user asks to prepare or set up development (e.g. "準備して", "自宅に戻ったので準備して"):

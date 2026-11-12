@@ -128,7 +128,8 @@ const caption = (node.caption || "").trim();
 <div class="cms-table-widget">
 	{title && <h3 class="cms-table-title">{title}</h3>}
 
-	<div class="cms-table-responsive-container">
+	{/* 1. PC/タブレット用：標準エディトリアル・テーブル */}
+	<div class="cms-table-desktop-container">
 		<table class="cms-responsive-table">
 			{headers.length > 0 && (
 				<thead>
@@ -142,8 +143,8 @@ const caption = (node.caption || "").trim();
 			<tbody>
 				{rows.map((r) => (
 					<tr>
-						{r.cells.map((c, cIdx) => (
-							<td data-label={headers[cIdx] || ""}>
+						{r.cells.map((c) => (
+							<td>
 								<Fragment set:html={c.text.replace(/\n/g, "<br />")} />
 							</td>
 						))}
@@ -153,6 +154,35 @@ const caption = (node.caption || "").trim();
 		</table>
 	</div>
 
+	{/* 2. スマートフォン用（横スクロール完全撤廃）：洗練されたスペックカード一覧 */}
+	<div class="cms-table-mobile-cards" aria-label={title || "スペック比較一覧"}>
+		{rows.map((r) => {
+			const titleCell = r.cells[0];
+			const specCells = r.cells.slice(1);
+			const specHeaders = headers.slice(1);
+
+			return (
+				<article class="cms-spec-card">
+					{titleCell && (
+						<h4 class="cms-spec-card__title">
+							<Fragment set:html={titleCell.text.replace(/\n/g, "<br />")} />
+						</h4>
+					)}
+					<dl class="cms-spec-card__dl">
+						{specCells.map((c, idx) => (
+							<div class="cms-spec-card__row">
+								<dt class="cms-spec-card__label">{specHeaders[idx] || ""}</dt>
+								<dd class="cms-spec-card__value">
+									<Fragment set:html={c.text.replace(/\n/g, "<br />")} />
+								</dd>
+							</div>
+						))}
+					</dl>
+				</article>
+			);
+		})}
+	</div>
+
 	{caption && <p class="cms-table-caption">{caption}</p>}
 </div>
 
@@ -160,155 +190,189 @@ const caption = (node.caption || "").trim();
 	.cms-table-widget {
 		margin: 2.75rem 0;
 		width: 100%;
+		position: relative;
 	}
 
 	.cms-table-title {
 		font-size: 1.15rem;
 		font-weight: 700;
 		color: #ffffff;
-		margin: 0 0 1rem 0;
+		margin: 0 0 0.85rem 0;
 		line-height: 1.4;
 	}
 
-	.cms-table-responsive-container {
+	/* -------------------------------------------------------------
+	   1. PC/タブレット用テーブル表示
+	   ------------------------------------------------------------- */
+	.cms-table-desktop-container {
+		display: block;
 		width: 100%;
 		border-radius: 8px;
 		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		background: #0a0c10;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: #0b0c10;
 	}
 
 	.cms-responsive-table {
-		width: 100%;
-		border-collapse: collapse;
+		width: 100% !important;
+		table-layout: auto !important;
+		border-collapse: collapse !important;
 		text-align: left;
-		font-size: 0.925rem;
-		line-height: 1.65;
+		font-size: 0.875rem;
+		line-height: 1.6;
+		margin: 0 !important;
 	}
 
 	.cms-responsive-table thead th {
-		background: rgba(255, 255, 255, 0.05);
-		color: #ffffff;
-		font-weight: 700;
-		padding: 14px 16px;
-		border-bottom: 2px solid rgba(255, 255, 255, 0.15);
-		font-size: 0.88rem;
+		background: #14161d !important;
+		color: #ffffff !important;
+		font-weight: 700 !important;
+		padding: 12px 14px !important;
+		border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+		font-size: 0.825rem !important;
 		letter-spacing: 0.02em;
-		vertical-align: middle;
+		white-space: nowrap !important;
+		vertical-align: middle !important;
+	}
+	.cms-responsive-table thead th:last-child {
+		border-right: none !important;
 	}
 
 	.cms-responsive-table tbody tr {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-		transition: background-color 0.2s ease;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+		transition: background-color 0.15s ease;
 	}
-
+	.cms-responsive-table tbody tr:nth-child(even) {
+		background: rgba(255, 255, 255, 0.015) !important;
+	}
 	.cms-responsive-table tbody tr:last-child {
-		border-bottom: none;
+		border-bottom: none !important;
 	}
-
 	.cms-responsive-table tbody tr:hover {
-		background: rgba(255, 255, 255, 0.02);
+		background: rgba(255, 255, 255, 0.04) !important;
 	}
 
 	.cms-responsive-table tbody td {
-		padding: 14px 16px;
-		vertical-align: top;
-		color: rgba(255, 255, 255, 0.88);
+		padding: 12px 14px !important;
+		vertical-align: middle !important;
+		color: rgba(255, 255, 255, 0.88) !important;
+		border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+		line-height: 1.55 !important;
+		word-break: break-word !important;
+	}
+	.cms-responsive-table tbody td:last-child {
+		border-right: none !important;
 	}
 
 	.cms-responsive-table tbody td:first-child {
+		font-weight: 700 !important;
+		color: #ffffff !important;
+		/* タブレットや中間幅でも不自然な突き抜けを防ぐ */
+		word-break: break-word !important;
+	}
+
+	/* -------------------------------------------------------------
+	   2. タブレット・スマホ用カード表示（横スクロール不要・縦スクロール完結）
+	   ------------------------------------------------------------- */
+	.cms-table-mobile-cards {
+		display: none;
+		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+		gap: 16px;
+		width: 100%;
+	}
+
+	.cms-spec-card {
+		background: #0d0f14;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 18px 16px;
+		box-sizing: border-box;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	}
+
+	.cms-spec-card__title {
+		font-size: 1.05rem;
 		font-weight: 700;
 		color: #ffffff;
+		margin: 0 0 12px 0;
+		padding-bottom: 10px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		line-height: 1.4;
+		letter-spacing: 0.01em;
+	}
+
+	.cms-spec-card__dl {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin: 0;
+		padding: 0;
+	}
+
+	.cms-spec-card__row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 12px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+	.cms-spec-card__row:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.cms-spec-card__label {
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.5);
+		margin: 0;
+		flex-shrink: 0;
+		max-width: 45%;
+		line-height: 1.45;
+	}
+
+	.cms-spec-card__value {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.92);
+		margin: 0;
+		text-align: right;
+		line-height: 1.5;
+		word-break: break-word;
 	}
 
 	.cms-table-caption {
 		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.55);
+		color: rgba(255, 255, 255, 0.5);
 		margin: 0.75rem 0 0 0;
 		line-height: 1.5;
 	}
 
-	/* ============================================================== */
-	/* スマホ表示（768px以下）：横スクロールを廃止し、カード化表示に自動変形 */
-	/* ============================================================== */
-	@media (max-width: 768px) {
-		.cms-table-responsive-container {
-			background: transparent;
-			border: none;
-			border-radius: 0;
+	/* ==============================================================
+	   ブレークポイント（1024px以下）：
+	   多列テーブルが窮屈になるタブレット縦向き（〜1024px）およびスマホにおいて、
+	   横スクロールを強要せず、美しく高密度なスペックカードグリッドへ自動変形。
+	   - タブレット（641px〜1024px）: 2列のスペックカード
+	   - スマホ（〜640px）: 1列の縦型スペックカード
+	   ============================================================== */
+	@media (max-width: 1024px) {
+		.cms-table-desktop-container {
+			display: none !important;
 		}
 
-		.cms-responsive-table {
-			display: block;
-			width: 100%;
+		.cms-table-mobile-cards {
+			display: grid !important;
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+			gap: 16px !important;
 		}
+	}
 
-		.cms-responsive-table thead {
-			display: none; /* スマホではヘッダー行を非表示（data-labelで各項目名を表示） */
-		}
-
-		.cms-responsive-table tbody {
-			display: flex;
-			flex-direction: column;
-			gap: 16px;
-			width: 100%;
-		}
-
-		.cms-responsive-table tbody tr {
-			display: block;
-			width: 100%;
-			background: #0d0f14;
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			border-radius: 12px;
-			padding: 18px;
-			box-sizing: border-box;
-		}
-
-		.cms-responsive-table tbody tr:hover {
-			background: #0d0f14;
-		}
-
-		/* 最初のセル（モデル名）：カードのメイン見出し */
-		.cms-responsive-table tbody td:first-child {
-			display: block;
-			font-size: 1.05rem;
-			font-weight: 700;
-			color: #ffffff;
-			border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-			padding: 0 0 12px 0;
-			margin-bottom: 10px;
-			line-height: 1.4;
-		}
-
-		.cms-responsive-table tbody td:first-child::before {
-			display: none;
-		}
-
-		/* 2番目以降のセル：項目名(data-label)と値の左右対照グリッド */
-		.cms-responsive-table tbody td:not(:first-child) {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			padding: 8px 0;
-			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-			font-size: 0.9rem;
-			gap: 12px;
-			text-align: right;
-		}
-
-		.cms-responsive-table tbody td:not(:first-child)::before {
-			content: attr(data-label);
-			font-weight: 500;
-			font-size: 0.8rem;
-			color: rgba(255, 255, 255, 0.5);
-			text-align: left;
-			flex-shrink: 0;
-			max-width: 45%;
-		}
-
-		.cms-responsive-table tbody td:last-child {
-			border-bottom: none;
-			padding-bottom: 0;
+	@media (max-width: 640px) {
+		.cms-table-mobile-cards {
+			grid-template-columns: 1fr !important;
+			gap: 12px !important;
 		}
 	}
 </style>

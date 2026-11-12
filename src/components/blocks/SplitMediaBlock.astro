@@ -51,10 +51,11 @@ if (Array.isArray(data.items) && data.items.length > 0) {
 
 const posMode = data.image_position || "zigzag"; // "zigzag" | "left" | "right"
 const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | "40-60"
+const fitMode = data.media_fit || "cover"; // "cover" (統一枠・余白なし) | "contain" (余白あり)
 ---
 
 {rows.length > 0 && (
-	<section class={`cms-split-list cms-split-list--ratio-${ratioMode}`}>
+	<section class={`cms-split-list cms-split-list--ratio-${ratioMode} cms-split-list--fit-${fitMode}`}>
 		{rows.map((row, idx) => {
 			let isRight = false;
 			if (row.image_position === "right") isRight = true;
@@ -63,13 +64,14 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 			else if (posMode === "left") isRight = false;
 			else isRight = idx % 2 === 1; // zigzag: 偶数段=左写真、奇数段=右写真
 
+			const imgSource = row.image || "/images/no-image.svg";
+			const isPlaceholder = !row.image || row.image.includes("no-image");
+
 			return (
-				<div class={`cms-split-card ${isRight ? "is-right" : "is-left"}`}>
-					{row.image && (
-						<div class="cms-split-card__media">
-							<img src={row.image} alt={row.title || ""} loading="lazy" />
-						</div>
-					)}
+				<div class={`cms-split-card ${isRight ? "is-right" : "is-left"} ${isPlaceholder ? "has-placeholder-img" : ""}`}>
+					<div class="cms-split-card__media">
+						<img src={imgSource} alt={row.title || "No Image Placeholder"} loading="lazy" />
+					</div>
 					<div class="cms-split-card__content">
 						{row.title && <h3 class="cms-split-card__title">{row.title}</h3>}
 						{row.text && <p class="cms-split-card__desc">{row.text}</p>}
@@ -146,9 +148,12 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		width: 100%;
 		height: 100%;
 		aspect-ratio: 16 / 10;
-		background: rgba(128, 128, 128, 0.12);
+		background: #0d0e12;
 		overflow: hidden;
 		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	.cms-split-card__media img {
 		width: 100%;
@@ -157,6 +162,12 @@ const ratioMode = data.media_ratio || "50-50"; // "50-50" | "60-40" | "65-35" | 
 		object-position: center;
 		display: block;
 		margin: 0 !important;
+	}
+	.cms-split-list--fit-cover .cms-split-card__media img {
+		object-fit: cover;
+	}
+	.cms-split-list--fit-contain .cms-split-card__media img {
+		object-fit: contain;
 	}
 	.cms-split-card__content {
 		min-width: 0;

@@ -107,6 +107,16 @@ export const editorialBlocks = [
 				]
 			},
 			{
+				type: "select",
+				action_id: "media_fit",
+				label: "【写真の収め方】車体全景の欠損防止（トリミング設定）",
+				initial_value: "contain",
+				options: [
+					{ label: "写真全体を表示（車体全景の欠損防止・比率維持・推奨）", value: "contain" },
+					{ label: "枠いっぱいにトリミング（ディテール寄り・背景カット用）", value: "cover" }
+				]
+			},
+			{
 				type: "repeater",
 				action_id: "items",
 				label: "【横並びセクション一覧】右上の「＋」で段を追加・ドラッグで順番変更",

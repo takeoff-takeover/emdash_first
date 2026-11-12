@@ -49,6 +49,27 @@
 	--shadow-card-hover: 0 0 0 1px rgba(255, 255 255, 0.18), 0 12px 32px -4px rgba(0, 0, 0, 0.9);
 }
 
+/* ==============================================================
+   見出し・タイトルの自然な文節改行ルール（言葉の途中での不自然な改行・ぶつ切りを完全防止）
+   ============================================================== */
+h1, h2, h3, h4, h5, h6,
+.title-phrase,
+.article-main-title,
+.cms-table-title,
+.cms-spec-card__title,
+.cms-split-card__title,
+.cms-notes-title,
+.accordion-summary,
+.cms-col-card__title {
+	word-break: auto-phrase !important;
+	line-break: strict !important;
+	overflow-wrap: break-word !important;
+}
+
+.title-phrase {
+	display: inline-block !important;
+}
+
 /* Adjust brand logo image in header */
 .brand__logo {
 	height: 36px;
@@ -74,7 +95,7 @@
 }
 
 .emdash-table,
-.prose table,
+.prose table:not(.cms-responsive-table),
 table.cms-table {
 	width: 100% !important;
 	min-width: 100% !important;
@@ -85,6 +106,39 @@ table.cms-table {
 	background: #0b0b0e !important;
 	color: #e4e4e7 !important;
 	margin: 0 !important;
+}
+
+/* レスポンシブ・スペック比較表（スマホでは横スクロール不要の縦型カード一覧に自動変形） */
+.cms-table-desktop-container {
+	display: block;
+	width: 100%;
+}
+
+.cms-table-desktop-container table,
+table.cms-responsive-table,
+.prose table.cms-responsive-table {
+	width: 100% !important;
+	table-layout: auto !important;
+	border-collapse: collapse !important;
+	margin: 0 !important;
+}
+
+@media (max-width: 1024px) {
+	.cms-table-desktop-container {
+		display: none !important;
+	}
+	.cms-table-mobile-cards {
+		display: grid !important;
+		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+		gap: 16px !important;
+	}
+}
+
+@media (max-width: 640px) {
+	.cms-table-mobile-cards {
+		grid-template-columns: 1fr !important;
+		gap: 12px !important;
+	}
 }
 
 .emdash-table thead,

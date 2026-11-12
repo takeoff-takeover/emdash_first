@@ -24,24 +24,24 @@
     ]
   },
   {
-    "_type": "editorial-tools:cta",
-    "_key": "cta_2",
-    "label": "試乗・相談予約をする",
+    "_type": "cta",
+    "_key": "cta_intro",
+    "label": "詳細はこちら",
     "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
-    "subtitle": "Nicole MINI 各ショールームにて随時受付中",
-    "style": "primary",
-    "align": "center"
+    "subtitle": "",
+    "style": "secondary",
+    "align": "center",
+    "shape": "rounded",
+    "has_arrow": "true"
   },
   {
     "_type": "image",
     "_key": "key-9-rh3ii",
     "asset": {
-      "_type": "reference",
       "_ref": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI-Cooper-5-Door-C-select-scaled.jpg",
       "url": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI-Cooper-5-Door-C-select-scaled.jpg"
     },
-    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真",
-    "src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI-Cooper-5-Door-C-select-scaled.jpg"
+    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真"
   },
   {
     "_type": "block",
@@ -56,58 +56,34 @@
     ]
   },
   {
-    "_type": "block",
-    "_key": "key-13-f84ue",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
+    "_type": "column_cards",
+    "_key": "summary_cards",
+    "columns": "1",
+    "card_style": "box",
+    "items": [
       {
-        "_type": "span",
-        "_key": "key-12-xegw3",
-        "text": "MINI「SELECT（セレクト）」シリーズは、ハッチバック（3ドア/5ドア）から本格SUV（カントリーマン）まで幅広く展開され、走りの質感、円形センター・ディスプレイ、世界最高水準の安全支援（ドライビング・アシスタント等）といった「車としての本質」を妥協なく標準搭載した新エントリーラインです。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-15-eimw0",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
+        "title": "① 本質を妥協なく標準搭載",
+        "text": "MINI「SELECT（セレクト）」シリーズは、ハッチバック（3ドア/5ドア）から本格SUV（カントリーマン）まで幅広く展開され、走りの質感、円形センター・ディスプレイ、世界最高水準の安全支援（ドライビング・アシスタント等）といった「車としての本質」を妥協なく標準搭載した新エントリーラインです。",
+        "button_label": "",
+        "button_url": ""
+      },
       {
-        "_type": "span",
-        "_key": "key-14-9xr2w",
-        "text": "装備をスマートに厳選・シンプル化することで、400万円を切るプライス（3ドア：365万円〜）を実現。デザイン面でも無駄な装飾を削ぎ落とし、MINI本来のアイコニックでスタイリッシュな佇まいを完成させています。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-17-5wmta",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
+        "title": "② 400万円を切るプライス（365万円〜）",
+        "text": "装備をスマートに厳選・シンプル化することで、400万円を切るプライス（3ドア：365万円〜）を実現。デザイン面でも無駄な装飾を削ぎ落とし、MINI本来のアイコニックでスタイリッシュな佇まいを完成させています。",
+        "button_label": "",
+        "button_url": ""
+      },
       {
-        "_type": "span",
-        "_key": "key-16-4kpic",
-        "text": "メインテナンスプログラム（MINI TENDER LOVING CARE）の標準付帯ではありませんが、ショールームでの購入時に有償オプションとして個別追加できるため、維持費に対する不安は軽減されます。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-19-xp40l",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
+        "title": "③ 維持費の不安を解消（個別オプション対応）",
+        "text": "メインテナンスプログラム（MINI TENDER LOVING CARE）の標準付帯ではありませんが、ショールームでの購入時に有償オプションとして個別追加できるため、維持費に対する不安は軽減されます。",
+        "button_label": "",
+        "button_url": ""
+      },
       {
-        "_type": "span",
-        "_key": "key-18-2u11d",
-        "text": "国産コンパクトカーやSUVの上級グレードと同等の価格帯（365万円〜）で、世界中で愛されるプレミアムなデザインと痛快な走りを手に入れられる、最も賢い乗り換え先（スマートバイ）です。"
+        "title": "④ 国産上級グレードと同等の最も賢い選択",
+        "text": "国産コンパクトカーやSUVの上級グレードと同等の価格帯（365万円〜）で、世界中で愛されるプレミアムなデザインと痛快な走りを手に入れられる、最も賢い乗り換え先（スマートバイ）です。",
+        "button_label": "",
+        "button_url": ""
       }
     ]
   },
@@ -185,8 +161,8 @@
   },
   {
     "_type": "block",
-    "_key": "key-33-8rq0v",
-    "style": "normal",
+    "_key": "vdco1yujw",
+    "style": "note",
     "children": [
       {
         "_type": "span",
@@ -220,204 +196,42 @@
     ]
   },
   {
-    "_type": "block",
-    "_key": "key-39-g7unj",
-    "style": "h3",
-    "children": [
+    "_type": "split_media",
+    "_key": "split_spec_features",
+    "image_position": "zigzag",
+    "media_ratio": "50-50",
+    "media_fit": "cover",
+    "items": [
       {
-        "_type": "span",
-        "_key": "key-38-bgntc",
-        "text": "① 先進表示・インテリア演出機能（エクスペリエンスモード・ヘッドアップディスプレイ）について"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-41-thjh0",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-40-7swyf",
-        "text": "ダッシュボード中央のディスプレイ演出を切り替える「MINIエクスペリエンスモード」や、フロントガラスにナビ情報を投影する「ヘッドアップディスプレイ」が標準装備から外されています（※カントリーマン SELECTではヘッドアップディスプレイやアダプティブLEDも標準維持されるなど、車種に応じた最適なパッケージが用意されています）。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-43-scq66",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-42-nd04k",
-        "text": "判断ポイント",
-        "marks": [
-          "strong"
-        ]
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-45-wysok",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-44-s6sr3",
-        "text": "ダッシュボード中央の先進的な「円形センター・ディスプレイ」の圧倒的な見やすさを誇るため、日常の利便性で困ることはありません。実際の走行映像に案内を重ねる「AR機能付きMINIナビゲーション」やスマホ連携（CarPlay等）も標準装備されています。ぜひ試乗にてご体感ください。"
-      }
-    ]
-  },
-  {
-    "_type": "editorial-tools:cta",
-    "_key": "cta_22",
-    "label": "試乗・相談予約をする",
-    "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
-    "subtitle": "Nicole MINI 各ショールームにて随時受付中",
-    "style": "primary",
-    "align": "center"
-  },
-  {
-    "_type": "block",
-    "_key": "key-51-3ff4y",
-    "style": "h3",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-50-1zfk6",
-        "text": "② ヘッドライトがシンプルな「円形LEDヘッドライト」に変更"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-53-v65md",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-52-nwr8c",
-        "text": "3ドア／5ドアのMINI SELECTでは、コーナリング等、進路を自動追従して照らす「アダプティブ機能」に代わり、より洗練されたシンプルな円形LEDヘッドライトに変更されています（※カントリーマン SELECTではアダプティブLEDが標準維持されます）。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-55-ka9fn",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-54-csxis",
-        "text": "判断ポイント",
-        "marks": [
-          "strong"
-        ]
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-57-v8b25",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-56-rluky",
-        "text": "シンプルなLEDヘッドライトであっても、夜間ドライブに十分すぎる明るさと視認性が確保されているため、街乗り中心であれば全く問題ありません。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-59-jd962",
-    "style": "h3",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-58-87pn9",
-        "text": "③ メインテナンスプラン「MINI TENDER LOVING CARE」の無償付帯対象外"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-61-gy2wf",
-    "style": "h4",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-60-njj8h",
-        "text": "【最も重要な注意点】"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-63-b6hc0",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-62-b3d8v",
-        "text": "新車購入から3年間の点検やオイル交換が無償になる「MINI TLC.スタンダードパック」が標準装備から外されています。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-66-ns4uc",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-64-i8auf",
-        "text": "判断ポイント：",
-        "marks": [
-          "strong"
-        ]
+        "_key": "split_item_light",
+        "image": "/uploads/magazine/mini_select_headlight_detail.jpg",
+        "title": "① ヘッドライト：シンプルな「円形LEDヘッドライト」に変更",
+        "text": "3ドア／5ドアのMINI SELECTでは、コーナリング等、進路を自動追従して照らす「アダプティブ機能」に代わり、より洗練されたシンプルな円形LEDヘッドライトに変更されています（※カントリーマン SELECTではアダプティブLEDが標準維持されます）。\n\n【判断ポイント】\nシンプルなLEDヘッドライトであっても、夜間ドライブに十分すぎる明るさと視認性が確保されているため、街乗り中心であれば全く問題ありません。愛らしい伝統の丸目デザインもしっかりと受け継がれています。"
       },
       {
-        "_type": "span",
-        "_key": "key-65-qk3kn",
-        "text": "ショールームでの商談時に、有償オプションとして「MINI TLC」を個別追加することが可能です。将来のメインテナンス費用をフラットに保ちたい方は、購入時に営業担当へ相談するのがスマートです。"
+        "_key": "split_item_display",
+        "image": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI-2.jpg",
+        "title": "② 先進表示：円形センター・ディスプレイとインテリア演出",
+        "text": "ダッシュボード中央のディスプレイ演出を切り替える「MINIエクスペリエンスモード」や、フロントガラスにナビ情報を投影する「ヘッドアップディスプレイ」が標準装備から外されています（※カントリーマン SELECTではヘッドアップディスプレイやアダプティブLEDも標準維持されるなど、車種に応じた最適なパッケージが用意されています）。\n\n【判断ポイント】\nダッシュボード中央の先進的な「円形センター・ディスプレイ」の圧倒的な見やすさを誇るため、日常の利便性で困ることはありません。実際の走行映像に案内を重ねる「AR機能付きMINIナビゲーション」やスマホ連携（CarPlay等）も標準装備されています。ぜひ試乗にてご体感ください。"
+      },
+      {
+        "_key": "split_item_tlc",
+        "image": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI3.jpg",
+        "title": "③ メインテナンス：点検プラン（MINI TLC）の無償付帯対象外",
+        "text": "【最も重要な注意点】\n新車購入から3年間の点検やオイル交換が無償になる「MINI TLC.スタンダードパック」が標準装備から外されています。\n\n【判断ポイント】\nショールームでの商談時に、有償オプションとして「MINI TLC」を個別追加することが可能です。将来のメインテナンス費用をフラットに保ちたい方は、購入時に営業担当へ相談するのがスマートです。"
       }
     ]
   },
   {
-    "_type": "image",
-    "_key": "key-67-wfrp5",
-    "asset": {
-      "_type": "reference",
-      "_ref": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI.jpg",
-      "url": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI.jpg"
-    },
-    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真",
-    "src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21MINI.jpg"
-  },
-  {
-    "_type": "image",
-    "_key": "key-68-ch3hv",
-    "asset": {
-      "_type": "reference",
-      "_ref": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI-2.jpg",
-      "url": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI-2.jpg"
-    },
-    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真",
-    "src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI-2.jpg"
-  },
-  {
-    "_type": "image",
-    "_key": "key-69-hfqs5",
-    "asset": {
-      "_type": "reference",
-      "_ref": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI3.jpg",
-      "url": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI3.jpg"
-    },
-    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真",
-    "src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/MINI3.jpg"
+    "_type": "cta",
+    "_key": "cta_mid_specs",
+    "label": "詳細はこちら",
+    "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
+    "subtitle": "",
+    "style": "secondary",
+    "align": "center",
+    "shape": "rounded",
+    "has_arrow": "true"
   },
   {
     "_type": "block",
@@ -444,85 +258,30 @@
     ]
   },
   {
-    "_type": "block",
-    "_key": "key-75-ce1gj",
-    "style": "h3",
-    "children": [
+    "_type": "column_cards",
+    "_key": "merit_step_cards",
+    "columns": "1",
+    "card_style": "step",
+    "items": [
       {
-        "_type": "span",
-        "_key": "key-74-4kwu1",
-        "text": "① 世界初の「円形センター・ディスプレイ」と最先端デジタル体験"
+        "title": "世界初の「円形センター・ディスプレイ」と最先端デジタル体験",
+        "text": "全SELECTモデルのダッシュボード中央に君臨する直径240mmの「円形センター・ディスプレイ」は、最新デジタルテクノロジーの象徴です。音声アシスタント「Hey MINI」やスマホ連携、実際の映像に矢印を重ねる「AR機能付きMINIナビゲーション」が全車標準装備され、国産車では味わえない先進的な車内空間を提供します。",
+        "button_label": "",
+        "button_url": ""
+      },
+      {
+        "title": "一度味わうと病みつきになる「ゴーカート・フィーリング」",
+        "text": "1.5L直列3気筒ターボエンジン＋7速DCT（ダブルクラッチトランスミッション）や48Vマイルドハイブリッド（カントリーマン）によるダイレクトな加速と、高剛性シャシー＆ステアリングを切った瞬間にクイックに曲がるハンドリングは、まさに「ゴーカート」そのもの。一般的な国産コンパクトカーやSUVでは決して味わえない、運転するたびに胸が躍るドライビングプレジャーがここにあります。",
+        "button_label": "",
+        "button_url": ""
+      },
+      {
+        "title": "最高水準の「ドライビング・アシスタント＆パーキング・アシスタント」",
+        "text": "衝突回避・被害軽減ブレーキやレーンキープアシスト、アクティブ・クルーズ・コントロール（ACC）に加え、自動で駐車操作を行ってくれる「パーキング・アシスタント」までもが全車標準装備されています。エントリーモデルであっても安全性と運転支援機能は上位グレードと完全に同等です。",
+        "button_label": "",
+        "button_url": ""
       }
     ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-77-tlwzk",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-76-wtkln",
-        "text": "全SELECTモデルのダッシュボード中央に君臨する直径240mmの「円形センター・ディスプレイ」は、最新デジタルテクノロジーの象徴です。音声アシスタント「Hey MINI」やスマホ連携、実際の映像に矢印を重ねる「AR機能付きMINIナビゲーション」が全車標準装備され、国産車では味わえない先進的な車内空間を提供します。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-79-n6d5v",
-    "style": "h3",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-78-58o5t",
-        "text": "② 一度味わうと病みつきになる「ゴーカート・フィーリング」"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-81-wlmzw",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-80-iyuiq",
-        "text": "1.5L直列3気筒ターボエンジン＋7速DCT（ダブルクラッチトランスミッション）や48Vマイルドハイブリッド（カントリーマン）によるダイレクトな加速と、高剛性シャシー＆ステアリングを切った瞬間にクイックに曲がるハンドリングは、まさに「ゴーカート」そのもの。一般的な国産コンパクトカーやSUVでは決して味わえない、運転するたびに胸が躍るドライビングプレジャーがここにあります。"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-83-vwmed",
-    "style": "h3",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-82-02vko",
-        "text": "③ 最高水準の「ドライビング・アシスタント＆パーキング・アシスタント」"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-85-sl0yl",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-84-32l78",
-        "text": "衝突回避・被害軽減ブレーキやレーンキープアシスト、アクティブ・クルーズ・コントロール（ACC）に加え、自動で駐車操作を行ってくれる「パーキング・アシスタント」までもが全車標準装備されています。エントリーモデルであっても安全性と運転支援機能は上位グレードと完全に同等です。"
-      }
-    ]
-  },
-  {
-    "_type": "editorial-tools:cta",
-    "_key": "cta_42",
-    "label": "試乗・相談予約をする",
-    "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
-    "subtitle": "Nicole MINI 各ショールームにて随時受付中",
-    "style": "primary",
-    "align": "center"
   },
   {
     "_type": "block",
@@ -549,8 +308,11 @@
     ]
   },
   {
-    "_type": "editorial-tools:table",
+    "_type": "table",
     "_key": "mini_select_specs_table",
+    "title": "MINI「SELECT」シリーズ 全ラインアップ（サイズ・価格一覧）",
+    "raw_csv": "モデル名\tボディタイプ\tサイズ（全長×全幅×全高）\t税込車両価格\t従来モデルとの差額\nMINI COOPER C SELECT（3-DOOR）\t3ドアハッチバック\t全長 3,875 mm × 全幅 1,745 mm × 全高 1,455 mm\t3,650,000円〜\tMINI COOPER C（402万円）より 37万円安\nMINI COOPER 5-DOOR C SELECT\t5ドアハッチバック\t全長 4,035 mm × 全幅 1,745 mm × 全高 1,470 mm\t3,770,000円〜\tMINI COOPER 5-DOOR C（414万円）より 37万円安\nMINI COUNTRYMAN C SELECT\tFF駆動SUV\t全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm\t4,800,000円〜\tMINI COUNTRYMAN C（518万円）より 38万円安\nMINI COUNTRYMAN S ALL4 SELECT\t4輪駆動SUV\t全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm\t5,530,000円〜\tMINI COUNTRYMAN S ALL4（592万円）より 39万円安",
+    "caption": "※従来モデルとの差額については、オプション等を含めない記事投稿時点の標準価格（メーカー希望小売価格）より算出しています。詳細はショールームにてご相談承っています。",
     "headers": [
       "モデル名",
       "ボディタイプ",
@@ -558,98 +320,376 @@
       "税込車両価格",
       "従来モデルとの差額"
     ],
+    "hasHeaderRow": true,
     "rows": [
       {
+        "_type": "tableRow",
+        "_key": "row_header_0",
+        "isHeader": true,
         "cells": [
           {
+            "_type": "tableCell",
+            "_key": "cell_h_0",
+            "isHeader": true,
+            "text": "モデル名",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_h_0",
+                "text": "モデル名"
+              }
+            ]
+          },
+          {
+            "_type": "tableCell",
+            "_key": "cell_h_1",
+            "isHeader": true,
+            "text": "ボディタイプ",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_h_1",
+                "text": "ボディタイプ"
+              }
+            ]
+          },
+          {
+            "_type": "tableCell",
+            "_key": "cell_h_2",
+            "isHeader": true,
+            "text": "サイズ（全長×全幅×全高）",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_h_2",
+                "text": "サイズ（全長×全幅×全高）"
+              }
+            ]
+          },
+          {
+            "_type": "tableCell",
+            "_key": "cell_h_3",
+            "isHeader": true,
+            "text": "税込車両価格",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_h_3",
+                "text": "税込車両価格"
+              }
+            ]
+          },
+          {
+            "_type": "tableCell",
+            "_key": "cell_h_4",
+            "isHeader": true,
+            "text": "従来モデルとの差額",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_h_4",
+                "text": "従来モデルとの差額"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "_type": "tableRow",
+        "_key": "row_data_0",
+        "cells": [
+          {
+            "_type": "tableCell",
+            "_key": "cell_0_0",
+            "isHeader": true,
             "text": "MINI COOPER C SELECT（3-DOOR）",
-            "isHeader": true
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_0_0",
+                "text": "MINI COOPER C SELECT（3-DOOR）"
+              }
+            ]
           },
           {
-            "text": "3ドアハッチバック"
+            "_type": "tableCell",
+            "_key": "cell_0_1",
+            "isHeader": false,
+            "text": "3ドアハッチバック",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_0_1",
+                "text": "3ドアハッチバック"
+              }
+            ]
           },
           {
-            "text": "全長 3,875 mm\n全幅 1,745 mm\n全高 1,455 mm"
+            "_type": "tableCell",
+            "_key": "cell_0_2",
+            "isHeader": false,
+            "text": "全長 3,875 mm × 全幅 1,745 mm × 全高 1,455 mm",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_0_2",
+                "text": "全長 3,875 mm × 全幅 1,745 mm × 全高 1,455 mm"
+              }
+            ]
           },
           {
-            "text": "3,650,000円"
+            "_type": "tableCell",
+            "_key": "cell_0_3",
+            "isHeader": false,
+            "text": "3,650,000円〜",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_0_3",
+                "text": "3,650,000円〜"
+              }
+            ]
           },
           {
-            "text": "MINI COOPER C（402万円）より\n<strong>37万円安</strong>"
+            "_type": "tableCell",
+            "_key": "cell_0_4",
+            "isHeader": false,
+            "text": "MINI COOPER C（402万円）より 37万円安",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_0_4",
+                "text": "MINI COOPER C（402万円）より 37万円安"
+              }
+            ]
           }
         ]
       },
       {
+        "_type": "tableRow",
+        "_key": "row_data_1",
         "cells": [
           {
+            "_type": "tableCell",
+            "_key": "cell_1_0",
+            "isHeader": true,
             "text": "MINI COOPER 5-DOOR C SELECT",
-            "isHeader": true
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_1_0",
+                "text": "MINI COOPER 5-DOOR C SELECT"
+              }
+            ]
           },
           {
-            "text": "5ドアハッチバック"
+            "_type": "tableCell",
+            "_key": "cell_1_1",
+            "isHeader": false,
+            "text": "5ドアハッチバック",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_1_1",
+                "text": "5ドアハッチバック"
+              }
+            ]
           },
           {
-            "text": "全長 4,035 mm\n全幅 1,745 mm\n全高 1,470 mm"
+            "_type": "tableCell",
+            "_key": "cell_1_2",
+            "isHeader": false,
+            "text": "全長 4,035 mm × 全幅 1,745 mm × 全高 1,470 mm",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_1_2",
+                "text": "全長 4,035 mm × 全幅 1,745 mm × 全高 1,470 mm"
+              }
+            ]
           },
           {
-            "text": "3,770,000円"
+            "_type": "tableCell",
+            "_key": "cell_1_3",
+            "isHeader": false,
+            "text": "3,770,000円〜",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_1_3",
+                "text": "3,770,000円〜"
+              }
+            ]
           },
           {
-            "text": "MINI COOPER 5-DOOR C（414万円）より\n<strong>37万円安</strong>"
+            "_type": "tableCell",
+            "_key": "cell_1_4",
+            "isHeader": false,
+            "text": "MINI COOPER 5-DOOR C（414万円）より 37万円安",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_1_4",
+                "text": "MINI COOPER 5-DOOR C（414万円）より 37万円安"
+              }
+            ]
           }
         ]
       },
       {
+        "_type": "tableRow",
+        "_key": "row_data_2",
         "cells": [
           {
+            "_type": "tableCell",
+            "_key": "cell_2_0",
+            "isHeader": true,
             "text": "MINI COUNTRYMAN C SELECT",
-            "isHeader": true
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_2_0",
+                "text": "MINI COUNTRYMAN C SELECT"
+              }
+            ]
           },
           {
-            "text": "FF駆動SUV"
+            "_type": "tableCell",
+            "_key": "cell_2_1",
+            "isHeader": false,
+            "text": "FF駆動SUV",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_2_1",
+                "text": "FF駆動SUV"
+              }
+            ]
           },
           {
-            "text": "全長 4,445 mm\n全幅 1,845 mm\n全高 1,660 mm"
+            "_type": "tableCell",
+            "_key": "cell_2_2",
+            "isHeader": false,
+            "text": "全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_2_2",
+                "text": "全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm"
+              }
+            ]
           },
           {
-            "text": "4,800,000円"
+            "_type": "tableCell",
+            "_key": "cell_2_3",
+            "isHeader": false,
+            "text": "4,800,000円〜",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_2_3",
+                "text": "4,800,000円〜"
+              }
+            ]
           },
           {
-            "text": "MINI COUNTRYMAN C（518万円）より\n<strong>38万円安</strong>"
+            "_type": "tableCell",
+            "_key": "cell_2_4",
+            "isHeader": false,
+            "text": "MINI COUNTRYMAN C（518万円）より 38万円安",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_2_4",
+                "text": "MINI COUNTRYMAN C（518万円）より 38万円安"
+              }
+            ]
           }
         ]
       },
       {
+        "_type": "tableRow",
+        "_key": "row_data_3",
         "cells": [
           {
+            "_type": "tableCell",
+            "_key": "cell_3_0",
+            "isHeader": true,
             "text": "MINI COUNTRYMAN S ALL4 SELECT",
-            "isHeader": true
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_3_0",
+                "text": "MINI COUNTRYMAN S ALL4 SELECT"
+              }
+            ]
           },
           {
-            "text": "4輪駆動SUV"
+            "_type": "tableCell",
+            "_key": "cell_3_1",
+            "isHeader": false,
+            "text": "4輪駆動SUV",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_3_1",
+                "text": "4輪駆動SUV"
+              }
+            ]
           },
           {
-            "text": "全長 4,445 mm\n全幅 1,845 mm\n全高 1,660 mm"
+            "_type": "tableCell",
+            "_key": "cell_3_2",
+            "isHeader": false,
+            "text": "全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_3_2",
+                "text": "全長 4,445 mm × 全幅 1,845 mm × 全高 1,660 mm"
+              }
+            ]
           },
           {
-            "text": "5,530,000円"
+            "_type": "tableCell",
+            "_key": "cell_3_3",
+            "isHeader": false,
+            "text": "5,530,000円〜",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_3_3",
+                "text": "5,530,000円〜"
+              }
+            ]
           },
           {
-            "text": "MINI COUNTRYMAN S ALL4（592万円）より\n<strong>39万円安</strong>"
+            "_type": "tableCell",
+            "_key": "cell_3_4",
+            "isHeader": false,
+            "text": "MINI COUNTRYMAN S ALL4（592万円）より 39万円安",
+            "content": [
+              {
+                "_type": "span",
+                "_key": "span_3_4",
+                "text": "MINI COUNTRYMAN S ALL4（592万円）より 39万円安"
+              }
+            ]
           }
         ]
       }
-    ],
-    "caption": "※従来モデルとの差額については、オプション等を含めない記事投稿時点の標準価格（メーカー希望小売価格）より算出しています。詳細はショールームにてご相談承っています。"
+    ]
   },
   {
-    "_type": "editorial-tools:cta",
-    "_key": "cta_49",
-    "label": "試乗・相談予約をする",
+    "_type": "cta",
+    "_key": "cta_after_table",
+    "label": "詳細はこちら",
     "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
-    "subtitle": "Nicole MINI 各ショールームにて随時受付中",
-    "style": "primary",
-    "align": "center"
+    "subtitle": "",
+    "style": "secondary",
+    "align": "center",
+    "shape": "rounded",
+    "has_arrow": "true"
   },
   {
     "_type": "block",
@@ -664,96 +704,22 @@
     ]
   },
   {
-    "_type": "block",
-    "_key": "key-242-rcugl",
-    "style": "h3",
-    "children": [
+    "_type": "column_cards",
+    "_key": "fit_check_cards",
+    "columns": "2",
+    "card_style": "box",
+    "items": [
       {
-        "_type": "span",
-        "_key": "key-241-9lvj5",
-        "text": "SELECTを選んで「大満足」できる人"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-244-nttf7",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
+        "title": "◯ SELECTを選んで「大満足」できる人",
+        "text": "・「ヤリスやヴェゼル、CX-30などの国産上級グレードと同じ300万〜400万円台の予算で、プレミアムなMINIに乗り換えたい」という方\n\n・車内の派手なライティング演出やヘッドアップディスプレイは不要で、痛快な走り・アイコニックなデザイン・円形センター・ディスプレイがあれば十分と思える方\n\n・毎日の通勤やドライブを「ただの移動」から「楽しい時間」に変えたい方",
+        "button_label": "",
+        "button_url": ""
+      },
       {
-        "_type": "span",
-        "_key": "key-243-xljah",
-        "text": "「ヤリスやヴェゼル、CX-30などの国産上級グレードと同じ300万〜400万円台の予算で、プレミアムなMINIに乗り換えたい」という方"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-246-v9faw",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-245-bn7i6",
-        "text": "車内の派手なライティング演出やヘッドアップディスプレイは不要で、痛快な走り・アイコニックなデザイン・円形センター・ディスプレイがあれば十分と思える方"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-248-5uu6y",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-247-5d37r",
-        "text": "毎日の通勤やドライブを「ただの移動」から「楽しい時間」に変えたい方"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-250-a0p0v",
-    "style": "h4",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-249-9wjdt",
-        "text": "SELECTを選ぶと「後悔」する人"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-252-r1sl0",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-251-gb9tb",
-        "text": "ボディカラーとルーフカラーを何十通りもの組み合わせからツートンカラーで自由自在にカスタムオーダーしたい方（クーパーSELECTはルーフ同色等シンプル仕様）"
-      }
-    ]
-  },
-  {
-    "_type": "block",
-    "_key": "key-254-3ok32",
-    "style": "normal",
-    "listItem": "bullet",
-    "level": 1,
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-253-c6znn",
-        "text": "夜間の車内演出プロジェクション（エクスペリエンスモード）に一目惚れしている方"
+        "title": "△ SELECTを選ぶと「後悔」する人",
+        "text": "・ボディカラーとルーフカラーを何十通りもの組み合わせからツートンカラーで自由自在にカスタムオーダーしたい方（クーパーSELECTはルーフ同色等シンプル仕様）\n\n・夜間の車内演出プロジェクション（エクスペリエンスモード）に一目惚れしている方",
+        "button_label": "",
+        "button_url": ""
       }
     ]
   },
@@ -770,7 +736,7 @@
     ]
   },
   {
-    "_type": "editorial-tools:faq",
+    "_type": "faq",
     "_key": "faq_mini_select",
     "style": "qa",
     "items": [
@@ -877,24 +843,25 @@
     ]
   },
   {
-    "_type": "editorial-tools:cta",
-    "_key": "cta_72",
-    "label": "試乗・相談予約をする",
+    "_type": "cta",
+    "_key": "cta_final_hero",
+    "label": "詳細はこちら",
     "url": "https://www.nicole.co.jp/contact/?form_type=inquiry",
-    "subtitle": "Nicole MINI 各ショールームにて随時受付中",
-    "style": "primary",
-    "align": "center"
+    "lead_text": "全国MINI最優秀・優秀ディーラー賞 通算3度受賞のNicole MINIが、あなたに最適な1台をご案内いたします。",
+    "subtitle": "",
+    "style": "secondary",
+    "align": "center",
+    "shape": "rounded",
+    "has_arrow": "true"
   },
   {
     "_type": "image",
     "_key": "key-311-stz04",
     "asset": {
-      "_type": "reference",
       "_ref": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21DI26_000384001_260812-scaled.jpg",
       "url": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21DI26_000384001_260812-scaled.jpg"
     },
-    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真",
-    "src": "https://www.nicole.co.jp/wp/wp-content/uploads/2026/09/21DI26_000384001_260812-scaled.jpg"
+    "alt": "300万円台からの選択！MINI「SELECT」の注意点と国産車から乗り換えるべきメリットの記事内写真"
   },
   {
     "_type": "block",
@@ -988,8 +955,8 @@
         "_key": "key-326-4iqgc",
         "text": "MINI COOPER C SELECT（3-DOOR）",
         "marks": [
-          "strong",
-          "key-325-8ic64"
+          "key-325-8ic64",
+          "strong"
         ]
       }
     ],
@@ -1014,8 +981,8 @@
         "_key": "key-329-s5n0f",
         "text": "MINI COOPER 5-DOOR C SELECT",
         "marks": [
-          "strong",
-          "key-328-p9v07"
+          "key-328-p9v07",
+          "strong"
         ]
       }
     ],
@@ -1040,8 +1007,8 @@
         "_key": "key-332-dme9a",
         "text": "MINI COUNTRYMAN C SELECT",
         "marks": [
-          "strong",
-          "key-331-y4l28"
+          "key-331-y4l28",
+          "strong"
         ]
       }
     ],
@@ -1066,8 +1033,8 @@
         "_key": "key-335-5nkim",
         "text": "MINI COUNTRYMAN S ALL4 SELECT",
         "marks": [
-          "strong",
-          "key-334-3hupr"
+          "key-334-3hupr",
+          "strong"
         ]
       }
     ],
@@ -1081,43 +1048,8 @@
     ]
   },
   {
-    "_type": "block",
-    "_key": "key-344-zjopp",
-    "style": "normal",
-    "children": [
-      {
-        "_type": "span",
-        "_key": "key-338-pz7ch",
-        "text": "本記事について\n",
-        "marks": [
-          "strong"
-        ]
-      },
-      {
-        "_type": "span",
-        "_key": "key-339-0chmb",
-        "text": "本稿は、全国MINI最優秀・優秀ディーラー賞を通算3度獲得のNicole MINIが、MINI正規ディーラーとして販売・顧客対応を行ってきた知見をもとに構成しています。"
-      },
-      {
-        "_type": "span",
-        "_key": "key-340-1pqhd",
-        "text": "※本稿は、モデルの概要と選び方の「総論」を整理したものです。個別の仕様や在庫状況については、リンク先の詳細記事またはショールームにてご確認ください。\n"
-      },
-      {
-        "_type": "span",
-        "_key": "key-341-swswx",
-        "text": "※このページで使用している画像・動画は日本仕様とは異なる場合があります。また、オプション装備等を含む場合があります。\n"
-      },
-      {
-        "_type": "span",
-        "_key": "key-342-q67cc",
-        "text": "※掲載されている情報は投稿日時点のものであり、予告なく変更される場合がございます。\n"
-      },
-      {
-        "_type": "span",
-        "_key": "key-343-zvuat",
-        "text": "※情報の掲載にあたりましては細心の注意を払っておりますが、その正確性や完全性を保証するものではございません。予めご了承ください。"
-      }
-    ]
+    "_type": "notes",
+    "_key": "article_disclaimer_notes",
+    "content": "本記事について\n本稿は、全国MINI最優秀・優秀ディーラー賞を通算3度獲得のNicole MINIが、MINI正規ディーラーとして販売・顧客対応を行ってきた知見をもとに構成しています。※本稿は、モデルの概要と選び方の「総論」を整理したものです。個別の仕様や在庫状況については、リンク先の詳細記事またはショールームにてご確認ください。\n※このページで使用している画像・動画は日本仕様とは異なる場合があります。また、オプション装備等を含む場合があります。\n※掲載されている情報は投稿日時点のものであり、予告なく変更される場合がございます。\n※情報の掲載にあたりましては細心の注意を払っておりますが、その正確性や完全性を保証するものではございません。予めご了承ください。"
   }
 ]

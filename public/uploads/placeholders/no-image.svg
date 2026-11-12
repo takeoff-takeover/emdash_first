@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181d" />
+      <stop offset="100%" stop-color="#0f0f13" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bgGrad)" />
+  <rect x="2" y="2" width="796" height="496" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+  
+  <g transform="translate(400, 215)" text-anchor="middle">
+    <!-- Camera / Photo Icon -->
+    <rect x="-36" y="-24" width="72" height="50" rx="8" fill="none" stroke="#71717a" stroke-width="2.5" />
+    <circle cx="0" cy="1" r="14" fill="none" stroke="#71717a" stroke-width="2.5" />
+    <path d="M-14 -24 L-8 -32 L8 -32 L14 -24 Z" fill="none" stroke="#71717a" stroke-width="2.5" stroke-linejoin="round" />
+    <circle cx="22" cy="-12" r="3" fill="#71717a" />
+    
+    <!-- Text Labels -->
+    <text y="64" fill="#d4d4d8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="0.2em">NO IMAGE</text>
+    <text y="90" fill="#71717a" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" letter-spacing="0.08em">PHOTO REQUIRED ／ 管理画面から写真を設定してください</text>
+  </g>
+</svg>

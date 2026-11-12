@@ -1240,8 +1240,11 @@ if (isSidebarSample) {
 	relatedStoriesUrl = "/magazine/?brand=BMW#magazine-archive";
 }
 
-// タイトルを自然な文節で改行・表示するためのセグメント分割
-function getTitleSegments(rawTitle: string) {
+// タイトルを自然な文節・意味のまとまりで改行するためのセグメント分割
+function getTitleSegments(rawTitle: string): { text: string; class: string }[] {
+	if (!rawTitle) return [];
+
+	// 個別最適化プリセット
 	if (rawTitle.includes("iX4") || rawTitle.includes("BMW iX4")) {
 		return [
 			{ text: "【公式発表】新型BMW iX4登場。", class: "title-phrase" },
@@ -1263,14 +1266,42 @@ function getTitleSegments(rawTitle: string) {
 			{ text: "直6搭載『M350 xDrive』が切り拓く新時代", class: "title-phrase" }
 		];
 	}
-	if (rawTitle.includes("。")) {
-		const parts = rawTitle.split("。");
-		return parts.map((p, idx) => ({
-			text: idx < parts.length - 1 ? `${p}。` : p,
-			class: "title-phrase"
-		})).filter(p => p.text.length > 0);
+
+	// 汎用自動文節・フレーズ分割ロジック（言葉の途中での不自然な改行を完全防止）
+	const phrases: string[] = [];
+	let rest = rawTitle.trim();
+
+	// 1. 【...】や[...]の接頭句を独立フレーズとして保護
+	const prefixMatch = rest.match(/^(【[^】]+】|\[[^\]]+\])\s*/);
+	if (prefixMatch) {
+		phrases.push(prefixMatch[1]);
+		rest = rest.slice(prefixMatch[0].length).trim();
 	}
-	return [{ text: rawTitle, class: "" }];
+
+	// 2. 句読点・区切り記号（！ ! ？ ? 。 ： : ／ / ──）で分割
+	const puncRegex = /([^！？?!。:：／/──]+[！？?!。:：／/──]?)/g;
+	const parts = rest.match(puncRegex) || [rest];
+
+	for (let part of parts) {
+		part = part.trim();
+		if (!part) continue;
+		// 16文字を超える長いセグメントは、助詞や括弧の自然な境界で安全に細分化
+		if (part.length > 16) {
+			const m = part.match(/^(.+?([「『].+?[」』])?[^「『]{2,8}?[とやからでの])(.{6,})$/);
+			if (m) {
+				phrases.push(m[1].trim());
+				phrases.push(m[3].trim());
+				continue;
+			}
+		}
+		phrases.push(part);
+	}
+
+	if (phrases.length === 0) {
+		return [{ text: rawTitle, class: "title-phrase" }];
+	}
+
+	return phrases.map(p => ({ text: p, class: "title-phrase" }));
 }
 
 const titleSegments = getTitleSegments(post.data.title);
@@ -1972,12 +2003,14 @@ if (Array.isArray(post.data?.content)) {
 		color: var(--magazine-text-color);
 		margin: 0 0 16px 0;
 		max-width: 1200px;
-		word-break: normal;
-		overflow-wrap: break-word;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+		overflow-wrap: break-word !important;
 	}
 
 	.article-main-title .title-phrase {
-		display: inline-block;
+		display: inline-block !important;
+		word-break: auto-phrase !important;
 	}
 
 	/* リード文（サブタイトル） */
@@ -2447,25 +2480,63 @@ if (Array.isArray(post.data?.content)) {
 		letter-spacing: 0.02em;
 	}
 
-	/* 見出し（ゴールド縦線と下地なし・クリーンタイポグラフィ） */
-	.article-rich-text :global(h2) {
+	/* 見出し（ゴールド縦線と下地なし・クリーンタイポグラフィ・文節改行保護・セクションブロック間余白）
+	   ※本文直下のセクション見出し（「30秒でわかること」等）のみを対象とし、カードやコンポーネント内には波及させない */
+	.article-rich-text > :global(h2) {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(24px, 2.4vw, 30px);
 		font-weight: 700;
 		color: var(--magazine-text-color);
-		margin: 64px 0 24px 0;
+		/* セクションブロック間のゆったりしたスペース */
+		margin: clamp(80px, 8.5vw, 116px) 0 28px 0 !important;
 		padding: 0;
 		border: none;
 		background: none;
 		line-height: 1.35;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+		overflow-wrap: break-word !important;
 	}
 
-	.article-rich-text :global(h3) {
+	.article-rich-text > :global(h3) {
 		font-size: 20px;
 		font-weight: 700;
 		color: var(--color-nicole-red, #E60012);
-		margin: 44px 0 18px 0;
+		margin: clamp(56px, 6vw, 76px) 0 22px 0 !important;
 		line-height: 1.4;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+		overflow-wrap: break-word !important;
+	}
+
+	.article-rich-text > :global(h4) {
+		font-size: 17px;
+		font-weight: 700;
+		color: var(--magazine-text-color);
+		margin: clamp(40px, 4.5vw, 54px) 0 16px 0 !important;
+		line-height: 1.45;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+		overflow-wrap: break-word !important;
+	}
+
+	/* 見出し同士が連続する場合の余白調整 */
+	.article-rich-text > :global(h2 + h3) {
+		margin-top: 28px !important;
+	}
+	.article-rich-text > :global(h3 + h4) {
+		margin-top: 20px !important;
+	}
+
+	/* 本文先頭の見出しは天井との不要な隙間を排除 */
+	.article-rich-text > :global(:first-child:is(h2, h3, h4)) {
+		margin-top: 0 !important;
+	}
+
+	/* カード・左右分割メディア・テーブル等のブロック内部の見出しは余白ゼロを完全保証 */
+	.article-rich-text :global(:is(.cms-col-card, .cms-split-card, .cms-spec-card, .cms-table-widget, .cms-notes-block, .cms-faq-block, .accordion-item, .cms-table-desktop-container) :is(h2, h3, h4, h5, h6, .cms-col-card__title, .cms-split-card__title, .cms-spec-card__title, .cms-table-title)) {
+		margin-top: 0 !important;
+		padding-top: 0 !important;
 	}
 
 	.article-rich-text :global(p) {

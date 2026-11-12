@@ -2,6 +2,60 @@
 	--magazine-text-color: #ffffff;
 }
 
+/* 見出し・タイトルの自然な文節改行（言葉の途中での不自然な改行・ぶつ切りを完全防止） */
+.is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6),
+.is-magazine-page .article-main-title,
+.is-magazine-page .article-rich-text :is(h1, h2, h3, h4, h5, h6),
+.cms-table-title,
+.cms-spec-card__title,
+.cms-split-card__title,
+.cms-notes-title,
+.accordion-summary,
+.cms-col-card__title,
+.title-phrase {
+	word-break: auto-phrase !important;
+	line-break: strict !important;
+	overflow-wrap: break-word !important;
+}
+
+.title-phrase {
+	display: inline-block !important;
+}
+
+/* 見出しブロック間スペーシング（本文のセクション見出し「30秒でわかること」等のみを対象とし、カード内には波及させない） */
+.is-magazine-page .article-rich-text > h2 {
+	margin-top: clamp(80px, 8.5vw, 116px) !important;
+	margin-bottom: 28px !important;
+}
+
+.is-magazine-page .article-rich-text > h3 {
+	margin-top: clamp(56px, 6vw, 76px) !important;
+	margin-bottom: 22px !important;
+}
+
+.is-magazine-page .article-rich-text > h4 {
+	margin-top: clamp(40px, 4.5vw, 54px) !important;
+	margin-bottom: 16px !important;
+}
+
+.is-magazine-page .article-rich-text > h2 + h3 {
+	margin-top: 28px !important;
+}
+
+.is-magazine-page .article-rich-text > h3 + h4 {
+	margin-top: 20px !important;
+}
+
+.is-magazine-page .article-rich-text > :first-child:is(h2, h3, h4) {
+	margin-top: 0 !important;
+}
+
+/* カードや各種カスタムブロック内の見出し・タイトルは内部マージン（上部ゼロ）を完全保護 */
+.is-magazine-page :is(.cms-col-card, .cms-split-card, .cms-spec-card, .cms-table-widget, .cms-notes-block, .cms-faq-block, .accordion-item, .cms-table-desktop-container) :is(h2, h3, h4, h5, h6, .cms-col-card__title, .cms-split-card__title, .cms-spec-card__title, .cms-table-title) {
+	margin-top: 0 !important;
+	padding-top: 0 !important;
+}
+
 /* Keep imported theme and CMS text colors readable on the magazine's dark canvas. */
 .is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
 .is-magazine-page .article-rich-text :is(p, li, dt, dd, blockquote, figcaption, th, td, strong, em, span):not(.is-dark-text, .is-dark-text *, a[class*="btn"] *, a[class*="cta"] *) {
