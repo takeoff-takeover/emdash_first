@@ -1,0 +1,310 @@
+---
+/**
+ * CTABlock.astro
+ * EmDash Portable Text カスタムブロック：自由自在な高機能CTAボタン
+ * 配置（左寄せ/中央/右寄せ/全幅）、デザイン色、形状、リード文、注記を柔軟にカスタマイズ可能
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		label?: string;
+		title?: string;
+		text?: string;
+		button_label?: string;
+		url?: string;
+		href?: string;
+		button_url?: string;
+		lead_text?: string;
+		subtitle?: string;
+		align?: "center" | "left" | "right" | "full" | string;
+		style?: "primary" | "secondary" | "outline" | "white" | "custom" | string;
+		custom_color?: string;
+		shape?: "pill" | "rounded" | string;
+		has_arrow?: boolean | string;
+		target_blank?: "auto" | "blank" | "self" | string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+
+const label = (node.label || node.button_label || node.title || node.text || "詳細はこちら").trim();
+const url = (node.url || node.href || node.button_url || "https://www.nicole.co.jp/contact/?form_type=inquiry").trim();
+const leadText = (node.lead_text || "").trim();
+const subtitle = (node.subtitle || "").trim();
+
+const align = node.align || "center";
+const styleType = node.style || "secondary";
+const customColor = (node.custom_color || "").trim();
+const shape = node.shape || "pill";
+const showArrow = node.has_arrow !== "false" && node.has_arrow !== false;
+
+// リンクの開き方の判定
+let isTargetBlank = false;
+if (node.target_blank === "blank") {
+	isTargetBlank = true;
+} else if (node.target_blank === "self") {
+	isTargetBlank = false;
+} else {
+	// auto
+	isTargetBlank = url.startsWith("http") && !url.includes("nicole.co.jp") && !url.includes("localhost");
+}
+
+// カスタム色・プリセット色のインラインスタイル
+let customInlineStyle = "";
+if (styleType === "custom" && customColor) {
+	customInlineStyle = `background: ${customColor}; border-color: ${customColor}; box-shadow: 0 4px 20px ${customColor}44; color: #ffffff !important;`;
+} else if (styleType === "blue") {
+	customInlineStyle = "background: #0066b1; border-color: #0066b1; box-shadow: 0 4px 20px rgba(0, 102, 177, 0.35); color: #ffffff !important;";
+}
+---
+
+<div class={`cms-cta-wrapper cms-cta--align-${align}`}>
+	<div class={`cms-cta-container cms-cta-container--align-${align}`}>
+		{leadText && (
+			<p class="cms-cta-lead-text">{leadText}</p>
+		)}
+
+		<a
+			href={url}
+			class={`cms-cta-btn cms-cta-btn--${styleType} cms-cta-shape--${shape} ${align === "full" ? "cms-cta-btn--full" : ""}`}
+			style={customInlineStyle || undefined}
+			target={isTargetBlank ? "_blank" : undefined}
+			rel={isTargetBlank ? "noopener noreferrer" : undefined}
+		>
+			<span class="cms-cta-label">{label}</span>
+			{showArrow && (
+				<span class="cms-cta-arrow" aria-hidden="true">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+						<polyline points="12 5 19 12 12 19"></polyline>
+					</svg>
+				</span>
+			)}
+		</a>
+
+		{subtitle && (
+			<p class="cms-cta-subtitle">{subtitle}</p>
+		)}
+	</div>
+</div>
+
+<style>
+	.cms-cta-wrapper {
+		margin: 2.75rem 0;
+		width: 100%;
+		display: flex;
+	}
+
+	.cms-cta--align-center {
+		justify-content: center;
+	}
+	.cms-cta--align-left {
+		justify-content: flex-start;
+	}
+	.cms-cta--align-right {
+		justify-content: flex-end;
+	}
+	.cms-cta--align-full {
+		justify-content: stretch;
+	}
+
+	.cms-cta-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		max-width: 100%;
+	}
+
+	.cms-cta-container--align-center {
+		align-items: center;
+		text-align: center;
+	}
+	.cms-cta-container--align-left {
+		align-items: flex-start;
+		text-align: left;
+	}
+	.cms-cta-container--align-right {
+		align-items: flex-end;
+		text-align: right;
+	}
+	.cms-cta-container--align-full {
+		width: 100%;
+		align-items: stretch;
+		text-align: center;
+	}
+
+	/* リード文 */
+	.cms-cta-lead-text {
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.88);
+		font-weight: 500;
+		margin: 0 !important;
+		letter-spacing: 0.02em;
+		max-width: 600px;
+	}
+
+	/* サブ注記・マイクロコピー */
+	.cms-cta-subtitle {
+		font-size: 0.825rem;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0 !important;
+		letter-spacing: 0.04em;
+	}
+
+	/* 基本ボタン */
+	.cms-cta-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		min-width: 260px;
+		padding: 14px 34px;
+		font-family: inherit;
+		font-size: 1.025rem;
+		font-weight: 700;
+		text-decoration: none !important;
+		cursor: pointer;
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		box-sizing: border-box;
+		position: relative;
+	}
+
+	.cms-cta-btn--full {
+		width: 100% !important;
+	}
+
+	/* 形状 */
+	.cms-cta-shape--pill {
+		border-radius: 9999px;
+	}
+	.cms-cta-shape--rounded {
+		border-radius: 8px;
+	}
+	.cms-cta-shape--square {
+		border-radius: 0;
+	}
+
+	/* スタイル1：アクセントレッド */
+	.cms-cta-btn--primary {
+		background: #e52d27;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 4px 20px rgba(229, 45, 39, 0.38);
+	}
+	.cms-cta-btn--primary:hover {
+		background: #d0201a;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 28px rgba(229, 45, 39, 0.5);
+		color: #ffffff !important;
+	}
+
+	/* スタイル1.5：ブランドブルー */
+	.cms-cta-btn--blue {
+		background: #0066b1;
+		color: #ffffff !important;
+		border: 1px solid #0066b1;
+		box-shadow: 0 4px 20px rgba(0, 102, 177, 0.35);
+	}
+	.cms-cta-btn--blue:hover {
+		background: #004d85;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 28px rgba(0, 102, 177, 0.5);
+		color: #ffffff !important;
+	}
+
+	/* スタイル2：シックグレー（基本色） */
+	.cms-cta-btn--secondary {
+		background: #2c2e35;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+	}
+	.cms-cta-btn--secondary:hover {
+		background: #383b44;
+		border-color: rgba(255, 255, 255, 0.35);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+		color: #ffffff !important;
+	}
+
+	/* スタイル2.5：シックブラック */
+	.cms-cta-btn--black {
+		background: #111216;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	}
+	.cms-cta-btn--black:hover {
+		background: #1d1e24;
+		border-color: rgba(255, 255, 255, 0.3);
+		transform: translateY(-2px);
+		color: #ffffff !important;
+	}
+
+	/* スタイル3：アウトライン */
+	.cms-cta-btn--outline {
+		background: transparent;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+	.cms-cta-btn--outline:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: #ffffff;
+		transform: translateY(-2px);
+		color: #ffffff !important;
+	}
+
+	/* スタイル4：ピュアホワイト */
+	.cms-cta-btn--white {
+		background: #ffffff;
+		color: #0b0d12 !important;
+		border: 1px solid #ffffff;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+	}
+	.cms-cta-btn--white:hover {
+		background: #e8e8ec;
+		border-color: #e8e8ec;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+		color: #0b0d12 !important;
+	}
+
+	/* スタイル5：カスタム */
+	.cms-cta-btn--custom:hover {
+		filter: brightness(1.1);
+		transform: translateY(-2px);
+	}
+
+	.cms-cta-label {
+		letter-spacing: 0.02em;
+	}
+
+	.cms-cta-arrow {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s ease;
+	}
+
+	.cms-cta-btn:hover .cms-cta-arrow {
+		transform: translateX(4px);
+	}
+
+	@media (max-width: 640px) {
+		.cms-cta-wrapper {
+			margin: 2rem 0;
+		}
+		.cms-cta-btn {
+			width: 100%;
+			min-width: unset;
+			padding: 13px 24px;
+			font-size: 0.95rem;
+		}
+		.cms-cta-container {
+			width: 100%;
+		}
+	}
+</style>

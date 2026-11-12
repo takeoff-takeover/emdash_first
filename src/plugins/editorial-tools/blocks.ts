@@ -307,10 +307,10 @@ export const editorialBlocks = [
 	},
 	{
 		type: "notes",
-		label: "注釈エリア（文字小）",
+		label: "注釈エリア（文字小・免責事項）",
 		icon: "align-left",
 		description: "記事末尾などに小さな文字サイズで掲載する注釈・免責事項・補足情報",
-		category: "テキスト",
+		category: "レイアウト",
 		fields: [
 			{
 				type: "text_input",
@@ -318,6 +318,137 @@ export const editorialBlocks = [
 				multiline: true,
 				label: "【注釈】注釈・免責テキスト（複数行入力対応）",
 				placeholder: "※掲載の諸元や数値は参考値です。\n※記載の情報は予告なく変更される場合があります。"
+			}
+		]
+	},
+	{
+		type: "cta",
+		label: "CTAボタン（配置・色・リンク自由設定）",
+		icon: "bookmark",
+		description: "ボタン文言、リンク、配置（左寄せ・中央・幅広）、色（レッド・ダーク・枠線・カスタム）、形状を自由自在に設定できるアクションボタン",
+		category: "レイアウト",
+		fields: [
+			{
+				type: "text_input",
+				action_id: "label",
+				label: "【ボタン文字】ボタン内の表示テキスト（必須）",
+				initial_value: "詳細はこちら",
+				placeholder: "例：詳細はこちら / 試乗・相談予約をする"
+			},
+			{
+				type: "text_input",
+				action_id: "url",
+				label: "【リンク先URL】クリック時の遷移先（必須）",
+				initial_value: "https://www.nicole.co.jp/contact/?form_type=inquiry",
+				placeholder: "https://... または /contact/ などの相対パス"
+			},
+			{
+				type: "text_input",
+				action_id: "lead_text",
+				multiline: true,
+				label: "【上部リード文】ボタンの上部に添える見出し・後押し文（任意）",
+				placeholder: "例：正規ディーラーならではの手厚いサポートで、あなたに最適な1台をご案内いたします。"
+			},
+			{
+				type: "text_input",
+				action_id: "subtitle",
+				label: "【下部注記】ボタン直下のマイクロコピー（※空欄の場合は非表示・枠も出ません）",
+				initial_value: "",
+				placeholder: "例：※所要時間約2分・当日のご予約も承ります"
+			},
+			{
+				type: "select",
+				action_id: "align",
+				label: "【配置】ボタンの揃え位置",
+				initial_value: "center",
+				options: [
+					{ label: "中央揃え（区切りや記事末尾の勝負CTAに最適）", value: "center" },
+					{ label: "左寄せ（文章の流れのまま自然に誘導）", value: "left" },
+					{ label: "右寄せ（補足・次のアクション）", value: "right" },
+					{ label: "幅いっぱい（100%ワイド・スマホでも迫力大）", value: "full" }
+				]
+			},
+			{
+				type: "select",
+				action_id: "style",
+				label: "【デザイン・色】ボタンの基本色（任意カラーも選択可）",
+				initial_value: "secondary",
+				options: [
+					{ label: "シックグレー（上品なグレー背景 / 白文字・基本）", value: "secondary" },
+					{ label: "シックブラック（黒背景 / 白文字）", value: "black" },
+					{ label: "ピュアホワイト（白背景 / 黒文字・高コントラスト）", value: "white" },
+					{ label: "アウトライン（上品な白枠線 / 背景透過）", value: "outline" },
+					{ label: "アクセントレッド（注目度No.1・最重要CTA推奨）", value: "primary" },
+					{ label: "ブランドブルー（BMW / MINIブルー #0066b1）", value: "blue" },
+					{ label: "任意カラー（下のカラーコード／カラーピッカーで自由指定）", value: "custom" }
+				]
+			},
+			{
+				type: "text_input",
+				action_id: "custom_color",
+				label: "【任意カラー】カラーコード（スタイルで「任意カラー」を選んだ場合に有効）",
+				placeholder: "例：#0066b1（ブルー） / #28a745（グリーン） / #ff6600（オレンジ）"
+			},
+			{
+				type: "select",
+				action_id: "shape",
+				label: "【形状】ボタンの角丸デザイン",
+				initial_value: "rounded",
+				options: [
+					{ label: "スクエア型（角丸8px：基本・高級感のあるシャープな印象）", value: "rounded" },
+					{ label: "ピル型（丸み・ラウンド：現代的でクリックしやすい）", value: "pill" },
+					{ label: "完全スクエア（角丸なし・シャープな四角）", value: "square" }
+				]
+			},
+			{
+				type: "select",
+				action_id: "has_arrow",
+				label: "【矢印アイコン】右端のアニメーション矢印表示",
+				initial_value: "true",
+				options: [
+					{ label: "矢印あり（→ ホバーで右へアニメーション）", value: "true" },
+					{ label: "矢印なし（テキストのみですっきり）", value: "false" }
+				]
+			},
+			{
+				type: "select",
+				action_id: "target_blank",
+				label: "【リンクの開き方】",
+				initial_value: "auto",
+				options: [
+					{ label: "自動判定（外部URLは新規タブ、サイト内は同一タブ）", value: "auto" },
+					{ label: "同じタブで開く（現在のページから移動）", value: "self" },
+					{ label: "新しいタブで開く（別ウィンドウで開く）", value: "blank" }
+				]
+			}
+		]
+	},
+	{
+		type: "table",
+		label: "スペック比較表（スプレッドシート・CSVコピペ対応）",
+		icon: "table",
+		description: "ExcelやGoogleスプレッドシートの表をそのままコピー＆ペースト（TSV/CSV）するだけで、スマホ対応の美しいスペック表が作成できます",
+		category: "レイアウト",
+		fields: [
+			{
+				type: "text_input",
+				action_id: "title",
+				label: "【表の見出し】表の上に表示するタイトル（任意）",
+				placeholder: "例：MINI「SELECT」シリーズ 全ラインアップ スペック比較"
+			},
+			{
+				type: "text_input",
+				action_id: "raw_csv",
+				multiline: true,
+				label: "【表データ】Excel / スプレッドシートから表をコピーして貼り付け（タブ区切り / CSV）",
+				placeholder: "モデル名\tボディタイプ\tサイズ（全長×全幅×全高）\t税込車両価格\t従来比差額目安\nMINI Cooper 3 Door C SELECT\t3ドアハッチバック\t3,875 × 1,745 × 1,455 mm\t3,650,000円〜\t約 -30万〜-40万円\nMINI Cooper 5 Door C SELECT\t5ドアハッチバック\t4,035 × 1,745 × 1,470 mm\t3,770,000円〜\t約 -30万〜-40万円\nMINI Countryman C SELECT\tSUV\t4,445 × 1,845 × 1,640 mm\t4,490,000円〜\t約 -40万〜-50万円"
+			},
+			{
+				type: "text_input",
+				action_id: "caption",
+				multiline: true,
+				label: "【注釈・補足】表の下に表示する注意書き・免責事項（任意）",
+				placeholder: "例：※従来モデルとの差額については、オプション等を含めない標準価格より算出しています。"
 			}
 		]
 	}

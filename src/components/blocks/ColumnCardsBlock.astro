@@ -81,15 +81,18 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 								{String(idx + 1).padStart(2, "0")}
 							</span>
 						)}
-						{c.title && <h3 class="cms-col-card__title">{c.title}</h3>}
-						{c.text && <p class="cms-col-card__text">{c.text}</p>}
-						{c.button_label && (
-							<div class="cms-col-card__footer">
-								<a href={c.button_url || "#cmp-booking"} class="cms-col-card__btn">
-									{c.button_label}
-								</a>
-							</div>
-						)}
+						<div class="cms-col-card__content-wrap">
+							{c.title && <h3 class="cms-col-card__title">{c.title}</h3>}
+							{c.text && <p class="cms-col-card__text">{c.text}</p>}
+							{c.button_label && c.button_url && (
+								<div class="cms-col-card__footer">
+									<a href={c.button_url} class="cms-col-card__btn">
+										{c.button_label}
+										<span class="cms-col-card__btn-arrow" aria-hidden="true">→</span>
+									</a>
+								</div>
+							)}
+						</div>
 					</div>
 				</article>
 			))}
@@ -99,13 +102,17 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 
 <style>
 	.cms-col-cards {
-		margin: 2rem 0 3rem 0;
+		margin: 3rem 0;
+		width: 100%;
 	}
+
 	.cms-col-cards__grid {
 		display: grid;
 		gap: 1.5rem;
-		align-items: stretch;
+		width: 100%;
 	}
+
+	/* カラム別グリッド定義 */
 	.cms-col-cards--cols-1 .cms-col-cards__grid {
 		grid-template-columns: minmax(0, 1fr);
 		width: 100%;
@@ -172,6 +179,12 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		flex: 1;
 	}
 
+	.cms-col-card__content-wrap {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
 	.cms-col-card__step-badge {
 		display: inline-flex;
 		align-items: center;
@@ -194,6 +207,25 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		background: rgba(0, 0, 0, 0.75);
 		color: #ffffff;
 		backdrop-filter: blur(4px);
+	}
+
+	/* 1列ステップカード（横長タイムラインスタイル：左に番号バッジ、右に文章で抜群の可読性） */
+	.cms-col-cards--cols-1.cms-col-cards--style-step .cms-col-card__body {
+		flex-direction: row;
+		gap: 1.75rem;
+		align-items: flex-start;
+		padding: 1.75rem 2rem;
+	}
+	.cms-col-cards--cols-1.cms-col-cards--style-step .cms-col-card__step-badge {
+		font-size: 1.15rem;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 8px;
+		flex-shrink: 0;
+		margin-bottom: 0;
+		background: rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
 	.cms-col-card__title {
@@ -219,6 +251,7 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 	.cms-col-card__btn {
 		display: inline-flex;
 		align-items: center;
+		gap: 0.35rem;
 		font-size: 0.875rem;
 		font-weight: 700;
 		color: var(--cms-card-heading, #ffffff) !important;
@@ -227,6 +260,12 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 	}
 	.cms-col-card__btn:hover {
 		opacity: 0.75;
+	}
+	.cms-col-card__btn-arrow {
+		transition: transform 0.2s ease;
+	}
+	.cms-col-card__btn:hover .cms-col-card__btn-arrow {
+		transform: translateX(3px);
 	}
 
 	/* 明るい背景（白・ライトグレー背景帯）の中にある場合のカード配色 */
@@ -262,6 +301,16 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		}
 		.cms-col-cards--cols-1 .cms-col-card__media {
 			aspect-ratio: 16 / 10;
+		}
+		.cms-col-cards--cols-1.cms-col-cards--style-step .cms-col-card__body {
+			flex-direction: column;
+			gap: 0.75rem;
+			padding: 1.25rem;
+		}
+		.cms-col-cards--cols-1.cms-col-cards--style-step .cms-col-card__step-badge {
+			width: 2.25rem;
+			height: 2.25rem;
+			font-size: 0.95rem;
 		}
 		.cms-col-card__body {
 			padding: 1.25rem;

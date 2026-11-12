@@ -4,6 +4,33 @@
 
 /* Keep imported theme and CMS text colors readable on the magazine's dark canvas. */
 .is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
-.is-magazine-page .article-rich-text :is(p, li, dt, dd, blockquote, figcaption, th, td, strong, em, span):not(.is-dark-text, .is-dark-text *, a[class*="btn"] *) {
+.is-magazine-page .article-rich-text :is(p, li, dt, dd, blockquote, figcaption, th, td, strong, em, span):not(.is-dark-text, .is-dark-text *, a[class*="btn"] *, a[class*="cta"] *) {
 	color: var(--magazine-text-color) !important;
+}
+
+/* 本文内インラインリンク（自動ボタン化は廃止・上品なリンクデザインに統一） */
+.is-magazine-page .article-rich-text a:not([class*="btn"], [class*="cta"], [class*="chip"]) {
+	color: #ffffff;
+	text-decoration: underline;
+	text-decoration-color: rgba(255, 255, 255, 0.4);
+	text-underline-offset: 4px;
+	transition: all 0.2s ease;
+}
+
+.is-magazine-page .article-rich-text a:not([class*="btn"], [class*="cta"], [class*="chip"]):hover {
+	color: #60a5fa;
+	text-decoration-color: #60a5fa;
+}
+
+/* 段落変換「注釈」スタイルの反映（他の注釈と同じサイズ・行間） */
+.is-magazine-page .article-rich-text p.is-note,
+.is-magazine-page .article-rich-text p[data-pt-style="note"],
+.is-magazine-page .article-rich-text .article-note {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+	font-size: 12.5px !important;
+	line-height: 1.45 !important;
+	color: rgba(255, 255, 255, 0.52) !important;
+	margin: 7px 0 !important;
+	letter-spacing: 0.02em;
+	word-break: break-word;
 }

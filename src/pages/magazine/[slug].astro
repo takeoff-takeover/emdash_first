@@ -1327,7 +1327,7 @@ const articleJsonLd: any = [
 
 // If content has FAQ block, construct FAQPage JSON-LD
 if (Array.isArray(post.data?.content)) {
-	const faqBlock = post.data.content.find((b: any) => b._type === "editorial-tools:faq");
+	const faqBlock = post.data.content.find((b: any) => b._type === "editorial-tools:faq" || b._type === "faq");
 	if (faqBlock && Array.isArray(faqBlock.items) && faqBlock.items.length > 0) {
 		articleJsonLd.push({
 			"@context": "https://schema.org",

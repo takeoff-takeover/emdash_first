@@ -47,6 +47,18 @@ const injectedCode = `
 				}
 				if (checkLocalAutoLogin()) return;
 
+				// エディタ内「注釈」スタイルの動的注入（管理画面のライト/ダーク背景に対応）
+				function injectEditorNoteStyles() {
+					let style = document.getElementById('emdash-editor-note-style');
+					if (!style) {
+						style = document.createElement('style');
+						style.id = 'emdash-editor-note-style';
+						document.head.appendChild(style);
+					}
+					style.textContent = '.ProseMirror p.is-note, .ProseMirror p[data-pt-style="note"] { font-size: 12.5px !important; line-height: 1.45 !important; color: #555e6d !important; margin-top: 6px !important; margin-bottom: 6px !important; letter-spacing: 0.02em !important; border-left: 2px solid #cbd5e1 !important; padding-left: 8px !important; } :is(.dark, [data-theme="dark"]) .ProseMirror p.is-note, :is(.dark, [data-theme="dark"]) .ProseMirror p[data-pt-style="note"] { color: rgba(255, 255, 255, 0.55) !important; border-left-color: rgba(255, 255, 255, 0.25) !important; }';
+				}
+				injectEditorNoteStyles();
+
 				const SECTION_CONFIG = [
 					{
 						id: 'sec-basic',
@@ -555,16 +567,32 @@ const injectedCode = `
 
 				function applyCampaignBrandFilterTabs() {
 					try {
-						const isCampaignPage = window.location.pathname.includes('/content/campaigns') || window.location.hash.includes('/content/campaigns');
-						if (!isCampaignPage) {
+						const rawPath = window.location.pathname || '';
+						const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath;
+
+						// エディタ画面・編集画面なら絶対にタブを配置せず、既存のタブがあれば即座に削除する
+						const isEditor = Boolean(
+							document.querySelector('form') ||
+							document.querySelector('.tiptap') ||
+							document.querySelector('[data-slate-editor]') ||
+							document.querySelector('.emdash-editor') ||
+							path.includes('/campaigns/') ||
+							path.endsWith('/campaigns/new')
+						);
+
+						const isCampaignListPage = !isEditor && (path === '/_emdash/admin/content/campaigns' || path.endsWith('/admin/content/campaigns'));
+						if (!isCampaignListPage) {
 							const existingTabs = document.getElementById('campaign-brand-filter-bar');
 							if (existingTabs) existingTabs.remove();
 							return;
 						}
 
-						// テーブルまたは一覧コンテナを探す
-						const table = document.querySelector('table');
+						// テーブルまたは一覧コンテナを探す（エディタ内のテーブルやブロックプレビュー内のテーブルは完全に除外）
+						const table = document.querySelector('main table, .emdash-table-wrap table, .overflow-x-auto > table');
 						if (!table) return;
+						if (table.closest('.tiptap') || table.closest('form') || table.closest('.plugin-block') || table.closest('.cms-table-widget') || table.closest('.nicole-block-preview')) {
+							return;
+						}
 
 						const tableTarget = table.closest('.overflow-x-auto') || table;
 						let tabContainer = document.getElementById('campaign-brand-filter-bar');
@@ -647,7 +675,7 @@ const injectedCode = `
 				}
 
 				function filterCampaignTableRows() {
-					const rows = document.querySelectorAll('table tbody tr');
+					const rows = document.querySelectorAll('main table tbody tr');
 					rows.forEach(tr => {
 						if (activeCampaignBrand === 'all') {
 							tr.style.display = '';
@@ -669,16 +697,32 @@ const injectedCode = `
 
 				function applyMagazineFilterTabs() {
 					try {
-						const isMagazinePage = window.location.pathname.includes('/content/magazine') || window.location.hash.includes('/content/magazine');
-						if (!isMagazinePage) {
+						const rawPath = window.location.pathname || '';
+						const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath;
+
+						// エディタ画面・編集画面なら絶対にタブを配置せず、既存のタブがあれば即座に削除する
+						const isEditor = Boolean(
+							document.querySelector('form') ||
+							document.querySelector('.tiptap') ||
+							document.querySelector('[data-slate-editor]') ||
+							document.querySelector('.emdash-editor') ||
+							path.includes('/magazine/') ||
+							path.endsWith('/magazine/new')
+						);
+
+						const isMagazineListPage = !isEditor && (path === '/_emdash/admin/content/magazine' || path.endsWith('/admin/content/magazine'));
+						if (!isMagazineListPage) {
 							const existingTabs = document.getElementById('magazine-filter-bar');
 							if (existingTabs) existingTabs.remove();
 							return;
 						}
 
-						// テーブルまたは一覧コンテナを探す
-						const table = document.querySelector('table');
+						// テーブルまたは一覧コンテナを探す（エディタ内のテーブルやブロックプレビュー内のテーブルは完全に除外）
+						const table = document.querySelector('main table, .emdash-table-wrap table, .overflow-x-auto > table');
 						if (!table) return;
+						if (table.closest('.tiptap') || table.closest('form') || table.closest('.plugin-block') || table.closest('.cms-table-widget') || table.closest('.nicole-block-preview')) {
+							return;
+						}
 
 						const tableTarget = table.closest('.overflow-x-auto') || table;
 						let tabContainer = document.getElementById('magazine-filter-bar');
@@ -1181,10 +1225,11 @@ const injectedCode = `
 
 						const isStartColor = lText.includes('開始カラー') || lText.includes('開始色');
 						const isEndColor = lText.includes('終了カラー') || lText.includes('終了色');
+						const isCustomColor = lText.includes('カスタム色') || lText.includes('任意カラー');
 						if (isStartColor) startColorInput = input;
 						if (isEndColor) endColorInput = input;
 
-						if ((isStartColor || isEndColor) && !input.dataset.nicoleColorEnhanced) {
+						if ((isStartColor || isEndColor || isCustomColor) && !input.dataset.nicoleColorEnhanced) {
 							input.dataset.nicoleColorEnhanced = 'true';
 							const helper = document.createElement('div');
 							helper.className = 'nicole-color-helper';
@@ -1197,7 +1242,7 @@ const injectedCode = `
 							const colorPicker = document.createElement('input');
 							colorPicker.type = 'color';
 							colorPicker.className = 'nicole-native-color-input';
-							colorPicker.value = /^#[0-9a-fA-F]{6}$/.test(input.value.trim()) ? input.value.trim() : (isStartColor ? '#141418' : '#000000');
+							colorPicker.value = /^#[0-9a-fA-F]{6}$/.test(input.value.trim()) ? input.value.trim() : (isStartColor ? '#141418' : isCustomColor ? '#0066b1' : '#000000');
 							colorPicker.style.cssText = 'width: 24px; height: 24px; padding: 0; border: none; background: transparent; cursor: pointer;';
 							colorPicker.addEventListener('input', () => {
 								setReactInputValue(input, colorPicker.value);
@@ -1418,6 +1463,13 @@ const injectedCode = `
 
 				function enhanceEditorPluginBlocks() {
 					injectEditorialBlockStyles();
+
+					// エディタ画面内に迷い込んだ一覧用フィルターバーがあれば無条件で完全消去
+					const strayMagFilter = document.getElementById('magazine-filter-bar');
+					if (strayMagFilter) strayMagFilter.remove();
+					const strayCampFilter = document.getElementById('campaign-brand-filter-bar');
+					if (strayCampFilter) strayCampFilter.remove();
+
 					const blocks = document.querySelectorAll('.plugin-block');
 					blocks.forEach(blockEl => { try {
 						const card = blockEl.querySelector('.rounded-lg.border');
@@ -1462,6 +1514,7 @@ const injectedCode = `
 
 						let precedingStart = '';
 						let precedingStartData = null;
+						let ctaPreviewStyles = null;
 						if (blockType.endsWith('bg_band_end')) {
 							for (const el of blocks) {
 								if (el === blockEl) break;
@@ -1583,8 +1636,85 @@ const injectedCode = `
 								if (it.question) texts.push(\`Q\${idx + 1}. \${it.question}\`);
 							});
 						} else if (blockType.endsWith('notes')) {
+							badges.push('注釈エリア（文字小・免責事項）');
 							const noteContent = data.content || data.items || '';
 							if (noteContent) texts.push(...String(noteContent).split('\\n').filter(Boolean));
+						} else if (blockType.endsWith('cta')) {
+							const alignLabel = data.align === 'left' ? '左寄せ' : data.align === 'right' ? '右寄せ' : data.align === 'full' ? '幅いっぱい' : '中央揃え';
+							const curStyle = data.style || 'secondary';
+							let styleLabel = 'シックブラック';
+							let dotColor = '#141418';
+							let previewBg = '#141418';
+							let previewTextColor = '#ffffff';
+							let previewBorder = '1px solid rgba(255,255,255,0.25)';
+
+							if (curStyle === 'primary') {
+								styleLabel = 'アクセントレッド';
+								dotColor = '#e52d27';
+								previewBg = '#e52d27';
+								previewBorder = '1px solid #e52d27';
+							} else if (curStyle === 'blue') {
+								styleLabel = 'ブランドブルー';
+								dotColor = '#0066b1';
+								previewBg = '#0066b1';
+								previewBorder = '1px solid #0066b1';
+							} else if (curStyle === 'white') {
+								styleLabel = 'ピュアホワイト';
+								dotColor = '#ffffff';
+								previewBg = '#ffffff';
+								previewTextColor = '#111111';
+								previewBorder = '1px solid #cccccc';
+							} else if (curStyle === 'outline') {
+								styleLabel = 'アウトライン';
+								dotColor = '#888888';
+								previewBg = 'transparent';
+								previewBorder = '1px solid rgba(255,255,255,0.4)';
+							} else if (curStyle === 'custom') {
+								const hex = data.custom_color || '#333333';
+								styleLabel = \`任意カラー (\${hex})\`;
+								dotColor = hex;
+								previewBg = hex;
+								previewBorder = \`1px solid \${hex}\`;
+							}
+
+							ctaPreviewStyles = {
+								bg: previewBg,
+								color: previewTextColor,
+								border: previewBorder,
+								label: data.label || '詳細はこちら',
+								shape: data.shape || 'pill',
+								align: data.align || 'center'
+							};
+
+							badges.push('CTAボタン', alignLabel, \`● \${styleLabel}\`);
+							if (data.label) texts.push(\`ボタン文字: \${data.label}\`);
+							if (data.url) texts.push(\`リンク先: \${data.url}\`);
+							if (data.lead_text) texts.push(\`リード文: \${data.lead_text}\`);
+							if (data.subtitle) texts.push(\`注記: \${data.subtitle}\`);
+						} else if (blockType.endsWith('table')) {
+							const rawCsv = String(data.raw_csv || data.csv || data.tsv || '').trim();
+							let headers = Array.isArray(data.headers) ? data.headers : [];
+							let rows = Array.isArray(data.rows) ? data.rows : [];
+
+							if (rawCsv) {
+								const lines = rawCsv.split(String.fromCharCode(10)).map(l => l.trim()).filter(Boolean);
+								if (lines.length > 0) {
+									const delim = lines[0].includes(String.fromCharCode(9)) ? String.fromCharCode(9) : ',';
+									headers = lines[0].split(delim).map(s => s.trim());
+									rows = lines.slice(1).map(l => ({
+										cells: l.split(delim).map(s => ({ text: s.trim() }))
+									}));
+								}
+							}
+
+							badges.push('スペック比較表（コピペ対応）', \`全 \${rows.length} 行 / \${headers.length} 列\`);
+							if (data.title) texts.push(\`表題: \${data.title}\`);
+							if (headers.length > 0) texts.push(\`列: \${headers.join(' ｜ ')}\`);
+							rows.slice(0, 4).forEach((r, idx) => {
+								const firstCell = r.cells?.[0]?.text || '';
+								if (firstCell) texts.push(\`[\${idx + 1}] \${firstCell}\`);
+							});
+							if (data.caption) texts.push(\`注記: \${data.caption}\`);
 						}
 
 						if (images.length === 0 && badges.length === 0 && texts.length === 0) return;
@@ -1607,6 +1737,28 @@ const injectedCode = `
 								bWrap.appendChild(span);
 							});
 							preview.appendChild(bWrap);
+						}
+
+						if (ctaPreviewStyles) {
+							const ctaBtn = document.createElement('div');
+							ctaBtn.style.cssText = \`
+								display: inline-flex;
+								align-items: center;
+								gap: 6px;
+								padding: 5px 14px;
+								font-size: 12px;
+								font-weight: 700;
+								border-radius: \${ctaPreviewStyles.shape === 'rounded' ? '6px' : '9999px'};
+								background: \${ctaPreviewStyles.bg};
+								color: \${ctaPreviewStyles.color};
+								border: \${ctaPreviewStyles.border};
+								box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+								margin-top: 6px;
+								margin-bottom: 4px;
+								width: fit-content;
+							\`;
+							ctaBtn.innerHTML = \`<span>\${ctaPreviewStyles.label}</span><span style="font-size:11px;">→</span>\`;
+							preview.appendChild(ctaBtn);
 						}
 
 						if (images.length > 0) {
@@ -1763,6 +1915,71 @@ for (const bundlePath of bundleCandidates) {
   if (js.includes(repeaterCollapseTarget)) {
     js = js.replace(repeaterCollapseTarget, repeaterCollapseReplacement);
     modified = true;
+  }
+
+  // 3. portableTextToProsemirror: table がプラグインブロックまたはカスタムデータ（raw_csv/headers）を持つ場合、convertCustomBlock にルーティングする
+  const tableTarget = 'case "table": {\n\t\t\tconst result = portableTextTableToProseMirror(block, {';
+  const tableReplacement = 'case "table": {\n\t\t\tif (pluginTypes.has("table") || pluginTypes.has("editorial-tools:table") || block.raw_csv || Array.isArray(block.headers)) return convertCustomBlock(block);\n\t\t\tconst result = portableTextTableToProseMirror(block, {';
+  if (!js.includes('pluginTypes.has("table")') && js.includes(tableTarget)) {
+    js = js.replace(tableTarget, tableReplacement);
+    modified = true;
+  }
+
+  // 4. 段落変換メニューへの「注釈」追加パッチ
+  // 4-1. textBlockTypes に "note" を追加
+  if (!js.includes('id: "note"')) {
+    const target = '{\n\t\tid: "codeBlock",\n\t\tlabel: {\n\t\t\tid: "N2eHWq",\n\t\t\tmessage: "Code Block"\n\t\t},\n\t\ticon: CodeBlock,\n\t\tmarkdown: "```",\n\t\tisActive: (editor) => editor.isActive("codeBlock"),\n\t\ttransform: (editor) => turnInto(editor, "codeBlock")\n\t}\n];';
+    const repl = '{\n\t\tid: "codeBlock",\n\t\tlabel: {\n\t\t\tid: "N2eHWq",\n\t\t\tmessage: "Code Block"\n\t\t},\n\t\ticon: CodeBlock,\n\t\tmarkdown: "```",\n\t\tisActive: (editor) => editor.isActive("codeBlock"),\n\t\ttransform: (editor) => turnInto(editor, "codeBlock")\n\t},\n\t{\n\t\tid: "note",\n\t\tlabel: {\n\t\t\tid: "custom_note_item",\n\t\t\tmessage: "注釈"\n\t\t},\n\t\ticon: TextT,\n\t\tisActive: (editor) => editor.isActive("paragraph", { ptStyle: "note" }),\n\t\ttransform: (editor) => turnInto(editor, "note")\n\t}\n];';
+    if (js.includes(target)) {
+      js = js.replace(target, repl);
+      modified = true;
+    }
+  }
+
+  // 4-2. ACTIVE_ORDER に "note" を追加
+  if (js.includes('"paragraph"\n];') && !js.includes('"note",\n\t"paragraph"\n];')) {
+    js = js.replace('"paragraph"\n];', '"note",\n\t"paragraph"\n];');
+    modified = true;
+  }
+
+  // 4-3. convertTextBlocks に "note" ハンドリングを追加
+  if (!js.includes('else if (id === "note") setTextBlockType')) {
+    const target = 'else if (id === "paragraph") setTextBlockType(tr, from, to, schema.nodes.paragraph);';
+    const repl = 'else if (id === "note") setTextBlockType(tr, from, to, schema.nodes.paragraph, { ptStyle: "note" });\n\t\telse if (id === "paragraph") setTextBlockType(tr, from, to, schema.nodes.paragraph, { ptStyle: null });';
+    if (js.includes(target)) {
+      js = js.replace(target, repl);
+      modified = true;
+    }
+  }
+
+  // 4-4. PortableTextIdentityExtension に ptStyle 属性を追加
+  if (!js.includes('ptStyle: {')) {
+    const target = 'attributes: { [PORTABLE_TEXT_KEY_ATTR]: hiddenAttribute }';
+    const repl = 'attributes: {\n\t\t\t\t[PORTABLE_TEXT_KEY_ATTR]: hiddenAttribute,\n\t\t\t\tptStyle: {\n\t\t\t\t\tdefault: null,\n\t\t\t\t\tparseHTML: (el) => el.getAttribute("data-pt-style") || (el.classList?.contains("is-note") ? "note" : null),\n\t\t\t\t\trenderHTML: (attrs) => attrs.ptStyle ? { "data-pt-style": attrs.ptStyle, class: attrs.ptStyle === "note" ? "is-note" : void 0 } : {}\n\t\t\t\t}\n\t\t\t}';
+    if (js.includes(target)) {
+      js = js.replace(target, repl);
+      modified = true;
+    }
+  }
+
+  // 4-5. convertPMNode で ptStyle を style: "note" として出力
+  if (!js.includes('const pStyle = node.attrs?.ptStyle === "note" ? "note" : "normal";')) {
+    const target = '\t\t\treturn {\n\t\t\t\t_type: "block",\n\t\t\t\t_key: portableTextKeyFromAttrs(node.attrs) ?? generateKey(),\n\t\t\t\tstyle: "normal",';
+    const repl = '\t\t\tconst pStyle = node.attrs?.ptStyle === "note" ? "note" : "normal";\n\t\t\treturn {\n\t\t\t\t_type: "block",\n\t\t\t\t_key: portableTextKeyFromAttrs(node.attrs) ?? generateKey(),\n\t\t\t\tstyle: pStyle,';
+    if (js.includes(target)) {
+      js = js.replace(target, repl);
+      modified = true;
+    }
+  }
+
+  // 4-6. convertPTBlock で style === "note" を ptStyle: "note" として読込
+  if (!js.includes('case "note": return {')) {
+    const target = '\t\t\t\tcase "blockquote": return {\n\t\t\t\t\ttype: "blockquote",';
+    const repl = '\t\t\t\tcase "note": return {\n\t\t\t\t\ttype: "paragraph",\n\t\t\t\t\tattrs: attrsWithPortableTextKey({\n\t\t\t\t\t\tptStyle: "note",\n\t\t\t\t\t\t...textAlign ? { textAlign } : {}\n\t\t\t\t\t}, block._key),\n\t\t\t\t\tcontent: pmContent.length > 0 ? pmContent : void 0\n\t\t\t\t};\n\t\t\t\tcase "blockquote": return {\n\t\t\t\t\ttype: "blockquote",';
+    if (js.includes(target)) {
+      js = js.replace(target, repl);
+      modified = true;
+    }
   }
 
   if (modified) {

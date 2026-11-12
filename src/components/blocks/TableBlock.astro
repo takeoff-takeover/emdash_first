@@ -1,0 +1,314 @@
+---
+/**
+ * TableBlock.astro
+ * EmDash Portable Text カスタムブロック：レスポンシブ・テーブル
+ * 
+ * 要件：
+ * 1. PCでは横スクロール不要で100%幅に収まる美しいエディトリアル表
+ * 2. スマホ（狭小画面）では横スクロールを強要せず、各行が美しいスペックカードに自動変形
+ * 3. 「← 横にスクロールしてご覧いただけます →」のような煩わしい注記を不要にする
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		title?: string;
+		caption?: string;
+		headers?: string[];
+		rows?: any[];
+		items?: any[];
+		html?: string;
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+
+interface ParsedRow {
+	cells: {
+		text: string;
+		isHeader?: boolean;
+	}[];
+}
+
+let headers: string[] = [];
+let rows: ParsedRow[] = [];
+
+// TSV/CSVテキストのパース補助関数
+function parseCsvLine(line: string, delimiter: string): string[] {
+	const result: string[] = [];
+	let cur = "";
+	let inQuote = false;
+	for (let i = 0; i < line.length; i++) {
+		const char = line[i];
+		if (char === '"') {
+			if (inQuote && line[i + 1] === '"') {
+				cur += '"';
+				i++;
+			} else {
+				inQuote = !inQuote;
+			}
+		} else if (char === delimiter && !inQuote) {
+			result.push(cur.trim());
+			cur = "";
+		} else {
+			cur += char;
+		}
+	}
+	result.push(cur.trim());
+	return result;
+}
+
+const rawCsvText = String(node.raw_csv || node.csv || node.tsv || "").trim();
+
+if (rawCsvText) {
+	// TSV/CSVからのパース
+	const rawLines = rawCsvText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+	if (rawLines.length > 0) {
+		const firstLine = rawLines[0];
+		const delimiter = firstLine.includes("\t") ? "\t" : ",";
+		headers = parseCsvLine(firstLine, delimiter);
+		for (let i = 1; i < rawLines.length; i++) {
+			const cellTexts = parseCsvLine(rawLines[i], delimiter);
+			rows.push({
+				cells: cellTexts.map(t => ({ text: t }))
+			});
+		}
+	}
+}
+
+if (headers.length === 0 && Array.isArray(node.headers) && node.headers.length > 0) {
+	headers = node.headers.map(h => String(h || "").trim());
+}
+
+if (rows.length === 0 && Array.isArray(node.rows)) {
+	node.rows.forEach((r: any, rIdx: number) => {
+		const rawCells = Array.isArray(r.cells) ? r.cells : [];
+		const parsedCells = rawCells.map((c: any) => {
+			let text = "";
+			if (typeof c === "string") {
+				text = c;
+			} else if (c?.text) {
+				text = c.text;
+			} else if (Array.isArray(c?.content)) {
+				text = c.content.map((span: any) => span.text || "").join("");
+			} else if (Array.isArray(c?.children)) {
+				text = c.children.map((span: any) => span.text || "").join("");
+			}
+			return {
+				text: text.trim(),
+				isHeader: Boolean(c?.isHeader || r?.isHeader || rIdx === 0 && rawCells.every((cell: any) => cell?.isHeader))
+			};
+		});
+
+		// 最初の行がヘッダー指定されている場合
+		if (rIdx === 0 && headers.length === 0 && (r.isHeader || parsedCells.every((c: { isHeader: boolean; text: string }) => c.isHeader))) {
+			headers = parsedCells.map((c: { isHeader: boolean; text: string }) => c.text);
+		} else {
+			rows.push({ cells: parsedCells });
+		}
+	});
+} else if (Array.isArray(node.items)) {
+	// key-value items or generic array
+	node.items.forEach((it: any) => {
+		if (typeof it === "object") {
+			const cellList = Object.values(it).map(val => ({ text: String(val || "").trim() }));
+			rows.push({ cells: cellList });
+			if (headers.length === 0) {
+				headers = Object.keys(it);
+			}
+		}
+	});
+}
+
+const title = (node.title || "").trim();
+const caption = (node.caption || "").trim();
+---
+
+<div class="cms-table-widget">
+	{title && <h3 class="cms-table-title">{title}</h3>}
+
+	<div class="cms-table-responsive-container">
+		<table class="cms-responsive-table">
+			{headers.length > 0 && (
+				<thead>
+					<tr>
+						{headers.map((h) => (
+							<th scope="col">{h}</th>
+						))}
+					</tr>
+				</thead>
+			)}
+			<tbody>
+				{rows.map((r) => (
+					<tr>
+						{r.cells.map((c, cIdx) => (
+							<td data-label={headers[cIdx] || ""}>
+								<Fragment set:html={c.text.replace(/\n/g, "<br />")} />
+							</td>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+
+	{caption && <p class="cms-table-caption">{caption}</p>}
+</div>
+
+<style>
+	.cms-table-widget {
+		margin: 2.75rem 0;
+		width: 100%;
+	}
+
+	.cms-table-title {
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 1rem 0;
+		line-height: 1.4;
+	}
+
+	.cms-table-responsive-container {
+		width: 100%;
+		border-radius: 8px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: #0a0c10;
+	}
+
+	.cms-responsive-table {
+		width: 100%;
+		border-collapse: collapse;
+		text-align: left;
+		font-size: 0.925rem;
+		line-height: 1.65;
+	}
+
+	.cms-responsive-table thead th {
+		background: rgba(255, 255, 255, 0.05);
+		color: #ffffff;
+		font-weight: 700;
+		padding: 14px 16px;
+		border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+		font-size: 0.88rem;
+		letter-spacing: 0.02em;
+		vertical-align: middle;
+	}
+
+	.cms-responsive-table tbody tr {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+		transition: background-color 0.2s ease;
+	}
+
+	.cms-responsive-table tbody tr:last-child {
+		border-bottom: none;
+	}
+
+	.cms-responsive-table tbody tr:hover {
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.cms-responsive-table tbody td {
+		padding: 14px 16px;
+		vertical-align: top;
+		color: rgba(255, 255, 255, 0.88);
+	}
+
+	.cms-responsive-table tbody td:first-child {
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.cms-table-caption {
+		font-size: 0.8rem;
+		color: rgba(255, 255, 255, 0.55);
+		margin: 0.75rem 0 0 0;
+		line-height: 1.5;
+	}
+
+	/* ============================================================== */
+	/* スマホ表示（768px以下）：横スクロールを廃止し、カード化表示に自動変形 */
+	/* ============================================================== */
+	@media (max-width: 768px) {
+		.cms-table-responsive-container {
+			background: transparent;
+			border: none;
+			border-radius: 0;
+		}
+
+		.cms-responsive-table {
+			display: block;
+			width: 100%;
+		}
+
+		.cms-responsive-table thead {
+			display: none; /* スマホではヘッダー行を非表示（data-labelで各項目名を表示） */
+		}
+
+		.cms-responsive-table tbody {
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			width: 100%;
+		}
+
+		.cms-responsive-table tbody tr {
+			display: block;
+			width: 100%;
+			background: #0d0f14;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			padding: 18px;
+			box-sizing: border-box;
+		}
+
+		.cms-responsive-table tbody tr:hover {
+			background: #0d0f14;
+		}
+
+		/* 最初のセル（モデル名）：カードのメイン見出し */
+		.cms-responsive-table tbody td:first-child {
+			display: block;
+			font-size: 1.05rem;
+			font-weight: 700;
+			color: #ffffff;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+			padding: 0 0 12px 0;
+			margin-bottom: 10px;
+			line-height: 1.4;
+		}
+
+		.cms-responsive-table tbody td:first-child::before {
+			display: none;
+		}
+
+		/* 2番目以降のセル：項目名(data-label)と値の左右対照グリッド */
+		.cms-responsive-table tbody td:not(:first-child) {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			padding: 8px 0;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			font-size: 0.9rem;
+			gap: 12px;
+			text-align: right;
+		}
+
+		.cms-responsive-table tbody td:not(:first-child)::before {
+			content: attr(data-label);
+			font-weight: 500;
+			font-size: 0.8rem;
+			color: rgba(255, 255, 255, 0.5);
+			text-align: left;
+			flex-shrink: 0;
+			max-width: 45%;
+		}
+
+		.cms-responsive-table tbody td:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+	}
+</style>
