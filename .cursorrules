@@ -58,6 +58,10 @@
     - FAQs / Q&A -> `accordion` / `faq`.
     - Galleries -> `slider` (SliderBlock).
   - When batch-inserting or fixing articles via scripts, always generate proper JSON schemas for blocks and sync all revisions (`live`, `draft`). See `.agents/rules/article-block-rules.md`.
+- **Editor-Render Parity rule (エディタ設定・装飾の完全描画保証)**:
+  - All styling options from Admin UI (`textAlign: left/center/right/justify`, link `blank: true`, etc.) must be 100% faithfully rendered on the front-end via custom blocks (`RichPortableText`, `CustomParagraph`, `CustomHeading`, `CustomLink`, `CustomBlockquote`, `CustomListItem`, `NoteText`). Never let CSS (`.prose`) suppress them.
+- **Smart Anchor & Case-Insensitive Jump rule (スマートアンカー・表記揺れ自動吸収)**:
+  - Use `[#anchor]` notation for headings. To prevent case-sensitivity link breaks, always generate dual alias IDs (`<span id="FAQ">` and `<h2 id="faq">`) and use client smooth-scroll logic so `#FAQ` and `#faq` jump reliably.
 
 ## Work Session Lifecycle Rules
 - **Development Setup rule ("開発準備して" / "準備して")**: When user asks to prepare or set up development (e.g. "準備して", "自宅に戻ったので準備して"):

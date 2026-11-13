@@ -49,7 +49,21 @@ When working in this repository, strictly adhere to all guidelines, rules, and d
 - Articles must be composed of structured Portable Text blocks (`table`, `cta`, `split_media`, `columnCards`, `accordion`, `slider`, `notes` / paragraph style `note`).
 - Raw HTML dumping (`CustomHtmlBlock` with huge tables) is strictly prohibited so human editors can edit every cell and item directly in Admin UI.
 
-## Workflows & Commands
+### 9. Editor-Render Parity Rule (エディタ設定・装飾の完全描画保証)
+- Every formatting option available in Admin UI (`textAlign: left/center/right/justify`, link `blank: true` for new tabs, inline styles) must be 100% faithfully rendered on the public website via custom blocks (`RichPortableText`, `CustomParagraph`, `CustomHeading`, `CustomLink`, `CustomBlockquote`, `CustomListItem`, `NoteText`).
+- Never allow CSS (`.prose` reset) to overwrite or negate editor-specified alignment.
+
+### 10. Smart Anchor & Case-Insensitive Jump Rule (スマートアンカー・表記揺れ自動吸収)
+- Support heading `[#anchor]` notation for automated ID assignment (`scroll-margin-top: 95px !important;`).
+- Since HTML anchors are case-sensitive, always generate dual alias IDs (`<span id="FAQ">` and `<h2 id="faq">`) and use client-side smooth-scroll interception so links like `#FAQ` and `#faq` work 100% reliably regardless of casing.
+
+## Skills & Workflows (.claude/skills / .agents/skills)
+Claude can and must read the following skills in `.claude/skills/` or `.agents/skills/`:
+- **dev-setup** (`.agents/skills/dev-setup/SKILL.md`): Triggered by 「準備して」「開発準備して」「作業開始」「最新にして」. Pulls git latest, restores local D1 DB (`npm run db:restore`), starts dev server, and provides bypass admin login URL.
+- **handover-wrapup** (`.agents/skills/handover-wrapup/SKILL.md`): Triggered by 「明日のための準備して」「引き継ぎ」「まとめて」「作業終了」. Backs up DB (`npm run db:backup`), generates `HANDOVER-YYYY-MM-DD.txt`, and commits & pushes to GitHub.
+- **seo-geo-audit** (`.agents/skills/seo-geo-audit/SKILL.md`): Triggered by 「SEOチェックして」「検索最適化して」「GEO対策」. Audits semantic HTML, JSON-LD, and generative search visibility.
+
+## Commands
 - Dev start: `npm run dev` (Admin direct bypass: `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin`)
 - Database backup: `npm run db:backup`
 - Database restore: `npm run db:restore --force`
