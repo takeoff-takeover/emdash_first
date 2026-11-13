@@ -88,16 +88,16 @@
               "value": "nicole-bmw-kawasaki"
             },
             {
-              "label": "Nicole BMW 新百合ヶ丘支店 / BMW Premium Selection 新百合ヶ丘",
-              "value": "nicole-bmw-shinyurigaoka"
-            },
-            {
               "label": "Nicole BMW 横浜港北支店",
               "value": "nicole-bmw-kohoku"
             },
             {
               "label": "Nicole BMW 青葉宮前支店",
               "value": "nicole-bmw-aoba-miyamae"
+            },
+            {
+              "label": "Nicole BMW 新百合ヶ丘支店",
+              "value": "nicole-bmw-shinyurigaoka"
             },
             {
               "label": "Nicole BMW 大田支店",
@@ -108,12 +108,12 @@
               "value": "bps-kohoku"
             },
             {
-              "label": "Nicole BMW Service Centre",
-              "value": "nicole-bmw-service-centre"
+              "label": "BMW Premium Selection 新百合ヶ丘",
+              "value": "bps-shinyurigaoka"
             },
             {
-              "label": "MINI 新百合ヶ丘 / MINI NEXT 新百合ヶ丘",
-              "value": "mini-shinyurigaoka"
+              "label": "Nicole BMW Service Centre",
+              "value": "nicole-bmw-service-centre"
             },
             {
               "label": "MINI 港北",
@@ -124,8 +124,16 @@
               "value": "mini-tsuzuki"
             },
             {
+              "label": "MINI 新百合ヶ丘",
+              "value": "mini-shinyurigaoka"
+            },
+            {
               "label": "MINI NEXT 横浜港北",
               "value": "mini-next-kohoku"
+            },
+            {
+              "label": "MINI NEXT 新百合ヶ丘",
+              "value": "mini-next-shinyurigaoka"
             },
             {
               "label": "ロールス・ロイス・モーター・カーズ横浜",
@@ -144,12 +152,12 @@
               "value": "nicole-competizione-service-centre"
             },
             {
-              "label": "ニコル青山ショールーム（ALPINA）",
-              "value": "nicole-aoyama"
-            },
-            {
               "label": "ニコル世田谷ショールーム（ALPINA）",
               "value": "nicole-setagaya"
+            },
+            {
+              "label": "ニコル青山ショールーム（ALPINA）",
+              "value": "nicole-aoyama"
             }
           ]
         }

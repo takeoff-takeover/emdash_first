@@ -216,3 +216,19 @@
 .is-magazine-page .article-notes-block .notes-title {
 	margin-bottom: 0 !important;
 }
+
+/* ==============================================================
+   10. 管理画面で設定可能な文字揃え・配置の完全保証（全要素で確実に反映）
+   ============================================================== */
+:is(.article-rich-text, .prose) :is(.has-text-align-left, [style*="text-align: left"], [style*="text-align:left"]) {
+	text-align: left !important;
+}
+:is(.article-rich-text, .prose) :is(.has-text-align-center, [style*="text-align: center"], [style*="text-align:center"]) {
+	text-align: center !important;
+}
+:is(.article-rich-text, .prose) :is(.has-text-align-right, [style*="text-align: right"], [style*="text-align:right"]) {
+	text-align: right !important;
+}
+:is(.article-rich-text, .prose) :is(.has-text-align-justify, [style*="text-align: justify"], [style*="text-align:justify"]) {
+	text-align: justify !important;
+}

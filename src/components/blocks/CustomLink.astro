@@ -1,0 +1,33 @@
+---
+// src/components/blocks/CustomLink.astro
+// EmDash Portable Text リンクマークコンポーネント
+// 管理画面で設定された「新しいタブで開く（blank: true）」を確実に反映する
+interface Props {
+	node: {
+		markDef: {
+			_type: "link";
+			_key?: string;
+			href: string;
+			blank?: boolean;
+		};
+	};
+	[key: string]: any;
+}
+
+const { node, ...attrs } = Astro.props;
+
+const markDef = node?.markDef || {};
+const href = String(markDef.href || "").trim();
+const isAnchor = href.startsWith("#");
+// ページ内アンカーは同じタブでスクロールさせるため blank を無効化
+const isBlank = !isAnchor && Boolean(markDef.blank);
+---
+
+<a
+	href={href}
+	target={isBlank ? "_blank" : undefined}
+	rel={isBlank ? "noopener noreferrer" : undefined}
+	{...attrs}
+>
+	<slot />
+</a>

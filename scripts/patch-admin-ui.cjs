@@ -1138,12 +1138,6 @@ const injectedCode = `
 					{ label: 'ディープレッド', hex: '#6b1116' },
 				];
 
-				const NICOLE_URL_PRESETS = [
-					{ label: '▼ ページ下部の予約枠へ (#cmp-booking)', url: '#cmp-booking' },
-					{ label: '📍 店舗一覧ページへ (/locations)', url: '/locations' },
-					{ label: '✉️ お問い合わせへ (/contact)', url: '/contact' },
-				];
-
 				function enhancePluginBlockModal() {
 					injectEditorialBlockStyles();
 					const modalScroll = document.querySelector('[role="dialog"] form .overflow-y-auto');
@@ -1297,22 +1291,18 @@ const injectedCode = `
 							wrap.appendChild(helper);
 						}
 
-						// リンク先URLのワンクリック入力チップ
+						// リンク先URLの注記・説明書き
 						if ((lText.includes('リンクURL') || lText.includes('リンク先URL')) && !input.dataset.nicoleUrlEnhanced) {
 							input.dataset.nicoleUrlEnhanced = 'true';
-							const urlHelper = document.createElement('div');
-							urlHelper.className = 'nicole-url-helper';
-							NICOLE_URL_PRESETS.forEach(p => {
-								const chip = document.createElement('button');
-								chip.type = 'button';
-								chip.className = 'nicole-url-chip';
-								chip.textContent = p.label;
-								chip.addEventListener('click', () => {
-									setReactInputValue(input, p.url);
-								});
-								urlHelper.appendChild(chip);
-							});
-							wrap.appendChild(urlHelper);
+							// 以前のチップがあれば削除
+							const oldHelper = wrap.querySelector('.nicole-url-helper');
+							if (oldHelper) oldHelper.remove();
+
+							const urlNote = document.createElement('div');
+							urlNote.className = 'nicole-url-note';
+							urlNote.style.cssText = 'margin-top: 6px; font-size: 11.5px; line-height: 1.5; color: var(--text-color-kumo-subtle, #a1a1aa); letter-spacing: 0.02em;';
+							urlNote.textContent = '※他ページへのリンク（例: /locations や /contact）のほか、見出し末尾に [#○○] と入れた場所へ「#○○」で直接ジャンプできます。';
+							wrap.appendChild(urlNote);
 						}
 					});
 
@@ -1987,3 +1977,6 @@ for (const bundlePath of bundleCandidates) {
     console.log('[patch-admin-ui] Patched admin bundle:', path.relative(path.join(__dirname, '..'), bundlePath));
   }
 }
+
+// Also apply repeater blocks accordion patch
+try { require("./patch-repeater-blocks.cjs"); } catch (e) { console.error("[patch-admin-ui] Failed to run patch-repeater-blocks.cjs", e); }

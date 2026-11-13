@@ -60,6 +60,8 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - **Official location naming rule**: 拠点名や指定工場の表記には、拠点マスタ（データベース・一覧）に登録されている正式表記（例: カタカナ「サービスセンター」ではなく、正式英語表記「`Nicole BMW Service Centre`」等）を常に厳格に用いること。
 - **Magazine Editorial & SEO/AIO Content rule**: オウンドメディア・マガジン記事（`src/pages/magazine/`、CMSコレクション `magazine`）の執筆・作成時は、即答性（Direct Answerability）・データとスペックの構造化（Table & DL）・FAQ/JSON-LD連動・一次情報（E-E-A-T）を順守すること。
 - **Block-First Article Authoring rule (ブロックファースト記事作成原則・手動編集担保)**: 誰が（人間）作っても、どのAI（Claude, Cursor, Antigravity, Windsurf等）が作っても、後から管理画面（Admin UI）で手作業で直接手直し・加筆・修正ができるよう、記事コンテンツは構造化ブロック（Portable Textブロック）を基本単位として作成すること。生HTML（`CustomHtmlBlock` 等）にテーブルやレイアウトを丸ごと流し込む作成方法は原則禁止。比較表・スペック表は `table` (TableBlock)、CTAボタンは `cta` (CTABlock)、注釈・補足は `notes` または段落スタイル `note`、カード列は `columnCards`、FAQは `accordion`、画像スライダーは `slider` などの標準ブロックを使用し、管理画面から誰でも直感的にセル単位・項目単位で打ち替えできるようにすること（詳細は `.agents/rules/article-block-rules.md` を参照）。
+- **Editor-Render Parity rule (エディタ設定・装飾の完全描画保証原則)**: 管理画面のエディタ上で設定できるすべての項目（文字揃え `textAlign: left/center/right/justify`、リンクの別タブ `blank: true`、インライン装飾等）は、Astro側のカスタムブロック（`RichPortableText`、`CustomParagraph`、`CustomHeading`、`CustomLink` 等）で100%確実に拾い上げてWebサイト側に反映すること。CSS側でも `.prose` による上書きを防止し、管理画面の設定がそのまま最優先で見た目に反映されるよう担保すること。
+- **Smart Anchor & Case-Insensitive Jump rule (スマートアンカー・表記揺れ自動吸収原則)**: 見出し末尾の `[#anchor]` 記法（または `{#anchor}`）による自動ID付与をサポートするとともに、HTMLのCase-Sensitive仕様によるリンク切れを防止するため、大文字・小文字両方のエイリアスID（`<span id="...">`）を自動生成し、さらにクライアントJSで大文字小文字無視のスムーズスクロールを担保すること。編集者が `#FAQ` と書いても見出しが `[#faq]` であっても100%確実にジャンプする環境を維持すること。
 
 ## This Template
 

@@ -1,0 +1,21 @@
+---
+// src/components/blocks/CustomListItem.astro
+// EmDash Portable Text リスト項目コンポーネント
+// 管理画面で設定された文字揃え（左寄せ、中央揃え、右寄せ等）を確実に反映する
+interface Props {
+	node?: any;
+	index?: number;
+	isInline?: boolean;
+	[key: string]: any;
+}
+
+const { node, index, isInline, ...attrs } = Astro.props;
+
+const textAlign = node?.textAlign;
+const textAlignStyle = textAlign ? `text-align: ${textAlign};` : undefined;
+const customStyle = [attrs.style, textAlignStyle].filter(Boolean).join(" ") || undefined;
+---
+
+<li style={customStyle} {...attrs}>
+	<slot />
+</li>

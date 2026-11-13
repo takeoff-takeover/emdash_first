@@ -15,6 +15,11 @@ import CustomHtmlBlock from "./CustomHtmlBlock.astro";
 import CTABlock from "./CTABlock.astro";
 import TableBlock from "./TableBlock.astro";
 import NoteText from "./NoteText.astro";
+import CustomParagraph from "./CustomParagraph.astro";
+import CustomHeading from "./CustomHeading.astro";
+import CustomBlockquote from "./CustomBlockquote.astro";
+import CustomListItem from "./CustomListItem.astro";
+import CustomLink from "./CustomLink.astro";
 
 interface Props {
 	value: any[];
@@ -25,7 +30,19 @@ const blocks = Array.isArray(value) ? value : [];
 
 const portableTextComponents = {
 	block: {
+		normal: CustomParagraph,
 		note: NoteText,
+		blockquote: CustomBlockquote,
+		h1: CustomHeading,
+		h2: CustomHeading,
+		h3: CustomHeading,
+		h4: CustomHeading,
+		h5: CustomHeading,
+		h6: CustomHeading,
+	},
+	listItem: CustomListItem,
+	mark: {
+		link: CustomLink,
 	},
 	type: {
 		column_cards: ColumnCardsBlock,

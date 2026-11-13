@@ -863,12 +863,43 @@ function normalizeFacilityData(locEntry: any, fallbackKey: string = "") {
 
 const matchedShowrooms = relatedLocationKeys
 	.map((key: string) => {
+		// 新百合ヶ丘・フェラーリなどの分割スラグ対応
+		let lookupKey = key;
+		let titleOverride = "";
+		let detailUrlOverride = "";
+
+		if (key === 'bps-shinyurigaoka') {
+			lookupKey = 'nicole-bmw-shinyurigaoka';
+			titleOverride = 'BMW Premium Selection 新百合ヶ丘';
+			detailUrlOverride = '/location/nicole-bmw-shinyurigaoka/';
+		} else if (key === 'nicole-bmw-shinyurigaoka') {
+			titleOverride = 'Nicole BMW 新百合ヶ丘支店';
+		} else if (key === 'mini-next-shinyurigaoka') {
+			lookupKey = 'mini-shinyurigaoka';
+			titleOverride = 'MINI NEXT 新百合ヶ丘';
+			detailUrlOverride = '/location/mini-shinyurigaoka/';
+		} else if (key === 'mini-shinyurigaoka') {
+			titleOverride = 'MINI 新百合ヶ丘';
+		} else if (key === 'nicole-competizione-pre-owned') {
+			lookupKey = 'nicole-competizione-preowned-service-centre';
+			titleOverride = 'Nicole Competizione プレオウンド ショールーム';
+			detailUrlOverride = '/location/nicole-competizione-preowned-service-centre/';
+		} else if (key === 'nicole-competizione-service-centre') {
+			lookupKey = 'nicole-competizione-preowned-service-centre';
+			titleOverride = 'Nicole Competizione サービスセンター';
+			detailUrlOverride = '/location/nicole-competizione-preowned-service-centre/';
+		}
+
 		const locEntry = allLocationsMaster.find((e: any) => {
 			const entrySlug = e.slug || (e.id && e.id.includes(":") ? e.id.split(":").pop() : e.id);
-			return entrySlug === key || e.id === key || e.slug === key;
+			return entrySlug === lookupKey || e.id === lookupKey || e.slug === lookupKey;
 		});
 		if (!locEntry) return null;
-		return normalizeFacilityData(locEntry, key);
+
+		const normalized = normalizeFacilityData(locEntry, key);
+		if (titleOverride) normalized.name = titleOverride;
+		if (detailUrlOverride) normalized.detailUrl = detailUrlOverride;
+		return normalized;
 	})
 	.filter((s: any): s is NonNullable<typeof s> => s !== null);
 
@@ -1643,7 +1674,7 @@ if (Array.isArray(post.data?.content)) {
 
 				{/* 関連する施設（パターン1ベース：薄型スリム行・ブランドロゴ・電話番号/MAPなし・詳細ボタン調和） */}
 				{hasShowrooms && (
-				<section class="magazine-facilities-section" aria-label="関連する施設">
+				<section class="magazine-facilities-section" id="cmp-booking" aria-label="関連する施設">
 					<div class="facilities-section-header">
 						<h3 class="facilities-section-title">関連する施設</h3>
 					</div>
@@ -1688,48 +1719,90 @@ if (Array.isArray(post.data?.content)) {
 
 				{/* SNSシェアボタン */}
 				<div class="article-share-bar">
-					<span class="share-label">記事をシェアする</span>
+					<span class="share-label">Let’s connect. Share it.</span>
 					<div class="share-buttons">
+						{/* 1. X (Twitter) */}
 						<a 
 							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
-							class="share-btn"
-							aria-label="X（Twitter）でシェア"
+							class="share-btn-round share-btn-x"
+							aria-label="X（旧Twitter）でシェア"
+							data-tooltip="X（旧Twitter）"
 						>
 							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-							<span>Xでポスト</span>
 						</a>
+
+						{/* 2. Threads */}
+						<a 
+							href={`https://www.threads.net/intent/post?text=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn-round share-btn-threads"
+							aria-label="Threadsでシェア"
+							data-tooltip="Threads"
+						>
+							<svg viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4384 44.7442 97.3148 44.7442 97.191 44.745C75.3129 44.745 57.5186 57.1706 50.817 77.2913L68.5132 83.1837C73.1979 69.1171 85.0935 63.3644 97.191 63.3644C97.2662 63.3644 97.3414 63.3644 97.4165 63.3653C110.841 63.4509 119.349 71.8601 120.485 86.8189C113.882 86.0718 107.039 85.8087 100.089 86.035C74.6528 86.8624 58.0772 100.942 58.7495 121.579C59.3879 141.178 75.3101 153.284 94.7577 153.284C108.572 153.284 119.516 146.945 125.753 135.34C130.658 144.664 138.831 149.771 150.942 149.771C164.717 149.771 173.864 141.401 177.348 125.615L159.227 121.758C157.345 130.297 152.053 134.152 145.474 134.152C138.544 134.152 134.125 129.566 133.407 119.511C138.358 116.347 141.979 111.455 143.722 105.184C145.756 97.8687 144.974 90.6382 141.537 88.9883ZM118.667 114.73C116.711 123.013 108.472 134.665 94.611 134.665C85.5786 134.665 77.3752 129.317 77.0197 118.423C76.6214 106.275 87.2152 99.4144 103.859 98.8726C109.117 98.7013 114.195 99.0142 119.012 99.7891C118.98 105.006 118.865 109.982 118.667 114.73Z"/></svg>
+						</a>
+
+						{/* 3. Facebook */}
 						<a 
 							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
-							class="share-btn"
+							class="share-btn-round share-btn-facebook"
 							aria-label="Facebookでシェア"
+							data-tooltip="Facebook"
 						>
 							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-							<span>Facebook</span>
 						</a>
-						<button type="button" class="share-btn" id="btn-copy-url">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-							<span id="copy-text">URLをコピー</span>
+
+						{/* 4. LINE */}
+						<a 
+							href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn-round share-btn-line"
+							aria-label="LINEで送る"
+							data-tooltip="LINE"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.82 2 10.53c0 4.22 3.59 7.76 8.44 8.41.33.07.78.22.89.51.1.26.07.67.03.94l-.16.98c-.05.3-.23 1.17 1.03.64 1.25-.53 6.78-4 9.25-6.85C23.04 13.3 24 11.97 24 10.53 24 5.82 19.52 2 12 2zm-4.3 11.27h-1.5c-.3 0-.54-.24-.54-.54V8.42c0-.3.24-.54.54-.54h1.5c.3 0 .54.24.54.54v.57c0 .3-.24.54-.54.54h-.96v1.16h.96c.3 0 .54.24.54.54v.57c0 .3-.24.54-.54.54zm2.86-.54c0 .3-.24.54-.54.54h-.57c-.3 0-.54-.24-.54-.54V8.42c0-.3.24-.54.54-.54h.57c.3 0 .54.24.54.54v4.31zm5.17.54h-.57c-.23 0-.43-.14-.5-.36l-1.63-2.34v2.16c0 .3-.24.54-.54.54h-.57c-.3 0-.54-.24-.54-.54V8.42c0-.3.24-.54.54-.54h.57c.23 0 .44.14.51.36l1.62 2.34V8.42c0-.3.24-.54.54-.54h.57c.3 0 .54.24.54.54v4.31zm3.89-2.61c0 .3-.24.54-.54.54h-.96v1.53h.96c.3 0 .54.24.54.54v.57c0 .3-.24.54-.54.54h-1.5c-.3 0-.54-.24-.54-.54V8.42c0-.3.24-.54.54-.54h1.5c.3 0 .54.24.54.54v.57c0 .3-.24.54-.54.54h-.96v1.13h.96c.3 0 .54.24.54.54v.53z"/></svg>
+						</a>
+
+						{/* 5. WhatsApp */}
+						<a 
+							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							target="_blank"
+							rel="noopener"
+							class="share-btn-round share-btn-whatsapp"
+							aria-label="WhatsAppで送る"
+							data-tooltip="WhatsApp"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.54 2 2.08 6.46 2.08 11.96c0 1.76.46 3.48 1.33 5l-1.41 5.16 5.28-1.39c1.47.8 3.12 1.23 4.76 1.23h.01c5.5 0 9.96-4.46 9.96-9.96 0-2.66-1.04-5.16-2.92-7.04C17.2 2.94 14.7 2 12.04 2zm5.82 14.12c-.24.68-1.39 1.3-1.94 1.38-.5.08-1.14.11-3.34-.8-2.81-1.16-4.63-4.04-4.77-4.22-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.42-.07.65.49.24.57.81 1.98.88 2.13.07.14.12.31.02.5-.1.19-.15.31-.3.48-.14.18-.31.39-.44.52-.14.14-.29.3-.12.59.16.28.73 1.2 1.56 1.94 1.07.96 1.97 1.25 2.25 1.39.29.14.45.12.62-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.65-.14.26.1 1.67.79 1.96.93.29.14.48.22.55.33.07.12.07.69-.17 1.37z"/></svg>
+						</a>
+
+						{/* 6. SMS (メッセージ) */}
+						<a 
+							href={`sms:?&body=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							class="share-btn-round share-btn-sms"
+							aria-label="SMS・メッセージで送る"
+							data-tooltip="SMS"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
+						</a>
+
+						{/* 7. URLコピー */}
+						<button 
+							type="button" 
+							class="share-btn-round share-btn-copy" 
+							id="btn-copy-url"
+							aria-label="記事URLをコピー"
+							data-tooltip="URLをコピー"
+						>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="copy-icon-default"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="copy-icon-success" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
 						</button>
 					</div>
-				</div>
-
-				{/* バックリンク & 編集リンク */}
-				<div class="article-back-nav">
-					<a href="/magazine/" class="btn-back-to-magazine">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-						<span>Nicole Connect 一覧へ戻る</span>
-					</a>
-					<a href={editUrl} class="btn-edit-article-admin" title="CMS管理画面でこの記事を編集">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-						</svg>
-						<span>記事を編集する（CMS）</span>
-					</a>
 				</div>
 			</div>
 
@@ -1794,9 +1867,9 @@ if (Array.isArray(post.data?.content)) {
 					</section>
 				)}
 
-				{/* 3. 関連記事ブロック（PCでは最下部でスティッキー追従、スクロール終盤でタイトル先頭に赤丸矢印が出現し右にトントンと動く演出） */}
+				{/* 3. おすすめの関連記事ブロック（PCでは最下部でスティッキー追従、スクロール終盤でタイトル先頭に赤丸矢印が出現し右にトントンと動く演出） */}
 				{relatedStories && relatedStories.length > 0 && (
-					<section class="sidebar-block sidebar-block-related" id="sidebar-related-block" aria-label={`${detectedBrand}の関連記事`}>
+					<section class="sidebar-block sidebar-block-related" id="sidebar-related-block" aria-label="おすすめの関連記事">
 						<div class="sidebar-header-row">
 							<h2 class="sidebar-heading">
 								<span class="related-title-arrow-circle" aria-hidden="true">
@@ -1805,9 +1878,9 @@ if (Array.isArray(post.data?.content)) {
 										<polyline points="12 5 19 12 12 19"></polyline>
 									</svg>
 								</span>
-								<span class="heading-main-text">{`${detectedBrand}の関連記事`}</span>
+								<span class="heading-main-text">おすすめの関連記事</span>
 							</h2>
-							<a href={relatedStoriesUrl} class="sidebar-heading-more" aria-label={`${detectedBrand}の関連記事をもっと見る`}>もっと見る →</a>
+							<a href={relatedStoriesUrl} class="sidebar-heading-more" aria-label="おすすめの関連記事をもっと見る">もっと見る →</a>
 						</div>
 
 						<div class="sidebar-story-list">
@@ -1833,6 +1906,21 @@ if (Array.isArray(post.data?.content)) {
 				)}
 			</aside>
 			)}
+
+			{/* バックリンク & 編集リンク（PCでは左カラム直下に配置、スマホではサイドバーの他記事群の下に配置） */}
+			<div class="article-back-nav">
+				<a href="/magazine/" class="btn-back-to-magazine">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+					<span>Nicole Connect 一覧へ戻る</span>
+				</a>
+				<a href={editUrl} class="btn-edit-article-admin" title="CMS管理画面でこの記事を編集">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+					</svg>
+					<span>記事を編集する（CMS）</span>
+				</a>
+			</div>
 		</div>
 	</div>
 	</article>
@@ -1878,18 +1966,27 @@ if (Array.isArray(post.data?.content)) {
 			});
 		}
 
-		// 2. URLコピーボタン
+		// 2. URLコピーボタン（アイコン切り替え ＆ 一時フィードバック）
 		const copyBtn = document.getElementById('btn-copy-url');
-		const copyText = document.getElementById('copy-text');
-		if (copyBtn && copyText) {
+		if (copyBtn) {
+			const defaultIcon = copyBtn.querySelector('.copy-icon-default');
+			const successIcon = copyBtn.querySelector('.copy-icon-success');
 			copyBtn.addEventListener('click', () => {
 				navigator.clipboard.writeText(window.location.href).then(() => {
-					copyText.textContent = 'コピーしました！';
+					if (defaultIcon) defaultIcon.style.display = 'none';
+					if (successIcon) successIcon.style.display = 'block';
+					copyBtn.style.background = '#16a34a'; // 成功時の鮮やかなグリーン
+					copyBtn.setAttribute('title', 'URLをコピーしました！');
+					copyBtn.setAttribute('data-tooltip', 'コピーしました！');
 					setTimeout(() => {
-						copyText.textContent = 'URLをコピー';
+						if (defaultIcon) defaultIcon.style.display = 'block';
+						if (successIcon) successIcon.style.display = 'none';
+						copyBtn.style.background = '';
+						copyBtn.setAttribute('title', '記事URLをコピー');
+						copyBtn.setAttribute('data-tooltip', 'URLをコピー');
 					}, 2000);
 				}).catch(() => {
-					copyText.textContent = 'コピー失敗';
+					copyBtn.setAttribute('title', 'コピーに失敗しました');
 				});
 			});
 		}
@@ -1923,6 +2020,14 @@ if (Array.isArray(post.data?.content)) {
 </script>
 
 <style>
+	html {
+		scroll-behavior: smooth;
+	}
+
+	#cmp-booking {
+		scroll-margin-top: 90px;
+	}
+
 	/* ============================================================== */
 	/* 現代的エディトリアル・マガジン記事詳細スタイル */
 	/* ============================================================== */
@@ -1949,9 +2054,7 @@ if (Array.isArray(post.data?.content)) {
 		margin: 0 auto;
 		padding: 0 40px;
 		box-sizing: border-box;
-		/* 本文開始前の境界線：パンくずリスト下の線と全く同じ左右幅に揃える */
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		padding-bottom: 32px;
+		padding-bottom: 0;
 	}
 
 	/* パンくず行（下部に上品な1pxヘアライン境界線 & 編集リンク） */
@@ -2067,6 +2170,8 @@ if (Array.isArray(post.data?.content)) {
 		gap: 12px;
 		flex-wrap: wrap;
 		margin-bottom: 0;
+		padding-bottom: 28px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	.meta-brand-pill {
@@ -2334,7 +2439,6 @@ if (Array.isArray(post.data?.content)) {
 	.sidebar-heading {
 		display: flex;
 		align-items: center;
-		gap: 6px;
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: 15px;
 		font-weight: 700;
@@ -2396,7 +2500,7 @@ if (Array.isArray(post.data?.content)) {
 	.sidebar-block-related.is-attention .related-title-arrow-circle {
 		width: 20px;
 		opacity: 1;
-		margin-right: 4px;
+		margin-right: 8px;
 		transform: scale(1) translateX(0);
 		animation: arrowTapRight 1.6s ease-in-out infinite;
 	}
@@ -2575,11 +2679,22 @@ if (Array.isArray(post.data?.content)) {
 
 		.article-main-col {
 			max-width: 100%;
+			grid-column: 1;
+			order: 1;
 		}
 
 		.article-sidebar-col {
 			height: auto;
 			gap: 26px;
+			grid-column: 1;
+			order: 2;
+		}
+
+		/* スマホ表示時：バックリンクは右カラムの他記事群のさらに下へ配置 */
+		.article-back-nav {
+			grid-column: 1;
+			order: 3;
+			margin-top: 20px;
 		}
 
 		/* スマホ・タブレットでは逆順：読了直後の誘導として関連記事を最上位に配置 */
@@ -3169,63 +3284,196 @@ if (Array.isArray(post.data?.content)) {
 	}
 
 	/* ============================================================== */
-	/* シェアバー ＆ バックリンク */
+	/* シェアバー ＆ バックリンク（上下ライン仕切り・ミニマル・1行レイアウト） */
 	/* ============================================================== */
 	.article-share-bar {
-		margin: 60px 0 40px 0;
-		padding: 24px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 12px;
+		margin: 54px 0 40px 0;
+		padding: 16px 0;
+		background: transparent;
+		border-top: 1px solid rgba(255, 255, 255, 0.14);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+		border-left: none;
+		border-right: none;
+		border-radius: 0;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		flex-wrap: wrap;
-		gap: 16px;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		gap: 12px;
+		box-sizing: border-box;
 	}
 
 	.share-label {
-		font-size: 12px;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: 15.5px;
 		font-weight: 700;
-		letter-spacing: 0.1em;
-		color: var(--magazine-text-color);
+		letter-spacing: 0.04em;
+		color: var(--magazine-text-color, #ffffff);
+		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.share-buttons {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 7px;
+		flex-wrap: nowrap;
+		margin-left: auto;
 	}
 
-	.share-btn {
+	.share-btn-round {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
-		padding: 8px 16px;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
-		font-size: 12px;
-		font-weight: 600;
-		color: var(--magazine-text-color);
+		justify-content: center;
+		color: #ffffff;
 		text-decoration: none;
+		border: none;
 		cursor: pointer;
-		transition: all 0.25s ease;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+		transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+		position: relative;
+		flex-shrink: 0;
+		padding: 0;
 	}
 
-	.share-btn svg {
-		width: 14px;
-		height: 14px;
+	.share-btn-round:hover {
+		transform: translateY(-2px) scale(1.1);
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+		opacity: 0.95;
 	}
 
-	.share-btn:hover {
-		background: rgba(255, 255, 255, 0.15);
-		color: var(--magazine-text-color);
-		border-color: rgba(255, 255, 255, 0.35);
+	.share-btn-round svg {
+		width: 15px;
+		height: 15px;
+		fill: currentColor;
+	}
+
+	/* マウスホバー時のツールチップ（説明バルーン） */
+	.share-btn-round::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%) translateY(4px);
+		padding: 4px 8px;
+		background: rgba(18, 18, 24, 0.96);
+		color: #ffffff;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		white-space: nowrap;
+		border-radius: 4px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+		z-index: 60;
+	}
+
+	/* ツールチップ下部の小三角 */
+	.share-btn-round::before {
+		content: "";
+		position: absolute;
+		bottom: calc(100% + 3px);
+		left: 50%;
+		transform: translateX(-50%) translateY(4px);
+		border-width: 5px 5px 0 5px;
+		border-style: solid;
+		border-color: rgba(18, 18, 24, 0.96) transparent transparent transparent;
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+		z-index: 60;
+	}
+
+	.share-btn-round:hover::after,
+	.share-btn-round:hover::before {
+		opacity: 1;
+		visibility: visible;
+		transform: translateX(-50%) translateY(0);
+	}
+
+	/* 各SNS公式ブランドカラー */
+	.share-btn-x { 
+		background: #000000; 
+		border: 1px solid rgba(255, 255, 255, 0.22); 
+	}
+	.share-btn-threads { 
+		background: #101010; 
+		border: 1px solid rgba(255, 255, 255, 0.22); 
+	}
+	.share-btn-facebook { 
+		background: #1877F2; 
+	}
+	.share-btn-line { 
+		background: #06C755; 
+	}
+	.share-btn-whatsapp { 
+		background: #25D366; 
+	}
+	.share-btn-sms { 
+		background: #34C759; 
+	}
+	.share-btn-copy { 
+		background: #27272a; 
+		border: 1px solid rgba(255, 255, 255, 0.22); 
+	}
+
+	/* スマートフォン表示（1行・右揃え・完全1行収容） */
+	@media (max-width: 640px) {
+		.article-share-bar {
+			margin: 40px 0 32px 0 !important;
+			padding: 14px 0 !important;
+			display: flex !important;
+			flex-direction: row !important;
+			flex-wrap: nowrap !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			gap: 6px !important;
+			width: 100% !important;
+			box-sizing: border-box !important;
+		}
+
+		.share-label {
+			font-size: clamp(10px, 2.6vw, 12px) !important;
+			letter-spacing: 0.01em !important;
+			white-space: nowrap !important;
+			flex-shrink: 0 !important;
+		}
+
+		.share-buttons {
+			display: flex !important;
+			flex-direction: row !important;
+			flex-wrap: nowrap !important;
+			gap: 4px !important;
+			margin-left: auto !important;
+			justify-content: flex-end !important;
+			flex-shrink: 0 !important;
+		}
+
+		.share-btn-round {
+			width: 27px !important;
+			height: 27px !important;
+			flex-shrink: 0 !important;
+		}
+
+		.share-btn-round svg {
+			width: 13px !important;
+			height: 13px !important;
+		}
 	}
 
 	.article-back-nav {
+		grid-column: 1;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -3465,8 +3713,8 @@ if (Array.isArray(post.data?.content)) {
 			padding-bottom: 0;
 		}
 
-		.article-header-container {
-			padding-bottom: 24px;
+		.article-meta-row {
+			padding-bottom: 22px;
 		}
 
 		.article-breadcrumb-row {
@@ -3524,21 +3772,6 @@ if (Array.isArray(post.data?.content)) {
 		.btn-facility-view {
 			padding: 6px 12px;
 			font-size: 11.5px;
-		}
-
-		.article-share-bar {
-			flex-direction: column;
-			align-items: stretch;
-		}
-
-		.share-buttons {
-			width: 100%;
-			justify-content: stretch;
-		}
-
-		.share-btn {
-			flex-grow: 1;
-			justify-content: center;
 		}
 	}
 
@@ -3765,5 +3998,37 @@ if (Array.isArray(post.data?.content)) {
 		} catch (e) {
 			// LocalStorage/SessionStorage disabled fallback
 		}
+
+		// ページ内アンカーリンクのスマートジャンプ（大文字・小文字の表記揺れ自動吸収 & スムーズスクロール）
+		document.addEventListener('click', function(e) {
+			const link = e.target && e.target.closest ? e.target.closest('a[href*="#"]') : null;
+			if (!link) return;
+			const href = link.getAttribute('href');
+			if (!href) return;
+			// 外部リンクやページ遷移を伴うものは除外
+			const url = new URL(link.href, window.location.href);
+			if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return;
+
+			let hash = url.hash.replace(/^#/, '');
+			if (!hash) return;
+			try {
+				hash = decodeURIComponent(hash);
+			} catch (_) {}
+
+			// 1. 完全一致
+			let target = document.getElementById(hash);
+			// 2. 小文字一致
+			if (!target) target = document.getElementById(hash.toLowerCase());
+			// 3. 大文字一致
+			if (!target) target = document.getElementById(hash.toUpperCase());
+			// 4. data-anchor 一致
+			if (!target) target = document.querySelector(`[data-anchor="${hash.toLowerCase()}"]`);
+
+			if (target) {
+				e.preventDefault();
+				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				history.pushState(null, '', '#' + encodeURIComponent(hash));
+			}
+		});
 	})();
 </script>
