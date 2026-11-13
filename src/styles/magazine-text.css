@@ -1,8 +1,20 @@
 :root {
-	--magazine-text-color: #ffffff;
+	/* Nicole Magazine プレミアム・タイポグラフィ階層パレット */
+	/* 白一色を脱却し、自然なグレーのグラデーションによって品格と可読性を両立 */
+	--magazine-text-title: #ffffff;             /* H1, H2, カード見出し, テーブル主項目（鮮明な白） */
+	--magazine-text-lead: #ececed;              /* リード文、記事要約（品格のある高コントラスト） */
+	--magazine-text-body: #d4d4d8;              /* 本文段落、標準リスト、主要解説文（目に優しいライトグレー #d4d4d8） */
+	--magazine-text-secondary: #a1a1aa;         /* 中見出しH3/H4、カード内補足、テーブル項目名(dt)、ヘッダー(th) */
+	--magazine-text-muted: #71717a;             /* メタ情報（日付・読了時間・閲覧数）、写真クレジット、キャプション */
+	--magazine-text-note: rgba(255, 255, 255, 0.58); /* 注釈・免責事項 */
+
+	/* 互換用基本色：本文の落ち着いたグレー */
+	--magazine-text-color: var(--magazine-text-body);
 }
 
-/* 見出し・タイトルの自然な文節改行（言葉の途中での不自然な改行・ぶつ切りを完全防止） */
+/* ==============================================================
+   見出し・タイトルの自然な文節改行（言葉の途中での不自然な改行・ぶつ切りを完全防止）
+   ============================================================== */
 .is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6),
 .is-magazine-page .article-main-title,
 .is-magazine-page .article-rich-text :is(h1, h2, h3, h4, h5, h6),
@@ -22,7 +34,9 @@
 	display: inline-block !important;
 }
 
-/* 見出しブロック間スペーシング（本文のセクション見出し「30秒でわかること」等のみを対象とし、カード内には波及させない） */
+/* ==============================================================
+   見出しブロック間スペーシング（本文のセクション見出し「30秒でわかること」等のみを対象とし、カード内には波及させない）
+   ============================================================== */
 .is-magazine-page .article-rich-text > h2 {
 	margin-top: clamp(80px, 8.5vw, 116px) !important;
 	margin-bottom: 28px !important;
@@ -56,13 +70,119 @@
 	padding-top: 0 !important;
 }
 
-/* Keep imported theme and CMS text colors readable on the magazine's dark canvas. */
+/* ==============================================================
+   Nicole Magazine タイポグラフィ・階層カラールール
+   白一色を脱却し、白・ライトグレー・ミディアムグレーで抜群の可読性を実現
+   ============================================================== */
+
+/* 1. 見出し・タイトル（純白 #ffffff で引き締める） */
 .is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
-.is-magazine-page .article-rich-text :is(p, li, dt, dd, blockquote, figcaption, th, td, strong, em, span):not(.is-dark-text, .is-dark-text *, a[class*="btn"] *, a[class*="cta"] *) {
-	color: var(--magazine-text-color) !important;
+.is-magazine-page .article-main-title,
+.is-magazine-page .article-rich-text :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
+.is-magazine-page .cms-col-card__title,
+.is-magazine-page .cms-split-card__title,
+.is-magazine-page .cms-table-title,
+.is-magazine-page .cms-spec-card__title,
+.is-magazine-page .cms-notes-title,
+.is-magazine-page .accordion-summary,
+.is-magazine-page .block-title,
+.is-magazine-page .slide-heading,
+.is-magazine-page .sidebar-heading {
+	color: var(--magazine-text-title) !important;
 }
 
-/* 本文内インラインリンク（自動ボタン化は廃止・上品なリンクデザインに統一） */
+/* 強調タグ */
+.is-magazine-page .article-rich-text :is(strong, b) {
+	color: var(--magazine-text-title) !important;
+}
+
+/* 2. リード文・サブタイトル（上質なオフホワイト） */
+.is-magazine-page .article-lead-text {
+	color: var(--magazine-text-lead) !important;
+}
+
+/* 3. 本文段落・リスト（目に優しいライトグレー #d4d4d8 で長文の眩しさを解消） */
+.is-magazine-page .article-rich-text :is(p, li):not(.is-note, [data-pt-style="note"], .article-note, .is-dark-text, .is-dark-text *, a[class*="btn"] *, a[class*="cta"] *),
+.is-magazine-page :is(.cms-split-card__desc, .cms-col-card__text, .accordion-content, .cms-notes-text, .block-sub, .slide-caption) {
+	color: var(--magazine-text-body) !important;
+}
+
+/* 4. テーブル・スペック表示（項目名と値のメリハリ） */
+.is-magazine-page .article-rich-text table th,
+.is-magazine-page .emdash-table th,
+.is-magazine-page .cms-responsive-table thead th {
+	color: #e4e4e7 !important;
+}
+
+.is-magazine-page .article-rich-text table td,
+.is-magazine-page .emdash-table td,
+.is-magazine-page .cms-responsive-table tbody td {
+	color: var(--magazine-text-body) !important;
+}
+
+.is-magazine-page .article-rich-text table td:first-child,
+.is-magazine-page .emdash-table td:first-child,
+.is-magazine-page .cms-responsive-table tbody td:first-child {
+	color: var(--magazine-text-title) !important;
+}
+
+/* スマホスペックカード変形（項目ラベルはグレー、値はオフホワイト） */
+.is-magazine-page .cms-spec-card__label,
+.is-magazine-page .article-rich-text dt {
+	color: var(--magazine-text-secondary) !important;
+}
+
+.is-magazine-page .cms-spec-card__value,
+.is-magazine-page .article-rich-text dd {
+	color: #e4e4e7 !important;
+}
+
+/* キャプション */
+.is-magazine-page .cms-table-caption,
+.is-magazine-page .article-rich-text figcaption {
+	color: var(--magazine-text-muted) !important;
+}
+
+/* 5. メタ情報・パンくず・補助情報（控えめなグレーで主役を邪魔しない） */
+.is-magazine-page .article-breadcrumb .bc-link {
+	color: var(--magazine-text-secondary) !important;
+}
+.is-magazine-page .article-breadcrumb .bc-sep {
+	color: var(--magazine-text-muted) !important;
+	opacity: 0.5;
+}
+.is-magazine-page .article-breadcrumb .bc-current {
+	color: var(--magazine-text-body) !important;
+}
+
+.is-magazine-page :is(.meta-date, .meta-views, .meta-views-unit, .sidebar-story-date, .sidebar-story-views) {
+	color: var(--magazine-text-muted) !important;
+}
+
+.is-magazine-page .article-photo-credit-overlay {
+	color: var(--magazine-text-secondary) !important;
+}
+
+.is-magazine-page .meta-category-pill {
+	color: var(--magazine-text-secondary) !important;
+}
+
+.is-magazine-page .sidebar-all-link {
+	color: var(--magazine-text-secondary) !important;
+}
+
+.is-magazine-page .sidebar-story-title {
+	color: #e4e4e7 !important;
+}
+
+/* 6. 引用ブロック（上品なグレー） */
+.is-magazine-page .article-rich-text blockquote {
+	color: #d1d1d6 !important;
+	border-left-color: rgba(255, 255, 255, 0.25) !important;
+	background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* 7. 本文内インラインリンク（自動ボタン化は廃止・上品なリンクデザインに統一） */
 .is-magazine-page .article-rich-text a:not([class*="btn"], [class*="cta"], [class*="chip"]) {
 	color: #ffffff;
 	text-decoration: underline;
@@ -76,15 +196,23 @@
 	text-decoration-color: #60a5fa;
 }
 
-/* 段落変換「注釈」スタイルの反映（他の注釈と同じサイズ・行間） */
+/* 8. 段落変換「注釈」スタイルの反映（他の注釈と同じサイズ・行間・控えめなグレー） */
 .is-magazine-page .article-rich-text p.is-note,
 .is-magazine-page .article-rich-text p[data-pt-style="note"],
-.is-magazine-page .article-rich-text .article-note {
+.is-magazine-page .article-rich-text .article-note,
+.is-magazine-page .cms-notes-text {
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 	font-size: 12.5px !important;
 	line-height: 1.45 !important;
-	color: rgba(255, 255, 255, 0.52) !important;
+	color: var(--magazine-text-note) !important;
 	margin: 7px 0 !important;
 	letter-spacing: 0.02em;
 	word-break: break-word;
+}
+
+/* 9. 注釈ブロック（NotesBlock）内の改行・マージン保護（親pマージン28pxによる不自然な巨大余白を完全抑止） */
+.is-magazine-page .article-notes-block p,
+.is-magazine-page .article-notes-block .notes-line,
+.is-magazine-page .article-notes-block .notes-title {
+	margin-bottom: 0 !important;
 }

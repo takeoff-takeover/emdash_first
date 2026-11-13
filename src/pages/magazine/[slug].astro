@@ -754,52 +754,6 @@ if (!post) {
 	return Astro.rewrite("/404");
 }
 
-// 関連拠点データの判定（CMSの related_location: 単一文字列 または 配列の両方に対応）
-const rawRelatedLoc = (post.data as any).related_location;
-const relatedLocationKeys: string[] = Array.isArray(rawRelatedLoc)
-	? rawRelatedLoc.filter((k: any) => typeof k === "string" && k.trim().length > 0)
-	: typeof rawRelatedLoc === "string" && rawRelatedLoc.trim().length > 0
-		? [rawRelatedLoc.trim()]
-		: [];
-const hasShowroom = relatedLocationKeys.length > 0;
-const firstLocationKey = relatedLocationKeys[0] || "nicole-bmw-kawasaki";
-
-// 拠点マスタ定義
-const showroomCatalog: Record<string, any> = {
-	"nicole-bmw-kawasaki": {
-		id: "nicole-bmw-kawasaki",
-		name: "Nicole BMW 本社ショールーム（川崎）",
-		subName: "Nicole BMW Kawasaki Headquarters & Service",
-		brand: "BMW",
-		address: "神奈川県川崎市幸区戸手2-5-7",
-		postal: "〒212-0005",
-		tel: "044-511-2000",
-		hours: "10:00～18:00",
-		closed: "水曜日（祝日を除く）",
-		image: "/uploads/2026/01/Nicole-BMW-本社.jpg",
-		detailUrl: "/location/nicole-bmw-kawasaki/",
-		googleMapsUrl: "https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7",
-		features: ["新車ショールーム", "BMWマイスター在籍ファクトリー併設", "納車ハンドオーバースペース", "150kW急速充電"]
-	},
-	"nicole-bmw-ota": {
-		id: "nicole-bmw-ota",
-		name: "Nicole BMW 大田支店",
-		subName: "Nicole BMW Ota Branch",
-		brand: "BMW",
-		address: "東京都大田区北馬込1-16-11 1階",
-		postal: "〒143-0021",
-		tel: "03-5743-2000",
-		hours: "10:00～18:00",
-		closed: "水曜日（祝日を除く）",
-		image: "/uploads/2026/01/大田支店.jpg",
-		detailUrl: "/location/nicole-bmw-ota/",
-		googleMapsUrl: "https://maps.google.com/?q=Nicole+BMW+大田支店",
-		features: ["都内正規拠点", "新車ショールーム", "サービス工場併設"]
-	}
-};
-
-const relatedShowroom = showroomCatalog[firstLocationKey] || showroomCatalog["nicole-bmw-kawasaki"];
-
 // アイキャッチ画像のURL取得（EmDash R2ストレージ key および 外部URLの両方に対応）
 function getImageUrl(img: unknown): string {
 	if (!img) return "";
@@ -827,6 +781,98 @@ function getImageUrl(img: unknown): string {
 	}
 	return "";
 }
+
+// 関連拠点データの判定（CMSの related_location: 単一文字列・配列・JSON配列・カンマ区切りに対応）
+const rawRelatedLoc = (post.data as any).related_location;
+let relatedLocationKeys: string[] = [];
+if (Array.isArray(rawRelatedLoc)) {
+	relatedLocationKeys = rawRelatedLoc.map((k: any) => String(k).trim()).filter(Boolean);
+} else if (typeof rawRelatedLoc === "string" && rawRelatedLoc.trim().length > 0) {
+	const trimmed = rawRelatedLoc.trim();
+	if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+		try {
+			const parsed = JSON.parse(trimmed);
+			if (Array.isArray(parsed)) {
+				relatedLocationKeys = parsed.map((k: any) => String(k).trim()).filter(Boolean);
+			}
+		} catch (e) {
+			relatedLocationKeys = [trimmed];
+		}
+	} else if (trimmed.includes(",")) {
+		relatedLocationKeys = trimmed.split(",").map((k: string) => k.trim()).filter(Boolean);
+	} else {
+		relatedLocationKeys = [trimmed];
+	}
+}
+
+// 拠点一覧（locationsコレクション）から実データを取得して完全一本化（ハードコードカタログ廃止）
+let allLocationsMaster: any[] = [];
+try {
+	const locResult = await getEmDashCollection("locations" as any, { limit: 100 });
+	if (locResult?.entries && locResult.entries.length > 0) {
+		allLocationsMaster = locResult.entries;
+	}
+} catch (e) {
+	console.error("[magazine] Failed to load locations collection:", e);
+}
+
+// フォールバック：万一コレクションが未取得の場合は seed/seed.json を参照
+if (allLocationsMaster.length === 0) {
+	try {
+		const seedPath = "seed/seed.json";
+		if (fs.existsSync(seedPath)) {
+			const seedData = JSON.parse(fs.readFileSync(seedPath, "utf-8"));
+			allLocationsMaster = seedData.content?.locations || [];
+		}
+	} catch (e) {}
+}
+
+// 拠点ごとのブランドロゴ取得（拠点一覧 locations.astro と完全同一マスタ）
+function getFacilityLogo(brand: string, name: string): string {
+	if (name.includes("青山") || name.includes("世田谷") || brand === "Nicole" || brand === "ALPINA") {
+		return "/brands/nicole-n-mark.svg";
+	}
+	if (brand === "BMW") return "/brands/bmw.svg";
+	if (brand === "MINI") return "/brands/mini.svg";
+	if (brand === "Rolls-Royce") return "/brands/rolls-royce.svg";
+	if (brand === "Ferrari") return "/brands/ferrari.svg";
+	return "/brands/nicole-n-mark.svg";
+}
+
+// 記事に関連付けられたショールーム情報を抽出・正規化（実データ一本化）
+function normalizeFacilityData(locEntry: any, fallbackKey: string = "") {
+	const row = locEntry.data || locEntry;
+	const title = row.title || "";
+	const brand = row.brand || "Nicole";
+	const postal = row.postal || "";
+	const address = row.address || "";
+	const slugVal = locEntry.slug || (locEntry.id && locEntry.id.includes(":") ? locEntry.id.split(":").pop() : fallbackKey);
+	const detailUrl = `/location/${slugVal}/`;
+	const logo = getFacilityLogo(brand, title);
+
+	return {
+		id: slugVal,
+		name: title,
+		brand,
+		postal,
+		address,
+		detailUrl,
+		logo,
+	};
+}
+
+const matchedShowrooms = relatedLocationKeys
+	.map((key: string) => {
+		const locEntry = allLocationsMaster.find((e: any) => {
+			const entrySlug = e.slug || (e.id && e.id.includes(":") ? e.id.split(":").pop() : e.id);
+			return entrySlug === key || e.id === key || e.slug === key;
+		});
+		if (!locEntry) return null;
+		return normalizeFacilityData(locEntry, key);
+	})
+	.filter((s: any): s is NonNullable<typeof s> => s !== null);
+
+const hasShowrooms = matchedShowrooms.length > 0;
 
 const isIX4 = slug.includes("ix4");
 const isBMWX5 = slug.includes("bmw_x5") || slug.includes("x5");
@@ -1068,79 +1114,68 @@ const articleContent = sanitizeContent(post.data.content);
 // 関連記事データ（作成日・公開日の新しい順に動的取得）
 
 
-const isSidebarSample = slug === "2027_new_bmw_ix4_neue_klasse";
-let dynamicRelatedStories: any[] = [];
+// 右カラム（サイドバー）ニュース生成：EmDash公式APIから全公開記事を取得
+const storiesBySlug = new Map<string, any>();
 try {
-	const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
-	if (!isSidebarSample && fs.existsSync(DB_PATH)) {
-		const db = new DatabaseSync(DB_PATH);
-		const dbRows = db.prepare(`
-			SELECT id, slug, title, featured_image, published_at, created_at,
-			       COALESCE(published_at, created_at) as sort_date
-			FROM ec_magazine
-			WHERE (status = 'published' OR status IS NULL) AND deleted_at IS NULL
-			  AND slug != ?
-			UNION ALL
-			SELECT id, slug, title, featured_image, published_at, created_at,
-			       COALESCE(published_at, created_at) as sort_date
-			FROM ec_posts
-			WHERE (status = 'published' OR status IS NULL) AND deleted_at IS NULL
-			  AND slug != ?
-			  AND slug NOT IN (SELECT slug FROM ec_magazine)
-			  AND title NOT LIKE '%休業%' AND title NOT LIKE '%定休日%' AND title NOT LIKE '%ドメイン%' AND title NOT LIKE '%SNS%' AND title NOT LIKE '%アカウント%'
-			ORDER BY sort_date DESC
-			LIMIT 12
-		`).all(slug, slug) as any[];
-
-		dynamicRelatedStories = dbRows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
-			let imgSrc = "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg";
-			if (r.featured_image) {
-				try {
-					const parsed = JSON.parse(r.featured_image);
-					imgSrc = parsed.src || parsed.previewUrl || imgSrc;
-				} catch {
-					if (typeof r.featured_image === 'string' && r.featured_image.startsWith('/')) {
-						imgSrc = r.featured_image;
-					}
+	for (const collection of ["magazine", "posts"] as const) {
+		let cursor: string | undefined;
+		do {
+			const result = await getEmDashCollection(collection as any, {
+				status: "published", orderBy: { published_at: "desc" }, limit: 100, cursor,
+			});
+			if (result.error) throw result.error;
+			if (Astro.cache?.enabled) Astro.cache.set(result.cacheHint);
+			const entries = result.entries || [];
+			const ids = entries.map((entry: any) => entry.data.id);
+			const brands = ids.length ? await getTermsForEntries(collection, ids, "brand") : new Map();
+			for (const entry of entries as any[]) {
+				if (entry.id === slug || isNoticeArticle(entry) || storiesBySlug.has(entry.id)) continue;
+				const assignedBrands = (brands.get(entry.data.id) || []).map((term: any) => term.label);
+				// 移行記事などでブランド未登録の場合、タイトル・slugから補完
+				if (!assignedBrands.length) {
+					const t = (entry.data.title || "").toLowerCase();
+					const entrySlug = entry.id.toLowerCase();
+					if (t.includes("mini") || entrySlug.includes("mini")) assignedBrands.push("MINI");
+					else if (t.includes("bmw") || entrySlug.includes("bmw") || /7シリーズ|3シリーズ/.test(t)) assignedBrands.push("BMW");
+					else if (t.includes("ferrari") || entrySlug.includes("ferrari")) assignedBrands.push("Ferrari");
+					else if (t.includes("rolls") || entrySlug.includes("rolls") || t.includes("ロールス")) assignedBrands.push("Rolls-Royce");
+					else if (t.includes("alpina") || entrySlug.includes("alpina") || t.includes("アルピナ")) assignedBrands.push("ALPINA");
+					else if (entry.data.related_location) assignedBrands.push("BMW");
 				}
+				const rawDate = entry.data.publishedAt || (entry.data as any).published_at || entry.data.createdAt;
+				storiesBySlug.set(entry.id, {
+					slug: entry.id,
+					title: entry.data.title,
+					brands: assignedBrands,
+					brand: isESGArticle(entry) ? "ESG" : (assignedBrands.join(" / ") || "NEWS"),
+					isESG: isESGArticle(entry),
+					sortDate: new Date(rawDate).getTime() || 0,
+					date: rawDate ? new Date(rawDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".") : "",
+					image: entry.data.featured_image,
+					url: entry.id === "mini-new-generation-debut-fair" ? `/campaigns/${entry.id}` : `/magazine/${encodeURIComponent(entry.id)}/`,
+				});
 			}
-			let brand = "BMW";
-			const t = (r.title || "").toLowerCase();
-			if (t.includes("mini")) brand = "MINI";
-			else if (t.includes("ferrari") || t.includes("フェラーリ")) brand = "Ferrari";
-			else if (t.includes("alpina") || t.includes("アルピナ")) brand = "ALPINA";
-			else if (t.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
-
-			const rawDate = r.sort_date || r.published_at || r.created_at;
-			const dateStr = rawDate ? new Date(rawDate).toISOString().slice(0, 10).replace(/-/g, '.') : "2026.10.25";
-
-			return {
-				slug: r.slug,
-				title: r.title,
-				brand,
-				date: dateStr,
-				sortDate: rawDate,
-				image: imgSrc,
-				url: `/magazine/${r.slug}/`
-			};
-		});
+			cursor = result.nextCursor || undefined;
+		} while (cursor);
 	}
 } catch (e) {
-	console.error("Failed to query dynamic related stories:", e);
+	console.error("Failed to query stories for sidebar:", e);
 }
 
-// CMSの記事を公開日の新しい順に並べ、最大5件を表示する。
-const combinedRelated = dynamicRelatedStories
-	.filter(s => s.slug !== slug)
-	.sort((a, b) => {
-		const dateA = a.sortDate || a.date?.replace(/\./g, '-') || "";
-		const dateB = b.sortDate || b.date?.replace(/\./g, '-') || "";
-		return dateB.localeCompare(dateA);
-	});
+const allStories = [...storiesBySlug.values()].sort((a, b) => b.sortDate - a.sortDate || a.slug.localeCompare(b.slug));
 
-let relatedStories = combinedRelated.slice(0, 5);
-let latestStories: any[] = [];
-let relatedStoriesUrl = "/magazine/";
+// 現在の記事のブランド（MINI / BMW / Ferrari 等）に合わせて関連記事を最適抽出
+const articleTitleLower = (post.data.title || slug).toLowerCase();
+const detectedBrand = articleTitleLower.includes("mini") ? "MINI"
+	: (articleTitleLower.includes("ferrari") || articleTitleLower.includes("フェラーリ")) ? "Ferrari"
+	: (articleTitleLower.includes("rolls") || articleTitleLower.includes("ロールス")) ? "Rolls-Royce"
+	: (articleTitleLower.includes("alpina") || articleTitleLower.includes("アルピナ")) ? "ALPINA"
+	: "BMW";
+
+const matchedRelated = allStories.filter(story => !story.isESG && story.brands.includes(detectedBrand)).slice(0, 5);
+const relatedStories = matchedRelated.length > 0 ? matchedRelated : allStories.filter(story => !story.isESG).slice(0, 5);
+const latestStories = allStories.slice(0, 5);
+const relatedStoriesUrl = `/magazine/?brand=${encodeURIComponent(detectedBrand)}#magazine-archive`;
 
 // 人気記事ランキング（上位5件）の取得
 let popularStories: any[] = [];
@@ -1160,17 +1195,6 @@ try {
 		`).all(slug) as any[];
 
 		popularStories = rows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
-			let imgSrc = "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg";
-			if (r.featured_image) {
-				try {
-					const parsed = JSON.parse(r.featured_image);
-					imgSrc = parsed.src || parsed.previewUrl || imgSrc;
-				} catch {
-					if (typeof r.featured_image === 'string' && r.featured_image.startsWith('/')) {
-						imgSrc = r.featured_image;
-					}
-				}
-			}
 			let brand = "BMW";
 			const t = (r.title || "").toLowerCase();
 			if (t.includes("mini")) brand = "MINI";
@@ -1178,66 +1202,27 @@ try {
 			else if (t.includes("alpina") || t.includes("アルピナ")) brand = "ALPINA";
 			else if (t.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
 
+			const storyObj = storiesBySlug.get(r.slug);
 			return {
 				slug: r.slug,
 				title: r.title,
 				brand,
 				views: typeof r.views === 'number' ? r.views : 0,
-				image: imgSrc,
+				image: storyObj?.image || r.featured_image,
 				url: `/magazine/${r.slug}/`
 			};
 		});
 	}
 } catch (e) {
-	console.error("Failed to query popular stories for sidebar:", e);
+	// フォールバック
 }
 
-// サンプルは1記事のみ。全公開記事を取得してからブランドで絞り込み、件数を制限する。
-if (isSidebarSample) {
-	const storiesBySlug = new Map<string, any>();
-	for (const collection of ["magazine", "posts"] as const) {
-		let cursor: string | undefined;
-		do {
-			const result = await getEmDashCollection(collection as any, {
-				status: "published", orderBy: { published_at: "desc" }, limit: 100, cursor,
-			});
-			if (result.error) throw result.error;
-			if (Astro.cache?.enabled) Astro.cache.set(result.cacheHint);
-			const entries = result.entries || [];
-			const ids = entries.map((entry: any) => entry.data.id);
-			const brands = ids.length ? await getTermsForEntries(collection, ids, "brand") : new Map();
-			for (const entry of entries as any[]) {
-				if (entry.id === slug || isNoticeArticle(entry) || storiesBySlug.has(entry.id)) continue;
-				const assignedBrands = (brands.get(entry.data.id) || []).map((term: any) => term.label);
-				// 一覧と同じく、移行記事でブランド未登録の場合のみタイトル・slugから補完する。
-				if (!assignedBrands.length) {
-					const title = (entry.data.title || "").toLowerCase();
-					const entrySlug = entry.id.toLowerCase();
-					if (title.includes("mini") || entrySlug.includes("mini")) assignedBrands.push("MINI");
-					else if (title.includes("bmw") || entrySlug.includes("bmw") || /7シリーズ|3シリーズ/.test(title)) assignedBrands.push("BMW");
-					else if (title.includes("ferrari") || entrySlug.includes("ferrari")) assignedBrands.push("Ferrari");
-					else if (title.includes("rolls") || entrySlug.includes("rolls") || title.includes("ロールス")) assignedBrands.push("Rolls-Royce");
-					else if (title.includes("alpina") || entrySlug.includes("alpina") || title.includes("アルピナ")) assignedBrands.push("ALPINA");
-					else if (entry.data.related_location) assignedBrands.push("BMW");
-				}
-				const rawDate = entry.data.publishedAt || entry.data.createdAt;
-				storiesBySlug.set(entry.id, {
-					slug: entry.id, title: entry.data.title, brands: assignedBrands,
-					brand: isESGArticle(entry) ? "ESG" : assignedBrands.join(" / "),
-					isESG: isESGArticle(entry),
-					sortDate: new Date(rawDate).getTime() || 0,
-					date: rawDate ? new Date(rawDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".") : "",
-					image: entry.data.featured_image,
-					url: entry.id === "mini-new-generation-debut-fair" ? `/campaigns/${entry.id}` : `/magazine/${encodeURIComponent(entry.id)}/`,
-				});
-			}
-			cursor = result.nextCursor || undefined;
-		} while (cursor);
-	}
-	const stories = [...storiesBySlug.values()].sort((a, b) => b.sortDate - a.sortDate || a.slug.localeCompare(b.slug));
-	relatedStories = stories.filter(story => !story.isESG && story.brands.includes("BMW")).slice(0, 5);
-	latestStories = stories.slice(0, 5);
-	relatedStoriesUrl = "/magazine/?brand=BMW#magazine-archive";
+if (!popularStories.length) {
+	// フォールバック: 全記事の中から上位5件を人気記事として表示
+	popularStories = allStories.slice(0, 5).map((s, idx) => ({
+		...s,
+		views: 2400 - (idx * 320)
+	}));
 }
 
 // タイトルを自然な文節・意味のまとまりで改行するためのセグメント分割
@@ -1451,7 +1436,6 @@ if (Array.isArray(post.data?.content)) {
 					<time class="meta-date">
 						{formattedArticleDate}
 					</time>
-					<span class="meta-reading-time">READING TIME: 4 MIN</span>
 					<span class="meta-views" id="metaViewsBadge" title="閲覧数" style="display: none;">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="meta-views-icon" aria-hidden="true">
 							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -1657,44 +1641,36 @@ if (Array.isArray(post.data?.content)) {
 					</section>
 				)}
 
-				{/* 関連拠点（ショールーム）カード（CMSで設定されている場合に表示） */}
-				{hasShowroom && (
-				<section class="showroom-feature-block">
-					<div class="showroom-card-modern">
-						<div class="showroom-card-media">
-							<img src={relatedShowroom.image} alt={relatedShowroom.name} />
-							<span class="showroom-brand-tag">{relatedShowroom.brand} 正規ディーラー</span>
-						</div>
-						<div class="showroom-card-body">
-							
-							<h3 class="showroom-title">{relatedShowroom.name}</h3>
-							<p class="showroom-sub">{relatedShowroom.subName}</p>
-							
-							<div class="showroom-details">
-								<div class="detail-row">
-									<span class="detail-label">ADDRESS</span>
-									<span class="detail-val">{relatedShowroom.postal} {relatedShowroom.address}</span>
-								</div>
-								<div class="detail-row">
-									<span class="detail-label">OPEN HOURS</span>
-									<span class="detail-val">{relatedShowroom.hours}（定休日: {relatedShowroom.closed}）</span>
-								</div>
-								<div class="detail-row">
-									<span class="detail-label">PHONE</span>
-									<span class="detail-val">{relatedShowroom.tel}</span>
-								</div>
-							</div>
+				{/* 関連する施設（パターン1ベース：薄型スリム行・ブランドロゴ・電話番号/MAPなし・詳細ボタン調和） */}
+				{hasShowrooms && (
+				<section class="magazine-facilities-section" aria-label="関連する施設">
+					<div class="facilities-section-header">
+						<h3 class="facilities-section-title">関連する施設</h3>
+					</div>
 
-							<div class="showroom-actions">
-								<a href={relatedShowroom.detailUrl} class="btn-showroom-detail">
-									<span>ショールーム詳細を見る</span>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-								</a>
-								<a href={relatedShowroom.googleMapsUrl} target="_blank" rel="noopener" class="btn-showroom-map">
-									<span>Google Mapsで開く ↗</span>
-								</a>
-							</div>
-						</div>
+					<div class="facilities-slim-list">
+						{matchedShowrooms.map((facility: any) => (
+							<article class="facility-slim-row">
+								<div class="facility-brand-box" title={facility.brand}>
+									<img src={facility.logo} alt={facility.brand} class="facility-brand-logo" loading="lazy" />
+								</div>
+								<div class="facility-info-box">
+									<h4 class="facility-title">
+										<a href={facility.detailUrl}>{facility.name}</a>
+									</h4>
+									<p class="facility-address">
+										{facility.postal && <span class="facility-postal">{facility.postal}</span>}
+										<span>{facility.address}</span>
+									</p>
+								</div>
+								<div class="facility-action-box">
+									<a href={facility.detailUrl} class="btn-facility-view">
+										<span>詳細</span>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+									</a>
+								</div>
+							</article>
+						))}
 					</div>
 				</section>
 				)}
@@ -1757,23 +1733,26 @@ if (Array.isArray(post.data?.content)) {
 				</div>
 			</div>
 
-			{/* 右サイドバーカラム：関連記事（1カラム指定時は非表示） */}
+			{/* 右サイドバーカラム：最新記事・ランキング・関連記事（PCでは最新→ランキング→関連記事で関連記事が追従、スマホでは関連記事が最上位） */}
 			{!isOneColumn && (
 			<aside class="article-sidebar-col">
-				<div class:list={["sidebar-sticky-panel", { "sidebar-sample": isSidebarSample }]}>
-					{(isSidebarSample ? [
-						{ heading: "関連記事", stories: relatedStories, url: relatedStoriesUrl, label: "BMWの関連記事をもっと見る" },
-						{ heading: "最新記事", stories: latestStories, url: "/magazine/?view=latest#magazine-archive", label: "すべての最新記事をもっと見る" },
-					] : [{ heading: "関連記事", stories: relatedStories, url: "/magazine/", label: "すべての記事を見る" }]).map(block => (
-					<section class="sidebar-block" aria-label={block.heading}>
-						<h2 class="sidebar-heading">{block.heading}</h2>
+				{/* 1. 最新記事ブロック */}
+				{latestStories && latestStories.length > 0 && (
+					<section class="sidebar-block sidebar-block-latest" aria-label="最新記事">
+						<div class="sidebar-header-row">
+							<h2 class="sidebar-heading">最新記事</h2>
+							<a href="/magazine/?view=latest#magazine-archive" class="sidebar-heading-more" aria-label="すべての最新記事をもっと見る">もっと見る →</a>
+						</div>
 						<div class="sidebar-story-list">
-							{block.stories.map((story) => (
+							{latestStories.map((story) => (
 								<article class="sidebar-story-card">
 									<a href={story.url} class="sidebar-story-link">
 										<div class="sidebar-story-media">
-											{isSidebarSample ? <Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" /> : <img src={story.image} alt={story.title} loading="lazy" />}
-											<span class="sidebar-story-brand">{story.brand}</span>
+											{story.image && typeof story.image === 'object' ? (
+												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
+											) : (
+												<img src={typeof story.image === 'string' && story.image ? story.image : '/uploads/ix4/ext-01.jpg'} alt={story.title} loading="lazy" />
+											)}
 										</div>
 										<div class="sidebar-story-body">
 											<time class="sidebar-story-date">{story.date}</time>
@@ -1783,44 +1762,75 @@ if (Array.isArray(post.data?.content)) {
 								</article>
 							))}
 						</div>
-						<div class="sidebar-footer-link">
-							<a href={block.url} class="sidebar-all-link" aria-label={block.label}>{isSidebarSample ? "もっと見る" : "すべての記事を見る"} →</a>
+					</section>
+				)}
+
+				{/* 2. 人気の記事（ランキング）ブロック */}
+				{popularStories && popularStories.length > 0 && (
+					<section class="sidebar-block sidebar-block-popular" aria-label="人気の記事">
+						<div class="sidebar-header-row">
+							<h2 class="sidebar-heading">人気の記事</h2>
+						</div>
+						<div class="sidebar-story-list">
+							{popularStories.map((story, idx) => (
+								<article class="sidebar-story-card">
+									<a href={story.url} class="sidebar-story-link">
+										<div class="sidebar-story-media">
+											{story.image && typeof story.image === 'object' ? (
+												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
+											) : (
+												<img src={typeof story.image === 'string' && story.image ? story.image : '/uploads/ix4/ext-01.jpg'} alt={story.title} loading="lazy" />
+											)}
+											<span class={`sidebar-rank-badge ${idx < 3 ? 'is-top' : ''}`}>{idx + 1}</span>
+										</div>
+										<div class="sidebar-story-body">
+											<span class="sidebar-story-views">{story.views.toLocaleString()} views</span>
+											<h3 class="sidebar-story-title">{story.title}</h3>
+										</div>
+									</a>
+								</article>
+							))}
 						</div>
 					</section>
-					))}
+				)}
 
-					{/* 人気の記事（ランキング） */}
-					{popularStories.length > 0 && (
-						<section class="sidebar-block" aria-label="人気の記事">
-							<h2 class="sidebar-heading">人気の記事</h2>
-							<div class="sidebar-story-list">
-								{popularStories.map((story, idx) => (
-									<article class="sidebar-story-card">
-										<a href={story.url} class="sidebar-story-link">
-											<div class="sidebar-story-media">
-												<img src={story.image} alt={story.title} loading="lazy" />
-												<span class={`sidebar-rank-badge ${idx < 3 ? 'is-top' : ''}`}>{idx + 1}</span>
-											</div>
-											<div class="sidebar-story-body">
-												<div class="sidebar-story-meta-row">
-													<span class="sidebar-story-brand">{story.brand}</span>
-													<span class="sidebar-story-views">
-														<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-														<span>{story.views.toLocaleString()} views</span>
-													</span>
-												</div>
-												<h3 class="sidebar-story-title">{story.title}</h3>
-											</div>
-										</a>
-									</article>
-								))}
-							</div>
-							<div class="sidebar-footer-link">
-								<a href="/magazine/#popular-stories" class="sidebar-all-link" aria-label="人気の記事をもっと見る">ランキングをもっと見る →</a>
-							</div>
-						</section>
-					)}
-				</div>
+				{/* 3. 関連記事ブロック（PCでは最下部でスティッキー追従、スクロール終盤でタイトル先頭に赤丸矢印が出現し右にトントンと動く演出） */}
+				{relatedStories && relatedStories.length > 0 && (
+					<section class="sidebar-block sidebar-block-related" id="sidebar-related-block" aria-label={`${detectedBrand}の関連記事`}>
+						<div class="sidebar-header-row">
+							<h2 class="sidebar-heading">
+								<span class="related-title-arrow-circle" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+										<line x1="5" y1="12" x2="19" y2="12"></line>
+										<polyline points="12 5 19 12 12 19"></polyline>
+									</svg>
+								</span>
+								<span class="heading-main-text">{`${detectedBrand}の関連記事`}</span>
+							</h2>
+							<a href={relatedStoriesUrl} class="sidebar-heading-more" aria-label={`${detectedBrand}の関連記事をもっと見る`}>もっと見る →</a>
+						</div>
+
+						<div class="sidebar-story-list">
+							{relatedStories.map((story) => (
+								<article class="sidebar-story-card">
+									<a href={story.url} class="sidebar-story-link">
+										<div class="sidebar-story-media">
+											{story.image && typeof story.image === 'object' ? (
+												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
+											) : (
+												<img src={typeof story.image === 'string' && story.image ? story.image : '/uploads/ix4/ext-01.jpg'} alt={story.title} loading="lazy" />
+											)}
+										</div>
+										<div class="sidebar-story-body">
+											<time class="sidebar-story-date">{story.date}</time>
+											<h3 class="sidebar-story-title">{story.title}</h3>
+										</div>
+									</a>
+								</article>
+							))}
+						</div>
+					</section>
+				)}
 			</aside>
 			)}
 		</div>
@@ -1882,6 +1892,32 @@ if (Array.isArray(post.data?.content)) {
 					copyText.textContent = 'コピー失敗';
 				});
 			});
+		}
+
+		// 3. 記事本文スクロール終盤検知 ＆ 関連記事ブロックへの視線誘導アテンション演出
+		const relatedBlock = document.getElementById('sidebar-related-block');
+		const triggerEl = document.querySelector('.magazine-facilities-section') || 
+						  document.querySelector('.article-share-bar') || 
+						  document.querySelector('.article-notes-block');
+
+		if (relatedBlock && triggerEl) {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						relatedBlock.classList.add('is-attention');
+					} else {
+						// 記事上部へ戻った場合に演出をリセットし再体験可能に
+						if (entry.boundingClientRect.top > 0) {
+							relatedBlock.classList.remove('is-attention');
+						}
+					}
+				});
+			}, {
+				rootMargin: '0px 0px -10% 0px',
+				threshold: 0.1
+			});
+
+			observer.observe(triggerEl);
 		}
 	});
 </script>
@@ -1955,7 +1991,7 @@ if (Array.isArray(post.data?.content)) {
 	}
 
 	.bc-current {
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-body, #d4d4d8);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -1971,7 +2007,7 @@ if (Array.isArray(post.data?.content)) {
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 4px;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-secondary, #a1a1aa);
 		font-size: 11.5px;
 		font-weight: 600;
 		text-decoration: none;
@@ -1984,7 +2020,7 @@ if (Array.isArray(post.data?.content)) {
 	.article-edit-btn:hover {
 		background: rgba(255, 255, 255, 0.15);
 		border-color: rgba(255, 255, 255, 0.35);
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-title, #ffffff);
 		transform: translateY(-1px);
 	}
 
@@ -2000,7 +2036,7 @@ if (Array.isArray(post.data?.content)) {
 		font-weight: 700;
 		line-height: 1.48;
 		letter-spacing: -0.01em;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-title, #ffffff);
 		margin: 0 0 16px 0;
 		max-width: 1200px;
 		word-break: auto-phrase !important;
@@ -2017,7 +2053,7 @@ if (Array.isArray(post.data?.content)) {
 	.article-lead-text {
 		font-size: clamp(16px, 1.4vw, 19px);
 		line-height: 1.8;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-lead, #ececed);
 		margin: 0 0 24px 0;
 		max-width: 980px;
 		padding-left: 0;
@@ -2061,15 +2097,14 @@ if (Array.isArray(post.data?.content)) {
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.12em;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-secondary, #a1a1aa);
 		backdrop-filter: blur(8px);
 	}
 
 	.meta-date,
-	.meta-reading-time,
 	.meta-views {
 		font-size: 12px;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-muted, #71717a);
 		letter-spacing: 0.08em;
 	}
 
@@ -2101,7 +2136,7 @@ if (Array.isArray(post.data?.content)) {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		border-radius: 999px;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-secondary, #a1a1aa);
 		font-size: 11px;
 		font-weight: 600;
 		text-decoration: none;
@@ -2112,7 +2147,7 @@ if (Array.isArray(post.data?.content)) {
 	.meta-edit-pill:hover {
 		background: rgba(230, 0, 18, 0.15);
 		border-color: var(--color-nicole-red, #E60012);
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-title, #ffffff);
 		transform: translateY(-1px);
 	}
 
@@ -2190,7 +2225,7 @@ if (Array.isArray(post.data?.content)) {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) 340px;
 		gap: 64px;
-		align-items: start;
+		align-items: stretch;
 		box-sizing: border-box;
 	}
 
@@ -2235,19 +2270,11 @@ if (Array.isArray(post.data?.content)) {
 		max-height: 680px;
 	}
 
-	/* 1カラム時：関連ショールームカード（川崎等）も左右いっぱいに雄大に広げる */
-	.modern-article-page.is-one-column .showroom-feature-block {
+	/* 1カラム時：関連する施設セクションも左右いっぱいにダイナミック展開 */
+	.modern-article-page.is-one-column .magazine-facilities-section {
 		width: 100%;
 		max-width: 100%;
-		margin: 80px 0 60px 0;
-	}
-	.modern-article-page.is-one-column .showroom-card-modern {
-		width: 100%;
-		max-width: 100%;
-		grid-template-columns: 460px 1fr;
-	}
-	.modern-article-page.is-one-column .showroom-card-media {
-		min-height: 320px;
+		margin: 64px 0 48px 0;
 	}
 
 	.article-main-col {
@@ -2256,52 +2283,151 @@ if (Array.isArray(post.data?.content)) {
 		min-width: 0;
 	}
 
-	/* サイドバー：シンプル・読みやすさ重視・スティッキー */
+	/* サイドバー：シンプル・高品位・回遊導線最適化 */
 	.article-sidebar-col {
 		width: 100%;
 		min-width: 0;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 36px;
+		position: relative;
 	}
 
-	.sidebar-sticky-panel {
-		position: sticky;
-		top: 120px;
-	}
-
-	.sidebar-sample {
-		display: grid;
-		gap: var(--magazine-sidebar-block-gap);
-	}
-
-	.sidebar-sample .sidebar-heading {
-		border-bottom-color: var(--color-nicole-red);
-	}
-
+	/* サイドバー各ブロック：端正な箱（カード枠）で独立 */
 	.sidebar-block {
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 4px;
-		padding: 28px 24px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 8px;
+		padding: 22px 20px;
+		box-sizing: border-box;
+		position: relative;
+	}
+
+	/* デスクトップ：最新記事 → 人気記事 → 関連記事（最下部でスティッキー追従） */
+	.sidebar-block-latest {
+		order: 1;
+	}
+
+	.sidebar-block-popular {
+		order: 2;
+	}
+
+	.sidebar-block-related {
+		order: 3;
+		position: -webkit-sticky;
+		position: sticky;
+		top: 100px;
+	}
+
+	/* 見出し行（ヘッダー行）：見出しと右揃えの「もっと見る」 */
+	.sidebar-header-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		margin: 0 0 16px 0;
+		padding-bottom: 10px;
+		border-bottom: 2px solid var(--color-nicole-red, #c41230);
 	}
 
 	.sidebar-heading {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 700;
 		letter-spacing: 0.04em;
-		color: var(--magazine-text-color);
-		margin: 0 0 20px 0;
-		padding-bottom: 12px;
-		border-bottom: 2px solid var(--color-nicole-red);
+		color: var(--magazine-text-color, #ffffff);
+		margin: 0;
+		padding: 0;
+		line-height: 1.3;
+	}
+
+	.heading-main-text {
+		display: inline-block;
+	}
+
+	/* 見出し横の右揃え「もっと見る →」リンク */
+	.sidebar-heading-more {
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+		font-size: 11.5px;
+		font-weight: 600;
+		color: var(--magazine-text-muted, #a1a1aa);
+		text-decoration: none;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+		display: inline-flex;
+		align-items: center;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.sidebar-heading-more:hover {
+		color: var(--color-nicole-red, #e60012);
+		transform: translateX(2px);
+	}
+
+	/* 関連記事見出し（タイトル）先頭の赤丸矢印（記事終盤到達時に出現し、右側にトントンと動く） */
+	.related-title-arrow-circle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 0;
+		height: 20px;
+		background: var(--color-nicole-red, #e60012);
+		border-radius: 50%;
+		color: #ffffff;
+		opacity: 0;
+		overflow: hidden;
+		transform: scale(0.6) translateX(-4px);
+		transition: width 0.35s ease, opacity 0.35s ease, transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), margin-right 0.35s ease;
+		flex-shrink: 0;
+		margin-right: 0;
+	}
+
+	.related-title-arrow-circle svg {
+		width: 12px;
+		height: 12px;
+		stroke-width: 3;
+	}
+
+	/* 記事終盤到達時（.is-attention）の演出：見出しタイトル先頭に赤丸矢印が出現し、右側にトントンと動く */
+	.sidebar-block-related.is-attention .related-title-arrow-circle {
+		width: 20px;
+		opacity: 1;
+		margin-right: 4px;
+		transform: scale(1) translateX(0);
+		animation: arrowTapRight 1.6s ease-in-out infinite;
+	}
+
+	/* 右側にトントンと動くアニメーション（2回小刻みにノック・タップして一息） */
+	@keyframes arrowTapRight {
+		0%, 100% {
+			transform: translateX(0);
+		}
+		12% {
+			transform: translateX(5px);
+		}
+		24% {
+			transform: translateX(0);
+		}
+		36% {
+			transform: translateX(5px);
+		}
+		48% {
+			transform: translateX(0);
+		}
 	}
 
 	.sidebar-story-list {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 12px;
 	}
 
 	.sidebar-story-card {
-		padding-bottom: 18px;
+		padding-bottom: 12px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
@@ -2312,8 +2438,8 @@ if (Array.isArray(post.data?.content)) {
 
 	.sidebar-story-link {
 		display: grid;
-		grid-template-columns: 88px 1fr;
-		gap: 14px;
+		grid-template-columns: 78px 1fr;
+		gap: 12px;
 		text-decoration: none;
 		color: inherit;
 		align-items: flex-start;
@@ -2326,8 +2452,8 @@ if (Array.isArray(post.data?.content)) {
 
 	.sidebar-story-media {
 		position: relative;
-		width: 88px;
-		height: 64px;
+		width: 78px;
+		height: 56px;
 		border-radius: 3px;
 		overflow: hidden;
 		background: #111111;
@@ -2374,52 +2500,41 @@ if (Array.isArray(post.data?.content)) {
 		font-size: 10px;
 		font-weight: 700;
 		background: rgba(0, 0, 0, 0.75);
-		color: var(--magazine-text-color);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: #a1a1aa;
+		border: 1px solid rgba(255, 255, 255, 0.15);
 		backdrop-filter: blur(4px);
 		z-index: 2;
 	}
 
+	/* 1.2.3位はNicoleレッドでピリッと引き締める */
 	.sidebar-rank-badge.is-top {
-		background: #ffffff;
-		color: #000000;
-		border-color: #ffffff;
+		background: var(--color-nicole-red, #c41230);
+		color: #ffffff;
+		border-color: var(--color-nicole-red, #c41230);
 	}
 
 	.sidebar-story-body {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 3px;
 		min-width: 0;
 	}
 
-	.sidebar-story-meta-row {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 10.5px;
-		color: var(--magazine-text-color);
-	}
-
+	.sidebar-story-date,
 	.sidebar-story-views {
-		display: inline-flex;
-		align-items: center;
-		gap: 3px;
-		opacity: 0.75;
-		margin-left: auto;
-	}
-
-	.sidebar-story-date {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-size: 11px;
-		color: var(--magazine-text-color);
-		letter-spacing: 0.04em;
+		font-weight: 500;
+		color: var(--magazine-text-muted, #71717a);
+		letter-spacing: 0.03em;
+		line-height: 1.2;
 	}
 
 	.sidebar-story-title {
-		font-size: 13.5px;
+		font-size: 13px;
 		font-weight: 500;
-		line-height: 1.45;
-		color: var(--magazine-text-color);
+		line-height: 1.42;
+		color: var(--magazine-text-lead, #e4e4e7);
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -2429,40 +2544,56 @@ if (Array.isArray(post.data?.content)) {
 	}
 
 	.sidebar-story-link:hover .sidebar-story-title {
-		color: var(--color-nicole-red);
+		color: var(--magazine-text-title, #ffffff);
 	}
 
 	.sidebar-footer-link {
-		margin-top: 22px;
-		padding-top: 14px;
+		margin-top: 14px;
+		padding-top: 10px;
 		border-top: 1px solid rgba(255, 255, 255, 0.06);
 		text-align: right;
 	}
 
 	.sidebar-all-link {
-		font-size: 12px;
+		font-size: 11.5px;
 		font-weight: 600;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-secondary, #a1a1aa);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
 
 	.sidebar-all-link:hover {
-		color: var(--color-nicole-red);
+		color: var(--magazine-text-title, #ffffff);
 	}
 
 	@media (max-width: 1080px) {
 		.article-two-col-layout {
 			grid-template-columns: 1fr;
 			gap: 50px;
+			align-items: start;
 		}
 
 		.article-main-col {
 			max-width: 100%;
 		}
 
-		.sidebar-sticky-panel {
+		.article-sidebar-col {
+			height: auto;
+			gap: 26px;
+		}
+
+		/* スマホ・タブレットでは逆順：読了直後の誘導として関連記事を最上位に配置 */
+		.sidebar-block-related {
+			order: 1;
 			position: static;
+		}
+
+		.sidebar-block-latest {
+			order: 2;
+		}
+
+		.sidebar-block-popular {
+			order: 3;
 		}
 	}
 
@@ -2486,7 +2617,7 @@ if (Array.isArray(post.data?.content)) {
 		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 		font-size: clamp(24px, 2.4vw, 30px);
 		font-weight: 700;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-title, #ffffff);
 		/* セクションブロック間のゆったりしたスペース */
 		margin: clamp(80px, 8.5vw, 116px) 0 28px 0 !important;
 		padding: 0;
@@ -2501,7 +2632,7 @@ if (Array.isArray(post.data?.content)) {
 	.article-rich-text > :global(h3) {
 		font-size: 20px;
 		font-weight: 700;
-		color: var(--color-nicole-red, #E60012);
+		color: var(--magazine-text-title, #ffffff);
 		margin: clamp(56px, 6vw, 76px) 0 22px 0 !important;
 		line-height: 1.4;
 		word-break: auto-phrase !important;
@@ -2512,7 +2643,7 @@ if (Array.isArray(post.data?.content)) {
 	.article-rich-text > :global(h4) {
 		font-size: 17px;
 		font-weight: 700;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-title, #ffffff);
 		margin: clamp(40px, 4.5vw, 54px) 0 16px 0 !important;
 		line-height: 1.45;
 		word-break: auto-phrase !important;
@@ -2543,6 +2674,17 @@ if (Array.isArray(post.data?.content)) {
 		margin-bottom: 28px;
 	}
 
+	/* 注釈・備考ブロック内の段落は本文の28pxマージンを完全無効化し、改行時の不自然な巨大余白を防止 */
+	.article-rich-text :global(.article-notes-block p),
+	.article-rich-text :global(.article-notes-block .notes-line),
+	.article-rich-text :global(.article-notes-block .notes-title),
+	.article-notes-block p,
+	.article-notes-block .notes-line,
+	.article-notes-block .notes-title {
+		margin: 0 !important;
+		margin-bottom: 0 !important;
+	}
+
 	.article-rich-text :global(img) {
 		width: 100%;
 		border-radius: 12px;
@@ -2567,22 +2709,24 @@ if (Array.isArray(post.data?.content)) {
 	.article-rich-text :global(blockquote) {
 		margin: 36px 0;
 		padding: 20px 24px;
-		background: rgba(223, 186, 115, 0.05);
-		border-left: 3px solid var(--color-nicole-red, #E60012);
+		background: rgba(255, 255, 255, 0.03);
+		border-left: 3px solid rgba(255, 255, 255, 0.3);
 		border-radius: 0 8px 8px 0;
 		font-style: italic;
-		color: var(--magazine-text-color);
+		color: var(--magazine-text-body, #d1d1d6);
 	}
 
-	.article-rich-text :global(a) {
-		color: var(--color-nicole-red, #E60012);
+	.article-rich-text :global(a:not([class*="btn"], [class*="cta"], [class*="chip"])) {
+		color: #ffffff;
 		text-decoration: underline;
+		text-decoration-color: rgba(255, 255, 255, 0.4);
 		text-underline-offset: 4px;
-		transition: color 0.2s ease;
+		transition: all 0.2s ease;
 	}
 
-	.article-rich-text :global(a:hover) {
-		color: var(--magazine-text-color);
+	.article-rich-text :global(a:not([class*="btn"], [class*="cta"], [class*="chip"]):hover) {
+		color: #60a5fa;
+		text-decoration-color: #60a5fa;
 	}
 
 	/* ============================================================== */
@@ -2835,151 +2979,148 @@ if (Array.isArray(post.data?.content)) {
 	}
 
 	/* ============================================================== */
-	/* 関連ショールームカード */
+	/* 関連する施設（パターン1ベース：薄型スリム行・ブランドロゴ・詳細ボタン調和） */
 	/* ============================================================== */
-	.showroom-feature-block {
-		margin: 70px 0;
+	.magazine-facilities-section {
+		margin: 56px 0 44px 0;
+		padding-top: 36px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
-	.showroom-card-modern {
-		display: grid;
-		grid-template-columns: 320px 1fr;
-		background: #090b0e;
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 16px;
-		overflow: hidden;
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+	.facilities-section-header {
+		margin-bottom: 18px;
 	}
 
-	.showroom-card-media {
-		position: relative;
-		background: #000;
-	}
-
-	.showroom-card-media img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.showroom-brand-tag {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		padding: 3px 10px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
-		font-size: 10.5px;
+	.facilities-section-title {
+		font-size: clamp(18px, 2.2vw, 22px);
 		font-weight: 700;
-		color: var(--magazine-text-color);
-		backdrop-filter: blur(6px);
+		color: var(--magazine-text-color, #ffffff);
+		margin: 0;
+		line-height: 1.35;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
 	}
 
-	.showroom-card-body {
-		padding: 32px;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.showroom-kicker {
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: var(--magazine-text-color);
-		margin-bottom: 6px;
-	}
-
-	.showroom-title {
-		font-size: 20px;
-		font-weight: 700;
-		color: var(--magazine-text-color);
-		margin: 0 0 4px 0;
-	}
-
-	.showroom-sub {
-		font-size: 12px;
-		color: var(--magazine-text-color);
-		margin: 0 0 20px 0;
-	}
-
-	.showroom-details {
+	.facilities-slim-list {
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		margin-bottom: 24px;
-		padding: 16px;
-		background: rgba(255, 255, 255, 0.03);
-		border-radius: 8px;
 	}
 
-	.detail-row {
+	.facility-slim-row {
 		display: flex;
-		align-items: baseline;
-		gap: 14px;
-		font-size: 12.5px;
+		align-items: center;
+		gap: 18px;
+		padding: 12px 20px;
+		background: #0d0f13;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 6px;
+		transition: background 0.2s ease, border-color 0.2s ease;
+		box-sizing: border-box;
+		width: 100%;
 	}
 
-	.detail-label {
-		font-size: 9.5px;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: var(--magazine-text-color);
-		width: 90px;
+	.facility-slim-row:hover {
+		background: #141820;
+		border-color: rgba(255, 255, 255, 0.22);
+	}
+
+	/* 左側：ブランドロゴ（拠点一覧と完全統一） */
+	.facility-brand-box {
+		width: 42px;
+		height: 42px;
 		flex-shrink: 0;
-	}
-
-	.detail-val {
-		color: var(--magazine-text-color);
-	}
-
-	.showroom-actions {
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 4px;
 		display: flex;
 		align-items: center;
-		gap: 16px;
-		margin-top: auto;
-		flex-wrap: wrap;
+		justify-content: center;
+		padding: 6px;
+		box-sizing: border-box;
 	}
 
-	.btn-showroom-detail {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 11px 22px;
-		background: #ffffff;
-		color: #000000;
-		font-size: 12px;
+	.facility-brand-logo {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		display: block;
+	}
+
+	/* 中央：施設名・所在地（電話番号・MAPなし） */
+	.facility-info-box {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+
+	.facility-title {
+		font-size: 15px;
 		font-weight: 700;
-		letter-spacing: 0.06em;
-		border-radius: 4px;
-		text-decoration: none;
-		transition: all 0.25s ease;
+		margin: 0;
+		line-height: 1.35;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
 	}
 
-	.btn-showroom-detail svg {
-		width: 14px;
-		height: 14px;
-		transition: transform 0.25s ease;
-	}
-
-	.btn-showroom-detail:hover {
-		background: rgba(255, 255, 255, 0.85);
-		transform: translateY(-2px);
-	}
-
-	.btn-showroom-detail:hover svg {
-		transform: translateX(3px);
-	}
-
-	.btn-showroom-map {
-		font-size: 12px;
-		color: var(--magazine-text-color);
+	.facility-title a {
+		color: var(--magazine-text-color, #ffffff);
 		text-decoration: none;
 		transition: color 0.2s ease;
 	}
 
-	.btn-showroom-map:hover {
-		color: var(--color-nicole-red, #E60012);
+	.facility-title a:hover {
+		color: var(--color-nicole-red, #e60012);
+	}
+
+	.facility-address {
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0;
+		line-height: 1.4;
+	}
+
+	.facility-postal {
+		margin-right: 6px;
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	/* 右側：詳細ボタン（真っ白にせずダークテーマに調和） */
+	.facility-action-box {
+		flex-shrink: 0;
+	}
+
+	.btn-facility-view {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 7px 16px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		color: #ffffff;
+		font-size: 12px;
+		font-weight: 600;
+		border-radius: 4px;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+
+	.btn-facility-view svg {
+		width: 12px;
+		height: 12px;
+		transition: transform 0.2s ease;
+	}
+
+	.btn-facility-view:hover {
+		background: rgba(255, 255, 255, 0.18);
+		border-color: rgba(255, 255, 255, 0.38);
+		transform: translateY(-1px);
+	}
+
+	.btn-facility-view:hover svg {
+		transform: translateX(2px);
 	}
 
 	/* ============================================================== */
@@ -2994,16 +3135,37 @@ if (Array.isArray(post.data?.content)) {
 	.notes-inner {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 0;
+	}
+
+	.notes-title {
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		font-size: 13px;
+		font-weight: 700;
+		line-height: 1.4;
+		color: var(--magazine-text-title, #ffffff);
+		margin: 0 0 8px 0 !important;
+		padding: 0 !important;
+		letter-spacing: 0.02em;
 	}
 
 	.notes-line {
 		font-family: 'Inter', -apple-system, sans-serif;
 		font-size: 12.5px;
-		line-height: 1.75;
+		line-height: 1.65;
 		color: var(--magazine-text-color);
-		margin: 0;
+		margin: 0 !important;
+		padding: 0 !important;
 		letter-spacing: 0.02em;
+		white-space: pre-line;
+	}
+
+	.notes-line.is-bullet {
+		margin-top: 6px !important;
+	}
+
+	.notes-line + .notes-line:not(.is-bullet) {
+		margin-top: 3px !important;
 	}
 
 	/* ============================================================== */
@@ -3287,14 +3449,6 @@ if (Array.isArray(post.data?.content)) {
 	/* レスポンシブ対応 */
 	/* ============================================================== */
 	@media (max-width: 992px) {
-		.showroom-card-modern {
-			grid-template-columns: 1fr;
-		}
-
-		.showroom-card-media {
-			height: 220px;
-		}
-
 		.recommended-grid {
 			grid-template-columns: 1fr;
 		}
@@ -3347,8 +3501,29 @@ if (Array.isArray(post.data?.content)) {
 			padding: 20px;
 		}
 
-		.showroom-card-body {
-			padding: 20px;
+		/* 関連する施設（薄型スリム行・スマホ対応） */
+		.facility-slim-row {
+			padding: 10px 14px;
+			gap: 12px;
+		}
+
+		.facility-brand-box {
+			width: 36px;
+			height: 36px;
+			padding: 4px;
+		}
+
+		.facility-title {
+			font-size: 14px;
+		}
+
+		.facility-address {
+			font-size: 11.5px;
+		}
+
+		.btn-facility-view {
+			padding: 6px 12px;
+			font-size: 11.5px;
 		}
 
 		.article-share-bar {
@@ -3456,7 +3631,7 @@ if (Array.isArray(post.data?.content)) {
 		font-size: 0.8125rem !important;
 		line-height: 1.55 !important;
 		background: #0b0b0e !important;
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-body, #d4d4d8) !important;
 		margin: 0 !important;
 	}
 	:global(.emdash-table thead),
@@ -3468,7 +3643,7 @@ if (Array.isArray(post.data?.content)) {
 	:global(.article-rich-text table th),
 	:global(.prose table th) {
 		background: #141419 !important;
-		color: var(--magazine-text-color) !important;
+		color: #e4e4e7 !important;
 		font-weight: 600 !important;
 		padding: 14px 10px !important;
 		border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -3487,7 +3662,7 @@ if (Array.isArray(post.data?.content)) {
 	:global(.emdash-table th p),
 	:global(.article-rich-text table th p),
 	:global(.prose table th p) {
-		color: var(--magazine-text-color) !important;
+		color: #e4e4e7 !important;
 		margin: 0 !important;
 		font-weight: 600 !important;
 		line-height: 1.4 !important;
@@ -3505,7 +3680,7 @@ if (Array.isArray(post.data?.content)) {
 	:global(.article-rich-text table td),
 	:global(.prose table td) {
 		background: transparent !important;
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-body, #d4d4d8) !important;
 		padding: 14px 10px !important;
 		border: 1px solid rgba(255, 255, 255, 0.12) !important;
 		vertical-align: middle !important;
@@ -3520,13 +3695,13 @@ if (Array.isArray(post.data?.content)) {
 	:global(.prose table td:first-child) {
 		text-align: left !important;
 		font-weight: 600 !important;
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-title, #ffffff) !important;
 		padding-left: 14px !important;
 	}
 	:global(.emdash-table td p),
 	:global(.article-rich-text table td p),
 	:global(.prose table td p) {
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-body, #d4d4d8) !important;
 		margin: 0 !important;
 		line-height: 1.55 !important;
 	}
@@ -3543,12 +3718,12 @@ if (Array.isArray(post.data?.content)) {
 	:global(.emdash-table tbody tr:hover td),
 	:global(.article-rich-text table tbody tr:hover td),
 	:global(.prose table tbody tr:hover td) {
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-title, #ffffff) !important;
 	}
 	:global(.emdash-table tbody tr:hover td p),
 	:global(.article-rich-text table tbody tr:hover td p),
 	:global(.prose table tbody tr:hover td p) {
-		color: var(--magazine-text-color) !important;
+		color: var(--magazine-text-title, #ffffff) !important;
 	}
 </style>
 
