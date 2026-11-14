@@ -4,7 +4,10 @@ This is an EmDash site -- a CMS built on Astro with a full admin UI.
 
 ```bash
 npm run dev              # Start the Astro dev server
-npx emdash types      # Regenerate TypeScript types from a running site
+npm run db:backup        # Backup D1 database to seed/backup.sqlite
+npm run db:restore --force # Restore D1 database from seed/backup.sqlite
+npm run typecheck        # Typecheck TypeScript
+npx emdash types         # Regenerate TypeScript types from a running site
 ```
 
 The admin UI is at `http://localhost:4321/_emdash/admin` (Direct bypass login: `http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin`).
@@ -53,6 +56,9 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
   6. *モバイル・タブレット表示の厳格点検とテーブル横スクロール廃止（カード自動変形原則）*: 全てのコンテンツ・ブロックは必ずスマホ（375px〜768px）およびタブレット（768px〜1024px）でも崩れがないか点検すること。テーブル（スペック表・価格一覧）は横スクロールを強要せず、1024px以下で美しいスペックカード一覧（`<dl><dt><dd>` 構造、タブレットでは2列グリッド、スマホでは1列縦並び）に自動変形させること。項目名が二重に表示される疑似要素ハック（`::before { content: attr(data-label); }`）は厳禁とし、カード形式で左右すっきり配置して1文字ごとの縦折れや横スクロール・端の見切れを完全に排除すること。
   7. *見出しの自然な文節改行ルール（言葉の途中のぶつ切り改行禁止）*: 記事タイトル（H1）、大見出し（H2）、中見出し（H3）、小見出し（H4）、カードタイトル等において、言葉・単語の途中（例: 「メリッ/ト」「注/意点」等）で文字が不自然に泣き別れ改行される現象は厳禁。CSSの `word-break: auto-phrase !important; line-break: strict !important;` を全見出しに徹底適用するとともに、記事タイトルでは意味のまとまり（句・文節・助詞の切れ目）ごとに `<span class="title-phrase">`（`display: inline-block`）で自然に改行する構造を担保すること。
   8. *見出しセクション・ブロック間のゆったりした余白設計（トピック境界の明確化とカード内余白保護）*: 「見出しから次の見出しが始まるまで」をひとつの完結したコンテンツブロックとして捉え、ブロック間のスペースを日常の段落間（約28px）や要素内マージンよりも意図的に広く確保すること。大見出し（H2）の前は `clamp(80px, 8.5vw, 116px)`、中見出し（H3）の前は `clamp(56px, 6vw, 76px)` のゆったりとしたマージンを設け、新しいトピック・章が始まったことが直感的に伝わる品格あるブリージングスペース（呼吸感）を担保すること（連続する見出し間は詰める）。【厳格禁止】この大余白は本文直下のセクション見出し（「30秒でわかること」等）のみに限定し、カード内部や各種ブロック内部の見出しには絶対に波及・適用させないこと（カード内のデザインバランスと情報密度を崩さない）。
+  9. *背景・枠線なしカード（flat）の写真前提原則とテキストカードのボックス化保護*: 背景や枠線のないフラットカード（`card_style: "flat"`）は、写真がある場合のみ許可。テキストのみ（`.is-text-only`）のカードは文字が空間に浮いて視認性・境界が曖昧になるため、必ず背景パネルと境界線を持ったボックス型（`card_style: "box"` または `"step"`）として表現すること。コンポーネント側でも写真が1枚もない場合は自動的にボックス型へフォールバックする安全保護ロジックを担保すること。
+  10. *見出しなき箱・カードブロックの連続スタック禁止（トピック境界と順序付けの厳格化）*: 見出しや適切な文脈（リード文）を挟まずに、異なるスタイルや目的のカードグループ（箱）を2段連続で直結して並べることは厳禁。話題の切り替わりには必ず小見出し（H3等）と導入文を設け、思考の区切りを明確にすること。また、時系列や手順ではない並列要素に無意味にステップ番号（`step`）を付与せず、並列要素は統一したボックス型（`box`）で整理すること。
+  11. *コンバージョン導線のCTAブロック化と記事末尾の集約原則*: 「○○について相談する」「商談予約をする」等のアクション導線や重要リンクは、本文中の生テキストやインラインリンクで放置せず、必ず正規のCTAブロック（`cta`）としてボタン化すること。記事末尾の注釈・免責事項はバラバラに放置せず単一の `notes` ブロックに美しく集約し、ハードコードされた関連記事や手動リンク群は削除してCMSの正規導線・CTAに統一すること。
 - **Workflows (Skills)**: 開発開始時は `dev-setup`、作業終了・引き継ぎ時は `handover-wrapup`、SEO/AI検索診断時は `seo-geo-audit` スキルを実行すること（詳細は `.agents/skills/` を参照）。
 - **Deploy rule**: Cloudflareへのデプロイ・本番アップロード（`wrangler deploy`）は、ユーザーから明示的に指示があった場合のみ実行すること。ユーザーの指示がない限り勝手に本番へアップロードせず、ローカル環境（`http://localhost:4321`）での確認にとどめること。
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。
@@ -61,6 +67,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - **Magazine Editorial & SEO/AIO Content rule**: オウンドメディア・マガジン記事（`src/pages/magazine/`、CMSコレクション `magazine`）の執筆・作成時は、即答性（Direct Answerability）・データとスペックの構造化（Table & DL）・FAQ/JSON-LD連動・一次情報（E-E-A-T）を順守すること。
 - **Block-First Article Authoring rule (ブロックファースト記事作成原則・手動編集担保)**: 誰が（人間）作っても、どのAI（Claude, Cursor, Antigravity, Windsurf等）が作っても、後から管理画面（Admin UI）で手作業で直接手直し・加筆・修正ができるよう、記事コンテンツは構造化ブロック（Portable Textブロック）を基本単位として作成すること。生HTML（`CustomHtmlBlock` 等）にテーブルやレイアウトを丸ごと流し込む作成方法は原則禁止。比較表・スペック表は `table` (TableBlock)、CTAボタンは `cta` (CTABlock)、注釈・補足は `notes` または段落スタイル `note`、カード列は `columnCards`、FAQは `accordion`、画像スライダーは `slider` などの標準ブロックを使用し、管理画面から誰でも直感的にセル単位・項目単位で打ち替えできるようにすること（詳細は `.agents/rules/article-block-rules.md` を参照）。
 - **Editor-Render Parity rule (エディタ設定・装飾の完全描画保証原則)**: 管理画面のエディタ上で設定できるすべての項目（文字揃え `textAlign: left/center/right/justify`、リンクの別タブ `blank: true`、インライン装飾等）は、Astro側のカスタムブロック（`RichPortableText`、`CustomParagraph`、`CustomHeading`、`CustomLink` 等）で100%確実に拾い上げてWebサイト側に反映すること。CSS側でも `.prose` による上書きを防止し、管理画面の設定がそのまま最優先で見た目に反映されるよう担保すること。
+- **Dual-File Rulebook Parity rule (AGENTS.md & CLAUDE.md 完全同期原則)**: `AGENTS.md` と `CLAUDE.md` は常に100%同一の内容を維持しなければならない。Claude Code、Antigravity、Cursor、Windsurf等、どのAIツールで作業・ルール追加・修正・学習を行った場合でも、必ず両方のファイル（`AGENTS.md` および `CLAUDE.md`）にまったく同じ内容を反映・同期すること。片方のみの更新・乖離は厳禁とする。
 - **Smart Anchor & Case-Insensitive Jump rule (スマートアンカー・表記揺れ自動吸収原則)**: 見出し末尾の `[#anchor]` 記法（または `{#anchor}`）による自動ID付与をサポートするとともに、HTMLのCase-Sensitive仕様によるリンク切れを防止するため、大文字・小文字両方のエイリアスID（`<span id="...">`）を自動生成し、さらにクライアントJSで大文字小文字無視のスムーズスクロールを担保すること。編集者が `#FAQ` と書いても見出しが `[#faq]` であっても100%確実にジャンプする環境を維持すること。
 
 ## This Template

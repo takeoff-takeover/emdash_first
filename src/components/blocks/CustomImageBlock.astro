@@ -1,0 +1,127 @@
+---
+/**
+ * CustomImageBlock.astro
+ * Portable Text 単体画像ブロック
+ * - node.asset, node.src, node.url 等の多様な入力形式に対応
+ * - 画像未設定または読込エラー時は自動的に /images/no-image.svg をフォールバック表示
+ * - 車両写真のトリミング厳禁（全景カットの欠損禁止）ルールに準拠
+ */
+interface Props {
+	node: {
+		_type: string;
+		_key?: string;
+		asset?: any;
+		src?: string;
+		url?: string;
+		alt?: string;
+		caption?: string;
+		title?: string;
+		displayWidth?: number;
+		displayHeight?: number;
+		alignment?: "left" | "center" | "right" | "wide" | "full";
+		link?: string | { href: string; blank?: boolean };
+		[key: string]: any;
+	};
+}
+
+const { node } = Astro.props;
+
+function resolveSrc(node: any): string {
+	if (!node) return "";
+	if (typeof node.src === "string" && node.src.trim()) return node.src.trim();
+	if (typeof node.url === "string" && node.url.trim()) return node.url.trim();
+	
+	const asset = node.asset;
+	if (typeof asset === "string" && asset.trim()) return asset.trim();
+	if (asset && typeof asset === "object") {
+		if (typeof asset.url === "string" && asset.url.trim()) return asset.url.trim();
+		if (typeof asset.src === "string" && asset.src.trim()) return asset.src.trim();
+		const ref = asset._ref || asset.id || asset.storageKey;
+		if (ref) return `/_emdash/api/media/file/${ref}`;
+	}
+	return "";
+}
+
+const resolvedSrc = resolveSrc(node);
+const imgSrc = resolvedSrc || "/images/no-image.svg";
+const isPlaceholder = !resolvedSrc || imgSrc.includes("no-image");
+const altText = node.alt || (isPlaceholder ? "写真未設定（NO IMAGE）" : "");
+const captionText = node.caption || node.title || "";
+const alignmentClass = node.alignment ? `align-${node.alignment}` : "align-center";
+
+const rawLink = node.link;
+const href = typeof rawLink === "string" ? rawLink : rawLink?.href;
+const isBlank = typeof rawLink === "object" && rawLink?.blank;
+---
+
+<figure class={`article-image-figure ${alignmentClass} ${isPlaceholder ? 'is-placeholder-figure' : ''}`}>
+	{href ? (
+		<a href={href} target={isBlank ? "_blank" : undefined} rel={isBlank ? "noopener noreferrer" : undefined} class="article-image-link">
+			<img
+				src={imgSrc}
+				alt={altText}
+				loading="lazy"
+				class="article-image-img"
+				onerror="this.onerror=null;this.src='/images/no-image.svg';"
+			/>
+		</a>
+	) : (
+		<img
+			src={imgSrc}
+			alt={altText}
+			loading="lazy"
+			class="article-image-img"
+			onerror="this.onerror=null;this.src='/images/no-image.svg';"
+		/>
+	)}
+	{captionText && <figcaption class="article-image-caption">{captionText}</figcaption>}
+</figure>
+
+<style>
+	.article-image-figure {
+		margin: clamp(28px, 4vw, 44px) 0;
+		padding: 0;
+		width: 100%;
+		display: block;
+	}
+	.article-image-figure.align-center {
+		text-align: center;
+	}
+	.article-image-figure.align-left {
+		text-align: left;
+	}
+	.article-image-figure.align-right {
+		text-align: right;
+	}
+	.article-image-link {
+		display: inline-block;
+		max-width: 100%;
+		text-decoration: none;
+	}
+	.article-image-img {
+		max-width: 100%;
+		width: 100%;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+		border-radius: 12px;
+		background: #18181d;
+		object-fit: contain; /* 車両写真のトリミング厳禁原則 */
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.is-placeholder-figure .article-image-img {
+		aspect-ratio: 16 / 10;
+		max-width: 680px;
+		object-fit: contain;
+		border: 1px dashed rgba(255, 255, 255, 0.2);
+	}
+	.article-image-caption {
+		margin-top: 10px;
+		font-size: 0.85rem;
+		color: #a1a1aa;
+		text-align: center;
+		letter-spacing: 0.03em;
+		line-height: 1.5;
+	}
+</style>

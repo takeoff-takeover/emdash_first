@@ -46,7 +46,8 @@ npm run db:backup
 
 ### 3. GitHubへのアップロード（PUT）
 1. `git status` で変更・追加されたファイルを確認します（コード、アセット、DBバックアップ、引き継ぎ書）。
-2. 作業ツリーを整理し、コミットします：
+2. `AGENTS.md` と `CLAUDE.md` の内容に乖離がないか確認し、常に100%完全同期された状態を維持します。
+3. 作業ツリーを整理し、コミットします：
    ```bash
    git add .
    git commit -m "chore: handover and db backup (YYYY-MM-DD)"

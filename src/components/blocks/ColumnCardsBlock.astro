@@ -57,7 +57,10 @@ if (cards.length === 1 || rawCols === "1") {
 	else resolvedCols = 3;
 }
 
-const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
+const rawCardStyle = data.card_style || "box"; // "box" | "flat" | "step"
+// 背景や箱無しカード（flat）は「写真がある場合」を前提とする（写真がないテキストのみの場合は自動でボックス型へ昇格）
+const hasAnyImage = cards.some((c) => Boolean(c.image));
+const cardStyle = (rawCardStyle === "flat" && !hasAnyImage) ? "box" : rawCardStyle;
 ---
 
 {cards.length > 0 && (
@@ -67,7 +70,7 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 				<article class={`cms-col-card ${c.image ? "has-image" : "is-text-only"}`}>
 					{c.image && (
 						<div class="cms-col-card__media">
-							<img src={c.image} alt={c.title || ""} loading="lazy" />
+							<img src={c.image} alt={c.title || ""} loading="lazy" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 							{cardStyle === "step" && (
 								<span class="cms-col-card__step-badge is-on-media">
 									{String(idx + 1).padStart(2, "0")}
@@ -145,6 +148,14 @@ const cardStyle = data.card_style || "box"; // "box" | "flat" | "step"
 		background: transparent;
 		border: none;
 		border-radius: 0;
+	}
+	.cms-col-cards--style-flat .cms-col-card.is-text-only {
+		background: var(--cms-card-bg, rgba(255, 255, 255, 0.04));
+		border: 1px solid var(--cms-card-border, rgba(255, 255, 255, 0.1));
+		border-radius: 12px;
+	}
+	.cms-col-cards--style-flat .cms-col-card.is-text-only .cms-col-card__body {
+		padding: 1.5rem;
 	}
 	.cms-col-cards--style-flat .cms-col-card__media {
 		border-radius: 10px;

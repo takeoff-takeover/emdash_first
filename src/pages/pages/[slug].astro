@@ -1,8 +1,10 @@
 ---
 // src/pages/pages/[slug].astro
 // ニコル・グループ 固定ページ動的ルーティング＆事業会社Elementorデザイン完全継承
-import { decodeSlug } from "emdash";
+import { decodeSlug, getEmDashEntry } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
+import "../../styles/prose.css";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -14,6 +16,8 @@ if (!slug) {
 
 // 1. トップレベル独立ページへの301リダイレクト
 const redirectMap: Record<string, string> = {
+	home: "/",
+	"ホーム": "/",
 	corporate: "/corporate",
 	philosophy: "/philosophy",
 	bmw: "/bmw",
@@ -27,7 +31,8 @@ const redirectMap: Record<string, string> = {
 };
 
 if (redirectMap[slug]) {
-	return Astro.redirect(redirectMap[slug], 301);
+	const target = redirectMap[slug] + (Astro.url.search || "");
+	return Astro.redirect(target, 301);
 }
 
 // 2. 5大事業会社のElementorデータロード
@@ -59,11 +64,32 @@ if (companyFileMap[slug]) {
 	}
 }
 
+// 3. CMSの「固定ページ（pages）」コレクションから取得
+let cmsPage: any = null;
+let cacheHint: any = null;
+
 if (!pageData) {
+	try {
+		const res = await getEmDashEntry("pages" as any, slug);
+		if (res?.entry) {
+			cmsPage = res.entry.data;
+			cacheHint = res.cacheHint;
+		}
+	} catch (e) {
+		console.error(`[pages] Error fetching entry for slug: ${slug}`, e);
+	}
+
+	if (Astro.cache?.enabled && cacheHint) {
+		Astro.cache.set(cacheHint);
+	}
+}
+
+if (!pageData && !cmsPage) {
 	return Astro.rewrite("/404");
 }
 ---
 
+{pageData ? (
 <NicoleLayout title={pageData.title} description={pageData.description}>
   <slot name="head" slot="head">
     {pageData.cssFiles.map((css: string) => (
@@ -113,3 +139,146 @@ if (!pageData) {
     <div class="entry-content" set:html={pageData.html} />
   </div>
 </NicoleLayout>
+) : (
+<NicoleLayout title={cmsPage.title} description={cmsPage.excerpt || cmsPage.title}>
+  <div class="cms-page-wrapper">
+    <!-- パンくずリスト -->
+    <nav class="cms-page-breadcrumb" aria-label="Breadcrumb">
+      <div class="breadcrumb-container">
+        <a href="/">HOME</a>
+        <span class="separator">/</span>
+        <span class="current">{cmsPage.title}</span>
+      </div>
+    </nav>
+
+    <!-- ページヘッダー -->
+    <header class="cms-page-header">
+      <div class="header-container">
+        <div class="page-eyebrow">PAGES</div>
+        <h1 class="page-title">{cmsPage.title}</h1>
+      </div>
+    </header>
+
+    <!-- ページ本文エリア（リッチブロック＆PortableText対応） -->
+    <main class="cms-page-body">
+      <div class="body-container">
+        {cmsPage.content && (
+          <RichPortableText value={cmsPage.content} />
+        )}
+      </div>
+    </main>
+  </div>
+
+  <style>
+    .cms-page-wrapper {
+      background: var(--color-bg, #0a0a0c);
+      color: var(--color-text, #ffffff);
+      min-height: 80vh;
+      padding-bottom: clamp(60px, 8vw, 120px);
+    }
+
+    .cms-page-breadcrumb {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 24px;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .breadcrumb-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .breadcrumb-container a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .breadcrumb-container a:hover {
+      color: #ffffff;
+    }
+
+    .breadcrumb-container .separator {
+      opacity: 0.4;
+    }
+
+    .breadcrumb-container .current {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    .cms-page-header {
+      padding: clamp(48px, 6vw, 80px) 24px clamp(32px, 4vw, 56px);
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+    }
+
+    .header-container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .page-eyebrow {
+      font-family: var(--font-mono, monospace);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .page-title {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin: 0;
+      word-break: auto-phrase !important;
+      line-break: strict !important;
+    }
+
+    .cms-page-body {
+      padding: clamp(36px, 5vw, 64px) 24px 0;
+    }
+
+    .body-container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* 各種ブロック・見出しの自然な文節改行・余白バランス */
+    :global(.cms-page-body h2) {
+      margin-top: clamp(60px, 7vw, 96px);
+      margin-bottom: 24px;
+      font-size: clamp(22px, 2.6vw, 30px);
+      font-weight: 700;
+      word-break: auto-phrase !important;
+      line-break: strict !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 12px;
+    }
+
+    :global(.cms-page-body h3) {
+      margin-top: clamp(40px, 5vw, 64px);
+      margin-bottom: 18px;
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-weight: 600;
+      word-break: auto-phrase !important;
+      line-break: strict !important;
+    }
+
+    :global(.cms-page-body p) {
+      font-size: clamp(15px, 1.1vw, 16.5px);
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 24px;
+    }
+  </style>
+</NicoleLayout>
+)}

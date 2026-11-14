@@ -905,207 +905,13 @@ const matchedShowrooms = relatedLocationKeys
 
 const hasShowrooms = matchedShowrooms.length > 0;
 
-const isIX4 = slug.includes("ix4");
-const isBMWX5 = slug.includes("bmw_x5") || slug.includes("x5");
-const isNeueKlasse = slug.includes("neue_klasse") || slug.includes("3series");
-const isPureBlockPage = slug === "2027_new_bmw_3series_neue_klasse";
-const layoutMode = (post.data as any).layout || "2col";
-const isOneColumn = layoutMode === "1col";
-const isDemoArticle = !isPureBlockPage && (isIX4 || isBMWX5 || isNeueKlasse || slug === "202608_bmw_kids_mechanic");
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
-
-const heroImageUrl = getImageUrl(featuredImage) || (isIX4 ? "/uploads/ix4/key-visual-v2.jpg" : (isBMWX5 ? "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg" : (isNeueKlasse ? "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg" : "/uploads/2026/08/DSC5134.jpg")));
+const heroImageUrl = getImageUrl(featuredImage) || "/images/no-image.svg";
 const heroImageUrlSp = getImageUrl(featuredImageSp);
 
-// 新型BMW X5 フォトギャラリー（BMW Group PressClub 公式高解像度写真）
-
-// 新型BMW iX4 ギャラリー（EXTERIOR 10枚 ＋ インテリア 5枚＝計15枚）
-// ルール準拠：余計な見出しやカテゴリプレフィックスを排除し、シンプルなタイトルと解説のみでミニマルに表示
-const ix4Gallery = [
-  {
-    "title": "Iconic Glowキドニーグリル ＆ 一体型LEDライト",
-    "caption": "ノイエ・クラッセの象徴である一体型発光キドニーグリルとスリムLEDヘッドライトシグネチャー。デジタル技術とBMWのアイコンが融合した新世代のフロントマスク。",
-    "image": "/uploads/ix4/ext-01.jpg"
-  },
-  {
-    "title": "ファストバック・クーペシルエット ＆ ホフマイスター・キンク",
-    "caption": "流麗なルーフラインと力強いショルダーラインが融合した新世代スポーツ・アクティビティ・クーペ（SAC）のプロポーション。Cピラーには象徴的なホフマイスター・キンクを刻む。",
-    "image": "/uploads/ix4/ext-02.jpg"
-  },
-  {
-    "title": "立体LEDリヤライトバー ＆ ダックテールスポイラー",
-    "caption": "車幅いっぱいに広がる3次元リヤライトバーと、空力性能を高めるインテグレーテッド・ダックテール。彫刻的な造形美と視認性を両立。",
-    "image": "/uploads/ix4/ext-03.jpg"
-  },
-  {
-    "title": "アルプス山岳ワインディングを駆けるiX4 M60 xDrive",
-    "caption": "標高2,500mを超える過酷なワインディングで鍛え上げられたデュアルモーターxDrive。瞬時に路面を捉えるトラクションと俊敏な旋回性を実証。",
-    "image": "/uploads/ix4/ext-04.jpg"
-  },
-  {
-    "title": "低重心レイアウトがもたらす極上のコーナリングスタンス",
-    "caption": "フロア下にフラット配置された第6世代バッテリーパックにより、従来のSACを圧倒する低重心と前後重量配分50:50を達成。",
-    "image": "/uploads/ix4/ext-05.jpg"
-  },
-  {
-    "title": "Cd値0.23を達成したエアロダイナミクス・ディテール",
-    "caption": "自動格納式フラッシュドアハンドル、整流エアカーテン、床下フルアンダーカバーにより、クーペSUVとして異例のCd値0.23をマーク。",
-    "image": "/uploads/ix4/ext-06.jpg"
-  },
-  {
-    "title": "21インチM専用鍛造アロイホイール ＆ スポーツブレーキ",
-    "caption": "軽量化と空力低減を極限まで両立した21インチ鍛造ホイール。大径ローターと高剛性Mキャリパーが強大な制動力を約束。",
-    "image": "/uploads/ix4/ext-07.jpg"
-  },
-  {
-    "title": "夕暮れのハイウェイを巡航するiX4 50 xDrive",
-    "caption": "長距離グランドツーリングにおける圧倒的な静粛性と優美な佇まい。航続最大828km（WLTP）がもたらす真の自由。",
-    "image": "/uploads/ix4/ext-08.jpg"
-  },
-  {
-    "title": "空力と機能性を研ぎ澄ましたアンダーフロア設計",
-    "caption": "気流の乱流を徹底して排除するフラットボトム構造。空気抵抗低減とダウンフォース発生を同時に実現。",
-    "image": "/uploads/ix4/ext-09.jpg"
-  },
-  {
-    "title": "スタジオに佇むiX4 M60 xDriveの彫刻的サーフェス",
-    "caption": "無駄な装飾ラインを削ぎ落とし、面と光の陰影のみで力強さを表現するノイエ・クラッセの還元主義（Reductionism）デザイン思想。",
-    "image": "/uploads/ix4/ext-10.jpg"
-  },
-  {
-    "title": "フロントガラス全幅投影「BMW Panoramic Vision」",
-    "caption": "ドライバーの視線移動を最小限に抑え、フロントガラス下端全幅に走行情報やナビゲーション、ADAS状況を黒地に高コントラストで投影する革新HUD。",
-    "image": "/uploads/ix4/int-01.jpg"
-  },
-  {
-    "title": "幾何学フリーフォーム17.9インチ中央ディスプレイ ＆ OS X",
-    "caption": "ドライバー側へ自然に傾斜したゼロレイヤー操作系。生成AIアシスタントと直感的なウィジェット配置により、視覚的・触覚的な心地よさを提供。",
-    "image": "/uploads/ix4/int-02.jpg"
-  },
-  {
-    "title": "クリスタルガラス製タッチセレクター ＆ フローティングコンソール",
-    "caption": "厳選された天然素材と精緻なクリスタルガラスが織りなす現代的クラフトマンシップ。不要な物理スイッチを排した洗練のセンター空間。",
-    "image": "/uploads/ix4/int-03.jpg"
-  },
-  {
-    "title": "海洋リサイクル繊維とヴィーガンレザーのエルゴノミックシート",
-    "caption": "100%リサイクル可能な素材を使用しながら、至高のホールド感と快適性を両立。ベンチレーションおよびマッサージ機能を内蔵。",
-    "image": "/uploads/ix4/int-04.jpg"
-  },
-  {
-    "title": "2,950mmロングホイールベースが生む広大な後席ラウンジ",
-    "caption": "クーペシルエットでありながら十分な頭上空間とクラストップレベルの足元スペースを確保。頭上にはUVカットフルパノラマガラスルーフが広がる。",
-    "image": "/uploads/ix4/int-05.jpg"
-  }
-];
-
-const x5Gallery = [
-	{
-		title: "新型BMW X5 / iX5 ダイナミック走行ビュー",
-		caption: "Neue Klasseのデザイン言語を融合させた第5世代SAV。海岸沿いのワインディングを力強く駆け抜ける。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646987/P90646987-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "Iconic Glowキドニーグリル ＆ ダブルXライト",
-		caption: "垂直発光するIconic GlowキドニーグリルとダブルXライトシグネチャーが創出する、圧倒的なフロントマスク。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646989/P90646989-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "伝統のSAVプロポーション ＆ サイドビュー",
-		caption: "ロングホイールベースとショートオーバーハングによる黄金比。無駄を削ぎ落としたモノリシックなサーフェス。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646996/P90646996-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "水平LEDライトバーが際立つリヤビュー",
-		caption: "ワイド＆ローのスタンスを強調する水平リヤライトバー。堂々たる存在感と精悍な造形美。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90647004/P90647004-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "空力と美学を極めたBMW Winglet",
-		caption: "ボディとシームレスに調和するフラッシュマウントドアハンドル「BMW Winglet」。乗車時に自動展開する。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646999/P90646999-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "パノラミックビジョン搭載デジタルコックピット",
-		caption: "フロントガラス全幅に投影されるBMWパノラミック・ビジョンと異形ステアリング、大型センターディスプレイが創る新空間。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90647000/P90647000-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "精緻なクリスタルガラス製センターコンソール",
-		caption: "スレート調の天然素材に埋め込まれたクリスタル製ギアセレクターと静電タッチスイッチ群。極上のクラフトマンシップ。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90647001/P90647001-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "スカイラウンジ・パノラマガラスサンルーフ＆アンビエント",
-		caption: "キャビン全体を柔らかな間接光で包み込むイルミネーションと、頭上に広がる広大なパノラミックガラスルーフ。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202606/P90646998/P90646998-the-new-bmw-x5-and-ix5-2250px.jpg"
-	},
-	{
-		title: "エルゴノミクスを極めたサステナブルシート",
-		caption: "厳選された上質ヴィーガンレザーと再生繊維を採用。マッサージ機能とベンチレーションを備えた極上のシート。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202302/P90494448/P90494448-bmw-ix5-hydrogen-on-location-antwerp-belgium-02-2023-2250px.jpg"
-	},
-	{
-		title: "広大な後席レッグルームと上下2分割テールゲート",
-		caption: "ロングホイールベース化により拡大したリヤ空間と、伝統の電動上下2分割式ラゲッジスペース。比類なき実用性。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202302/P90494451/P90494451-bmw-ix5-hydrogen-on-location-antwerp-belgium-02-2023-2250px.jpg"
-	}
-];
-
-// スライドギャラリー写真データ（BMW Group PressClub 公式高解像度写真）
-const neueKlasseGallery = [
-	{
-		title: "新型BMW 3シリーズ エクステリア（フロント）",
-		caption: "Neue Klasseデザイン言語を採用した先進のフロントマスク。キドニーグリルとツインヘッドライトが一体化し、新たな光のシグネチャーを創出。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
-	},
-	{
-		title: "サイドプロファイル ＆ 2.5ボックスシルエット",
-		caption: "ロングホイールベースとショートオーバーハングによる伝統のスポーツプロポーション。自動格納式フラッシュドアハンドルと低重心なキャラクターライン。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657631/P90657631-the-new-bmw-3-series-exterior-2250px.jpg"
-	},
-	{
-		title: "BMW M350 xDrive（Mパフォーマンス・フラッグシップ）",
-		caption: "3.0L 直6 TwinPower Turbo＋48Vマイルドハイブリッド（326kW/443hp）。専用アダプティブMサスペンションを標準装備。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657689/P90657689-the-new-bmw-m350-xdrive-exterior-09-26-2250px.jpg"
-	},
-	{
-		title: "BMW 320（高効率4気筒ガソリンモデル）",
-		caption: "最新世代BMW TwinPower Turboと48Vマイルドハイブリッドを搭載し、優れた環境性能と洗練された俊敏なハンドリングを高次元で両立。",
-		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657728/P90657728-the-new-bmw-320-exterior-09-26-2250px.jpg"
-	}
-];
-
-const kidsGallery = [
-	{
-		title: "メカニックウエアへの着替え",
-		caption: "BMWマイスターと同じつなぎに身を包み、少し緊張しながらも誇らしげな笑顔",
-		image: "/uploads/2026/08/DSC5139.jpg"
-	},
-	{
-		title: "実車を使ったタイヤ空気圧・点検作業",
-		caption: "プロのBMWマイスターの手ほどきを受けながら、エアゲージを使って適正空気圧をチェック",
-		image: "/uploads/2026/08/DSC5162.jpg"
-	},
-	{
-		title: "「ニコル・ユーロ」給与明細の授与",
-		caption: "すべての点検ミッションを終え、自らの労働の対価として給与明細とお給料を受け取る",
-		image: "/uploads/2026/08/DSC5188.jpg"
-	},
-	{
-		title: "特別ファクトリー見学ツアー",
-		caption: "普段は立ち入ることのできないNicole BMW 本社サービス工場を保護者様と共に見学",
-		image: "/uploads/2026/08/DSC5206.jpg"
-	}
-];
-
-const currentGallery = isIX4 ? ix4Gallery : (isBMWX5 ? x5Gallery : (isNeueKlasse ? neueKlasseGallery : kidsGallery));
-
-// 本文内に既にスライダー／アコーディオン／FAQ／注釈ブロックが存在するか判定
+// 本文内に注釈ブロックが存在するか判定
 const contentArray = Array.isArray(post.data.content) ? post.data.content : [];
-const hasSliderBlock = contentArray.some((b: any) => b && (b._type === "slider" || b._type === "editorial-tools:slider"));
-const hasAccordionBlock = contentArray.some((b: any) => b && (b._type === "accordion" || b._type === "faq" || b._type === "accordion_faq" || b._type === "editorial-tools:faq"));
 const hasNotesBlock = contentArray.some((b: any) => b && (b._type === "notes" || b._type === "editorial-tools:notes"));
 
 // 本文の数字付き見出し・タイトルを自動サニタイズ（「1. 」「2. 」等の連番を完全撤廃）
@@ -1400,7 +1206,7 @@ if (Array.isArray(post.data?.content)) {
 	currentSlug={slug}
 	jsonLd={articleJsonLd}
 >
-	<article class={`modern-article-page ${isOneColumn ? "is-one-column" : ""}`} id="article-top">
+	<article class="modern-article-page" id="article-top">
 		{/* ============================================================== */}
 		{/* 1. 最上部：左右いっぱいに広がるアイキャッチ写真（フルブリード・シネマティック） */}
 		{/* ============================================================== */}
@@ -1415,11 +1221,9 @@ if (Array.isArray(post.data?.content)) {
 					alt={post.data.title} 
 					class="article-hero-img" 
 					loading="eager" 
+					onerror="this.onerror=null;this.src='/images/no-image.svg';"
 				/>
 			</picture>
-			<div class="article-photo-credit-overlay">
-				<span>Photo: © BMW AG PressClub Global / Nicole Group Editorial</span>
-			</div>
 		</div>
 
 		<header class="article-header-section">
@@ -1459,10 +1263,10 @@ if (Array.isArray(post.data?.content)) {
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
-						{articleBrands.join(" / ") || (isIX4 || isBMWX5 || isNeueKlasse ? "BMW" : "ALL BRANDS")}
+						{articleBrands.join(" / ") || "ALL BRANDS"}
 					</span>
 					<span class="meta-category-pill">
-						{articleCategories.join(" / ") || (isIX4 ? "WORLD PREMIERE" : (isBMWX5 || isNeueKlasse ? "FEATURE STORY" : "PEOPLE & CAR LIFE"))}
+						{articleCategories.join(" / ") || "PEOPLE & CAR LIFE"}
 					</span>
 					<time class="meta-date">
 						{formattedArticleDate}
@@ -1492,185 +1296,13 @@ if (Array.isArray(post.data?.content)) {
 		{/* 2. 本文エリア（現代的エディトリアルレイアウト） */}
 		{/* ============================================================== */}
 		<div class="article-content-wrapper">
-			<div class={`article-two-col-layout ${isOneColumn ? "is-one-column" : ""}`}>
+			<div class="article-two-col-layout">
 				{/* 左メインカラム：記事本文 */}
 				<div class="article-main-col">
 					{/* 本文（Portable Text） */}
-				<div class="article-rich-text prose prose-invert">
-					<RichPortableText value={articleContent} />
-				</div>
-
-				{/* インタラクティブ・スライダー（デモ記事のみフォールバック表示） */}
-				{!hasSliderBlock && isDemoArticle && (
-					<section class="gallery-slider-block">
-						<div class="modern-slider-wrap" id="modernSlider">
-							<div class="slider-viewport">
-								<div class="slider-track" id="sliderTrack">
-									{currentGallery.map((item, index) => (
-										<div class={`slider-slide ${index === 0 ? 'is-active' : ''}`} data-index={index}>
-											<div class="slide-media">
-												<img src={item.image} alt={item.title} loading={index === 0 ? "eager" : "lazy"} />
-												<span class="slide-badge">{index + 1} / {currentGallery.length}</span>
-											</div>
-											<div class="slide-info">
-												<p class="slide-caption">{item.caption}</p>
-											</div>
-										</div>
-									))}
-								</div>
-
-								{/* ナビゲーション矢印 */}
-								<button type="button" class="slider-btn slider-btn--prev" id="sliderPrev" aria-label="前の写真">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-								</button>
-								<button type="button" class="slider-btn slider-btn--next" id="sliderNext" aria-label="次の写真">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-								</button>
-							</div>
-
-							{/* サムネイルナビ */}
-							<div class="slider-thumbnails">
-								{currentGallery.map((item, index) => (
-									<button type="button" class={`slider-thumb-btn ${index === 0 ? 'is-active' : ''}`} data-thumb-index={index} aria-label={`写真 ${index + 1}`}>
-										<img src={item.image} alt="" />
-									</button>
-								))}
-							</div>
-						</div>
-					</section>
-				)}
-
-				{/* アコーディオン（デモ記事のみフォールバック表示） */}
-				{!hasAccordionBlock && isDemoArticle && (
-					<section class="accordion-details-block">
-						<div class="block-header">
-							
-							<h3 class="block-title">
-								{isIX4 ? "新型BMW iX4 主要諸元 ＆ よくあるご質問（FAQ）" : (isBMWX5 ? "新型BMW X5 主要諸元・パワートレイン詳細" : (isNeueKlasse ? "新型3シリーズ 主要諸元 ＆ よくあるご質問" : "イベント概要・詳細情報"))}
-							</h3>
-						</div>
-
-						<div class="modern-accordion-list">
-														{isIX4 ? (
-								<>
-									<details class="accordion-item" open>
-										<summary class="accordion-summary">
-											<span>BMW iX4の日本発売時期や予約受付はいつからですか？</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>グローバル市場では2027年3月より順次デリバリーが開始され、日本市場へは2027年内の導入が予定されています。最新情報の配信および先行購入相談は順次開始される予定です。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>ガソリン車やマイルドハイブリッド車の設定はありますか？</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>新型iX4は、次世代EV専用プラットフォーム「ノイエ・クラッセ（Neue Klasse）」に基づいて開発された完全電気自動車（BEV）専用モデルです。内燃機関モデルの設定はなく、ピュアEV専用設計ならではの低重心パッケージングと最大828kmの圧倒的な航続距離を実現しています。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>一充電での航続距離と充電時間はどのくらいですか？</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>「iX4 50 xDrive」で最大828km（WLTP）、「iX4 40 xDrive」で最大638kmを達成しています。800V高電圧充電システムの採用により、最大300kW〜400kWのDC超急速充電に対応。わずか10分間の充電で約300km以上の航続距離を回復可能です。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>クーペフォルムですが、後席の居住性やトランク容量は実用的ですか？</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>新世代EV専用のフラットフロア構造と2,950mmのロングホイールベースにより、美しいファストバックルーフを描きながらも大人がゆったり乗車できる後席クリアランスを確保しています。トランク容量も通常時515L、後席可倒時最大1,560Lと高い積載力を誇ります。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>「BMW Panoramic Vision」とはどのような機能ですか？</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>従来のメーターパネルの概念を一新し、フロントガラス下部全幅（ピラーからピラーまで）に走行速度、ナビゲーション、ADAS運転支援情報を高コントラストに直接投影する次世代ヘッドアップディスプレイです。ドライバーは視線を外すことなく直感的な操作が可能です。</p>
-										</div>
-									</details>
-								</>
-							) : isBMWX5 ? (
-								<>
-									<details class="accordion-item" open>
-										<summary class="accordion-summary">
-											<span>完全電動モデル『BMW iX5（60 xDrive）』の航続距離と充電性能</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>第6世代BMW eDriveテクノロジー、800Vアーキテクチャ、新開発の円筒型バッテリーセルを搭載。WLTP基準で最大約845km（暫定値）の航続距離を実現し、超急速DC充電器を使用することで、わずか10分で約300km分のエネルギーを急速充電可能です。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>水素燃料電池モデル『BMW iX5 Hydrogen』の量産化</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>BMWとして初となる量産型の水素燃料電池車（FCEV）としてラインナップ。トヨタ自動車との共同開発による第3世代燃料電池スタックとフラット構造の水素ストレージを搭載し、数分間の水素充填でEVと同等以上の長距離ゼロエミッション走行を可能にします。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>日本国内での導入時期と最新情報</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>日本市場へのデリバリーは2026年秋以降を予定しております。詳細な日本仕様やプレオーダー受付スケジュールは順次アナウンスされる見通しです。</p>
-										</div>
-									</details>
-								</>
-							) : (
-								<>
-									<details class="accordion-item" open>
-										<summary class="accordion-summary">
-											<span>Neue Klasse（ノイエ・クラッセ）アーキテクチャの革新性</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>第6世代BMW eDriveテクノロジーを搭載し、エネルギー密度が20%向上した新開発の円筒型リチウムイオンバッテリーセルを採用。800Vシステムによる超急速充電に対応し、わずか10分の充電で最大300kmの航続距離を回復します。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>『BMW パノラミック・ビジョン』と新世代デジタル・キャビン</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>フロントガラスの全幅にわたって運転関連情報を投影する「BMWパノラミック・ビジョン」を初採用。ドライバーと助手席乗員の視線移動を最小限に抑え、直感的なステアリング操作と音声コマンドにより、次世代のコックピット体験を提供します。</p>
-										</div>
-									</details>
-
-									<details class="accordion-item">
-										<summary class="accordion-summary">
-											<span>日本市場における導入スケジュールと最新情報</span>
-											<span class="accordion-icon">+</span>
-										</summary>
-										<div class="accordion-content">
-											<p>日本国内でのデリバリーは2026年後半以降を予定しております。最新情報は公式Webマガジン等にて順次ご案内いたします。</p>
-										</div>
-									</details>
-								</>
-							)}
-						</div>
-					</section>
-				)}
+					<div class="article-rich-text prose prose-invert">
+						<RichPortableText value={articleContent} />
+					</div>
 
 				{/* 関連する施設（パターン1ベース：薄型スリム行・ブランドロゴ・電話番号/MAPなし・詳細ボタン調和） */}
 				{hasShowrooms && (
@@ -1807,7 +1439,6 @@ if (Array.isArray(post.data?.content)) {
 			</div>
 
 			{/* 右サイドバーカラム：最新記事・ランキング・関連記事（PCでは最新→ランキング→関連記事で関連記事が追従、スマホでは関連記事が最上位） */}
-			{!isOneColumn && (
 			<aside class="article-sidebar-col">
 				{/* 1. 最新記事ブロック */}
 				{latestStories && latestStories.length > 0 && (
@@ -1821,10 +1452,15 @@ if (Array.isArray(post.data?.content)) {
 								<article class="sidebar-story-card">
 									<a href={story.url} class="sidebar-story-link">
 										<div class="sidebar-story-media">
-											{story.image && typeof story.image === 'object' ? (
+											{story.image && typeof story.image === 'object' && story.image.src ? (
 												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
 											) : (
-												<img src={typeof story.image === 'string' && story.image ? story.image : '/uploads/ix4/ext-01.jpg'} alt={story.title} loading="lazy" />
+												<img
+													src={getImageUrl(story.image) || '/images/no-image.svg'}
+													alt={story.title}
+													loading="lazy"
+													onerror="this.onerror=null;this.src='/images/no-image.svg';"
+												/>
 											)}
 										</div>
 										<div class="sidebar-story-body">
@@ -1888,10 +1524,15 @@ if (Array.isArray(post.data?.content)) {
 								<article class="sidebar-story-card">
 									<a href={story.url} class="sidebar-story-link">
 										<div class="sidebar-story-media">
-											{story.image && typeof story.image === 'object' ? (
+											{story.image && typeof story.image === 'object' && story.image.src ? (
 												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
 											) : (
-												<img src={typeof story.image === 'string' && story.image ? story.image : '/uploads/ix4/ext-01.jpg'} alt={story.title} loading="lazy" />
+												<img
+													src={getImageUrl(story.image) || '/images/no-image.svg'}
+													alt={story.title}
+													loading="lazy"
+													onerror="this.onerror=null;this.src='/images/no-image.svg';"
+												/>
 											)}
 										</div>
 										<div class="sidebar-story-body">
@@ -1905,7 +1546,6 @@ if (Array.isArray(post.data?.content)) {
 					</section>
 				)}
 			</aside>
-			)}
 
 			{/* バックリンク & 編集リンク（PCでは左カラム直下に配置、スマホではサイドバーの他記事群の下に配置） */}
 			<div class="article-back-nav">
@@ -2289,23 +1929,6 @@ if (Array.isArray(post.data?.content)) {
 		height: clamp(460px, 72vh, 800px);
 		object-fit: cover;
 		display: block;
-	}
-
-	/* 写真の右下に重ねるクレジット（黒い余計な下地をなくす） */
-	.article-photo-credit-overlay {
-		position: absolute;
-		bottom: 16px;
-		right: 28px;
-		z-index: 3;
-		font-size: 11px;
-		color: var(--magazine-text-color);
-		letter-spacing: 0.04em;
-		background: rgba(0, 0, 0, 0.45);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		padding: 4px 10px;
-		border-radius: 3px;
-		pointer-events: none;
 	}
 
 	/* ============================================================== */

@@ -159,10 +159,6 @@
 	color: var(--magazine-text-muted) !important;
 }
 
-.is-magazine-page .article-photo-credit-overlay {
-	color: var(--magazine-text-secondary) !important;
-}
-
 .is-magazine-page .meta-category-pill {
 	color: var(--magazine-text-secondary) !important;
 }

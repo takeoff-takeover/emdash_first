@@ -59,29 +59,12 @@ function parseCsvLine(line: string, delimiter: string): string[] {
 	return result;
 }
 
-const rawCsvText = String(node.raw_csv || node.csv || node.tsv || "").trim();
-
-if (rawCsvText) {
-	// TSV/CSVからのパース
-	const rawLines = rawCsvText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-	if (rawLines.length > 0) {
-		const firstLine = rawLines[0];
-		const delimiter = firstLine.includes("\t") ? "\t" : ",";
-		headers = parseCsvLine(firstLine, delimiter);
-		for (let i = 1; i < rawLines.length; i++) {
-			const cellTexts = parseCsvLine(rawLines[i], delimiter);
-			rows.push({
-				cells: cellTexts.map(t => ({ text: t }))
-			});
-		}
-	}
-}
-
-if (headers.length === 0 && Array.isArray(node.headers) && node.headers.length > 0) {
+// 1. node.rows が存在する場合は最優先でパース（構造化データを最優先）
+if (Array.isArray(node.headers) && node.headers.length > 0) {
 	headers = node.headers.map(h => String(h || "").trim());
 }
 
-if (rows.length === 0 && Array.isArray(node.rows)) {
+if (Array.isArray(node.rows) && node.rows.length > 0) {
 	node.rows.forEach((r: any, rIdx: number) => {
 		const rawCells = Array.isArray(r.cells) ? r.cells : [];
 		const parsedCells = rawCells.map((c: any) => {
@@ -97,28 +80,44 @@ if (rows.length === 0 && Array.isArray(node.rows)) {
 			}
 			return {
 				text: text.trim(),
-				isHeader: Boolean(c?.isHeader || r?.isHeader || rIdx === 0 && rawCells.every((cell: any) => cell?.isHeader))
+				isHeader: Boolean(c?.isHeader || r?.isHeader || (rIdx === 0 && rawCells.every((cell: any) => cell?.isHeader)))
 			};
 		});
 
-		// 最初の行がヘッダー指定されている場合
+		// 最初の行がヘッダー行の場合
 		if (rIdx === 0 && headers.length === 0 && (r.isHeader || parsedCells.every((c: { isHeader: boolean; text: string }) => c.isHeader))) {
 			headers = parsedCells.map((c: { isHeader: boolean; text: string }) => c.text);
-		} else {
+		} else if (!(rIdx === 0 && (r.isHeader || parsedCells.every((c: { isHeader: boolean; text: string }) => c.isHeader)))) {
 			rows.push({ cells: parsedCells });
 		}
 	});
-} else if (Array.isArray(node.items)) {
-	// key-value items or generic array
-	node.items.forEach((it: any) => {
-		if (typeof it === "object") {
-			const cellList = Object.values(it).map(val => ({ text: String(val || "").trim() }));
-			rows.push({ cells: cellList });
-			if (headers.length === 0) {
-				headers = Object.keys(it);
+} else {
+	// 2. node.rows がない場合の raw_csv / csv パース
+	const rawCsvText = String(node.raw_csv || node.csv || node.tsv || "").trim();
+	if (rawCsvText) {
+		const rawLines = rawCsvText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+		if (rawLines.length > 0) {
+			const firstLine = rawLines[0];
+			const delimiter = firstLine.includes("\t") ? "\t" : ",";
+			headers = parseCsvLine(firstLine, delimiter);
+			for (let i = 1; i < rawLines.length; i++) {
+				const cellTexts = parseCsvLine(rawLines[i], delimiter);
+				rows.push({
+					cells: cellTexts.map(t => ({ text: t }))
+				});
 			}
 		}
-	});
+	} else if (Array.isArray(node.items)) {
+		node.items.forEach((it: any) => {
+			if (typeof it === "object") {
+				const cellList = Object.values(it).map(val => ({ text: String(val || "").trim() }));
+				rows.push({ cells: cellList });
+				if (headers.length === 0) {
+					headers = Object.keys(it);
+				}
+			}
+		});
+	}
 }
 
 const title = (node.title || "").trim();

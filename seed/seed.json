@@ -6,11 +6,244 @@
     "description": "Exported from existing EmDash database"
   },
   "settings": {
-    "tagline": "Thoughts on building for the web",
-    "title": "My Blog"
+    "tagline": "ニコル・グループ公式サイト",
+    "title": "Nicole Group"
   },
   "blockTypes": [],
   "collections": [
+    {
+      "slug": "homepage",
+      "label": "トップページ設定",
+      "labelSingular": "トップページ設定",
+      "description": "トップページのヒーロー動画や主要設定を管理します",
+      "icon": "house",
+      "sortOrder": 0,
+      "urlPattern": "/",
+      "supports": [
+        "revisions"
+      ],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "設定名称",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "hero_video_enabled",
+          "label": "【ヒーロー動画】動画の有効化（OFF時はカバー写真を表示）",
+          "type": "boolean"
+        },
+        {
+          "slug": "hero_video_url",
+          "label": "【ヒーロー動画】YouTube動画URL / 動画ID",
+          "type": "string"
+        },
+        {
+          "slug": "hero_video_start",
+          "label": "【ヒーロー動画】再生開始位置（秒）",
+          "type": "integer"
+        },
+        {
+          "slug": "hero_video_end",
+          "label": "【ヒーロー動画】ループ終了位置（秒）",
+          "type": "integer"
+        },
+        {
+          "slug": "hero_video_brightness",
+          "label": "【ヒーロー動画】動画の明るさ調整",
+          "type": "select",
+          "options": [
+            {
+              "label": "標準（85%・シネマ風）",
+              "value": "0.85"
+            },
+            {
+              "label": "暗め（70%・重厚感重視）",
+              "value": "0.70"
+            },
+            {
+              "label": "通常（100%・そのまま）",
+              "value": "1.00"
+            }
+          ]
+        },
+        {
+          "slug": "hero_poster_image",
+          "label": "【ヒーロー動画】フォールバック画像 / 読込中カバー写真",
+          "type": "image"
+        },
+        {
+          "slug": "banner_recruit_image",
+          "label": "【採用情報バナー】写真",
+          "type": "image"
+        },
+        {
+          "slug": "banner_recruit_title",
+          "label": "【採用情報バナー】見出し",
+          "type": "string"
+        },
+        {
+          "slug": "banner_recruit_desc",
+          "label": "【採用情報バナー】説明文",
+          "type": "string"
+        },
+        {
+          "slug": "banner_recruit_btn_label",
+          "label": "【採用情報バナー】ボタン文言",
+          "type": "string"
+        },
+        {
+          "slug": "banner_recruit_btn_style",
+          "label": "【採用情報バナー】ボタンスタイル",
+          "type": "select",
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_recruit_url",
+          "label": "【採用情報バナー】リンク先URL",
+          "type": "string"
+        },
+        {
+          "slug": "banner_philosophy_image",
+          "label": "【私たちの志バナー】写真",
+          "type": "image"
+        },
+        {
+          "slug": "banner_philosophy_title",
+          "label": "【私たちの志バナー】見出し",
+          "type": "string"
+        },
+        {
+          "slug": "banner_philosophy_desc",
+          "label": "【私たちの志バナー】説明文",
+          "type": "string"
+        },
+        {
+          "slug": "banner_philosophy_btn_label",
+          "label": "【私たちの志バナー】ボタン文言",
+          "type": "string"
+        },
+        {
+          "slug": "banner_philosophy_btn_style",
+          "label": "【私たちの志バナー】ボタンスタイル",
+          "type": "select",
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_philosophy_url",
+          "label": "【私たちの志バナー】リンク先URL",
+          "type": "string"
+        },
+        {
+          "slug": "banner_esg_image",
+          "label": "【ESG / SDGsバナー】背景写真",
+          "type": "image"
+        },
+        {
+          "slug": "banner_esg_title",
+          "label": "【ESG / SDGsバナー】見出し",
+          "type": "string"
+        },
+        {
+          "slug": "banner_esg_desc",
+          "label": "【ESG / SDGsバナー】説明文",
+          "type": "string"
+        },
+        {
+          "slug": "banner_esg_btn_label",
+          "label": "【ESG / SDGsバナー】ボタン文言",
+          "type": "string"
+        },
+        {
+          "slug": "banner_esg_btn_style",
+          "label": "【ESG / SDGsバナー】ボタンスタイル",
+          "type": "select",
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・Nicole Red・高視認性）",
+              "value": "red"
+            },
+            {
+              "label": "白枠アウトラインボタン（上品な白枠・半透明背景）",
+              "value": "white_outline"
+            },
+            {
+              "label": "白ソリッドボタン（白背景・黒文字）",
+              "value": "white_solid"
+            },
+            {
+              "label": "黒枠アウトラインボタン",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_esg_url",
+          "label": "【ESG / SDGsバナー】リンク先URL",
+          "type": "string"
+        },
+        {
+          "slug": "banner_store_image",
+          "label": "【オンラインストアバナー】写真",
+          "type": "image"
+        },
+        {
+          "slug": "banner_store_title",
+          "label": "【オンラインストアバナー】見出し",
+          "type": "string"
+        },
+        {
+          "slug": "banner_store_desc",
+          "label": "【オンラインストアバナー】説明文",
+          "type": "string"
+        },
+        {
+          "slug": "banner_store_btn_label",
+          "label": "【オンラインストアバナー】ボタン文言",
+          "type": "string"
+        },
+        {
+          "slug": "banner_store_btn_style",
+          "label": "【オンラインストアバナー】ボタンスタイル",
+          "type": "select",
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_store_url",
+          "label": "【オンラインストアバナー】リンク先URL",
+          "type": "string"
+        }
+      ]
+    },
     {
       "slug": "magazine",
       "label": "マガジン",
@@ -702,8 +935,8 @@
     },
     {
       "slug": "pages",
-      "label": "Pages",
-      "labelSingular": "Page",
+      "label": "固定ページ",
+      "labelSingular": "固定ページ",
       "supports": [
         "drafts",
         "revisions",
@@ -103086,6 +103319,46 @@
           ],
           "excerpt": "Nicole BMWでは、夏休みの特別なプログラムとして、弊社をご愛顧いただいているオーナー様、ならびに近隣にお住まいの小学生のお子様を対象としたイベント「キッズメカニック」を開催いたしました。",
           "related_location": "nicole-bmw-kawasaki"
+        }
+      }
+    ],
+    "homepage": [
+      {
+        "id": "homepage:main",
+        "slug": "main",
+        "status": "published",
+        "data": {
+          "title": "トップページ メイン設定",
+          "hero_video_enabled": 1,
+          "hero_video_url": "https://www.youtube.com/watch?v=1Z0CddMzQBM",
+          "hero_video_start": null,
+          "hero_video_end": null,
+          "hero_video_brightness": "0.85",
+          "hero_poster_image": null,
+          "banner_recruit_image": "/uploads/2026/02/career001.webp",
+          "banner_recruit_title": "ニコル・グループ採用情報",
+          "banner_recruit_desc": "妥協なきクオリティと、積み重ねてきた信頼。自動車業界をリードするグループの一員として、新たなキャリアを刻みませんか？　入社お祝い金、インセンティブ保証制度あり。",
+          "banner_recruit_btn_label": "採用情報を詳しく",
+          "banner_recruit_btn_style": "red",
+          "banner_recruit_url": "https://www.nicole-recruit.com/",
+          "banner_philosophy_image": "/uploads/2026/02/DSC3504.jpg",
+          "banner_philosophy_title": "私たちの志",
+          "banner_philosophy_desc": "ニコル・グループを形作っているもの。それは、単なる事業の集合体ではなく、共通の意志です。私たちが社会に対して約束する、3つの核心（MISSION / VISION / VALUE）についてご説明します。",
+          "banner_philosophy_btn_label": "3つの核心を詳しく",
+          "banner_philosophy_btn_style": "red",
+          "banner_philosophy_url": "/philosophy",
+          "banner_esg_image": "/uploads/2026/02/AdobeStock_1808926524-scaled.webp",
+          "banner_esg_title": "サステナビリティ・ESGへの取り組み",
+          "banner_esg_desc": "環境保全、地域社会への貢献、コンプライアンスの徹底など、持続可能な未来に向けたニコル・グループの具体的な取り組みをご紹介します。",
+          "banner_esg_btn_label": "活動内容を詳しく",
+          "banner_esg_btn_style": "red",
+          "banner_esg_url": "/esg",
+          "banner_store_image": "/uploads/2026/02/store01.webp",
+          "banner_store_title": "ニコル・オンラインストア",
+          "banner_store_desc": "各ブランドの公式ライフスタイル・アクセサリーや限定コレクションをオンラインで。",
+          "banner_store_btn_label": "オンラインストアへ",
+          "banner_store_btn_style": "red",
+          "banner_store_url": "https://nicole-store.com/"
         }
       }
     ]

@@ -70,7 +70,7 @@ const fitMode = data.media_fit || "cover"; // "cover" (統一枠・余白なし)
 			return (
 				<div class={`cms-split-card ${isRight ? "is-right" : "is-left"} ${isPlaceholder ? "has-placeholder-img" : ""}`}>
 					<div class="cms-split-card__media">
-						<img src={imgSource} alt={row.title || "No Image Placeholder"} loading="lazy" />
+						<img src={imgSource} alt={row.title || "No Image Placeholder"} loading="lazy" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 					</div>
 					<div class="cms-split-card__content">
 						{row.title && <h3 class="cms-split-card__title">{row.title}</h3>}

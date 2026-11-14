@@ -191,7 +191,7 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	const featImg = p.data.featured_image;
 	const imgUrl = resolveMediaUrl(
 		featImg,
-		"https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg"
+		"/images/no-image.svg"
 	);
 	const entryDbId = p.data?.id || p.id;
 	const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
@@ -296,7 +296,8 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 					alt={coverArticle.title} 
 					class="apple-hero__img" 
 					id="apple-hero-img"
-					loading="eager" 
+					loading="eager"
+					onerror="this.onerror=null;this.src='/images/no-image.svg';"
 				/>
 				<!-- 映画的なダークビネットとグラデーション -->
 				<div class="apple-hero__gradient"></div>
@@ -361,7 +362,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 						<article class="toc-card">
 							<a href={story.url} class="toc-card__link">
 								<div class="toc-card__media">
-									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" />
+									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 									<div class="toc-card__overlay"></div>
 									<span class="toc-card__brand">{story.brand}</span>
 								</div>
@@ -405,7 +406,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 						<article class="popular-card">
 							<a href={story.url} class="popular-card__link">
 								<div class="popular-card__media">
-									<img src={story.image} alt={story.title} loading="lazy" class="popular-card__img" />
+									<img src={story.image} alt={story.title} loading="lazy" class="popular-card__img" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 									<div class="popular-card__overlay"></div>
 									<span class={`popular-rank-badge ${index < 3 ? 'is-top' : ''}`}>
 										{index + 1}
@@ -519,7 +520,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 							>
 								<a href={art.url} class="article-item__link">
 									<div class="article-item__media">
-										<img src={art.image} alt={art.title} loading="lazy" class="article-item__img" />
+										<img src={art.image} alt={art.title} loading="lazy" class="article-item__img" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 										<div class="article-item__overlay"></div>
 										<span class="article-brand-pill">{art.brand}</span>
 									</div>
@@ -594,7 +595,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 						<article class={`esg-card ${index >= 4 ? 'is-collapsed' : ''}`} data-esg-index={index}>
 							<a href={art.url} class="esg-card__link">
 								<div class="esg-card__media">
-									<img src={art.image} alt={art.title} loading="lazy" class="esg-card__img" />
+									<img src={art.image} alt={art.title} loading="lazy" class="esg-card__img" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 									<span class="esg-card__badge">ESG / SDGs</span>
 								</div>
 								<div class="esg-card__body">

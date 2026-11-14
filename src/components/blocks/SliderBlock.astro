@@ -90,7 +90,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		{allImages.map((item, idx) => (
 			<figure class="cms-photo-grid__item">
 				<div class="cms-photo-grid__media">
-					<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading="lazy" />
+					<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading="lazy" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 				</div>
 				{item.caption && <figcaption class="cms-photo-grid__caption">{item.caption}</figcaption>}
 			</figure>
@@ -105,7 +105,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			<div class="filmstrip-track" id={`${blockId}-track`}>
 				{allImages.map((item, idx) => (
 					<div class={`filmstrip-slide ${idx === 0 ? 'is-active' : ''}`} data-index={idx}>
-						<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading={idx === 0 ? "eager" : "lazy"} />
+						<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading={idx === 0 ? "eager" : "lazy"} onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 						<span class="filmstrip-badge">{idx + 1} / {allImages.length}</span>
 					</div>
 				))}
@@ -133,7 +133,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			<div class="filmstrip-thumbs" id={`${blockId}-thumbs`}>
 				{allImages.map((item, idx) => (
 					<button type="button" class={`filmstrip-thumb ${idx === 0 ? 'is-active' : ''}`} data-thumb={idx} aria-label={`写真 ${idx + 1}`}>
-						<img src={item.image} alt="" />
+						<img src={item.image} alt="" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
 					</button>
 				))}
 			</div>
@@ -144,9 +144,9 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 <style>
 	.cms-photo-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 1.25rem;
-		margin: 2.5rem 0;
+		margin: clamp(28px, 4vw, 44px) 0;
 	}
 	.cms-photo-grid__item {
 		margin: 0 !important;
@@ -159,12 +159,13 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		aspect-ratio: 16 / 10;
 		overflow: hidden;
 		border-radius: 10px;
-		background: rgba(128, 128, 128, 0.12);
+		background: #09090d;
+		border: 1px solid rgba(255, 255, 255, 0.08);
 	}
 	.cms-photo-grid__media img {
 		width: 100% !important;
 		height: 100% !important;
-		object-fit: cover !important;
+		object-fit: contain !important;
 		margin: 0 !important;
 		display: block !important;
 	}
@@ -176,7 +177,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 	}
 
 	.cms-filmstrip-gallery {
-		margin: 2.5rem 0;
+		margin: clamp(32px, 4.5vw, 48px) 0;
 		background: transparent;
 		border: none;
 		padding: 0;
@@ -195,12 +196,14 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		position: relative;
 		width: 100%;
 		aspect-ratio: 16 / 10;
-		background: #000000;
+		background: #09090d;
 		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
 		touch-action: pan-y;
 		user-select: none;
 		-webkit-user-select: none;
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 	}
 
 	.filmstrip-track {
@@ -229,83 +232,96 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 	.filmstrip-slide img {
 		width: 100% !important;
 		height: 100% !important;
-		object-fit: cover !important;
+		object-fit: contain !important;
 		margin: 0 !important;
 		border-radius: 0 !important;
 		box-shadow: none !important;
 		display: block !important;
 	}
 
-	/* 右上のカウンターバッジ（角型・モノトーン・楕円なし） */
+	/* 右上のカウンターバッジ（角丸・モノトーン・すりガラス） */
 	.filmstrip-badge {
 		position: absolute;
-		top: 12px;
-		right: 12px;
-		background: rgba(0, 0, 0, 0.8);
-		border: 1px solid rgba(255, 255, 255, 0.25);
-		border-radius: 0;
+		top: 14px;
+		right: 14px;
+		background: rgba(10, 10, 14, 0.75);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 6px;
 		font-family: var(--font-mono, monospace);
 		font-size: 0.75rem;
 		font-weight: 600;
-		padding: 3px 8px;
+		padding: 4px 10px;
 		color: #ffffff;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		z-index: 2;
 	}
 
-	/* 左右矢印（背景なし・フロートシェブロン・楕円なし） */
+	/* 左右矢印（すりガラス・丸型ボタン・ホバー浮遊） */
 	.filmstrip-nav {
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
-		background: transparent;
-		border: none;
+		background: rgba(10, 10, 14, 0.65);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 50%;
+		width: 44px;
+		height: 44px;
 		color: #ffffff;
-		padding: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
 		cursor: pointer;
-		filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
-		transition: transform 0.2s ease, opacity 0.2s;
+		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+		transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
 		z-index: 5;
 	}
 
 	.filmstrip-nav:hover {
-		transform: translateY(-50%) scale(1.15);
+		transform: translateY(-50%) scale(1.08);
+		background: rgba(22, 22, 30, 0.9);
+		border-color: rgba(255, 255, 255, 0.35);
 	}
 
 	.filmstrip-nav svg {
-		width: 32px;
-		height: 32px;
+		width: 22px;
+		height: 22px;
 	}
 
 	.filmstrip-nav--prev {
-		left: 8px;
+		left: 14px;
 	}
 
 	.filmstrip-nav--next {
-		right: 8px;
+		right: 14px;
 	}
 
-	/* キャプション（グレーの小さい文字のみ・見出しなし） */
+	/* キャプション */
 	.filmstrip-caption-wrap {
 		padding: 10px 0 4px 0;
 		min-height: 24px;
 	}
 
 	.filmstrip-caption {
-		font-size: 0.88rem;
-		color: #9ca3af;
+		font-size: 0.85rem;
+		color: #a1a1aa;
 		line-height: 1.6;
 		margin: 0;
+		letter-spacing: 0.02em;
 	}
 
-	/* フィルムストリップ・サムネイルバー（角型・楕円なし） */
+	/* フィルムストリップ・サムネイルバー */
 	.filmstrip-thumbs {
 		display: flex;
 		gap: 8px;
 		margin-top: 10px;
 		overflow-x: auto;
 		overflow-y: hidden !important;
-		padding: 2px 0 6px 0;
+		padding: 4px 0 6px 0;
 		scrollbar-width: thin;
 		scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 		-webkit-overflow-scrolling: touch;
@@ -322,6 +338,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 
 	.filmstrip-thumbs::-webkit-scrollbar-thumb {
 		background: rgba(255, 255, 255, 0.25);
+		border-radius: 4px;
 	}
 
 	.filmstrip-thumb {
@@ -329,28 +346,30 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		min-width: 76px !important;
 		max-width: 76px !important;
 		height: 48px !important;
-		border: 1px solid transparent !important;
-		background: #000000 !important;
-		border-radius: 0 !important;
+		border: 1.5px solid transparent !important;
+		background: #09090d !important;
+		border-radius: 6px !important;
 		padding: 0 !important;
 		margin: 0 !important;
 		cursor: pointer;
-		opacity: 0.45;
+		opacity: 0.5;
 		flex-shrink: 0 !important;
 		overflow: hidden !important;
 		display: block !important;
 		box-sizing: border-box !important;
 		line-height: 0 !important;
-		transition: opacity 0.2s ease, border-color 0.2s ease;
+		transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 	}
 
 	.filmstrip-thumb:hover {
-		opacity: 0.8;
+		opacity: 0.85;
+		transform: translateY(-1px);
 	}
 
 	.filmstrip-thumb.is-active {
 		opacity: 1;
 		border-color: #ffffff !important;
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 4px 10px rgba(0, 0, 0, 0.5);
 	}
 
 	.filmstrip-thumb img {
@@ -375,6 +394,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			const captionEl = document.getElementById(`${blockId}-caption`);
 			const prevBtn = document.getElementById(`${blockId}-prev`);
 			const nextBtn = document.getElementById(`${blockId}-next`);
+			const viewport = container.querySelector('.filmstrip-viewport');
 
 			function goTo(idx) {
 				current = (idx + images.length) % images.length;
