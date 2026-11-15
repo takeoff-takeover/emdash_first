@@ -1,48 +1,149 @@
 ---
 // src/pages/corporate/nicole-competizione.astro
 // Nicole Competizione合同会社 会社案内（Nicole Connect マガジン同等の黒背景エディトリアルデザイン）
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import MapBadge from "../../components/MapBadge.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import svgs from "../../data/corporate-svgs.json";
 
-const pageTitle = "Nicole Competizione合同会社 | フェラーリ正規ディーラー | Nicole Group 公式";
-const pageDescription = "イタリアが誇る至高の跳ね馬 フェラーリ正規販売代理店 Nicole Competizione合同会社の企業情報です。横浜みなとみらいの新車ショールーム、都筑区川向町のプレオウンド（認定中古車）ショールームならびに最新鋭サービスセンターを展開。2年連続となる「全国フェラーリ最優秀ディーラー賞（2024・2025）」を受賞。";
+// CMS 'companies' コレクションからデータを優先取得
+let companyEntry: any = null;
+try {
+	const res = await getEmDashEntry("companies" as any, "nicole-competizione");
+	if (res?.entry) {
+		companyEntry = res.entry.data || res.entry;
+	}
+} catch (e) {}
 
-// ショールームフォトギャラリー写真（Gallery format rule準拠: シンプルな番号と説明のみ）
-const showroomGallery = [
+// 管理画面で追加された自由ブロック（Portable Text）のパース
+let parsedContent: any[] = [];
+if (companyEntry?.content) {
+	if (Array.isArray(companyEntry.content)) {
+		parsedContent = companyEntry.content;
+	} else if (typeof companyEntry.content === "string") {
+		try {
+			const parsed = JSON.parse(companyEntry.content);
+			if (Array.isArray(parsed)) parsedContent = parsed;
+		} catch (e) {}
+	}
+}
+
+const companyTitle = companyEntry?.title || "Nicole Competizione合同会社";
+
+const pageTitle = companyEntry?.title 
+	? `${companyEntry.title} | フェラーリ正規ディーラー | Nicole Group 公式`
+	: "Nicole Competizione合同会社 | フェラーリ正規ディーラー | Nicole Group 公式";
+
+const pageDescription = companyEntry?.hero_phrase
+	? companyEntry.hero_phrase
+	: "イタリアが誇る至高の跳ね馬 フェラーリ正規販売代理店 Nicole Competizione合同会社の企業情報です。横浜みなとみらいの新車ショールーム、都筑区川向町のプレオウンド（認定中古車）ショールームならびに最新鋭サービスセンターを展開。2年連続となる「全国フェラーリ最優秀ディーラー賞（2024・2025）」を受賞。";
+
+// ヒーロー
+const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/02/トーンカーブ-1-e1773743622630-1.jpg";
+const heroPhrase = companyEntry?.hero_phrase || "イタリアが誇る至高の跳ね馬「フェラーリ」正規販売代理店。全国最優秀ディーラー賞 2年連続受賞（2024・2025）。横浜みなとみらいの新車ショールーム、都筑区川向町のプレオウンドショールームとサービスセンターの3拠点体制で、フェラーリが織りなす特別な世界観とライフスタイルをお届けします。";
+
+// 会社紹介
+const aboutTitle = companyEntry?.about_title || "情熱と卓越の跳ね馬。<br />お客様と紡ぐ揺るぎない信頼。";
+const aboutLead = companyEntry?.about_lead || "フェラーリ正規販売代理店として、包括的なサービスと比類なき体験をお届けします";
+const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/wp/2026/02/Z7A8366_re_web-1024x683.avif";
+const aboutImageCaption = companyEntry?.about_image_caption || "フェラーリ アトリエ（Nicole Competizione Atelier）";
+const aboutText = companyEntry?.about_text || "Nicole Competizione合同会社は、イタリアが誇る至高のラグジュアリースポーツカーブランド「フェラーリ」の正規販売代理店として、2014年8月に設立されました。\n\n横浜みなとみらいに位置する新車ショールーム、都筑区川向町に展開する認定中古車（プレオウンド）ショールーム、ならびに最新鋭の設備を備えたサービスセンターの3拠点体制を敷き、新車のご購入からパーソナライゼーション、認定中古車のご提案、点検・車検・レストアに至るまで、一貫した最高峰のサービスを提供しています。\n\n設立10年目となる2024年に初の「全国フェラーリ最優秀ディーラー賞」を獲得、さらに2025年にも2年連続となる最優秀ディーラー賞を受賞。世界水準の情熱と高度な専門技術をもって、オーナーの皆様の情熱的なフェラーリライフを誠心誠意サポートいたします。";
+
+// ハイライト
+const highlight1Num = companyEntry?.highlight_1_num || "2年連続";
+const highlight1Label = companyEntry?.highlight_1_label || "最優秀ディーラー賞（2024・2025）";
+const highlight2Num = companyEntry?.highlight_2_num || "2014年";
+const highlight2Label = companyEntry?.highlight_2_label || "設立・正規指名";
+const highlight3Num = companyEntry?.highlight_3_num || "3拠点";
+const highlight3Label = companyEntry?.highlight_3_label || "新車・認定中古車・サービス拠点";
+
+// 受賞実績
+const awardTitle = companyEntry?.award_title || "全国フェラーリ最優秀ディーラー賞";
+const awardBadge = companyEntry?.award_badge || "2年連続受賞（2024・2025）";
+const awardDesc = companyEntry?.award_desc || "日本国内の正規フェラーリディーラーネットワークにおいて、販売実績、顧客満足度、アフターセールス品質、ブランド基準遵守のすべてにおいて最高峰の評価を獲得。設立10年目の2024年に続き、2025年にも栄冠を手にしました。";
+const awardSvgIndex = 17;
+
+// ショールームフォトギャラリー写真（フォールバック用規定データ）
+const fallbackGallery = [
 	{
-		src: "/uploads/2026/02/22A4894_web_size_re-e1772189562839.avif",
+		src: "/uploads/2026/02/トーンカーブ-1-e1773743622630-1-1024x683.jpg",
 		alt: "Nicole Competizione メインショールーム展示エリア",
 		num: "01",
-		caption: "横浜みなとみらいに位置する最新モデル展示メインフロア"
+		title: "メインショールーム",
+		caption: "横浜みなとみらいに位置する最新CI基準の跳ね馬展示フロア"
 	},
 	{
-		src: "/uploads/2026/02/Z7A8366_re_web.avif",
+		src: "/uploads/wp/2026/02/Z7A8366_re_web-1024x683.avif",
 		alt: "Nicole Competizione アトリエ・パーソナライゼーション空間",
 		num: "02",
-		caption: "内外装マテリアルを選び世界に一台を仕立てるアトリエ"
+		title: "アトリエ（Atelier）",
+		caption: "内外装マテリアルを選び世界に一台を仕立てるパーソナライゼーション空間"
 	},
 	{
-		src: "/uploads/2026/02/24_0206_nicol_kohoku_35470_re_web.avif",
+		src: "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-2-1024x683.jpg",
 		alt: "Nicole Competizione プレオウンドショールーム 展示スペース",
 		num: "03",
-		caption: "厳格な品質基準をクリアしたFerrari Approved認定中古車フロア"
+		title: "プレオウンドショールーム",
+		caption: "厳格な品質基準をクリアしたFerrari Approved認定中古車展示フロア"
 	},
 	{
-		src: "/uploads/2026/02/24_0206_nicol_kohoku_33477_re_re-scaled.avif",
+		src: "/uploads/wp/2026/08/24_0206_nicol_kohoku_33477_re_web-1024x683.jpg",
 		alt: "Nicole Competizione サービスセンター ワークショップ",
 		num: "04",
+		title: "サービスセンター・テクニカルベイ",
 		caption: "マラネッロ基準の専用診断テスターと設備を備えるテクニカルベイ"
 	},
 	{
-		src: "/uploads/2026/02/24_0206_nicol_kohoku_35084_re_web.avif",
+		src: "/uploads/wp/2026/02/24_0206_nicol_kohoku_35084_re_web-1024x683.avif",
 		alt: "Nicole Competizione オーナーズラウンジ",
 		num: "05",
-		caption: "フェラーリのヘリテージを感じながら寛げるオーナーズラウンジ"
+		title: "オーナーズラウンジ",
+		caption: "フェラーリのヘリテージを感じながら寛げるプライベートラウンジ"
 	}
 ];
 
-// 拠点データ（locations.json準拠）
-const facilities = [
+// CMS 'companies' コレクションから写真ギャラリーを動的取得
+let showroomGallery = fallbackGallery;
+if (companyEntry) {
+	const dynamicGallery: any[] = [];
+	for (let i = 1; i <= 6; i++) {
+		const rawImg = companyEntry[`gallery_image_${i}`];
+		if (rawImg) {
+			let src = "";
+			let alt = companyEntry[`gallery_title_${i}`] || `${companyTitle} 施設写真 ${i}`;
+			if (typeof rawImg === "string") {
+				try {
+					const parsed = JSON.parse(rawImg);
+					src = parsed.src || rawImg;
+					if (parsed.alt) alt = parsed.alt;
+				} catch {
+					src = rawImg;
+				}
+			} else if (typeof rawImg === "object" && rawImg !== null) {
+				src = rawImg.src || "";
+				if (rawImg.alt) alt = rawImg.alt;
+			}
+			if (src) {
+				const num = String(dynamicGallery.length + 1).padStart(2, "0");
+				dynamicGallery.push({
+					src,
+					alt,
+					num,
+					title: companyEntry[`gallery_title_${i}`] || `ギャラリー ${num}`,
+					caption: companyEntry[`gallery_caption_${i}`] || ""
+				});
+			}
+		}
+	}
+	if (dynamicGallery.length > 0) {
+		showroomGallery = dynamicGallery;
+	}
+}
+
+// 拠点データ（フォールバック用規定データ）
+const fallbackFacilities = [
 	{
 		name: "Nicole Competizione ショールーム",
 		type: "新車ショールーム",
@@ -76,13 +177,127 @@ const facilities = [
 		address: "神奈川県横浜市都筑区川向町2003-6",
 		tel: "045-577-3824",
 		fax: "045-577-3825",
-		hours: "10:00～18:00",
-		closed: "水曜日",
+		hours: "09:30～18:00",
+		closed: "水曜日（祝日を除く）",
 		image: "/uploads/2026/02/24_0206_nicol_kohoku_34664_re_re-e1773743709911-1-1024x683.jpg",
 		mapUrl: "https://maps.google.com/?q=Nicole+Competizione+サービスセンター+横浜市都筑区川向町2003-6",
 		desc: "フェラーリ本国マラネッロ指定の最新鋭診断テスターと専用工具を備え、メーカー公式認定を受けた熟練テクニシャンが点検・車検・レストアを執り行います。"
 	}
 ];
+
+// CMS 'locations' コレクションからフェラーリ関連拠点を動的取得
+let facilities = fallbackFacilities;
+try {
+	const locResult = await getEmDashCollection("locations" as any, {
+		limit: 50,
+	});
+	if (locResult?.entries && locResult.entries.length > 0) {
+		const ferrariLocs = locResult.entries.filter((entry: any) => {
+			const data = entry.data || entry;
+			const brand = (data.brand || "").toLowerCase();
+			const slug = (entry.id || entry.slug || "").toLowerCase();
+			const title = (data.title || "").toLowerCase();
+			return brand.includes("ferrari") || slug.includes("competizione") || title.includes("competizione");
+		});
+
+		const showroomEntry = ferrariLocs.find((l: any) => {
+			const s = (l.id || l.slug || "").toLowerCase();
+			return s.includes("showroom") && !s.includes("preowned");
+		});
+		const preownedEntry = ferrariLocs.find((l: any) => {
+			const s = (l.id || l.slug || "").toLowerCase();
+			return s.includes("preowned");
+		});
+
+		const dynamicFacilities: any[] = [];
+
+		if (showroomEntry) {
+			const d = showroomEntry.data || showroomEntry;
+			let imgSrc = fallbackFacilities[0].image;
+			if (d.featured_image) {
+				const feat = typeof d.featured_image === "string" ? (() => { try { return JSON.parse(d.featured_image); } catch { return d.featured_image; } })() : d.featured_image;
+				if (feat?.src) imgSrc = feat.src;
+				else if (typeof feat === "string" && feat.trim()) imgSrc = feat.trim();
+			}
+
+			dynamicFacilities.push({
+				name: d.sales_subtitle || d.title || fallbackFacilities[0].name,
+				type: "新車ショールーム",
+				postal: d.postal || fallbackFacilities[0].postal,
+				address: d.address || fallbackFacilities[0].address,
+				tel: d.sales_tel || d.tel || fallbackFacilities[0].tel,
+				fax: d.sales_fax || d.fax || fallbackFacilities[0].fax,
+				hours: d.sales_hours || fallbackFacilities[0].hours,
+				closed: d.sales_closed || fallbackFacilities[0].closed,
+				image: imgSrc,
+				mapUrl: d.google_maps_url || fallbackFacilities[0].mapUrl,
+				desc: d.sales_desc || d.concept_text || fallbackFacilities[0].desc
+			});
+		}
+
+		if (preownedEntry) {
+			const d = preownedEntry.data || preownedEntry;
+			let imgSrc = fallbackFacilities[1].image;
+			if (d.featured_image) {
+				const feat = typeof d.featured_image === "string" ? (() => { try { return JSON.parse(d.featured_image); } catch { return d.featured_image; } })() : d.featured_image;
+				if (feat?.src) imgSrc = feat.src;
+				else if (typeof feat === "string" && feat.trim()) imgSrc = feat.trim();
+			}
+
+			// 認定中古車（プレオウンド）
+			dynamicFacilities.push({
+				name: d.used_subtitle || fallbackFacilities[1].name,
+				type: "認定中古車ショールーム",
+				postal: d.postal || fallbackFacilities[1].postal,
+				address: d.address || fallbackFacilities[1].address,
+				tel: d.used_tel || d.tel || fallbackFacilities[1].tel,
+				fax: d.used_fax || d.fax || fallbackFacilities[1].fax,
+				hours: d.used_hours || fallbackFacilities[1].hours,
+				closed: d.used_closed || fallbackFacilities[1].closed,
+				image: imgSrc,
+				mapUrl: d.google_maps_url || fallbackFacilities[1].mapUrl,
+				desc: d.used_desc || fallbackFacilities[1].desc
+			});
+
+			// サービスセンター
+			dynamicFacilities.push({
+				name: d.service_subtitle || fallbackFacilities[2].name,
+				type: "指定サービス工場",
+				postal: d.postal || fallbackFacilities[2].postal,
+				address: d.address || fallbackFacilities[2].address,
+				tel: d.service_tel || fallbackFacilities[2].tel,
+				fax: d.service_fax || fallbackFacilities[2].fax,
+				hours: d.service_hours || fallbackFacilities[2].hours,
+				closed: d.service_closed || fallbackFacilities[2].closed,
+				image: fallbackFacilities[2].image,
+				mapUrl: d.google_maps_url || fallbackFacilities[2].mapUrl,
+				desc: d.service_desc || fallbackFacilities[2].desc
+			});
+		}
+
+		if (dynamicFacilities.length > 0) {
+			facilities = dynamicFacilities;
+		}
+	}
+} catch (e) {}
+
+// 会社基本データ（会社マスタを優先し、未設定項目はメイン拠点と完全連動）
+const companyNameEn = companyEntry?.name_en || "Nicole Competizione LLC";
+const established = companyEntry?.established || "2014年8月";
+const representative = companyEntry?.representative || "代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）";
+const postal = companyEntry?.postal || facilities[0]?.postal || "〒220-0012";
+const address = companyEntry?.address || facilities[0]?.address || "神奈川県横浜市西区みなとみらい3-3-3";
+const tel = companyEntry?.tel || (facilities[0]?.tel ? `${facilities[0].tel}（代表） / FAX：${facilities[0].fax || '045-680-4466'}` : "045-680-4465（代表） / FAX：045-680-4466");
+const telDisplay = tel.startsWith("TEL") ? tel : `TEL：${tel}`;
+const businessList = companyEntry?.business_desc
+	? companyEntry.business_desc.split("\n").filter(Boolean)
+	: [
+		"フェラーリ新車販売およびアフターセールス",
+		"フェラーリ認定中古車「Ferrari Approved」の販売・査定・買取",
+		"フェラーリ純正部品・アクセサリーの販売",
+		"アトリエによるパーソナライゼーション（オーダーメイド）の相談・受注",
+		"正規指定サービス工場における車検・法定点検・メンテナンス・クラシケレストア"
+	];
 
 // 受賞歴
 const awardInfo = {
@@ -92,37 +307,150 @@ const awardInfo = {
 	svgIndex: 17
 };
 
-// 関連記事データ
-const relatedArticles = [
-	{
-		title: "フェラーリ認定中古車は買い？最大202項目点検・保証・維持費を解説",
-		date: "2026.08.15",
-		tag: "Ferrari Approved",
-		url: "/posts/202608_ferrari_approved-guide/",
-		img: "/uploads/2026/02/24_0206_nicol_kohoku_35470_re_web.avif"
-	},
-	{
-		title: "初めてのフェラーリ購入ガイド｜新車vs認定中古車・モデル選び・納期の現実",
-		date: "2026.08.10",
-		tag: "Ferrari Guide",
-		url: "/posts/202608_ferrari_first-guide/",
-		img: "/uploads/2026/02/22A4894_web_size_re-e1772189562839.avif"
-	},
-	{
-		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
-		date: "2026.08.08",
-		tag: "Ferrari Innovation",
-		url: "/posts/202608_ferrari_luce/",
-		img: "/uploads/2026/02/Z7A8366_re_web.avif"
-	},
-	{
-		title: "フェラーリスタの心を揺さぶる体験。その世界観を支えるマーケターの視点",
-		date: "2026.08.07",
-		tag: "Ferrari Culture",
-		url: "/posts/202608_ferrari_marketing/",
-		img: "/uploads/2026/02/24_0206_nicol_kohoku_35084_re_web.avif"
+// 記事カテゴリー判定ヘルパー（マガジン「Nicole Connect」と完全共通）
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
+
+	if (slug.includes("campaign") || slug.includes("fair") || slug.includes("debut") || title.includes("フェア") || title.includes("キャンペーン")) {
+		return "Campaign";
 	}
-];
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
+		return "Buyer's Guide";
+	}
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"norimonofes", "sdgs", "summerconference", "esg", "美化活動", "クリーンアップ", "交通安全", "防災", "寄付"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic.includes("esg") || topic.includes("sdgs")) {
+		return "ESG";
+	}
+	const peopleKeywords = [
+		"people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー",
+		"ストーリー", "story", "マイスター", "junior_high", "work-experience", "international-employee",
+		"fire-department", "mochitsuki", "餅つき", "交流会", "感謝状", "職場体験", "alpina-heritage", "rolls-royce-bespoke"
+	];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic === "people") {
+		return "People";
+	}
+	return "Cars";
+}
+
+// マガジンコレクションからフェラーリ関連最新記事を動的取得
+let relatedArticles: Array<{
+	title: string;
+	date: string;
+	category: string;
+	brand: string;
+	url: string;
+	img: string;
+}> = [];
+
+try {
+	const magResult = await getEmDashCollection("magazine" as any, {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (magResult?.entries && magResult.entries.length > 0) {
+		const filtered = magResult.entries.filter((entry: any) => {
+			const slug = (entry.id || entry.slug || "").toLowerCase();
+			const title = (entry.data?.title || entry.title || "").toLowerCase();
+			// フェラーリ専有記事を優先（BMW/MINI混合の汎用記事は除外）
+			const isFerrari = slug.includes("ferrari") || title.includes("ferrari") || title.includes("フェラーリ");
+			const isMixed = slug.includes("bmw") || slug.includes("mini") || title.includes("bmw") || title.includes("mini");
+			return isFerrari && !isMixed;
+		});
+
+		// 専有記事が4件未満なら混合記事も許容
+		const finalEntries = filtered.length >= 4 
+			? filtered 
+			: magResult.entries.filter((entry: any) => {
+				const slug = (entry.id || entry.slug || "").toLowerCase();
+				const title = (entry.data?.title || entry.title || "").toLowerCase();
+				return slug.includes("ferrari") || title.includes("ferrari") || title.includes("フェラーリ");
+			});
+
+		const selectedEntries = finalEntries.slice(0, 4);
+		const entryIds = selectedEntries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+
+		let categoryTermsByEntry = new Map<string, any[]>();
+		try {
+			if (entryIds.length > 0) {
+				categoryTermsByEntry = await getTermsForEntries("magazine", entryIds, "category");
+			}
+		} catch (e) {}
+
+		relatedArticles = selectedEntries.map((entry: any) => {
+			const slug = entry.id || entry.slug;
+			const title = entry.data?.title || entry.title || "フェラーリ特集記事";
+			const entryDbId = entry.data?.id || entry.id;
+			const publishedAt = new Date(entry.data?.publishedAt ?? entry.data?.createdAt ?? entry.published_at ?? 0).getTime() || 0;
+			const dateStr = publishedAt 
+				? new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
+				: "2026.08.26";
+			
+			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/wp/2026/08/DSC2894-scaled.jpg";
+			if (imgPath.includes("nicole.co.jp/wp/wp-content")) {
+				imgPath = imgPath.replace(/https?:\/\/[^\/]+\/wp\/wp-content/, "/uploads/wp");
+			}
+
+			const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+			const inferredCat = determineArticleCategory({ slug, title, topic: entry.data?.topic || entry.topic });
+			const category = assignedCategories.length > 0 ? assignedCategories[0] : inferredCat;
+
+			return {
+				title,
+				date: dateStr,
+				category,
+				brand: "Ferrari",
+				url: `/magazine/${slug}/`,
+				img: imgPath
+			};
+		});
+	}
+} catch (e) {
+	// フォールバック
+}
+
+// フォールバック（フェラーリ厳選4記事・実在画像保証）
+if (relatedArticles.length === 0) {
+	relatedArticles = [
+		{
+			title: "フェラーリ認定中古車は買い？最大202項目点検・保証・維持費を解説",
+			date: "2026.08.26",
+			category: "Buyer's Guide",
+			brand: "Ferrari",
+			url: "/magazine/202608_ferrari_approved-guide/",
+			img: "/uploads/wp/2026/08/DSC2894-scaled.jpg"
+		},
+		{
+			title: "初めてのフェラーリ購入ガイド｜新車vs認定中古車・モデル選び・納期の現実",
+			date: "2026.08.21",
+			category: "Buyer's Guide",
+			brand: "Ferrari",
+			url: "/magazine/202608_ferrari_first-guide/",
+			img: "/uploads/wp/2026/08/3220231013-DSC06916-強化-NR-scaled.jpg"
+		},
+		{
+			title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
+			date: "2026.08.17",
+			category: "Cars",
+			brand: "Ferrari",
+			url: "/magazine/202608_ferrari_luce/",
+			img: "/uploads/wp/2026/08/DSC4983-3.jpg"
+		},
+		{
+			title: "フェラーリスタの心を揺さぶる体験。その世界観を支えるマーケターの視点",
+			date: "2026.08.07",
+			category: "People",
+			brand: "Ferrari",
+			url: "/magazine/202608_ferrari_marketing/",
+			img: "/uploads/wp/2026/08/DSC8263-e1786070601479.jpg"
+		}
+	];
+}
 
 // Schema.org 構造化データ（JSON-LD）
 const jsonLd = {
@@ -200,6 +528,21 @@ const jsonLd = {
 				background-color: #040507 !important;
 				background-image: none !important;
 			}
+			body:has(.corporate-magazine-main) #primary,
+			body:has(.corporate-magazine-main) .content-area {
+				margin: 0 !important;
+				padding: 0 !important;
+			}
+			body:has(.corporate-magazine-main) #content,
+			body:has(.corporate-magazine-main) .site-content,
+			body:has(.corporate-magazine-main) .ast-container {
+				margin: 0 !important;
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				padding-top: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+			}
 		</style>
 	</Fragment>
 
@@ -208,8 +551,8 @@ const jsonLd = {
 		<header class="corp-hero">
 			<div class="corp-hero__media">
 				<img 
-					src="/uploads/2026/02/22A4894_web_size_re-e1772189562839.avif" 
-					alt="Nicole Competizione合同会社 フェラーリ メインショールーム" 
+					src={heroImageSrc} 
+					alt={`${companyTitle} メインショールーム`} 
 					class="corp-hero__img" 
 					loading="eager" 
 					decoding="async" 
@@ -225,20 +568,13 @@ const jsonLd = {
 						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
 						<li class="corp-breadcrumbs__item"><a href="/corporate" class="corp-breadcrumbs__link">会社概要</a></li>
 						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
-						<li class="corp-breadcrumbs__item" aria-current="page">Nicole Competizione合同会社</li>
+						<li class="corp-breadcrumbs__item" aria-current="page">{companyTitle}</li>
 					</ol>
 				</nav>
 
-				<div class="corp-hero__logo-wrap">
-					<div class="corp-hero__brand-logo" set:html={svgs[8]} />
-				</div>
-
-				<h1 class="corp-hero__title">Nicole Competizione合同会社</h1>
+				<h1 class="corp-hero__title">{companyTitle}</h1>
 				<p class="corp-hero__subtitle">
-					<span class="corp-hero__phrase">イタリアが誇る至高の跳ね馬「フェラーリ」正規販売代理店。</span>
-					<span class="corp-hero__phrase">全国最優秀ディーラー賞 2年連続受賞（2024・2025）。</span><br class="corp-hero__br" />
-					<span class="corp-hero__phrase">横浜みなとみらいの新車ショールーム、都筑区川向町のプレオウンドショールームとサービスセンターの3拠点体制で、</span>
-					<span class="corp-hero__phrase">フェラーリが織りなす特別な世界観とライフスタイルをお届けします。</span>
+					<span class="corp-hero__phrase">{heroPhrase}</span>
 				</p>
 
 				<!-- ページ内クイックナビゲーション -->
@@ -246,10 +582,11 @@ const jsonLd = {
 					<ul class="corp-subnav__list">
 						<li><a href="#about" class="corp-subnav__pill">会社紹介</a></li>
 						<li><a href="#showrooms" class="corp-subnav__pill">拠点案内</a></li>
-						<li><a href="#awards" class="corp-subnav__pill">受賞歴</a></li>
-						<li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>
-						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 						<li><a href="#profile" class="corp-subnav__pill">会社基本データ</a></li>
+						<li><a href="#awards" class="corp-subnav__pill">受賞実績</a></li>
+						<li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>
+						{parsedContent.length > 0 && <li><a href="#additional-content" class="corp-subnav__pill">詳細情報</a></li>}
+						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -263,48 +600,42 @@ const jsonLd = {
 					<div class="corp-narrative-visual">
 						<div class="corp-narrative-card">
 							<img 
-								src="/uploads/2026/02/Z7A8366_re_web.avif" 
-								alt="Nicole Competizione アトリエ・パーソナライゼーション空間" 
+								src={aboutImageSrc} 
+								alt={aboutImageCaption} 
 								class="corp-narrative-img" 
-								width="1200" 
-								height="800" 
+								width="1024" 
+								height="683" 
 								loading="lazy" 
 								decoding="async" 
 							/>
-							<div class="corp-narrative-caption">
-								<span class="corp-narrative-caption-title">フェラーリ アトリエ</span>
-								<span class="corp-narrative-caption-sub">Nicole Competizione Atelier</span>
-							</div>
 						</div>
 					</div>
 
 					<!-- 右列: ストーリー本文 -->
 					<div class="corp-narrative-content">
 						<header class="corp-section-header">
-							<h2 class="corp-section-title">情熱と卓越の跳ね馬。<br />お客様と紡ぐ揺るぎない信頼。</h2>
-							<p class="corp-section-lead">フェラーリ正規販売代理店として、包括的なサービスと比類なき体験をお届けします</p>
+							<h2 class="corp-section-title" set:html={aboutTitle} />
+							<p class="corp-section-lead">{aboutLead}</p>
 						</header>
 
 						<div class="corp-narrative-body">
-							<p>Nicole Competizione合同会社は、イタリアが誇る至高のラグジュアリースポーツカーブランド「フェラーリ」の正規販売代理店として、2014年8月に設立されました。</p>
-
-							<p>横浜みなとみらいに位置する新車ショールーム、都筑区川向町に展開する認定中古車（プレオウンド）ショールーム、ならびに最新鋭の設備を備えたサービスセンターの3拠点体制を敷き、新車のご購入からパーソナライゼーション、認定中古車のご提案、点検・車検・レストアに至るまで、一貫した最高峰のサービスを提供しています。</p>
-
-							<p>設立10年目となる2024年に初の「全国フェラーリ最優秀ディーラー賞」を獲得、さらに2025年にも2年連続となる最優秀ディーラー賞を受賞。世界水準の情熱と高度な専門技術をもって、オーナーの皆様の情熱的なフェラーリライフを誠心誠意サポートいたします。</p>
+							{aboutText.split("\n\n").map((para: string) => (
+								<p>{para}</p>
+							))}
 						</div>
 
 						<div class="corp-narrative-highlights">
 							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">2年連続</div>
-								<div class="corp-highlight-item__label">最優秀ディーラー賞（2024・2025）</div>
+								<div class="corp-highlight-item__num">{highlight1Num}</div>
+								<div class="corp-highlight-item__label">{highlight1Label}</div>
 							</div>
 							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">2014年</div>
-								<div class="corp-highlight-item__label">設立・正規指名</div>
+								<div class="corp-highlight-item__num">{highlight2Num}</div>
+								<div class="corp-highlight-item__label">{highlight2Label}</div>
 							</div>
 							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">3拠点</div>
-								<div class="corp-highlight-item__label">新車・認定中古車・サービス拠点</div>
+								<div class="corp-highlight-item__num">{highlight3Num}</div>
+								<div class="corp-highlight-item__label">{highlight3Label}</div>
 							</div>
 						</div>
 					</div>
@@ -317,7 +648,10 @@ const jsonLd = {
 			<div class="corp-container">
 				<header class="corp-section-header">
 					<h2 class="corp-section-title">拠点のご案内</h2>
-					<p class="corp-section-subtitle">横浜みなとみらいと都筑区に展開する3つの正規ネットワーク。新車、認定中古車、アフターセールスの全方位でフェラーリの世界を支えます。</p>
+					<p class="corp-section-subtitle">
+						<span class="corp-hero__phrase">横浜みなとみらいと都筑区に展開する3つの正規ネットワーク。</span>
+						<span class="corp-hero__phrase">新車、認定中古車、アフターセールスの全方位でフェラーリの世界を支えます。</span>
+					</p>
 				</header>
 
 				<div class="corp-showrooms-stack">
@@ -332,7 +666,6 @@ const jsonLd = {
 										loading="lazy" 
 										decoding="async" 
 									/>
-									<div class="corp-showroom-photo-badge">{f.type}</div>
 								</div>
 							</div>
 
@@ -350,8 +683,8 @@ const jsonLd = {
 									<div class="corp-showroom-row">
 										<dt class="corp-showroom-dt">所在地</dt>
 										<dd class="corp-showroom-dd">
-											{f.postal} {f.address}
-											<a href={f.mapUrl} target="_blank" rel="noopener noreferrer" class="corp-map-link">Google Mapsで開く</a>
+											<span>{f.postal} {f.address}</span>
+											<MapBadge href={f.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${f.name}の地図をGoogleマップで開く`} />
 										</dd>
 									</div>
 									<div class="corp-showroom-row">
@@ -377,90 +710,8 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 4. 受賞歴（AWARDS） -->
-		<section id="awards" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">受賞実績</h2>
-					<p class="corp-section-subtitle">全国のフェラーリ正規販売代理店ネットワークにおいて最高峰の栄誉を連続受賞。</p>
-				</header>
-
-				<div class="corp-awards-panel">
-					<div class="corp-award-card corp-award-card--featured">
-						<div class="corp-award-card__wreath" set:html={svgs[awardInfo.svgIndex]} />
-						<div class="corp-award-card__content">
-							<span class="corp-award-card__badge">{awardInfo.badge}</span>
-							<h3 class="corp-award-card__title">{awardInfo.title}</h3>
-							<p class="corp-award-card__desc">{awardInfo.desc}</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- 5. ギャラリー（GALLERY） -->
-		<section id="gallery" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">ギャラリー</h2>
-					<p class="corp-section-subtitle">Nicole Competizioneが誇る最新ショールーム、アトリエ、テクニカルベイの空間。</p>
-				</header>
-
-				<div class="corp-gallery-grid">
-					{showroomGallery.map((item) => (
-						<article class="corp-gallery-card">
-							<div class="corp-gallery-visual">
-								<img 
-									src={item.src} 
-									alt={item.alt} 
-									class="corp-gallery-img" 
-									loading="lazy" 
-									decoding="async" 
-								/>
-								<span class="corp-gallery-badge">{item.num}</span>
-							</div>
-							<div class="corp-gallery-meta">
-								<p class="corp-gallery-caption">{item.caption}</p>
-							</div>
-						</article>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- 6. 関連記事（RELATED ARTICLES） -->
-		<section id="articles" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">関連記事</h2>
-					<p class="corp-section-subtitle">オウンドメディア「Nicole Connect」より、フェラーリに関する最新情報やオーナー向け解説記事をお届けします。</p>
-				</header>
-
-				<div class="corp-articles-grid">
-					{relatedArticles.map((art) => (
-						<a href={art.url} class="corp-article-card">
-							<div class="corp-article-card__thumb-wrap">
-								<img 
-									src={art.img} 
-									alt={art.title} 
-									class="corp-article-card__thumb" 
-									loading="lazy" 
-									decoding="async" 
-								/>
-								<span class="corp-article-card__tag">{art.tag}</span>
-							</div>
-							<div class="corp-article-card__content">
-								<time class="corp-article-card__date">{art.date}</time>
-								<h3 class="corp-article-card__title">{art.title}</h3>
-							</div>
-						</a>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- 7. 会社基本データ -->
-		<section id="profile" class="corp-section">
+		<!-- 4. 会社基本データ -->
+		<section id="profile" class="corp-section corp-section--bordered">
 			<div class="corp-container">
 				<header class="corp-section-header">
 					<h2 class="corp-section-title">会社基本データ</h2>
@@ -472,50 +723,53 @@ const jsonLd = {
 						<tbody>
 							<tr>
 								<th scope="row">会社名</th>
-								<td>Nicole Competizione合同会社（Nicole Competizione LLC）</td>
+								<td>{companyTitle}（{companyNameEn}）</td>
 							</tr>
 							<tr>
 								<th scope="row">設立</th>
-								<td>2014年8月</td>
+								<td>{established}</td>
 							</tr>
 							<tr>
 								<th scope="row">代表者</th>
-								<td>代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）</td>
+								<td>{representative}</td>
 							</tr>
 							<tr>
 								<th scope="row">所在地</th>
-								<td>〒220-0012 神奈川県横浜市西区みなとみらい3-3-3</td>
+								<td>
+									<span>{postal} {address}</span>
+									{facilities[0]?.mapUrl && (
+										<MapBadge href={facilities[0].mapUrl} title="Googleマップで地図を見る" ariaLabel="本社の地図をGoogleマップで開く" />
+									)}
+								</td>
 							</tr>
 							<tr>
 								<th scope="row">電話番号</th>
-								<td>045-680-4465（代表） / FAX：045-680-4466</td>
+								<td>{telDisplay}</td>
 							</tr>
 							<tr>
 								<th scope="row">事業内容</th>
 								<td>
 									<ul class="corp-business-list">
-										<li>フェラーリ新車販売およびアフターセールス</li>
-										<li>フェラーリ認定中古車「Ferrari Approved」の販売・査定・買取</li>
-										<li>フェラーリ純正部品・アクセサリーの販売</li>
-										<li>アトリエによるパーソナライゼーション（オーダーメイド）の相談・受注</li>
-										<li>車検・法定点検・一般整備・修理、クラシケ鑑定代行</li>
-										<li>自動車保険代理店業務</li>
+										{businessList.map((item: string) => (
+											<li>{item}</li>
+										))}
 									</ul>
 								</td>
 							</tr>
 							<tr>
 								<th scope="row">運営拠点</th>
 								<td>
-									全3拠点（神奈川県横浜市）<br />
-									新車ショールーム：Nicole Competizione ショールーム（横浜市西区みなとみらい3-3-3）<br />
-									認定中古車ショールーム：Nicole Competizione プレオウンド ショールーム（横浜市都筑区川向町2003-6）<br />
-									指定サービス工場：Nicole Competizione サービスセンター（横浜市都筑区川向町2003-6）
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">親会社・グループ</th>
-								<td>
-									ニコル・グループ（Nicole Group）
+									<span class="corp-facility-summary">全{facilities.length}拠点（神奈川県横浜市）</span>
+									<ul class="corp-profile-facilities">
+										{facilities.map((f) => (
+											<li>
+												<span class="corp-facility-type">{f.type}：</span>
+												<strong class="corp-facility-name">{f.name}</strong>
+												<span class="corp-facility-addr">（{f.postal} {f.address}）</span>
+												<MapBadge href={f.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${f.name}の地図をGoogleマップで開く`} />
+											</li>
+										))}
+									</ul>
 								</td>
 							</tr>
 							<tr>
@@ -530,16 +784,126 @@ const jsonLd = {
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/philosophy" class="corp-inline-link">企業理念</a>
 										<span class="corp-inline-link-sep">/</span>
-										<a href="/locations" class="corp-inline-link">拠点一覧（全22拠点）</a>
+										<a href="/locations" class="corp-inline-link">グループ拠点一覧</a>
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/magazine" class="corp-inline-link">Web Magazine</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/contact" class="corp-inline-link">お問い合わせ</a>
 									</div>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+				</div>
+			</div>
+		</section>
+
+		<!-- 5. 受賞実績（AWARDS） -->
+		<section id="awards" class="corp-section corp-section--bordered">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">受賞実績</h2>
+					<p class="corp-section-subtitle">全国のフェラーリ正規販売代理店ネットワークにおいて最高峰の栄誉を連続受賞。</p>
+				</header>
+
+				<div class="corp-awards-panel">
+					<div class="corp-award-card corp-award-card--featured">
+						<div class="corp-award-card__content">
+							<span class="corp-award-card__badge">{awardBadge}</span>
+							<h3 class="corp-award-card__title">{awardTitle}</h3>
+							<p class="corp-award-card__desc">{awardDesc}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 6. ギャラリー（GALLERY - カルーセルスライダー） -->
+		<section id="gallery" class="corp-section corp-section--bordered">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">ギャラリー</h2>
+					<p class="corp-section-subtitle">Nicole Competizioneが誇る最新ショールーム、アトリエ、テクニカルベイの空間。</p>
+				</header>
+
+				<div class="corp-slider-wrapper">
+					<div class="corp-slider-viewport">
+						<div class="corp-slider-track" id="corpSliderTrack">
+							{showroomGallery.map((item, idx) => (
+								<div class={`corp-slider-slide ${idx === 0 ? "is-active" : ""}`} data-slide-index={idx}>
+									<div class="corp-slider-media">
+										<img 
+											src={item.src} 
+											alt={item.alt} 
+											class="corp-slider-img" 
+											loading={idx === 0 ? "eager" : "lazy"} 
+											decoding="async" 
+										/>
+										<span class="corp-slider-badge">{item.num} / {String(showroomGallery.length).padStart(2, "0")}</span>
+									</div>
+									<div class="corp-slider-caption">
+										<h3 class="corp-slider-title">{item.title}</h3>
+										<p class="corp-slider-desc">{item.caption}</p>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<!-- 左右ナビゲーション矢印 -->
+						<button type="button" class="corp-slider-btn corp-slider-btn--prev" id="corpSliderPrev" aria-label="前の写真へ">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+						</button>
+						<button type="button" class="corp-slider-btn corp-slider-btn--next" id="corpSliderNext" aria-label="次の写真へ">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+						</button>
+					</div>
+
+					<!-- サムネイルナビゲーション -->
+					<div class="corp-slider-thumbs" id="corpSliderThumbs" role="tablist" aria-label="サムネイル一覧">
+						{showroomGallery.map((item, idx) => (
+							<button 
+								type="button" 
+								class={`corp-slider-thumb ${idx === 0 ? "is-active" : ""}`} 
+								data-thumb-index={idx}
+								aria-label={`スライド ${idx + 1} (${item.title}) を表示`}
+							>
+								<img src={item.src} alt={item.title} class="corp-slider-thumb-img" loading="lazy" decoding="async" />
+							</button>
+						))}
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 7. 追加コンテンツ（CMS Portable Text 自由ブロック） -->
+		{parsedContent.length > 0 && (
+			<section id="additional-content" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<div class="corp-prose-wrap">
+						<RichPortableText value={parsedContent} />
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- 8. 関連記事（RELATED ARTICLES） -->
+		<section id="articles" class="corp-section">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">関連記事</h2>
+					<p class="corp-section-subtitle">オウンドメディア「Nicole Connect」より、フェラーリに関する最新情報やオーナー向け解説記事をお届けします。</p>
+				</header>
+
+				<div class="corp-articles-grid">
+					{relatedArticles.map((art) => (
+						<ArticleCard
+							title={art.title}
+							url={art.url}
+							image={art.img}
+							date={art.date}
+							topic={art.category}
+							brand={art.brand}
+							showBrandPill={false}
+						/>
+					))}
 				</div>
 			</div>
 		</section>
@@ -557,7 +921,7 @@ const jsonLd = {
 		min-height: 100vh;
 		position: relative;
 		overflow-x: hidden;
-		padding-top: 80px;
+		padding-top: 0;
 	}
 
 	.corp-container {
@@ -630,14 +994,20 @@ const jsonLd = {
 	/* ============================================================== */
 	.corp-hero {
 		position: relative;
-		min-height: 82vh;
+		min-height: 520px;
 		display: flex;
 		align-items: flex-end;
-		padding-bottom: 70px;
-		padding-top: 60px;
+		padding: 130px 0 50px 0;
 		box-sizing: border-box;
 		overflow: hidden;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	@media (max-width: 768px) {
+		.corp-hero {
+			min-height: 440px;
+			padding: 100px 0 40px 0;
+		}
 	}
 
 	.corp-hero__media {
@@ -696,8 +1066,7 @@ const jsonLd = {
 		margin: 0;
 		padding: 0;
 		font-size: 12px;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		letter-spacing: 0.04em;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
@@ -801,7 +1170,7 @@ const jsonLd = {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 60px;
-		align-items: center;
+		align-items: flex-start;
 	}
 
 	@media (max-width: 992px) {
@@ -816,6 +1185,7 @@ const jsonLd = {
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		background: #0a0c10;
 		overflow: hidden;
+		border-radius: 8px;
 	}
 
 	.corp-narrative-img {
@@ -1008,19 +1378,6 @@ const jsonLd = {
 		color: rgba(255, 255, 255, 0.9);
 	}
 
-	.corp-map-link {
-		display: inline-block;
-		margin-left: 10px;
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: underline;
-		text-underline-offset: 3px;
-	}
-
-	.corp-map-link:hover {
-		color: #ffffff;
-	}
-
 	.corp-tel-link {
 		color: #ffffff;
 		text-decoration: none;
@@ -1040,303 +1397,406 @@ const jsonLd = {
 	/* 4. AWARDS */
 	/* ============================================================== */
 	.corp-awards-panel {
-		max-width: 900px;
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.corp-award-card {
 		display: flex;
-		align-items: center;
-		gap: 36px;
-		padding: 36px;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 44px 48px;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 16px;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
 	}
 
 	@media (max-width: 768px) {
 		.corp-award-card {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 20px;
-			padding: 24px;
+			padding: 28px 24px;
 		}
 	}
 
-	.corp-award-card__wreath {
-		width: 140px;
-		flex-shrink: 0;
-	}
-
-	.corp-award-card__wreath :global(svg) {
-		width: 100%;
-		height: auto;
-		display: block;
-	}
-
 	.corp-award-card__badge {
-		display: inline-block;
-		font-size: 12px;
+		display: inline-flex;
+		align-items: center;
+		font-size: 12.5px;
 		font-weight: 700;
-		letter-spacing: 0.06em;
-		color: #e52d27;
+		letter-spacing: 0.08em;
+		color: #ff3b30;
 		background: rgba(229, 45, 39, 0.12);
-		border: 1px solid rgba(229, 45, 39, 0.25);
-		padding: 4px 10px;
-		margin-bottom: 10px;
+		border: 1px solid rgba(229, 45, 39, 0.3);
+		padding: 6px 14px;
+		border-radius: 999px;
+		margin-bottom: 16px;
 	}
 
 	.corp-award-card__title {
-		font-size: clamp(20px, 2.2vw, 24px);
+		font-size: clamp(22px, 2.6vw, 30px);
 		font-weight: 700;
 		color: #ffffff;
-		margin: 0 0 12px 0;
+		margin: 0 0 16px 0;
 		line-height: 1.35;
+		letter-spacing: -0.01em;
 	}
 
 	.corp-award-card__desc {
-		font-size: 14px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.7);
+		font-size: 15px;
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.75);
+		max-width: 920px;
 		margin: 0;
 	}
 
 	/* ============================================================== */
-	/* 5. GALLERY */
+	/* 5. GALLERY (CAROUSEL SLIDER - サイト幅1440pxコンテナ連動) */
 	/* ============================================================== */
-	.corp-gallery-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 24px;
+	.corp-slider-wrapper {
+		position: relative;
+		width: 100%;
+		margin: 0 auto;
 	}
 
-	@media (max-width: 1024px) {
-		.corp-gallery-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 600px) {
-		.corp-gallery-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.corp-gallery-card {
-		background: #0a0c10;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+	.corp-slider-viewport {
+		position: relative;
 		overflow: hidden;
+		border-radius: 14px;
+		background: #000000;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.corp-slider-track {
+		display: flex;
+		transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+		width: 100%;
+	}
+
+	.corp-slider-slide {
+		min-width: 100%;
 		display: flex;
 		flex-direction: column;
+		opacity: 0.4;
+		transition: opacity 0.3s ease;
 	}
 
-	.corp-gallery-visual {
+	.corp-slider-slide.is-active {
+		opacity: 1;
+	}
+
+	.corp-slider-media {
 		position: relative;
-		aspect-ratio: 16 / 10;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		max-height: 640px;
 		background: #000000;
 		overflow: hidden;
 	}
 
-	.corp-gallery-img {
+	.corp-slider-img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		display: block;
-		transition: transform 0.4s ease;
 	}
 
-	.corp-gallery-card:hover .corp-gallery-img {
-		transform: scale(1.03);
-	}
-
-	.corp-gallery-badge {
+	.corp-slider-badge {
 		position: absolute;
-		bottom: 10px;
-		left: 10px;
-		padding: 2px 8px;
+		top: 18px;
+		right: 18px;
+		padding: 4px 12px;
 		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.25);
 		color: #ffffff;
-		font-size: 11px;
-		font-family: monospace;
+		font-size: 12px;
+		font-family: var(--font-mono, monospace);
+		letter-spacing: 0.08em;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border-radius: 4px;
 	}
 
-	.corp-gallery-meta {
-		padding: 14px 16px;
+	.corp-slider-caption {
+		padding: 22px 28px;
+		background: rgba(10, 12, 16, 0.96);
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.corp-gallery-caption {
-		font-size: 13.5px;
-		line-height: 1.5;
-		color: rgba(255, 255, 255, 0.8);
+	.corp-slider-title {
+		font-size: 18px;
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 6px 0;
+		letter-spacing: -0.01em;
+	}
+
+	.corp-slider-desc {
+		font-size: 14px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.75);
 		margin: 0;
 	}
 
+	/* 左右フロート矢印 */
+	.corp-slider-btn {
+		position: absolute;
+		top: 42%;
+		transform: translateY(-50%);
+		width: 46px;
+		height: 46px;
+		border-radius: 50%;
+		background: rgba(4, 5, 7, 0.78);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		color: #ffffff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		transition: all 0.25s ease;
+		z-index: 10;
+		padding: 0;
+	}
+
+	.corp-slider-btn svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	.corp-slider-btn:hover {
+		background: rgba(229, 45, 39, 0.95);
+		border-color: #e52d27;
+		transform: translateY(-50%) scale(1.08);
+	}
+
+	.corp-slider-btn--prev { left: 20px; }
+	.corp-slider-btn--next { right: 20px; }
+
+	/* サムネイル一覧 */
+	.corp-slider-thumbs {
+		display: flex;
+		gap: 12px;
+		margin-top: 18px;
+		overflow-x: auto;
+		padding-bottom: 6px;
+		scrollbar-width: thin;
+	}
+
+	.corp-slider-thumb {
+		width: 104px;
+		height: 66px;
+		border-radius: 6px;
+		overflow: hidden;
+		border: 2px solid transparent;
+		background: #000000;
+		padding: 0;
+		cursor: pointer;
+		flex-shrink: 0;
+		opacity: 0.45;
+		transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+	}
+
+	.corp-slider-thumb:hover {
+		opacity: 0.8;
+	}
+
+	.corp-slider-thumb.is-active {
+		border-color: #ffffff;
+		opacity: 1;
+		transform: translateY(-2px);
+	}
+
+	.corp-slider-thumb-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
 	/* ============================================================== */
-	/* 6. ARTICLES */
+	/* 6. ARTICLES (Nicole Connect マガジン同等カードデザイン - ArticleCard 共通コンポーネント使用) */
 	/* ============================================================== */
 	.corp-articles-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
+		display: grid !important;
+		grid-template-columns: repeat(4, 1fr) !important;
+		gap: 20px !important;
 	}
 
 	@media (max-width: 1024px) {
 		.corp-articles-grid {
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: repeat(2, 1fr) !important;
+			gap: 16px !important;
 		}
 	}
 
 	@media (max-width: 540px) {
 		.corp-articles-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: 1fr !important;
+			gap: 16px !important;
 		}
 	}
 
-	.corp-article-card {
-		background: #0a0c10;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		text-decoration: none;
-		color: inherit;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		transition: all 0.3s ease;
-	}
-
-	.corp-article-card:hover {
-		border-color: rgba(255, 255, 255, 0.25);
-		transform: translateY(-2px);
-	}
-
-	.corp-article-card__thumb-wrap {
-		position: relative;
-		aspect-ratio: 16 / 10;
-		background: #000000;
-		overflow: hidden;
-	}
-
-	.corp-article-card__thumb {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.4s ease;
-	}
-
-	.corp-article-card:hover .corp-article-card__thumb {
-		transform: scale(1.04);
-	}
-
-	.corp-article-card__tag {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		padding: 3px 8px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: #ffffff;
-		font-size: 10px;
-		letter-spacing: 0.04em;
-	}
-
-	.corp-article-card__content {
-		padding: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		flex-grow: 1;
-	}
-
-	.corp-article-card__date {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.5);
-		letter-spacing: 0.04em;
-	}
-
-	.corp-article-card__title {
-		font-size: 14px;
-		font-weight: 600;
-		color: #ffffff;
-		line-height: 1.5;
-		margin: 0;
-	}
-
 	/* ============================================================== */
-	/* 7. PROFILE TABLE */
+	/* 7. 会社基本データ（他社案内ページと完全に統一した美しいカードテーブル） */
 	/* ============================================================== */
 	.corp-profile-card {
-		background: #0a0c10;
+		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		padding: 40px;
+		border-radius: 18px;
+		overflow: hidden;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
+	.corp-profile-card table.corp-profile-table {
+		width: 100% !important;
+		border-collapse: collapse !important;
+		border-spacing: 0 !important;
+		border: none !important;
+		margin: 0 !important;
+		background: transparent !important;
+	}
+
+	.corp-profile-card table.corp-profile-table tbody {
+		border: none !important;
+		background: transparent !important;
+	}
+
+	.corp-profile-card table.corp-profile-table tr {
+		border: none !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+		background: transparent !important;
+	}
+
+	.corp-profile-card table.corp-profile-table tr:last-child {
+		border-bottom: none !important;
+	}
+
+	.corp-profile-card table.corp-profile-table th,
+	.corp-profile-card table.corp-profile-table td {
+		border: none !important;
+		box-shadow: none !important;
+		outline: none !important;
+	}
+
+	.corp-profile-card table.corp-profile-table th {
+		width: 240px !important;
+		padding: 22px 30px !important;
+		font-size: 14px !important;
+		font-weight: 600 !important;
+		color: rgba(255, 255, 255, 0.65) !important;
+		background: rgba(255, 255, 255, 0.02) !important;
+		vertical-align: top !important;
+		text-align: left !important;
+		white-space: nowrap !important;
+	}
+
+	.corp-profile-card table.corp-profile-table td {
+		padding: 22px 30px !important;
+		font-size: 14.5px !important;
+		color: rgba(255, 255, 255, 0.9) !important;
+		line-height: 1.8 !important;
+		background: transparent !important;
+		vertical-align: top !important;
+		text-align: left !important;
 	}
 
 	@media (max-width: 768px) {
-		.corp-profile-card {
-			padding: 20px;
-		}
-	}
-
-	.corp-profile-table {
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-	.corp-profile-table tr {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.corp-profile-table tr:last-child {
-		border-bottom: none;
-	}
-
-	.corp-profile-table th {
-		width: 220px;
-		padding: 18px 20px 18px 0;
-		text-align: left;
-		vertical-align: top;
-		font-size: 14px;
-		font-weight: 600;
-		color: rgba(255, 255, 255, 0.7);
-		letter-spacing: 0.02em;
-	}
-
-	.corp-profile-table td {
-		padding: 18px 0;
-		font-size: 14px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.9);
-	}
-
-	@media (max-width: 768px) {
-		.corp-profile-table th,
-		.corp-profile-table td {
-			display: block;
-			width: 100%;
-			padding: 10px 0;
+		.corp-profile-card table.corp-profile-table,
+		.corp-profile-card table.corp-profile-table tbody,
+		.corp-profile-card table.corp-profile-table tr,
+		.corp-profile-card table.corp-profile-table th,
+		.corp-profile-card table.corp-profile-table td {
+			display: block !important;
+			width: 100% !important;
+			box-sizing: border-box !important;
 		}
 
-		.corp-profile-table th {
-			padding-bottom: 4px;
-			color: rgba(255, 255, 255, 0.5);
-			font-size: 13px;
+		.corp-profile-card table.corp-profile-table tr {
+			border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+			padding: 16px 20px !important;
 		}
 
-		.corp-profile-table tr {
-			display: block;
-			padding: 14px 0;
+		.corp-profile-card table.corp-profile-table th {
+			width: 100% !important;
+			padding: 0 0 6px 0 !important;
+			background: transparent !important;
+			color: rgba(255, 255, 255, 0.5) !important;
+			font-size: 12px !important;
+			font-weight: 600 !important;
+			white-space: normal !important;
+		}
+
+		.corp-profile-card table.corp-profile-table td {
+			width: 100% !important;
+			padding: 0 !important;
+			color: rgba(255, 255, 255, 0.92) !important;
+			font-size: 14px !important;
+			line-height: 1.7 !important;
 		}
 	}
 
 	.corp-business-list {
-		margin: 0;
-		padding-left: 20px;
+		list-style: none !important;
+		padding: 0 !important;
+		margin: 0 !important;
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 8px !important;
 	}
 
 	.corp-business-list li {
-		margin-bottom: 6px;
+		position: relative;
+		padding-left: 0 !important;
+		margin: 0;
+		color: rgba(255, 255, 255, 0.92);
 	}
 
-	.corp-business-list li:last-child {
-		margin-bottom: 0;
+	.corp-business-list li::before {
+		display: none !important;
+	}
+
+	.corp-facility-summary {
+		display: block;
+		font-weight: 600;
+		color: #ffffff;
+		margin-bottom: 10px;
+	}
+
+	.corp-profile-facilities {
+		list-style: none !important;
+		padding: 0 !important;
+		margin: 0 !important;
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 8px !important;
+	}
+
+	.corp-profile-facilities li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px;
+		color: rgba(255, 255, 255, 0.88);
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	.corp-facility-type {
+		color: rgba(255, 255, 255, 0.55);
+		font-size: 13px;
+	}
+
+	.corp-facility-name {
+		color: #ffffff;
+		font-weight: 600;
+	}
+
+	.corp-facility-addr {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 13.5px;
 	}
 
 	.corp-related-links {
@@ -1347,7 +1807,7 @@ const jsonLd = {
 	}
 
 	.corp-inline-link {
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba(255, 255, 255, 0.85);
 		text-decoration: underline;
 		text-underline-offset: 3px;
 		transition: color 0.2s ease;
@@ -1360,4 +1820,60 @@ const jsonLd = {
 	.corp-inline-link-sep {
 		color: rgba(255, 255, 255, 0.25);
 	}
+
+	/* ============================================================== */
+	/* 7. 追加コンテンツ（CMS Portable Text 自由ブロック） */
+	/* ============================================================== */
+	.corp-prose-wrap {
+		max-width: 960px;
+		margin: 0 auto;
+		color: rgba(255, 255, 255, 0.88);
+		font-size: 16px;
+		line-height: 1.85;
+	}
 </style>
+
+<!-- ギャラリー カルーセルスライダースクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const track = document.getElementById('corpSliderTrack');
+		const prevBtn = document.getElementById('corpSliderPrev');
+		const nextBtn = document.getElementById('corpSliderNext');
+		const thumbs = document.querySelectorAll('.corp-slider-thumb');
+		const slides = document.querySelectorAll('.corp-slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) {
+						t.classList.add('is-active');
+						t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+					} else {
+						t.classList.remove('is-active');
+					}
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
+		}
+	});
+</script>

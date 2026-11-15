@@ -1,0 +1,270 @@
+---
+/**
+ * ArticleCard.astro
+ * オウンドメディア「Nicole Connect」および企業・ブランドページ共通の記事カードコンポーネント
+ */
+interface Props {
+	title: string;
+	url: string;
+	image: string;
+	date: string;
+	topic: string;
+	brand?: string;
+	lead?: string;
+	showBrandPill?: boolean;
+	showLead?: boolean;
+	showViews?: boolean;
+	views?: number | string;
+	className?: string;
+}
+
+const {
+	title,
+	url,
+	image,
+	date,
+	topic,
+	brand = "",
+	lead = "",
+	showBrandPill = false,
+	showLead = false,
+	showViews = false,
+	views = 0,
+	className = "",
+} = Astro.props;
+---
+
+<article class={`article-item ${className}`}>
+	<a href={url} class="article-item__link">
+		<div class="article-item__media">
+			<img
+				src={image}
+				alt={title}
+				loading="lazy"
+				decoding="async"
+				class="article-item__img"
+				onerror="this.onerror=null;this.src='/images/no-image.svg';"
+			/>
+			<div class="article-item__overlay"></div>
+			{showBrandPill && brand && (
+				<span class="article-brand-pill">{brand}</span>
+			)}
+		</div>
+		<div class="article-item__body">
+			<div class="article-item__meta">
+				<time class="meta-date">{date}</time>
+				<span class="meta-divider">/</span>
+				<span class="meta-topic">{topic}</span>
+			</div>
+			<h3 class="article-item__title">{title}</h3>
+			{showLead && lead && (
+				<p class="article-item__lead">{lead}</p>
+			)}
+			<div class="article-item__footer">
+				<span class="article-item__more">記事を読む</span>
+				{showViews ? (
+					<span class="article-item__views" title="閲覧数">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+						<span>{views}</span>
+					</span>
+				) : (
+					<span class="article-item__arrow" aria-hidden="true">→</span>
+				)}
+			</div>
+		</div>
+	</a>
+</article>
+
+<style>
+	:root {
+		--mag-color-heading: #f2f3f6;
+		--mag-color-lead: #9ea3ae;
+		--mag-color-meta: #6b707d;
+		--mag-color-border: rgba(255, 255, 255, 0.1);
+	}
+
+	.article-item {
+		background: #090b0e;
+		border: 1px solid var(--mag-color-border, rgba(255, 255, 255, 0.1));
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		font-family: inherit;
+	}
+
+	.article-item:hover {
+		transform: translateY(-5px);
+		border-color: rgba(255, 255, 255, 0.35);
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+	}
+
+	.article-item__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.article-item__media {
+		position: relative;
+		height: 200px;
+		overflow: hidden;
+		background: #000;
+	}
+
+	@media (max-width: 768px) {
+		.article-item__media {
+			height: 180px;
+		}
+	}
+
+	.article-item__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+		display: block;
+	}
+
+	.article-item:hover .article-item__img {
+		transform: scale(1.05);
+	}
+
+	.article-item__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(180deg, transparent 50%, rgba(9, 11, 14, 0.8) 100%);
+		pointer-events: none;
+	}
+
+	.article-brand-pill {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		padding: 3px 10px;
+		background: rgba(7, 8, 10, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 999px;
+		font-size: 10.5px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: var(--mag-color-heading, #f2f3f6);
+		backdrop-filter: blur(8px);
+		z-index: 2;
+	}
+
+	.article-item__body {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		box-sizing: border-box;
+	}
+
+	.article-item__meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 11.5px;
+		color: var(--mag-color-meta, #6b707d);
+		margin-bottom: 8px;
+		font-feature-settings: "palt" 1;
+	}
+
+	.meta-divider {
+		opacity: 0.4;
+	}
+
+	.meta-topic {
+		color: var(--mag-color-meta, #6b707d);
+		font-weight: 600;
+		letter-spacing: 0.04em;
+	}
+
+	.article-item__title {
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.5;
+		color: var(--mag-color-heading, #f2f3f6) !important;
+		margin: 0 0 12px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		min-height: 3em;
+		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
+		word-break: auto-phrase;
+		line-break: strict;
+	}
+
+	.article-item:hover .article-item__title {
+		color: #ffffff !important;
+		text-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
+	}
+
+	.article-item__lead {
+		font-size: 13px;
+		color: var(--mag-color-lead, #9ea3ae);
+		line-height: 1.6;
+		margin: 0 0 16px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		min-height: 3.2em;
+		flex: none;
+	}
+
+	.article-item__footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 11.5px;
+		padding-top: 14px;
+		border-top: 1px solid var(--mag-color-border, rgba(255, 255, 255, 0.1));
+		margin-top: auto;
+	}
+
+	.article-item__more {
+		color: var(--mag-color-heading, #f2f3f6);
+		font-weight: 600;
+		transition: color 0.25s ease, transform 0.25s ease;
+	}
+
+	.article-item:hover .article-item__more {
+		color: #ffffff;
+	}
+
+	.article-item__arrow {
+		color: var(--mag-color-meta, #6b707d);
+		font-size: 13px;
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
+	}
+
+	.article-item:hover .article-item__arrow {
+		transform: translateX(4px);
+		color: #ffffff;
+	}
+
+	.article-item__views {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		color: var(--mag-color-meta, #6b707d);
+		font-size: 11px;
+		opacity: 0.85;
+		letter-spacing: 0.04em;
+	}
+
+	.card-views-icon {
+		width: 14px;
+		height: 14px;
+	}
+</style>

@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
 import { getEmDashCollection } from "emdash";
+import { getSiteUrl } from "../utils/siteUrl";
 
-export const GET: APIRoute = async () => {
-	const siteUrl = (import.meta.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev").replace(/\/$/, "");
+export const GET: APIRoute = async ({ site }) => {
+	const siteUrl = getSiteUrl(site);
 	const now = new Date().toISOString();
 
 	type SitemapPage = { 

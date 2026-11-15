@@ -6,7 +6,7 @@ export const prerender = false;
 import { search } from "emdash";
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
-const query = Astro.url.searchParams.get("q")?.trim() || "";
+const query = Astro.url.searchParams.get("q")?.trim() || Astro.url.searchParams.get("s")?.trim() || "";
 
 // posts（お知らせ）および magazine（マガジン）の両コレクションから検索
 const { items: results, nextCursor } = query

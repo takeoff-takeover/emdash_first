@@ -7,6 +7,9 @@ import { DatabaseSync } from "node:sqlite";
 import { getEmDashCollection, getEmDashEntry } from "emdash";
 import { isNoticeArticle, isESGArticle } from "../lib/magazinePolicy";
 
+// 閲覧数の表示フラグ（移行データなしのためデフォルト非表示）
+const SHOW_ARTICLE_VIEWS = false;
+
 // ==============================================================
 // 0. トップページ ヒーロー動画・背景設定（CMS Pages > HOME から取得）
 // ==============================================================
@@ -63,11 +66,15 @@ function buildYouTubeEmbedUrl(videoId: string, start?: number | null, end?: numb
 }
 
 const DEFAULT_VIDEO_ID = "1Z0CddMzQBM";
+const DEFAULT_POSTER_IMAGE = "/uploads/hero-poster.jpg";
+const DEFAULT_MP4_VIDEO = "/uploads/hero.mp4";
+
 let homeHeroConfig = {
 	enabled: true,
+	mp4Url: DEFAULT_MP4_VIDEO as string | null,
 	embedUrl: buildYouTubeEmbedUrl(DEFAULT_VIDEO_ID),
 	brightness: "0.85",
-	posterImage: null as string | null,
+	posterImage: DEFAULT_POSTER_IMAGE as string | null,
 };
 
 let homepageData: any = null;
@@ -108,11 +115,15 @@ try {
 				: (homepageData.hero_poster_image.src || null);
 		}
 
+		// MP4動画（設定時またはデフォルト動画ファイルが存在する場合に優先し、ノイズゼロで0秒即時再生）
+		const mp4Src = (homepageData.hero_video_mp4 && String(homepageData.hero_video_mp4).trim()) || DEFAULT_MP4_VIDEO;
+
 		homeHeroConfig = {
 			enabled: isEnabled,
+			mp4Url: mp4Src || null,
 			embedUrl: buildYouTubeEmbedUrl(videoId, startSec, endSec),
 			brightness: String(brightness),
-			posterImage: posterSrc,
+			posterImage: posterSrc || DEFAULT_POSTER_IMAGE,
 		};
 	}
 } catch (e) {
@@ -170,43 +181,45 @@ function getBannerBtnClass(style: string = "red"): string {
 	return "nicole-red-btn";
 }
 
-// 記事閲覧数マップを一括取得（マガジン一覧と共通）
+// 記事閲覧数マップを一括取得（マガジン一覧と共通、非表示時はスキップしてSSR高速化）
 const viewsMap = new Map<string, number>();
-try {
-	let db: any = null;
+if (SHOW_ARTICLE_VIEWS) {
 	try {
-		db = (Astro.locals as any)?.runtime?.env?.DB || (Astro.locals as any)?.env?.DB;
-	} catch (e) {}
+		let db: any = null;
+		try {
+			db = (Astro.locals as any)?.runtime?.env?.DB || (Astro.locals as any)?.env?.DB;
+		} catch (e) {}
 
-	if (db) {
-		const rows = await db.prepare("SELECT slug, views FROM article_views").all();
-		for (const r of (rows.results || [])) {
-			if (r.slug && typeof r.views === "number") {
-				viewsMap.set(r.slug, r.views);
-			}
-		}
-	} else {
-		const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
-		let dbPath = "";
-		if (fs.existsSync(d1Dir)) {
-			const files = fs.readdirSync(d1Dir);
-			const f = files.find((name: string) => name.endsWith(".sqlite") && !name.includes("metadata") && !name.includes("bak"));
-			if (f) dbPath = `${d1Dir}/${f}`;
-		}
-		if (!dbPath && fs.existsSync("seed/backup.sqlite")) {
-			dbPath = "seed/backup.sqlite";
-		}
-		if (dbPath) {
-			const localDb = new DatabaseSync(dbPath);
-			const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
-			for (const r of rows) {
+		if (db) {
+			const rows = await db.prepare("SELECT slug, views FROM article_views").all();
+			for (const r of (rows.results || [])) {
 				if (r.slug && typeof r.views === "number") {
 					viewsMap.set(r.slug, r.views);
 				}
 			}
+		} else {
+			const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
+			let dbPath = "";
+			if (fs.existsSync(d1Dir)) {
+				const files = fs.readdirSync(d1Dir);
+				const f = files.find((name: string) => name.endsWith(".sqlite") && !name.includes("metadata") && !name.includes("bak"));
+				if (f) dbPath = `${d1Dir}/${f}`;
+			}
+			if (!dbPath && fs.existsSync("seed/backup.sqlite")) {
+				dbPath = "seed/backup.sqlite";
+			}
+			if (dbPath) {
+				const localDb = new DatabaseSync(dbPath);
+				const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
+				for (const r of rows) {
+					if (r.slug && typeof r.views === "number") {
+						viewsMap.set(r.slug, r.views);
+					}
+				}
+			}
 		}
-	}
-} catch (e) {}
+	} catch (e) {}
+}
 
 // 記事トピック判定ヘルパー（マガジン一覧と統一）
 function determineArticleTopic(p: any): string {
@@ -232,7 +245,7 @@ let cmsMagazines: any[] = [];
 try {
 	const magResult = await getEmDashCollection("magazine" as any, {
 		orderBy: { published_at: "desc" },
-		limit: 100,
+		limit: 20,
 	});
 	cmsMagazines = magResult?.entries || [];
 } catch (e) {
@@ -243,7 +256,7 @@ let cmsPosts: any[] = [];
 try {
 	const result = await getEmDashCollection("posts", {
 		orderBy: { published_at: "desc" },
-		limit: 100,
+		limit: 15,
 	});
 	cmsPosts = result?.entries || [];
 } catch (e) {
@@ -520,13 +533,23 @@ const formattedCmsArticles = uniqueCmsArticles.map((p: any) => {
 	const t = (p.data?.title || "").toLowerCase();
 	const s = (p.id || "").toLowerCase();
 	let brand = "NICOLE";
-	if (t.includes("alpina") || s.includes("alpina")) brand = "ALPINA";
+	if (
+		t.includes("下取り") || t.includes("買取") || s.includes("resale") || s.includes("trade-in") ||
+		s.includes("all-brands") || t.includes("全ブランド") ||
+		(t.includes("bmw") && (t.includes("mini") || t.includes("ferrari") || t.includes("rolls")))
+	) {
+		brand = "ALL BRANDS";
+	} else if (t.includes("alpina") || s.includes("alpina")) brand = "ALPINA";
 	else if (t.includes("mini") || s.includes("mini")) brand = "MINI";
 	else if (t.includes("ferrari") || s.includes("ferrari")) brand = "Ferrari";
 	else if (t.includes("rolls") || s.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
 	else if (t.includes("bmw") || s.includes("bmw") || p.data?.related_location) brand = "BMW";
 
 	const viewsCount = viewsMap.get(p.id) || viewsMap.get(p.data?.id) || 0;
+	const isCampaign = s.includes("mini-new-generation-debut-fair") || 
+		p.data?.category === "Campaign" || 
+		(Array.isArray(p.data?.tags) && p.data.tags.includes("campaign"));
+	const articleUrl = isCampaign ? `/campaigns/${p.id}` : `/magazine/${p.id}/`;
 
 	return {
 		id: p.id || p.data?.id,
@@ -541,7 +564,7 @@ const formattedCmsArticles = uniqueCmsArticles.map((p: any) => {
 		views: `${viewsCount.toLocaleString()} views`,
 		image: imgUrl,
 		lead: extractLead(p),
-		url: `/magazine/${p.id}/`
+		url: articleUrl
 	};
 });
 
@@ -561,10 +584,8 @@ const subInsights = allInsights.slice(2, 5);
 // 最新インフォメーション（CMS "posts" コレクションからお知らせを取得）
 function getNoticeCategory(slugStr: string, titleStr: string): string {
 	const combined = `${slugStr} ${titleStr}`.toLowerCase();
-	if (/休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "休業案内";
-	if (/定休日|営業時間|営業日/.test(combined)) return "営業案内";
 	if (/重要|注意|法改正|閉鎖|停止/.test(combined)) return "重要なお知らせ";
-	if (/協定|加入|リリース|寄贈|csr|esg|パートナー/.test(combined)) return "プレスリリース";
+	if (/定休日|営業時間|営業日|休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "営業日案内";
 	return "お知らせ";
 }
 
@@ -613,7 +634,7 @@ const fallbackNewsList = [
 		date: "2026.07.31",
 		category: "休業案内",
 		title: "ニコル・グループ 2026年 夏季休業のお知らせ",
-		url: "/news/ニコル・グループ-2026年-夏季休業のお知らせ"
+		url: "/news/202607_nicole_summer-holiday"
 	},
 	{
 		date: "2026.04.30",
@@ -658,19 +679,53 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 						aria-hidden="true"
 					></div>
 				)}
-				{homeHeroConfig.enabled && homeHeroConfig.embedUrl ? (
+				{homeHeroConfig.enabled && homeHeroConfig.mp4Url ? (
+					<video 
+						id="hero-native-video"
+						src={homeHeroConfig.mp4Url} 
+						class="cinematic-hero__video cinematic-hero__video--native" 
+						style={`filter: brightness(${homeHeroConfig.brightness});`}
+						autoplay
+						muted
+						loop
+						playsinline
+						preload="metadata"
+						tabindex="-1"
+						aria-hidden="true"
+					></video>
+				) : homeHeroConfig.enabled && homeHeroConfig.embedUrl ? (
 					<iframe 
 						id="hero-youtube-iframe"
 						src={homeHeroConfig.embedUrl} 
 						title="Nicole Group Official Video"
 						class="cinematic-hero__video" 
 						style={`filter: brightness(${homeHeroConfig.brightness});`}
-						allow="autoplay; encrypted-media"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+						referrerpolicy="strict-origin-when-cross-origin"
 						tabindex="-1"
 						aria-hidden="true"
 					></iframe>
 				) : null}
 				<div class="cinematic-hero__overlay"></div>
+			</div>
+
+			<!-- メインビジュアル タイトル（nicole.co.jp 仕様・シネマティックモーション） -->
+			<div class="cinematic-hero__content" id="hero-content">
+				<h1 class="cinematic-hero__title-group" id="hero-title-group">
+					<span class="cinematic-hero__lead" aria-label="BEYOND EXPECTATIONS">
+						<span class="hero-line hero-line--1">
+							<span class="hero-line__inner hero-shimmer-text">BEYOND</span>
+						</span>
+						<span class="hero-line hero-line--2">
+							<span class="hero-line__inner hero-shimmer-text">EXPECTATIONS</span>
+						</span>
+					</span>
+					<span class="cinematic-hero__sub">
+						<span class="hero-line hero-line--sub">
+							<span class="hero-line__inner">期待を超える喜びを</span>
+						</span>
+					</span>
+				</h1>
 			</div>
 
 			<a href="#magazine-section" class="hero-scroll-indicator" aria-label="Scroll to Content">
@@ -740,10 +795,12 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 									<div class="article-item__footer">
 										<span class="article-item__more">記事を読む</span>
-										<span class="article-item__views" title="閲覧数">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-											<span>{item.views}</span>
-										</span>
+										{SHOW_ARTICLE_VIEWS && (
+											<span class="article-item__views" title="閲覧数">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+												<span>{item.views}</span>
+											</span>
+										)}
 									</div>
 								</div>
 							</a>
@@ -783,10 +840,12 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 									<div class="article-item__footer">
 										<span class="article-item__more">記事を読む</span>
-										<span class="article-item__views" title="閲覧数">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-											<span>{item.views}</span>
-										</span>
+										{SHOW_ARTICLE_VIEWS && (
+											<span class="article-item__views" title="閲覧数">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+												<span>{item.views}</span>
+											</span>
+										)}
 									</div>
 								</div>
 							</a>
@@ -797,7 +856,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 				<!-- 最下部：マガジンの記事をもっと読むボタン -->
 				<div class="insights-bottom-action editorial-reveal" data-delay="200">
 					<a href="/magazine/" class="btn-magazine-more">
-						<span>Read more from the magazine</span>
+						<span>Nicole Connect - Web Magazineを見る</span>
 						<span class="btn-magazine-more__icon">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-svg">
 								<path d="M5 12h14M12 5l7 7-7 7"/>
@@ -828,8 +887,8 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					</p>
 				</div>
 
-				<div class="nicole-we-are-cta">
-					<a href="/corporate" class="btn-nicole-outline">会社案内へ</a>
+				<div class="nicole-banner-btn-wrap nicole-we-are-cta">
+					<a href="/corporate" class="nicole-black-btn">会社案内へ</a>
 				</div>
 			</div>
 
@@ -849,7 +908,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					</a>
 
 					<!-- 2. BMW -->
-					<a href="/locations#bmw" class="nicole-brand-item brand-reveal-item" data-delay="120">
+					<a href="https://nicole.bmw.jp/" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="120">
 						<div class="nicole-brand-icon-wrap">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 157.24 157.24" aria-hidden="true" class="brand-svg-mark">
 								<path fill="#FFFFFF" d="M78.62,0C35.2,0,0,35.2,0,78.62s35.2,78.62,78.62,78.62,78.62-35.2,78.62-78.62S122.04,0,78.62,0M152.13,78.62c0,40.6-32.91,73.51-73.51,73.51S5.11,119.22,5.11,78.62,38.02,5.11,78.62,5.11s73.51,32.91,73.51,73.51"></path>
@@ -867,7 +926,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					</a>
 
 					<!-- 3. MINI -->
-					<a href="/locations#mini" class="nicole-brand-item brand-reveal-item" data-delay="240">
+					<a href="https://www.mini-yokohama.com/" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="240">
 						<div class="nicole-brand-icon-wrap">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234.96 103.21" aria-hidden="true" class="brand-svg-mark">
 								<path fill="#FFFFFF" d="M86.74,63.28h-4.56v-23.34h6.79l5.95,18.63,5.9-18.63h6.79v23.34h-4.7v-17.28l-5.46,17.28h-5.09l-5.61-17.41v17.41h-.01ZM117.73,63.28h-4.83v-23.34h4.83v23.34ZM127.66,63.28h-4.65v-23.34h5.69l9.31,16.92v-16.92h4.63v23.34h-5.7l-9.28-16.84v16.84ZM152.77,63.28h-4.83v-23.34h4.83v23.34ZM187.06,71.88h-22.15c1.19-2.75,2.12-5.62,2.81-8.6h27.93l7.38-7.37h-34.15c.11-1.42.2-2.85.2-4.3s-.08-2.88-.2-4.3h42.75l7.36-7.37h-51.27c-.69-2.97-1.63-5.86-2.81-8.61h62.69l7.36-7.37h-73.95C151.84,9.57,135.77,0,117.48,0s-34.37,9.57-43.54,23.96H0l7.36,7.37h62.67c-1.18,2.75-2.12,5.63-2.81,8.61H15.96l7.36,7.37h42.75c-.12,1.42-.19,2.85-.19,4.3s.07,2.88.19,4.3H31.93l7.36,7.37h27.93c.69,2.98,1.63,5.85,2.81,8.6h-22.14l7.37,7.37h18.68c9.17,14.39,25.25,23.96,43.54,23.96s34.37-9.57,43.53-23.96h18.68l7.37-7.37h0ZM117.47,95.84c-25.44,0-45.93-21.58-44.12-47.39,1.52-21.79,19.17-39.44,40.96-40.96,25.81-1.8,47.39,18.69,47.39,44.12s-19.84,44.23-44.24,44.23"></path>
@@ -878,7 +937,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					</a>
 
 					<!-- 4. Rolls-Royce -->
-					<a href="/locations#rolls-royce" class="nicole-brand-item brand-reveal-item" data-delay="360">
+					<a href="https://www.rolls-roycemotorcars.com/yokohama/" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="360">
 						<div class="nicole-brand-icon-wrap">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 114.55 150.86" aria-hidden="true" class="brand-svg-mark">
 								<path fill="#FFFFFF" d="M65.8,23.03h-21.37v43.16c-2.51,1.22-5.31,2.31-8.38,3.2-1.54.46-3.21.82-4.89,1.15V24.94s.42-6.55-3.35-8.76v-.82h34.22c1.54,1.86,2.93,4.38,3.77,7.65M71.8,82.07c15.51-7.43,23.05-20.52,23.19-35.51,0-10.2-3.49-16.45-7.54-19.78-.28-.19-.56-.38-.7-.56-.28-1.2-.56-2.37-.98-3.54-.84-2.4-1.82-4.61-2.93-6.63.7.1,1.4.24,2.1.35,11.18,2.39,20.25,9.03,24.59,21.84,3.35,10.44,1.68,23.39-5.73,33.8-1.81,2.45-6.43,7.68-11.87,11.57-.98.71-1.68,1.1-2.66,1.75,6.85,10.84,10.06,17.08,14.39,28.9,3.77,10.35,6.71,24.08,7.12,27.32.84,7.68,3.21,8.31,3.77,8.45v.82h-27.1v-.82c.84-.44,8.24-3.42,8.24-14.86,0-8.42-2.09-17.68-5.73-28.05-1.68-4.64-5.03-12.1-8.1-17.78v-.14c-1.4.64-3.35,1.32-5.59,2.02-1.4-3.25-2.8-6.2-4.47-9.17M44.42,81.15v7.02c2.1-.09,8.38-.59,14.25-1.72,1.26,2.94,2.38,5.72,3.21,7.89v.3c-2.24.38-4.89.73-7.68,1.05-3.77.44-7.54.68-9.78.83v45.33c0,.98.28,6.33,3.77,8.19v.82h-20.81v-.82c3.35-1.78,3.77-7.21,3.77-8.19v-58.28c4.33-.57,9.22-1.37,13.27-2.42M47.36,7.86l-2.93-.04h-26.96v66.46c2.65-.11,12.57-.95,19.14-2.87,21.79-6.44,32.27-21.67,32.41-39.56,0-10.42-3.63-16.8-7.68-20.2-2.66-2.11-6.01-3.12-8.52-3.47-1.26-.29-4.47-.32-5.45-.32M3.78,129.23V9.78S4.2,3.11.57.84v-.84h46.09c3.91,0,8.94.4,12.01,1.07,11.45,2.44,20.68,9.19,25.01,22.28,3.63,10.67,1.96,23.88-5.73,34.5-1.82,2.51-6.57,7.86-12.15,11.8-.98.72-1.54,1.12-2.66,1.79,6.98,11.08,10.34,17.42,14.81,29.49,3.77,10.56,6.71,24.59,7.12,27.88.98,7.83,3.35,8.62,3.77,8.79v.84h-27.52v-.84c.84-.45,8.24-3.67,8.38-15.36,0-8.56-2.1-18.01-5.87-28.6-1.68-4.73-5.03-12.34-8.24-18.14l-.14-.14c-3.63,1.66-11.32,3.92-16.34,4.87-3.63.68-7.26,1.24-11.73,1.75-3.91.45-7.68.7-9.92.85v46.4c0,1.02.14,6.46,3.77,8.37v.84H0v-.84c3.49-1.81,3.77-7.35,3.77-8.37"></path>
@@ -889,7 +948,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					</a>
 
 					<!-- 5. Ferrari -->
-					<a href="https://yokohama.ferraridealers.com/ja-JP" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="480">
+					<a href="https://yokohama.ferraridealers.com/" target="_blank" rel="noopener noreferrer" class="nicole-brand-item brand-reveal-item" data-delay="480">
 						<div class="nicole-brand-icon-wrap">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116.05 161.43" aria-hidden="true" class="brand-svg-mark">
 								<path fill="#FFFFFF" d="M54.85,3.84c.57.29.79.52,1.37.66.53.13,1.21.53,1.41.08s-.1-1.01-.43-1.55c-.56-.92-.85-1.14-1.68-2.42-.18-.27-.32-.57-.57-.61,0,0-.1.97-.33,1.55-.21.52-.78.88-.74,1.23.04.35.41.76.98,1.06"></path>
@@ -1028,24 +1087,26 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		</div>
 	</section>
 
-	<!-- 4. 【ESG / SDGs活動】フルブリード・サステナビリティ・バンド -->
-	<section class="nicole-strip-section nicole-strip-section--esg" id="esg-banner">
-		<div class="nicole-strip-grid editorial-reveal">
-			<div class="nicole-strip-img-wrap nicole-banner-img-wrap">
-				<img src={bannerEsg.image} alt={bannerEsg.title} class="nicole-scroll-zoom-img" loading="lazy" decoding="async" />
-			</div>
-			<div class="nicole-strip-content">
-				<h2 class="nicole-banner-heading nicole-banner-heading--white">
-					<a href={bannerEsg.url} target={bannerEsg.url.startsWith("http") ? "_blank" : undefined} rel={bannerEsg.url.startsWith("http") ? "noopener noreferrer" : undefined}>{bannerEsg.title}</a>
-				</h2>
-				<p class="nicole-banner-desc nicole-banner-desc--white">
-					{bannerEsg.desc}
-				</p>
-				{bannerEsg.btnLabel && bannerEsg.btnLabel.trim() && (
-					<div class="nicole-banner-btn-wrap">
-						<a href={bannerEsg.url} target={bannerEsg.url.startsWith("http") ? "_blank" : undefined} rel={bannerEsg.url.startsWith("http") ? "noopener noreferrer" : undefined} class={getBannerBtnClass(bannerEsg.btnStyle)}>{bannerEsg.btnLabel}</a>
-					</div>
-				)}
+	<!-- 4. 【ESG / SDGs活動】ラグジュアリー・カード -->
+	<section class="nicole-esg-section" id="esg-banner">
+		<div class="editorial-container">
+			<div class="nicole-boutique-card nicole-esg-card editorial-reveal">
+				<div class="nicole-boutique-img-wrap nicole-esg-img-wrap nicole-banner-img-wrap">
+					<img src={bannerEsg.image} alt={bannerEsg.title} class="nicole-scroll-zoom-img" loading="lazy" decoding="async" />
+				</div>
+				<div class="nicole-boutique-content nicole-esg-content">
+					<h2 class="nicole-banner-heading nicole-banner-heading--white">
+						<a href={bannerEsg.url} target={bannerEsg.url.startsWith("http") ? "_blank" : undefined} rel={bannerEsg.url.startsWith("http") ? "noopener noreferrer" : undefined}>{bannerEsg.title}</a>
+					</h2>
+					<p class="nicole-banner-desc nicole-banner-desc--white">
+						{bannerEsg.desc}
+					</p>
+					{bannerEsg.btnLabel && bannerEsg.btnLabel.trim() && (
+						<div class="nicole-banner-btn-wrap">
+							<a href={bannerEsg.url} target={bannerEsg.url.startsWith("http") ? "_blank" : undefined} rel={bannerEsg.url.startsWith("http") ? "noopener noreferrer" : undefined} class={getBannerBtnClass(bannerEsg.btnStyle)}>{bannerEsg.btnLabel}</a>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	</section>
@@ -1080,22 +1141,26 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 <!-- ============================================================== -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
-		// 1. スクロール監視による要素の順次フェードイン
+		// 1. スクロール監視による要素の順次フェードイン（事前に滑らかに展開）
 		const reveals = document.querySelectorAll('.editorial-reveal');
 		const observerOptions = {
 			root: null,
-			rootMargin: '0px 0px -60px 0px',
-			threshold: 0.1
+			rootMargin: '160px 0px 40px 0px',
+			threshold: 0.01
 		};
 
 		const revealObserver = new IntersectionObserver((entries, observer) => {
 			entries.forEach(entry => {
 				if (entry.isIntersecting) {
 					const el = entry.target;
-					const delay = el.getAttribute('data-delay') || 0;
-					setTimeout(() => {
+					const delay = Math.min(Number(el.getAttribute('data-delay') || 0), 120);
+					if (delay > 0) {
+						setTimeout(() => {
+							el.classList.add('is-visible');
+						}, delay);
+					} else {
 						el.classList.add('is-visible');
-					}, delay);
+					}
 					observer.unobserve(el);
 				}
 			});
@@ -1109,45 +1174,74 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 			entries.forEach(entry => {
 				if (entry.isIntersecting) {
 					const el = entry.target;
-					const delay = el.getAttribute("data-delay") || 0;
-					setTimeout(() => {
+					const delay = Math.min(Number(el.getAttribute("data-delay") || 0), 120);
+					if (delay > 0) {
+						setTimeout(() => {
+							el.classList.add("is-visible");
+						}, delay);
+					} else {
 						el.classList.add("is-visible");
-					}, delay);
+					}
 					observer.unobserve(el);
 				}
 			});
-		}, { root: null, rootMargin: "0px 0px -40px 0px", threshold: 0.15 });
+		}, { root: null, rootMargin: "160px 0px 40px 0px", threshold: 0.05 });
 		brandItems.forEach(el => brandObserver.observe(el));
 
-		// 2. ヒーローセクションは常にフル幅を維持（縮小処理なし）
+		// 2. ヒーロータイトルのシネマティック・スクロールパララックス＆マウスティルト
+		const heroTitleGroup = document.getElementById('hero-title-group');
+		const heroSection = document.getElementById('hero-section');
+		if (heroTitleGroup && heroSection) {
+			let ticking = false;
+			let targetTiltX = 0, targetTiltY = 0;
+			let currentTiltX = 0, currentTiltY = 0;
+
+			const updateHeroMotion = () => {
+				const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+				const heroHeight = heroSection.offsetHeight;
+				if (scrollY <= heroHeight * 1.2) {
+					const progress = Math.min(1, Math.max(0, scrollY / (heroHeight * 0.85)));
+					const translateY = scrollY * 0.38; // 滑らかなパララックス
+					const scale = 1 - progress * 0.06; // 奥へ沈み込むスケール
+					const opacity = Math.max(0, 1 - progress * 1.35); // 緩やかなフェードアウト
+					
+					heroTitleGroup.style.transform = `translate3d(${currentTiltX.toFixed(2)}px, ${(translateY + currentTiltY).toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+					heroTitleGroup.style.opacity = opacity.toFixed(3);
+				}
+				ticking = false;
+			};
+
+			window.addEventListener('scroll', () => {
+				if (!ticking) {
+					window.requestAnimationFrame(updateHeroMotion);
+					ticking = true;
+				}
+			}, { passive: true });
+
+			// PC限定：マウス微細パララックス（奥行き感・ティルト）
+			if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+				window.addEventListener('mousemove', (e) => {
+					const { innerWidth, innerHeight } = window;
+					const x = (e.clientX / innerWidth - 0.5) * 2;
+					const y = (e.clientY / innerHeight - 0.5) * 2;
+					targetTiltX = -x * 7;
+					targetTiltY = -y * 5;
+				}, { passive: true });
+
+				const animateTilt = () => {
+					currentTiltX += (targetTiltX - currentTiltX) * 0.05;
+					currentTiltY += (targetTiltY - currentTiltY) * 0.05;
+					updateHeroMotion();
+					requestAnimationFrame(animateTilt);
+				};
+				requestAnimationFrame(animateTilt);
+			}
+		}
 
 		// 3. The latest Nicole Group Insights スライダー（ボタンなし・スムーズスクロール）
 		const slider = document.getElementById('insights-slider');
 		if (slider) {
 			// マウスホイールやタッチによる快適なネイティブスワイプスクロール
-		}
-
-		// 3. YouTubeヒーロー動画：常時自動再生＆一時停止防止ガード（軽量イベント駆動）
-		const heroIframe = document.getElementById('hero-youtube-iframe');
-		if (heroIframe) {
-			const ensurePlay = () => {
-				try {
-					if (heroIframe.contentWindow) {
-						heroIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-					}
-				} catch (e) {}
-			};
-
-			// タブ復帰・可視化時に確実に再開
-			document.addEventListener('visibilitychange', () => {
-				if (!document.hidden) {
-					ensurePlay();
-				}
-			});
-
-			// 初期化時に安全に再生トリガー（タイマーポーリング廃止・CPU負荷ゼロ）
-			setTimeout(ensurePlay, 1000);
-			setTimeout(ensurePlay, 3000);
 		}
 	});
 </script>
@@ -1223,12 +1317,17 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 	.cinematic-hero__poster {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: 50%;
+		left: 50%;
 		width: 100%;
 		height: 100%;
+		min-width: 177.78vh;
+		min-height: 56.25vw;
+		transform: translate(-50%, -50%) scale(1.3);
+		transform-origin: center center;
 		background-size: cover;
 		background-position: center;
+		filter: brightness(0.85);
 		z-index: 0;
 	}
 
@@ -1246,12 +1345,34 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		filter: brightness(0.85);
 		pointer-events: none !important;
 		user-select: none;
+		z-index: 1;
+	}
+
+	.cinematic-hero__video--native {
+		object-fit: cover !important;
+		width: 100% !important;
+		height: 100% !important;
+		min-width: 100% !important;
+		min-height: 100% !important;
+		max-width: 100% !important;
+		transform: none !important;
+		top: 0 !important;
+		left: 0 !important;
 	}
 
 	@media (max-width: 768px) {
 		.cinematic-hero {
 			height: 85vh;
 			min-height: 540px;
+		}
+
+		.cinematic-hero__poster {
+			width: auto;
+			height: 100%;
+			min-width: 177.78vh;
+			min-height: 100%;
+			transform: translate(-50%, -50%) scale(1.4);
+			transform-origin: center center;
 		}
 
 		.cinematic-hero__video {
@@ -1270,9 +1391,136 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.45) 100%);
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.05) 35%, rgba(0, 0, 0, 0.25) 65%, rgba(0, 0, 0, 0.75) 100%);
 		z-index: 5;
 		pointer-events: auto;
+	}
+
+	/* メインビジュアル タイトル（nicole.co.jp 仕様・シネマティックモーション） */
+	.cinematic-hero__content {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 6;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-start;
+		pointer-events: none;
+		perspective: 1200px;
+	}
+
+	.cinematic-hero__title-group {
+		width: 100%;
+		max-width: 1360px;
+		margin: 0 auto;
+		padding: 0 40px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		transform: translateY(-20px);
+		transform-style: preserve-3d;
+		will-change: transform, opacity;
+	}
+
+	.cinematic-hero__lead {
+		font-family: var(--font-helvetica);
+		font-size: clamp(48px, 9vw, 136px);
+		font-weight: 100;
+		line-height: 0.9;
+		letter-spacing: -0.015em;
+		color: #ffffff;
+		margin: 0;
+		text-shadow: 0 4px 28px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.35);
+		user-select: none;
+	}
+
+	.cinematic-hero__sub {
+		font-family: var(--font-helvetica);
+		font-size: clamp(16px, 3vw, 42px);
+		font-weight: 100;
+		line-height: 1.4;
+		letter-spacing: 0.04em;
+		color: #ffffff;
+		margin: 0;
+		text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.35);
+		user-select: none;
+	}
+
+	/* マスク＆シネマティックスライドイン */
+	.hero-line {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.08em;
+	}
+
+	.hero-line__inner {
+		display: inline-block;
+		transform: translateY(115%);
+		opacity: 0;
+		animation: heroSlideUp 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		will-change: transform, opacity;
+	}
+
+	.hero-line--1 .hero-line__inner {
+		animation-delay: 0.15s;
+	}
+
+	.hero-line--2 .hero-line__inner {
+		animation-delay: 0.32s;
+	}
+
+	.hero-line--sub .hero-line__inner {
+		animation-delay: 0.55s;
+	}
+
+	@keyframes heroSlideUp {
+		0% {
+			transform: translateY(115%);
+			opacity: 0;
+			letter-spacing: 0.05em;
+		}
+		50% {
+			opacity: 0.85;
+		}
+		100% {
+			transform: translateY(0%);
+			opacity: 1;
+			letter-spacing: inherit;
+		}
+	}
+
+	/* 光彩シマーアニメーション（車体に反射する光のようなシルバー・スウィープ） */
+	.hero-shimmer-text {
+		position: relative;
+		display: inline-block;
+		background: linear-gradient(
+			115deg,
+			#ffffff 0%,
+			#ffffff 36%,
+			#e4edfc 44%,
+			#ffffff 50%,
+			#dbeafe 56%,
+			#ffffff 64%,
+			#ffffff 100%
+		);
+		background-size: 260% 100%;
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: heroSlideUp 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+		           heroShimmerSweep 3.6s cubic-bezier(0.4, 0, 0.2, 1) 1.4s infinite;
+	}
+
+	@keyframes heroShimmerSweep {
+		0% {
+			background-position: 100% 0%;
+		}
+		45%, 100% {
+			background-position: -120% 0%;
+		}
 	}
 
 	.hero-scroll-indicator {
@@ -2452,37 +2700,49 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		flex: 1;
 	}
 
-	/* --- 4. フルブリード・サステナビリティ・バンド (ESG / SDGs) --- */
-	.nicole-strip-section--esg {
-		width: 100%;
-		background: #000000;
-		color: #FFFFFF;
-		position: relative;
-		overflow: hidden;
-		margin: 30px 0 90px 0;
+	/* --- 4. ラグジュアリー・ESGカード (ESG / SDGs) --- */
+	.nicole-esg-section {
+		padding: 30px 0;
+		background: #FFFFFF;
 	}
 
-	.nicole-strip-grid {
+	.nicole-esg-card {
 		display: flex;
 		flex-direction: row;
 		align-items: stretch;
-		width: 100%;
-		min-height: 500px;
+		background: #000000;
+		color: #FFFFFF;
+		border-radius: 4px;
+		overflow: hidden;
+		min-height: 440px;
 	}
 
-	.nicole-strip-img-wrap {
+	.nicole-esg-img-wrap {
 		flex: 1 1 50%;
 		width: 50%;
-		min-height: 500px;
+		min-height: 440px;
+		position: relative;
+		overflow: hidden;
+		align-self: stretch;
 	}
 
-	.nicole-strip-content {
+	.nicole-esg-img-wrap .nicole-scroll-zoom-img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.nicole-esg-content {
 		flex: 1 1 50%;
 		width: 50%;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 80px max(40px, calc((100vw - 1440px) / 2 + 40px)) 80px 6vw;
+		padding: 64px 56px;
 		gap: 22px;
 		box-sizing: border-box;
 	}
@@ -2527,6 +2787,19 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		flex: 1 1 48%;
 		width: 48%;
 		min-height: 440px;
+		position: relative;
+		overflow: hidden;
+		align-self: stretch;
+	}
+
+	.nicole-boutique-img-wrap .nicole-static-img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
 	}
 
 	/* ============================================================== */
@@ -2548,17 +2821,42 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		filter: blur(0);
 	}
 
-	/* モーションアニメーション・ユーティリティ */
+	/* モーションアニメーション・ユーティリティ（初期チラつき防止＆即応性） */
 	.editorial-reveal {
-		opacity: 0;
-		transform: translateY(24px);
-		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+		opacity: 0.05;
+		transform: translateY(14px);
+		transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 		will-change: opacity, transform;
 	}
 
 	.editorial-reveal.is-visible {
 		opacity: 1;
 		transform: translateY(0);
+	}
+
+	/* 会社案内 ブラックCTAボタン（赤グラデーション背景に映える漆黒ラグジュアリースタイル） */
+	.nicole-black-btn {
+		display: inline-block;
+		background-color: #000000;
+		color: #FFFFFF;
+		font-family: var(--font-helvetica);
+		font-size: 15px;
+		font-weight: 500;
+		border-radius: 40px;
+		padding: 16px 48px;
+		text-decoration: none;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+		transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.nicole-black-btn:hover {
+		background-color: #FFFFFF;
+		color: #000000;
+		border-color: #FFFFFF;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 22px rgba(0, 0, 0, 0.6);
 	}
 
 	/* ============================================================== */
@@ -2637,20 +2935,32 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 			padding: 36px 20px 44px 20px !important;
 		}
 
-		/* 4. サステナビリティ・バンドスマホ */
-		.nicole-strip-grid {
+		/* 4. ESGカードスマホ */
+		.nicole-esg-card {
 			flex-direction: column !important;
 			min-height: auto;
 		}
 
-		.nicole-strip-img-wrap {
+		.nicole-esg-img-wrap {
 			order: 1 !important;
 			width: 100% !important;
-			height: 280px !important;
-			min-height: 260px !important;
+			height: 300px !important;
+			min-height: 280px !important;
+			position: relative !important;
+			overflow: hidden !important;
 		}
 
-		.nicole-strip-content {
+		.nicole-esg-img-wrap .nicole-scroll-zoom-img {
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: cover !important;
+			display: block !important;
+		}
+
+		.nicole-esg-content {
 			order: 2 !important;
 			width: 100% !important;
 			padding: 40px 20px 48px 20px !important;
@@ -2665,8 +2975,20 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		.nicole-boutique-img-wrap {
 			order: 1 !important;
 			width: 100% !important;
-			height: 280px !important;
-			min-height: 260px !important;
+			height: 300px !important;
+			min-height: 280px !important;
+			position: relative !important;
+			overflow: hidden !important;
+		}
+
+		.nicole-boutique-img-wrap .nicole-static-img {
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: cover !important;
+			display: block !important;
 		}
 
 		.nicole-boutique-content {
@@ -2722,8 +3044,32 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 			padding: 0 20px;
 		}
 
+		.cinematic-hero {
+			height: 100svh;
+			min-height: 540px;
+		}
+
 		.cinematic-hero__viewport {
 			padding: 0 20px 40px 20px;
+		}
+
+		.cinematic-hero__title-group {
+			padding: 0 20px;
+			gap: 10px;
+			transform: translateY(-10px);
+		}
+
+		.cinematic-hero__lead {
+			font-size: clamp(38px, 11vw, 64px);
+			line-height: 0.92;
+			letter-spacing: -0.01em;
+		}
+
+		.cinematic-hero__sub {
+			font-size: clamp(15px, 4.2vw, 22px);
+			line-height: 1.4;
+			letter-spacing: 0.03em;
+			white-space: nowrap;
 		}
 
 		.hero-scroll-indicator {

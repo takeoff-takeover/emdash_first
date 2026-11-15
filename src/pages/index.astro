@@ -1,6 +1,12 @@
 ---
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 import NicoleHomeMain from "../components/NicoleHomeMain.astro";
+
+// 旧WordPress検索クエリ（/?s=...）の互換転送
+const searchParam = Astro.url.searchParams.get("s");
+if (searchParam !== null) {
+	return Astro.redirect(`/search?q=${encodeURIComponent(searchParam)}`, 301);
+}
 ---
 
 <NicoleLayout 

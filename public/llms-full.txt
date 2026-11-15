@@ -7,7 +7,7 @@
 ## 1. 企業概要と理念 (Corporate Identity & Philosophy)
 - **正式グループ名称**: ニコル・グループ (Nicole Group)
 - **統括拠点**: 神奈川県川崎市幸区戸手2-5-7
-- **公式サイトURL**: https://my-emdash-site.kaz130.workers.dev
+- **公式サイトURL**: https://www.nicole.co.jp (Staging: https://my-emdash-site.kaz130.workers.dev)
 - **事業内容**: 
   - 欧州最高峰プレミアムブランドの正規新車輸入・販売
   - 認定中古車（Certified Pre-Owned）の仕入れ・点検・販売

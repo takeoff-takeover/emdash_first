@@ -1,3 +1,9 @@
+---
+// src/components/NicoleFooter.astro
+const pathname = Astro.url.pathname.replace(/\/$/, "");
+const isHome = pathname === "" || pathname === "/";
+---
+
 <footer data-elementor-type="footer" data-elementor-id="12887" class="elementor elementor-12887 elementor-location-footer" data-elementor-post-type="elementor_library">
 			<div class="elementor-element elementor-element-2b79637 e-flex e-con-boxed e-con e-parent" data-id="2b79637" data-element_type="container" data-e-type="container">
 					<div class="e-con-inner">
@@ -70,12 +76,15 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>				</div>
 					</div>
 				</div>
-		<div class="elementor-element elementor-element-8f091e6 e-flex e-con-boxed e-con e-parent" data-id="8f091e6" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
-					<div class="e-con-inner">
-				<div class="elementor-element elementor-element-7ca4f5b elementor-widget elementor-widget-breadcrumbs" data-id="7ca4f5b" data-element_type="widget" data-e-type="widget" data-widget_type="breadcrumbs.default">
-					<p id="breadcrumbs"><span><span class="breadcrumb_last" aria-current="page">ホーム</span></span></p>				</div>
+		{!isHome && (
+			<div class="elementor-element elementor-element-8f091e6 e-flex e-con-boxed e-con e-parent" data-id="8f091e6" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="e-con-inner">
+					<div class="elementor-element elementor-element-7ca4f5b elementor-widget elementor-widget-breadcrumbs" data-id="7ca4f5b" data-element_type="widget" data-e-type="widget" data-widget_type="breadcrumbs.default">
+						<p id="breadcrumbs"><span><span class="breadcrumb_last" aria-current="page">ホーム</span></span></p>
 					</div>
 				</div>
+			</div>
+		)}
 		<div class="elementor-element elementor-element-3fd0e53d e-con-full e-flex e-con e-parent" data-id="3fd0e53d" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
 		<div class="elementor-element elementor-element-3dfcebc2 e-flex e-con-boxed e-con e-child" data-id="3dfcebc2" data-element_type="container" data-e-type="container">
 					<div class="e-con-inner">

@@ -242,6 +242,15 @@
 				}
 
 				function applyAccordion() {
+					// 拠点詳細編集画面以外ならアコーディオンやセレクターを削除して即終了
+					if (!window.location.pathname.includes('/content/locations/')) {
+						document.querySelectorAll('[data-accordion-header]').forEach(el => el.remove());
+						const existingToolbar = document.getElementById('emdash-accordion-toolbar');
+						if (existingToolbar) existingToolbar.remove();
+						const existingSelector = document.getElementById('emdash-badges-selector-wrap');
+						if (existingSelector) existingSelector.remove();
+						return;
+					}
 					// 専用CSSの注入（ホバーや開閉スタイルをCSSで完結させ、JSのタイマー上書きによるチカチカ・点滅を完全防止）
 					if (!document.getElementById('emdash-accordion-styles')) {
 						const styleEl = document.createElement('style');
@@ -522,6 +531,695 @@
 								if (fieldEl.classList.contains('emdash-sec-field-open')) {
 									fieldEl.classList.remove('emdash-sec-field-open');
 								}
+							}
+						});
+					});
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// トップページ設定（homepage）画面でのブロック別セクション＆境界線UI
+				// ─────────────────────────────────────────────────────────────
+				const HOMEPAGE_SECTION_CONFIG = [
+					{
+						id: 'sec-hp-basic',
+						prefix: '設定名称',
+						title: '基本設定',
+						desc: 'トップページ設定の管理名称です。'
+					},
+					{
+						id: 'sec-hp-hero',
+						prefix: '【ヒーロー動画】',
+						title: 'ヒーロー動画・ファーストビュー設定',
+						desc: 'ファーストビューの全画面動画。MP4動画（アイコンなし0秒再生）またはYouTube URL、フォールバック画像、明るさを設定します。'
+					},
+					{
+						id: 'sec-hp-recruit',
+						prefix: '【採用情報バナー】',
+						title: '採用情報バナー設定',
+						desc: 'トップページ中段の採用情報誘導カード設定（写真・見出し・説明文・ボタン・リンク先）。'
+					},
+					{
+						id: 'sec-hp-philosophy',
+						prefix: '【私たちの志バナー】',
+						title: '私たちの志（理念）バナー設定',
+						desc: 'ニコル・グループの理念・フィロソフィー誘導カード設定（写真・見出し・説明文・ボタン・リンク先）。'
+					},
+					{
+						id: 'sec-hp-esg',
+						prefix: '【ESG / SDGsバナー】',
+						title: 'ESG / SDGs サステナビリティ・バンド設定',
+						desc: 'フルブリードのサステナビリティ活動バナー設定（背景写真・見出し・説明文・ボタン・リンク先）。'
+					},
+					{
+						id: 'sec-hp-store',
+						prefix: '【オンラインストアバナー】',
+						title: 'オンラインストア・ブティック設定',
+						desc: 'アルピナパーツ・公式ストア誘導カード設定（写真・見出し・説明文・ボタン・リンク先）。'
+					}
+				];
+
+				const hpOpenState = {
+					'sec-hp-basic': true,
+					'sec-hp-hero': true,
+					'sec-hp-recruit': true,
+					'sec-hp-philosophy': true,
+					'sec-hp-esg': true,
+					'sec-hp-store': true
+				};
+
+				function applyHomepageSections() {
+					// スタイルの注入
+					if (!document.getElementById('emdash-homepage-styles')) {
+						const styleEl = document.createElement('style');
+						styleEl.id = 'emdash-homepage-styles';
+						styleEl.textContent = `
+							[data-hp-header] {
+								margin-top: 32px;
+								margin-bottom: 16px;
+								padding: 14px 18px;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
+								border-left: 4px solid var(--color-brand, #e11900);
+								border-radius: 8px;
+								cursor: pointer;
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								user-select: none;
+								transition: background 0.15s ease, border-color 0.15s ease;
+							}
+							[data-hp-header]:first-of-type {
+								margin-top: 12px;
+							}
+							[data-hp-header][data-is-open="true"] {
+								background: var(--color-kumo-tint);
+							}
+							[data-hp-header]:hover {
+								background: var(--color-kumo-tint) !important;
+								border-color: var(--color-kumo-line) !important;
+							}
+							.emdash-hp-field-open {
+								padding-left: 14px !important;
+								border-left: 3px solid var(--color-kumo-tint) !important;
+								margin-left: 4px !important;
+								transition: all 0.15s ease;
+							}
+							.emdash-hp-field-last {
+								margin-bottom: 32px !important;
+								padding-bottom: 24px !important;
+								border-bottom: 2px dashed var(--color-kumo-line) !important;
+							}
+							#emdash-hp-toolbar button {
+								transition: background 0.15s ease, color 0.15s ease;
+							}
+							#emdash-hp-toolbar button:hover {
+								background: var(--color-kumo-line) !important;
+							}
+						`;
+						document.head.appendChild(styleEl);
+					}
+
+					// トップページ設定画面かどうかを判定
+					const allElements = Array.from(document.querySelectorAll('label, p, span, h3, h4'));
+					const hasHomepageField = allElements.some(el =>
+						el.textContent && (
+							el.textContent.includes('【ヒーロー動画】') ||
+							el.textContent.includes('【採用情報バナー】') ||
+							el.textContent.includes('【私たちの志バナー】') ||
+							el.textContent.includes('【ESG / SDGsバナー】') ||
+							el.textContent.includes('【オンラインストアバナー】')
+						)
+					);
+
+					if (!hasHomepageField) {
+						document.querySelectorAll('[data-hp-header]').forEach(el => el.remove());
+						const existingToolbar = document.getElementById('emdash-hp-toolbar');
+						if (existingToolbar) existingToolbar.remove();
+						return;
+					}
+
+					// 既存のツールバーと全ヘッダーがあるかチェック
+					const existingToolbar = document.getElementById('emdash-hp-toolbar');
+					const existingHeaders = document.querySelectorAll('[data-hp-header]');
+					if (existingToolbar && existingHeaders.length >= 5 && document.body.contains(existingToolbar)) {
+						return;
+					}
+
+					// 各セクションのフィールド要素を収集
+					const sectionElements = {};
+					HOMEPAGE_SECTION_CONFIG.forEach(sec => { sectionElements[sec.id] = []; });
+
+					const searchTargets = [
+						...Array.from(document.querySelectorAll('label')),
+						...Array.from(document.querySelectorAll('p, span, h3, h4'))
+					];
+
+					searchTargets.forEach(el => {
+						const text = el.textContent || '';
+						if (!text) return;
+						for (const sec of HOMEPAGE_SECTION_CONFIG) {
+							if (text.includes(sec.prefix)) {
+								let container = el.parentElement;
+								while (container && container.parentElement) {
+									if (container.parentElement.classList.contains('space-y-6') || container.parentElement.tagName === 'FIELDSET') {
+										break;
+									}
+									container = container.parentElement;
+								}
+								if (container && !sectionElements[sec.id].includes(container)) {
+									const alreadyAdded = Object.values(sectionElements).some(arr => arr.includes(container));
+									if (!alreadyAdded) {
+										sectionElements[sec.id].push(container);
+									}
+								}
+								break;
+							}
+						}
+					});
+
+					const totalFound = Object.values(sectionElements).reduce((acc, arr) => acc + arr.length, 0);
+					if (totalFound < 3) return;
+
+					// ターゲット親要素
+					const firstField = sectionElements['sec-hp-basic'][0] || Object.values(sectionElements).find(arr => arr.length > 0)?.[0];
+					if (!firstField || !firstField.parentElement) return;
+					const parentContainer = firstField.parentElement;
+
+					// ツールバーの生成
+					let toolbar = document.getElementById('emdash-hp-toolbar');
+					if (!toolbar) {
+						toolbar = document.createElement('div');
+						toolbar.id = 'emdash-hp-toolbar';
+						toolbar.style.cssText = `
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							margin-bottom: 24px;
+							padding: 12px 18px;
+							background: var(--color-kumo-base);
+							border: 1px solid var(--color-kumo-line);
+							border-radius: 8px;
+							gap: 12px;
+						`;
+
+						const infoText = document.createElement('span');
+						infoText.style.cssText = 'font-size: 13px; color: var(--text-color-kumo-subtle); font-weight: 500;';
+						infoText.innerHTML = '<span style="color: var(--text-color-kumo-default); font-weight: 700;">トップページ設定（ブロック別編集）</span>（各ブロックをクリックして開閉できます）';
+
+						const btnGroup = document.createElement('div');
+						btnGroup.style.cssText = 'display: flex; gap: 8px;';
+
+						const expandAllBtn = document.createElement('button');
+						expandAllBtn.type = 'button';
+						expandAllBtn.textContent = 'すべて開く';
+						expandAllBtn.style.cssText = `
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: var(--text-color-kumo-default);
+							background: var(--color-kumo-tint);
+							border: 1px solid var(--color-kumo-line);
+							border-radius: 4px;
+							cursor: pointer;
+						`;
+						expandAllBtn.onclick = (e) => {
+							e.preventDefault();
+							HOMEPAGE_SECTION_CONFIG.forEach(s => { hpOpenState[s.id] = true; });
+							updateHomepageVisibility(sectionElements);
+						};
+
+						const collapseAllBtn = document.createElement('button');
+						collapseAllBtn.type = 'button';
+						collapseAllBtn.textContent = 'すべて閉じる';
+						collapseAllBtn.style.cssText = `
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: var(--text-color-kumo-subtle);
+							background: transparent;
+							border: 1px solid var(--color-kumo-line);
+							border-radius: 4px;
+							cursor: pointer;
+						`;
+						collapseAllBtn.onclick = (e) => {
+							e.preventDefault();
+							HOMEPAGE_SECTION_CONFIG.forEach(s => { hpOpenState[s.id] = false; });
+							updateHomepageVisibility(sectionElements);
+						};
+
+						btnGroup.appendChild(expandAllBtn);
+						btnGroup.appendChild(collapseAllBtn);
+						toolbar.appendChild(infoText);
+						toolbar.appendChild(btnGroup);
+
+						parentContainer.insertBefore(toolbar, firstField);
+					} else {
+						const infoText = toolbar.querySelector('span');
+						if (infoText && infoText.innerHTML.includes('🏠')) {
+							infoText.innerHTML = '<span style="color: var(--text-color-kumo-default); font-weight: 700;">トップページ設定（ブロック別編集）</span>（各ブロックをクリックして開閉できます）';
+						}
+					}
+
+					// 各セクションのヘッダーバーを生成
+					for (const sec of HOMEPAGE_SECTION_CONFIG) {
+						const fields = sectionElements[sec.id];
+						if (!fields || fields.length === 0) continue;
+
+						const firstFieldOfSec = fields[0];
+						let header = document.querySelector(`[data-hp-header="${sec.id}"]`);
+
+						if (!header) {
+							header = document.createElement('div');
+							header.setAttribute('data-hp-header', sec.id);
+
+							header.onclick = (e) => {
+								e.preventDefault();
+								hpOpenState[sec.id] = !hpOpenState[sec.id];
+								updateHomepageVisibility(sectionElements);
+							};
+
+							const leftDiv = document.createElement('div');
+							leftDiv.style.cssText = 'flex: 1;';
+
+							const h3 = document.createElement('div');
+							h3.className = 'hp-title-text';
+							h3.style.cssText = 'font-size: 15px; font-weight: 700; color: var(--text-color-kumo-default); letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px;';
+							h3.textContent = sec.title;
+
+							const p = document.createElement('div');
+							p.className = 'hp-desc-text';
+							p.textContent = sec.desc;
+							p.style.cssText = 'margin: 4px 0 0 0; font-size: 12px; color: var(--text-color-kumo-subtle); line-height: 1.4;';
+
+							leftDiv.appendChild(h3);
+							leftDiv.appendChild(p);
+
+							const rightDiv = document.createElement('div');
+							rightDiv.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-left: 14px;';
+
+							const countBadge = document.createElement('span');
+							countBadge.className = 'hp-badge';
+							countBadge.textContent = `${fields.length}項目`;
+							countBadge.style.cssText = 'font-size: 11px; background: var(--color-kumo-tint); color: var(--text-color-kumo-default); padding: 2px 8px; border-radius: 9999px; border: 1px solid var(--color-kumo-line);';
+
+							const arrow = document.createElement('span');
+							arrow.className = 'hp-arrow';
+							arrow.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-default); transition: transform 0.2s ease;';
+
+							rightDiv.appendChild(countBadge);
+							rightDiv.appendChild(arrow);
+
+							header.appendChild(leftDiv);
+							header.appendChild(rightDiv);
+
+							firstFieldOfSec.parentNode.insertBefore(header, firstFieldOfSec);
+						}
+
+						// タイトル更新
+						const h3El = header.querySelector('.hp-title-text');
+						if (h3El && h3El.textContent !== sec.title) {
+							h3El.textContent = sec.title;
+						}
+					}
+
+					updateHomepageVisibility(sectionElements);
+				}
+
+				function updateHomepageVisibility(sectionElements) {
+					HOMEPAGE_SECTION_CONFIG.forEach(sec => {
+						const header = document.querySelector(`[data-hp-header="${sec.id}"]`);
+						const fields = sectionElements ? (sectionElements[sec.id] || []) : [];
+						const isOpen = !!hpOpenState[sec.id];
+
+						if (header) {
+							const currentIsOpenAttr = header.getAttribute('data-is-open');
+							const targetIsOpenStr = isOpen ? 'true' : 'false';
+							if (currentIsOpenAttr !== targetIsOpenStr) {
+								header.setAttribute('data-is-open', targetIsOpenStr);
+							}
+							const arrow = header.querySelector('.hp-arrow');
+							if (arrow) {
+								const targetArrowText = isOpen ? '▲ 閉じる' : '▼ 開く';
+								if (arrow.textContent !== targetArrowText) {
+									arrow.textContent = targetArrowText;
+								}
+							}
+						}
+
+						fields.forEach((fieldEl, idx) => {
+							const targetDisplay = isOpen ? '' : 'none';
+							if (fieldEl.style.display !== targetDisplay) {
+								fieldEl.style.display = targetDisplay;
+							}
+							if (isOpen) {
+								if (!fieldEl.classList.contains('emdash-hp-field-open')) {
+									fieldEl.classList.add('emdash-hp-field-open');
+								}
+								// セクションの最後のフィールドに境界線を付与
+								if (idx === fields.length - 1) {
+									if (!fieldEl.classList.contains('emdash-hp-field-last')) {
+										fieldEl.classList.add('emdash-hp-field-last');
+									}
+								} else {
+									fieldEl.classList.remove('emdash-hp-field-last');
+								}
+							} else {
+								fieldEl.classList.remove('emdash-hp-field-open');
+								fieldEl.classList.remove('emdash-hp-field-last');
+							}
+						});
+					});
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// 会社（Companies）詳細編集画面でのブロック別アコーディオンUI
+				// ─────────────────────────────────────────────────────────────
+				const COMPANIES_SECTION_CONFIG = [
+					{
+						id: 'sec-comp-basic',
+						prefix: '【基本情報】',
+						title: '基本情報',
+						desc: '会社名（正式日本語・英語）、役割・取扱ブランド'
+					},
+					{
+						id: 'sec-comp-hero',
+						prefix: '【ヒーローカバー】',
+						title: 'ヒーローカバー',
+						desc: 'メインカバー写真、導入メッセージ'
+					},
+					{
+						id: 'sec-comp-about',
+						prefix: '【会社紹介】',
+						title: '会社紹介',
+						desc: '大見出し、サブリード、アトリエ写真、キャプション、本文'
+					},
+					{
+						id: 'sec-comp-highlights',
+						prefix: '【実績ハイライト】',
+						title: '実績ハイライト',
+						desc: '数値とラベル（最大3項目）'
+					},
+					{
+						id: 'sec-comp-profile',
+						prefix: '【基本データ】',
+						title: '会社基本データ',
+						desc: '設立年月、代表者、所在地住所、代表電話番号、事業内容'
+					},
+					{
+						id: 'sec-comp-awards',
+						prefix: '【受賞実績】',
+						title: '受賞実績',
+						desc: '賞名、受賞年バッジ、実績説明文'
+					},
+					{
+						id: 'sec-comp-gallery',
+						prefix: '【写真ギャラリー】',
+						title: '写真ギャラリー',
+						desc: 'ショールーム・施設写真（最大6枚）、タイトル、説明文'
+					},
+					{
+						id: 'sec-comp-content',
+						prefix: '【自由ブロック】',
+						title: '追加コンテンツ・詳細ブロック',
+						desc: 'Portable Text（文章、画像、表、CTAなど）'
+					}
+				];
+
+				const compOpenState = {
+					'sec-comp-basic': true,
+					'sec-comp-hero': false,
+					'sec-comp-about': false,
+					'sec-comp-highlights': false,
+					'sec-comp-awards': false,
+					'sec-comp-gallery': true,
+					'sec-comp-profile': false,
+					'sec-comp-content': true
+				};
+
+				function applyCompaniesSections() {
+					// 会社詳細編集画面以外ならアコーディオン要素を削除して何もしない
+					if (!window.location.pathname.includes('/content/companies/')) {
+						document.querySelectorAll('[data-comp-header]').forEach(el => el.remove());
+						const existingToolbar = document.getElementById('emdash-companies-toolbar');
+						if (existingToolbar) existingToolbar.remove();
+						return;
+					}
+
+					// 拠点用ツールバー・ヘッダー・セレクターが万一残っていたら確実に消去
+					document.querySelectorAll('[data-accordion-header]').forEach(el => el.remove());
+					const strayLocationToolbar = document.getElementById('emdash-accordion-toolbar');
+					if (strayLocationToolbar) strayLocationToolbar.remove();
+					const straySelector = document.getElementById('emdash-badges-selector-wrap');
+					if (straySelector) straySelector.remove();
+
+					// スタイルの注入
+					if (!document.getElementById('emdash-companies-styles')) {
+						const styleEl = document.createElement('style');
+						styleEl.id = 'emdash-companies-styles';
+						styleEl.textContent = `
+							[data-comp-header] {
+								margin-top: 24px;
+								margin-bottom: 12px;
+								padding: 12px 18px;
+								background: var(--color-kumo-elevated, #18181b);
+								border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+								border-radius: 8px;
+								cursor: pointer;
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								user-select: none;
+								transition: background 0.15s ease, border-color 0.15s ease;
+							}
+							[data-comp-header]:hover {
+								background: var(--color-kumo-tint, rgba(255,255,255,0.05));
+								border-color: var(--color-kumo-line-focus, rgba(255,255,255,0.25));
+							}
+							[data-comp-header][data-is-open="true"] {
+								border-bottom-left-radius: 0;
+								border-bottom-right-radius: 0;
+								margin-bottom: 0;
+								border-bottom: 1px dashed var(--color-kumo-line, rgba(255,255,255,0.1));
+							}
+							.emdash-comp-field-open {
+								padding-left: 16px !important;
+								padding-right: 16px !important;
+								border-left: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+								border-right: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+								background: var(--color-kumo-surface, #09090b);
+							}
+							.emdash-comp-field-last {
+								border-bottom: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1)) !important;
+								border-bottom-left-radius: 8px !important;
+								border-bottom-right-radius: 8px !important;
+								margin-bottom: 24px !important;
+								padding-bottom: 16px !important;
+							}
+						`;
+						document.head.appendChild(styleEl);
+					}
+
+					// ツールバーと各セクション要素のグループ化
+					const sectionElements = {};
+					COMPANIES_SECTION_CONFIG.forEach(sec => { sectionElements[sec.id] = []; });
+
+					const searchTargets = [
+						...Array.from(document.querySelectorAll('label')),
+						...Array.from(document.querySelectorAll('p, span, h3, h4'))
+					];
+
+					searchTargets.forEach(el => {
+						const text = el.textContent || '';
+						if (!text) return;
+						for (const sec of COMPANIES_SECTION_CONFIG) {
+							if (text.includes(sec.prefix)) {
+								let container = el.parentElement;
+								while (container && container.parentElement) {
+									if (container.parentElement.classList.contains('space-y-6') || container.parentElement.tagName === 'FIELDSET') {
+										break;
+									}
+									container = container.parentElement;
+								}
+								if (container && !sectionElements[sec.id].includes(container)) {
+									const alreadyAdded = Object.values(sectionElements).some(arr => arr.includes(container));
+									if (!alreadyAdded) {
+										sectionElements[sec.id].push(container);
+									}
+								}
+								break;
+							}
+						}
+					});
+
+					// 該当フィールドが1件もなければ終了
+					const totalFound = Object.values(sectionElements).reduce((acc, curr) => acc + curr.length, 0);
+					if (totalFound === 0) return;
+
+					// ツールバー（すべて開く / すべて閉じる）の挿入
+					const firstField = Object.values(sectionElements).find(arr => arr.length > 0)?.[0];
+					if (!firstField || !firstField.parentNode) return;
+
+					const parentContainer = firstField.parentNode;
+					let toolbar = document.getElementById('emdash-companies-toolbar');
+
+					// 旧絵文字付きツールバーがあれば再構築
+					if (toolbar && toolbar.innerHTML.includes('🏢')) {
+						toolbar.remove();
+						toolbar = null;
+					}
+
+					if (!toolbar || !document.body.contains(toolbar)) {
+						if (toolbar) toolbar.remove();
+						toolbar = document.createElement('div');
+						toolbar.id = 'emdash-companies-toolbar';
+						toolbar.style.cssText = `
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							margin-bottom: 16px;
+							padding: 10px 14px;
+							background: var(--color-kumo-elevated, #18181b);
+							border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+							border-radius: 8px;
+							flex-wrap: wrap;
+							gap: 8px;
+						`;
+
+						const infoText = document.createElement('span');
+						infoText.style.cssText = 'font-size: 13px; color: var(--text-color-kumo-subtle, #a1a1aa); font-weight: 500;';
+						infoText.innerHTML = '<span style="color: var(--text-color-kumo-default); font-weight: 700;">会社案内設定</span>';
+
+						const btnGroup = document.createElement('div');
+						btnGroup.style.cssText = 'display: flex; gap: 8px;';
+
+						const expandAllBtn = document.createElement('button');
+						expandAllBtn.type = 'button';
+						expandAllBtn.textContent = 'すべて開く';
+						expandAllBtn.style.cssText = `
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: var(--text-color-kumo-default);
+							background: var(--color-kumo-tint);
+							border: 1px solid var(--color-kumo-line);
+							border-radius: 4px;
+							cursor: pointer;
+						`;
+						expandAllBtn.onclick = (e) => {
+							e.preventDefault();
+							COMPANIES_SECTION_CONFIG.forEach(s => { compOpenState[s.id] = true; });
+							updateCompaniesVisibility(sectionElements);
+						};
+
+						const collapseAllBtn = document.createElement('button');
+						collapseAllBtn.type = 'button';
+						collapseAllBtn.textContent = 'すべて閉じる';
+						collapseAllBtn.style.cssText = `
+							padding: 5px 12px;
+							font-size: 12px;
+							font-weight: 600;
+							color: var(--text-color-kumo-subtle);
+							background: transparent;
+							border: 1px solid var(--color-kumo-line);
+							border-radius: 4px;
+							cursor: pointer;
+						`;
+						collapseAllBtn.onclick = (e) => {
+							e.preventDefault();
+							COMPANIES_SECTION_CONFIG.forEach(s => { compOpenState[s.id] = false; });
+							updateCompaniesVisibility(sectionElements);
+						};
+
+						btnGroup.appendChild(expandAllBtn);
+						btnGroup.appendChild(collapseAllBtn);
+						toolbar.appendChild(infoText);
+						toolbar.appendChild(btnGroup);
+
+						parentContainer.insertBefore(toolbar, firstField);
+					}
+
+					// 各セクションのヘッダーバーを生成
+					for (const sec of COMPANIES_SECTION_CONFIG) {
+						const fields = sectionElements[sec.id];
+						if (!fields || fields.length === 0) continue;
+
+						const firstFieldOfSec = fields[0];
+						let header = document.querySelector(`[data-comp-header="${sec.id}"]`);
+
+						if (!header) {
+							header = document.createElement('div');
+							header.setAttribute('data-comp-header', sec.id);
+
+							header.onclick = (e) => {
+								e.preventDefault();
+								compOpenState[sec.id] = !compOpenState[sec.id];
+								updateCompaniesVisibility(sectionElements);
+							};
+
+							const titleWrap = document.createElement('div');
+							titleWrap.style.cssText = 'display: flex; flex-direction: column; gap: 2px;';
+
+							const h3 = document.createElement('h3');
+							h3.className = 'comp-title-text';
+							h3.style.cssText = 'margin: 0; font-size: 14px; font-weight: 700; color: var(--text-color-kumo-default, #f4f4f5); display: flex; align-items: center; gap: 8px;';
+							h3.textContent = sec.title;
+
+							const desc = document.createElement('span');
+							desc.style.cssText = 'font-size: 11px; color: var(--text-color-kumo-subtle, #a1a1aa);';
+							desc.textContent = sec.desc;
+
+							titleWrap.appendChild(h3);
+							titleWrap.appendChild(desc);
+
+							const arrow = document.createElement('span');
+							arrow.className = 'comp-arrow';
+							arrow.style.cssText = 'font-size: 11px; font-weight: 600; color: var(--text-color-kumo-subtle, #a1a1aa);';
+
+							header.appendChild(titleWrap);
+							header.appendChild(arrow);
+
+							firstFieldOfSec.parentNode.insertBefore(header, firstFieldOfSec);
+						} else {
+							// 既存ヘッダーのタイトルと説明文を最新に更新
+							const h3 = header.querySelector('.comp-title-text');
+							if (h3 && h3.textContent !== sec.title) h3.textContent = sec.title;
+							const desc = header.querySelector('span:not(.comp-arrow)');
+							if (desc && desc.textContent !== sec.desc) desc.textContent = sec.desc;
+						}
+					}
+
+					updateCompaniesVisibility(sectionElements);
+				}
+
+				function updateCompaniesVisibility(sectionElements) {
+					COMPANIES_SECTION_CONFIG.forEach(sec => {
+						const header = document.querySelector(`[data-comp-header="${sec.id}"]`);
+						const fields = sectionElements ? (sectionElements[sec.id] || []) : [];
+						const isOpen = !!compOpenState[sec.id];
+
+						if (header) {
+							header.setAttribute('data-is-open', isOpen ? 'true' : 'false');
+							const arrow = header.querySelector('.comp-arrow');
+							if (arrow) {
+								arrow.textContent = isOpen ? '▲ 閉じる' : '▼ 開く';
+							}
+						}
+
+						fields.forEach((fieldEl, idx) => {
+							const targetDisplay = isOpen ? '' : 'none';
+							if (fieldEl.style.display !== targetDisplay) {
+								fieldEl.style.display = targetDisplay;
+							}
+							if (isOpen) {
+								fieldEl.classList.add('emdash-comp-field-open');
+								if (idx === fields.length - 1) {
+									fieldEl.classList.add('emdash-comp-field-last');
+								} else {
+									fieldEl.classList.remove('emdash-comp-field-last');
+								}
+							} else {
+								fieldEl.classList.remove('emdash-comp-field-open');
+								fieldEl.classList.remove('emdash-comp-field-last');
 							}
 						});
 					});
@@ -1830,6 +2528,8 @@
 				setInterval(() => {
 					try { if (checkLocalAutoLogin()) return; } catch(e){}
 					try { applyAccordion(); } catch(e){}
+					try { applyHomepageSections(); } catch(e){}
+					try { applyCompaniesSections(); } catch(e){}
 					try { applyCampaignBrandFilterTabs(); } catch(e){}
 					try { applyMagazineFilterTabs(); } catch(e){}
 					try { enhancePluginBlockModal(); } catch(e){}
@@ -1838,6 +2538,8 @@
 				window.addEventListener('popstate', () => {
 					setTimeout(() => {
 						try { applyAccordion(); } catch(e){}
+						try { applyHomepageSections(); } catch(e){}
+						try { applyCompaniesSections(); } catch(e){}
 						try { applyCampaignBrandFilterTabs(); } catch(e){}
 						try { applyMagazineFilterTabs(); } catch(e){}
 					}, 100);

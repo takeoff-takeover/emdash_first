@@ -5,6 +5,9 @@ import { getEmDashCollection } from "emdash";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import { getSiteUrl } from "../../utils/siteUrl";
+
+const siteUrl = getSiteUrl(Astro.site);
 
 let posts: any[] = [];
 let cacheHint: any = null;
@@ -54,13 +57,11 @@ if (!posts || posts.length === 0) {
 
 if (Astro.cache?.enabled && cacheHint) Astro.cache.set(cacheHint);
 
-// カテゴリー自動判定
+// カテゴリー自動判定（重要なお知らせ / 営業日案内 / お知らせ の3構成）
 function getCategory(slugStr: string, titleStr: string): string {
 	const combined = `${slugStr} ${titleStr}`.toLowerCase();
-	if (/休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "休業案内";
-	if (/定休日|営業時間|営業日/.test(combined)) return "営業案内";
 	if (/重要|注意|法改正|閉鎖|停止/.test(combined)) return "重要なお知らせ";
-	if (/協定|加入|リリース|寄贈|csr|esg|パートナー/.test(combined)) return "プレスリリース";
+	if (/定休日|営業時間|営業日|休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "営業日案内";
 	return "お知らせ";
 }
 
@@ -72,7 +73,7 @@ function formatNoticeDate(raw: any, fallbackStr: string = "2026.10.20"): string 
 }
 
 const pageTitle = "お知らせ | INFORMATION - ニコル・グループ公式";
-const pageDescription = "ニコル・グループからの最新のお知らせ、営業日のご案内、各種告知、プレスリリースを掲載しています。";
+const pageDescription = "ニコル・グループからの最新のお知らせ、営業日・休業日のご案内、各種告知を掲載しています。";
 
 const jsonLd = [
 	{
@@ -83,13 +84,13 @@ const jsonLd = [
 				"@type": "ListItem",
 				"position": 1,
 				"name": "HOME",
-				"item": "https://my-emdash-site.kaz130.workers.dev/"
+				"item": `${siteUrl}/`
 			},
 			{
 				"@type": "ListItem",
 				"position": 2,
 				"name": "お知らせ",
-				"item": "https://my-emdash-site.kaz130.workers.dev/news"
+				"item": `${siteUrl}/news`
 			}
 		]
 	},
@@ -98,7 +99,7 @@ const jsonLd = [
 		"@type": "CollectionPage",
 		"name": pageTitle,
 		"description": pageDescription,
-		"url": "https://my-emdash-site.kaz130.workers.dev/news"
+		"url": `${siteUrl}/news`
 	}
 ];
 ---
@@ -159,10 +160,8 @@ const jsonLd = [
 				<div class="news-filter-box" id="category-filters">
 					<button type="button" class="news-filter-btn is-active" data-cat="all">すべて</button>
 					<button type="button" class="news-filter-btn" data-cat="重要なお知らせ">重要なお知らせ</button>
-					<button type="button" class="news-filter-btn" data-cat="営業案内">営業案内</button>
-					<button type="button" class="news-filter-btn" data-cat="休業案内">休業案内</button>
-					<button type="button" class="news-filter-btn" data-cat="プレスリリース">プレスリリース</button>
-					<button type="button" class="news-filter-btn" data-cat="お知らせ">その他のお知らせ</button>
+					<button type="button" class="news-filter-btn" data-cat="営業日案内">営業日案内</button>
+					<button type="button" class="news-filter-btn" data-cat="お知らせ">お知らせ</button>
 				</div>
 			</div>
 		</section>

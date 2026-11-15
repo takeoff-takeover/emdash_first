@@ -205,7 +205,14 @@ const cmsArticles = allCmsEntries.map((p: any) => {
 	const assignedBrands = (brandTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
 
 	let b = "ALL";
-	if (assignedBrands.length > 0) {
+	if (
+		assignedBrands.includes("ALL BRANDS") || 
+		assignedBrands.length >= 3 ||
+		t.includes("下取り") || t.includes("買取") || s.includes("resale") || s.includes("trade-in") ||
+		s.includes("all-brands") || t.includes("全ブランド")
+	) {
+		b = "ALL BRANDS";
+	} else if (assignedBrands.length > 0) {
 		b = assignedBrands.join(" / ");
 	} else if (t.includes("mini") || s.includes("mini")) b = "MINI";
 	else if (t.includes("bmw") || s.includes("bmw") || t.includes("7シリーズ") || t.includes("3シリーズ")) b = "BMW";
@@ -272,7 +279,7 @@ const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.
 // 初期表示時のアーカイブ収録記事数（最新3記事を除いた件数）
 const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).length;
 
-const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA"];
+const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA", "ALL BRANDS"];
 const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
 const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	? [...allArticles].sort((a, b) => b.publishedAt - a.publishedAt || a.id.localeCompare(b.id))
@@ -666,7 +673,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		let visibleCount = INITIAL_COUNT;
 		const archiveParams = new URLSearchParams(window.location.search);
 		const requestedBrand = archiveParams.get('brand');
-		const allowedBrands = ['BMW', 'MINI', 'Ferrari', 'Rolls-Royce', 'ALPINA'];
+		const allowedBrands = ['BMW', 'MINI', 'Ferrari', 'Rolls-Royce', 'ALPINA', 'ALL BRANDS'];
 		let currentBrand = allowedBrands.includes(requestedBrand || '') ? requestedBrand : 'ALL';
 		let showLatestArchive = archiveParams.get('view') === 'latest';
 		let currentTopic = 'ALL';

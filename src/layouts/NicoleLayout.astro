@@ -21,15 +21,18 @@ const {
 	jsonLd
 } = Astro.props;
 
+import { getSiteUrl } from "../utils/siteUrl";
+
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
 
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : (import.meta.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev").replace(/\/$/, "");
+const siteUrl = getSiteUrl(Astro.site);
 const canonicalUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
 const ogImageUrl = image 
 	? (image.startsWith("http") ? image : `${siteUrl}${image.startsWith("/") ? "" : "/"}${image}`)
-	: `${siteUrl}/uploads/2026/01/Nicole_Group_LOGO_neg.svg`;
+	: `${siteUrl}/images/og-default.png`;
 
-const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true";
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === "true" || 
+	(typeof process !== "undefined" && process.env.PUBLIC_ALLOW_INDEXING === "true");
 
 const organizationSchema = {
 	"@context": "https://schema.org",
@@ -76,6 +79,13 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- FOUC / 白背景チラつき防止（インライン最優先即時適用） -->
+	<style>
+		html, body, #page, .site, #content, .site-content, .ast-container, #primary, .content-area {
+			background-color: #000000 !important;
+			color: #ffffff;
+		}
+	</style>
 	{allowIndexing ? (
 		<meta name="robots" content="index, follow" />
 	) : (
@@ -104,10 +114,10 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<link rel="icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
 	<link rel="apple-touch-icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
 
-	<!-- Google Fonts -->
+	<!-- Web Fonts (Optimized for Core Web Vitals) -->
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,600,700,800,900|Roboto+Slab:100,200,300,400,500,600,700,800,900&display=swap" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
 
 	<!-- WordPress & Astra & Elementor Core Styles (Self-hosted) -->
 	<link rel="stylesheet" href="/wp-content/themes/astra/assets/css/minified/main.min.css?ver=4.14.1" />
@@ -135,6 +145,11 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<link rel="stylesheet" href="/css/nicole-core.css" />
 
 	<style is:global>
+		/* 0. 下地白背景の完全隠蔽＆ダークラグジュアリー基調の固定 */
+		html, body, #page, .site, #content, .site-content, .ast-container, #primary, .content-area, .nicole-editorial-main {
+			background-color: #000000 !important;
+		}
+
 		/* 1. スマホ表示時の横スクロールおよび強制拡大の完全防止 */
 		html, body {
 			overflow-x: clip !important;
@@ -187,8 +202,9 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 		<link rel="preload" as="image" href={ogImageUrl} />
 	)}
 
-	<!-- Core scripts in head (Self-hosted, deferred for non-blocking rendering) -->
-	<script is:inline defer src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
+	<!-- AI検索 / LLM Knowledge Discovery (AIO / GEO 最適化) -->
+	<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Knowledge Base" />
+
 	{!isHome && (
 		<script is:inline defer src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
 	)}
@@ -200,7 +216,7 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<slot name="head" />
 </head>
 
-<body class={`home wp-singular page-template-default page page-id-2030 wp-custom-logo wp-embed-responsive wp-theme-astra eio-default nicole-brand nicole-brand-nicole nicole-brand-slug-nicole ast-desktop ast-page-builder-template ast-no-sidebar astra-4.14.1 group-blog ast-single-post ast-inherit-site-logo-transparent ast-hfb-header ast-full-width-primary-header ast-normal-title-enabled elementor-default elementor-kit-8 elementor-page elementor-page-2030 astra-addon-4.13.11 ${isMagazine ? 'is-magazine-page' : ''}`}>
+<body class={`nicole-brand ast-desktop elementor-default elementor-kit-8 ${isHome ? 'home page' : 'page'} ${isMagazine ? 'is-magazine-page' : ''}`}>
 	<div class="hfeed site" id="page">
 		<NicoleHeader />
 		{isMagazine && <NicoleConnectSubnav currentSlug={currentSlug} />}

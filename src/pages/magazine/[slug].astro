@@ -11,6 +11,9 @@ import { isNoticeArticle, isESGArticle } from "../../lib/magazinePolicy";
 import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import "../../styles/prose.css";
 import "../../styles/magazine-sidebar-tokens.css";
+import { getSiteUrl } from "../../utils/siteUrl";
+
+const siteUrl = getSiteUrl(Astro.site);
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -1148,7 +1151,7 @@ const editUrl = postDbId
 	? `/_emdash/admin/content/${contentCollection}/${postDbId}`
 	: `/_emdash/admin/content/${contentCollection}`;
 
-const pageUrl = `https://my-emdash-site.kaz130.workers.dev/magazine/${slug}`;
+const pageUrl = `${siteUrl}/magazine/${slug}`;
 const articleJsonLd: any = [
 	{
 		"@context": "https://schema.org",
@@ -1159,20 +1162,20 @@ const articleJsonLd: any = [
 		},
 		"headline": post.data.title,
 		"description": post.data.excerpt || "世界最高峰のモビリティと美学を編むNicole Connect公式記事。",
-		"image": heroImageUrl ? [heroImageUrl.startsWith("http") ? heroImageUrl : `https://my-emdash-site.kaz130.workers.dev${heroImageUrl}`] : [],
+		"image": heroImageUrl ? [heroImageUrl.startsWith("http") ? heroImageUrl : `${siteUrl}${heroImageUrl.startsWith("/") ? "" : "/"}${heroImageUrl}`] : [],
 		"datePublished": (post.data as any).publishedAt || (post.data as any).published_at || new Date().toISOString(),
 		"dateModified": (post.data as any).updatedAt || (post.data as any).updated_at || (post.data as any).publishedAt || new Date().toISOString(),
 		"author": {
 			"@type": "Organization",
 			"name": "ニコル・グループ (Nicole Group)",
-			"url": "https://my-emdash-site.kaz130.workers.dev"
+			"url": siteUrl
 		},
 		"publisher": {
 			"@type": "Organization",
 			"name": "ニコル・グループ",
 			"logo": {
 				"@type": "ImageObject",
-				"url": "https://my-emdash-site.kaz130.workers.dev/uploads/2026/01/NICOLE_N_LOGO_neg.svg"
+				"url": `${siteUrl}/uploads/2026/01/NICOLE_N_LOGO_neg.svg`
 			}
 		}
 	}
@@ -1263,7 +1266,7 @@ if (Array.isArray(post.data?.content)) {
 				<div class="article-meta-row">
 					<span class="meta-brand-pill">
 						<span class="brand-dot"></span>
-						{articleBrands.join(" / ") || "ALL BRANDS"}
+						{articleBrands.includes("ALL BRANDS") || articleBrands.length >= 3 ? "ALL BRANDS" : (articleBrands.join(" / ") || "ALL BRANDS")}
 					</span>
 					<span class="meta-category-pill">
 						{articleCategories.join(" / ") || "PEOPLE & CAR LIFE"}
@@ -1355,7 +1358,7 @@ if (Array.isArray(post.data?.content)) {
 					<div class="share-buttons">
 						{/* 1. X (Twitter) */}
 						<a 
-							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`${siteUrl}/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
 							class="share-btn-round share-btn-x"
@@ -1367,7 +1370,7 @@ if (Array.isArray(post.data?.content)) {
 
 						{/* 2. Threads */}
 						<a 
-							href={`https://www.threads.net/intent/post?text=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`https://www.threads.net/intent/post?text=${encodeURIComponent(`${post.data.title} ${siteUrl}/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
 							class="share-btn-round share-btn-threads"
@@ -1379,7 +1382,7 @@ if (Array.isArray(post.data?.content)) {
 
 						{/* 3. Facebook */}
 						<a 
-							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${siteUrl}/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
 							class="share-btn-round share-btn-facebook"
@@ -1391,7 +1394,7 @@ if (Array.isArray(post.data?.content)) {
 
 						{/* 4. LINE */}
 						<a 
-							href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`${siteUrl}/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
 							class="share-btn-round share-btn-line"
@@ -1403,7 +1406,7 @@ if (Array.isArray(post.data?.content)) {
 
 						{/* 5. WhatsApp */}
 						<a 
-							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${post.data.title} ${siteUrl}/magazine/${slug}/`)}`}
 							target="_blank"
 							rel="noopener"
 							class="share-btn-round share-btn-whatsapp"
@@ -1415,7 +1418,7 @@ if (Array.isArray(post.data?.content)) {
 
 						{/* 6. SMS (メッセージ) */}
 						<a 
-							href={`sms:?&body=${encodeURIComponent(`${post.data.title} https://my-emdash-site.kaz130.workers.dev/magazine/${slug}/`)}`}
+							href={`sms:?&body=${encodeURIComponent(`${post.data.title} ${siteUrl}/magazine/${slug}/`)}`}
 							class="share-btn-round share-btn-sms"
 							aria-label="SMS・メッセージで送る"
 							data-tooltip="SMS"

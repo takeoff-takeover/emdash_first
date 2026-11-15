@@ -5,37 +5,38 @@
 const brands = [
 	{ 
 		name: "ALPINA", 
+		period: "［1965-2025］",
 		corp: "Nicole Automobiles", 
 		logo: "/brands/alpina.png", 
-		url: "/corporate/nicole-automobiles",
+		url: "https://nicole-automobiles.com/",
 		desc: "名門BMWアルピナの日本総輸入元として培った半世紀の情熱と哲学"
 	},
 	{ 
 		name: "BMW", 
 		corp: "Nicole Cars", 
 		logo: "/brands/bmw.svg", 
-		url: "/bmw",
+		url: "https://nicole.bmw.jp/",
 		desc: "駆けぬける歓びの真価を東京・神奈川からお届けする正規ディーラー"
 	},
 	{ 
 		name: "MINI", 
 		corp: "Nicole Cars", 
 		logo: "/brands/mini.svg", 
-		url: "/mini",
+		url: "https://www.mini-yokohama.com/",
 		desc: "時代を切り拓くアイコニックデザインとゴーカート・フィーリング"
 	},
 	{ 
 		name: "Rolls-Royce", 
 		corp: "Nicole MotorCars", 
 		logo: "/brands/rolls-royce.svg", 
-		url: "/corporate/nicole-motorcars",
+		url: "https://www.rolls-roycemotorcars.com/yokohama/",
 		desc: "静寂と至高の美。ビスポークが紡ぎ出す世界唯一のラグジュアリー"
 	},
 	{ 
 		name: "Ferrari", 
 		corp: "Nicole Competizione", 
 		logo: "/brands/ferrari.svg", 
-		url: "/corporate/nicole-competizione",
+		url: "https://yokohama.ferraridealers.com/",
 		desc: "跳ね馬の情熱とレーシングスピリットを横浜から体現"
 	}
 ];
@@ -78,23 +79,29 @@ const corporateLinks = [
 					<!-- メガメニュー・ドロップダウン -->
 					<div class="dropdown-menu dropdown-menu--brands" id="dropdown-brands">
 						<div class="dropdown-inner">
-							<div class="dropdown-header">
-								<h3 class="dropdown-title">取り扱いブランド</h3>
+							<div class="dropdown-header dropdown-header--brands">
+								<div class="dropdown-header__title-group">
+									<span class="dropdown-title">取り扱いブランド</span>
+								</div>
+								<span class="dropdown-note">※各ブランドの公式サイトへ移動します</span>
 							</div>
 							<div class="brands-dropdown-grid">
 								{brands.map((b) => (
 									<a href={b.url} class="brand-dropdown-card" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
 										<div class="brand-dropdown-card__top">
-											<div class="brand-dropdown-card__head">
-												<img src={b.logo} alt="" class="brand-dropdown-card__logo" loading="lazy" />
-												<span class="brand-dropdown-card__name">{b.name}</span>
-											</div>
+											<img src={b.logo} alt="" class="brand-dropdown-card__logo" loading="lazy" />
 										</div>
-										<p class="brand-dropdown-card__corp">{b.corp}</p>
+										<div class="brand-dropdown-card__main">
+											<div class="brand-dropdown-card__name-row">
+												<span class="brand-dropdown-card__name">{b.name}</span>
+												{b.period && <span class="brand-dropdown-card__period">{b.period}</span>}
+											</div>
+											<span class="brand-dropdown-card__corp">{b.corp}</span>
+										</div>
 										<p class="brand-dropdown-card__desc">{b.desc}</p>
-										<span class="brand-dropdown-card__arrow">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-										</span>
+										<div class="brand-dropdown-card__action">
+											ブランドサイトへ
+										</div>
 									</a>
 								))}
 							</div>
@@ -112,7 +119,7 @@ const corporateLinks = [
 					<div class="dropdown-menu dropdown-menu--corporate" id="dropdown-corporate">
 						<div class="dropdown-inner">
 							<div class="dropdown-header">
-								<h3 class="dropdown-title">企業情報</h3>
+								<div class="dropdown-title">企業情報</div>
 							</div>
 							<div class="corporate-dropdown-list">
 								{corporateLinks.map((item) => (
@@ -182,14 +189,27 @@ const corporateLinks = [
 					<!-- Brands アコーディオン -->
 					<li class="mobile-nav-item">
 						<button type="button" class="mobile-accordion-toggle" aria-expanded="false">
-							<span>BRANDS</span>
+							<div class="mobile-accordion-toggle__text">
+								<span class="mobile-accordion-title">BRANDS</span>
+								<span class="mobile-link-sub">取り扱いブランド</span>
+							</div>
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="accordion-arrow"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="mobile-accordion-content">
+							<p class="mobile-menu-note">※各ブランドの公式サイトへ移動します</p>
 							{brands.map((b) => (
-								<a href={b.url} class="mobile-sub-link" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
-									<span class="brand-sub-name">{b.name}</span>
-									<span class="brand-sub-corp">{b.corp}</span>
+								<a href={b.url} class="mobile-sub-link mobile-sub-link--brand" target={b.url.startsWith('http') ? "_blank" : "_self"} rel="noopener noreferrer">
+									<div class="mobile-sub-link__brand-left">
+										<img src={b.logo} alt="" class="mobile-brand-logo" loading="lazy" />
+										<div class="mobile-sub-link__text">
+											<span class="brand-sub-name">
+												{b.name}
+												{b.period && <span class="brand-sub-period">{b.period}</span>}
+											</span>
+											<span class="brand-sub-corp">{b.corp}</span>
+										</div>
+									</div>
+									<span class="mobile-sub-link__tag">ブランドサイトへ</span>
 								</a>
 							))}
 						</div>
@@ -198,7 +218,10 @@ const corporateLinks = [
 					<!-- Corporate アコーディオン -->
 					<li class="mobile-nav-item">
 						<button type="button" class="mobile-accordion-toggle" aria-expanded="false">
-							<span>CORPORATE</span>
+							<div class="mobile-accordion-toggle__text">
+								<span class="mobile-accordion-title">CORPORATE</span>
+								<span class="mobile-link-sub">企業情報・会社概要</span>
+							</div>
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="accordion-arrow"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="mobile-accordion-content">
@@ -365,17 +388,13 @@ const corporateLinks = [
 				}
 			});
 
-			// クリック/タップ（タッチ端末対応）
+			// クリック/タップ（タッチ端末対応・「押しても消えない」安定制御）
 			if (btn) {
 				btn.addEventListener('click', (e) => {
 					e.preventDefault();
-					const isCurrentlyActive = item.classList.contains('is-active');
-					if (isCurrentlyActive) {
-						item.classList.remove('is-active');
-						btn.setAttribute('aria-expanded', 'false');
-					} else {
-						openDropdown();
-					}
+					e.stopPropagation();
+					// クリックされたら確実にメニューを開く（開いた状態でクリックしても誤って閉じない）
+					openDropdown();
 				});
 			}
 		});
@@ -612,6 +631,7 @@ const corporateLinks = [
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
+		z-index: 10002;
 		transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
 	}
 
@@ -636,7 +656,9 @@ const corporateLinks = [
 	}
 
 	.dropdown-menu--brands {
-		width: 820px;
+		width: 960px;
+		max-width: calc(100vw - 32px);
+		padding: 20px 22px;
 	}
 
 	.dropdown-menu--corporate {
@@ -647,6 +669,28 @@ const corporateLinks = [
 		margin-bottom: 20px;
 		padding-bottom: 12px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.dropdown-header--brands {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 14px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.dropdown-header__title-group {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.dropdown-note {
+		font-size: 11.5px;
+		color: rgba(255, 255, 255, 0.75);
+		letter-spacing: 0.02em;
 	}
 
 	.dropdown-eyebrow {
@@ -665,92 +709,118 @@ const corporateLinks = [
 		margin: 0;
 	}
 
-	/* ブランドカードグリッド（ドロップダウン内） */
+	/* ブランドカードグリッド（ドロップダウン内：横5列） */
 	.brands-dropdown-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 14px;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 10px;
 	}
 
 	.brand-dropdown-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
-		padding: 16px;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		padding: 14px 12px 12px;
 		text-decoration: none;
 		display: flex;
 		flex-direction: column;
+		justify-content: space-between;
 		position: relative;
-		transition: all 0.3s ease;
+		transition: all 0.25s ease;
+		min-height: 170px;
 	}
 
 	.brand-dropdown-card:hover {
-		background: rgba(255, 255, 255, 0.07);
-		border-color: rgba(255, 255, 255, 0.35);
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.45);
 		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 	}
 
 	.brand-dropdown-card__top {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 6px;
-	}
-
-	.brand-dropdown-card__head {
-		display: flex;
-		align-items: center;
-		gap: 10px;
+		margin-bottom: 10px;
 	}
 
 	.brand-dropdown-card__logo {
-		width: 22px;
-		height: 22px;
+		width: 26px;
+		height: 26px;
 		object-fit: contain;
 		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-		transition: transform 0.3s ease;
+		transition: transform 0.25s ease;
 	}
 
 	.brand-dropdown-card:hover .brand-dropdown-card__logo {
-		transform: scale(1.15);
+		transform: scale(1.1);
+	}
+
+	.brand-dropdown-card__main {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.brand-dropdown-card__name-row {
+		display: flex;
+		align-items: baseline;
+		gap: 4px;
+		flex-wrap: wrap;
 	}
 
 	.brand-dropdown-card__name {
 		font-family: 'Inter', sans-serif;
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 700;
 		color: #ffffff;
+		letter-spacing: 0.02em;
+		line-height: 1.2;
+	}
+
+	.brand-dropdown-card__period {
+		font-size: 10px;
+		color: rgba(255, 255, 255, 0.45);
+		font-weight: 500;
+		font-family: 'Inter', sans-serif;
+		letter-spacing: 0;
 	}
 
 	.brand-dropdown-card__corp {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.6);
-		margin: 0 0 8px 0;
+		font-size: 10px;
+		color: rgba(255, 255, 255, 0.65);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.brand-dropdown-card__desc {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.4);
+		color: rgba(255, 255, 255, 0.45);
 		line-height: 1.5;
-		margin: 0 0 8px 0;
+		margin: 8px 0 12px;
 		flex-grow: 1;
 	}
 
-	.brand-dropdown-card__arrow {
-		align-self: flex-end;
-		opacity: 0.4;
-		transition: opacity 0.3s ease, transform 0.3s ease;
+	.brand-dropdown-card__action {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		font-size: 10.5px;
+		font-weight: 600;
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 4px;
+		padding: 5px 8px;
+		letter-spacing: 0.04em;
+		transition: all 0.2s ease;
 	}
 
-	.brand-dropdown-card__arrow svg {
-		width: 14px;
-		height: 14px;
-		stroke: #ffffff;
-	}
-
-	.brand-dropdown-card:hover .brand-dropdown-card__arrow {
-		opacity: 1;
-		transform: translateX(3px);
+	.brand-dropdown-card:hover .brand-dropdown-card__action {
+		background: #ffffff;
+		border-color: #ffffff;
+		color: #000000;
 	}
 
 	/* コーポレートリスト（ドロップダウン内） */
@@ -902,13 +972,25 @@ const corporateLinks = [
 		background: none;
 		border: none;
 		padding: 14px 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.mobile-accordion-toggle__text {
+		display: flex;
+		flex-direction: column;
+		text-align: left;
+	}
+
+	.mobile-accordion-title {
 		font-family: 'Inter', sans-serif;
 		font-size: 18px;
 		font-weight: 600;
 		letter-spacing: 0.12em;
 		color: #ffffff;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		cursor: pointer;
+		margin-bottom: 4px;
+		line-height: 1.2;
 	}
 
 	.accordion-arrow {
@@ -931,8 +1013,16 @@ const corporateLinks = [
 	}
 
 	.mobile-accordion-content.is-open {
-		max-height: 480px;
+		max-height: 520px;
 		padding-top: 10px;
+	}
+
+	.mobile-menu-note {
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		margin: 2px 0 10px;
+		padding-left: 10px;
+		letter-spacing: 0.02em;
 	}
 
 	.mobile-sub-link {
@@ -947,6 +1037,54 @@ const corporateLinks = [
 		transition: background 0.2s ease, color 0.2s ease;
 	}
 
+	.mobile-sub-link--brand {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.mobile-sub-link__brand-left {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+	}
+
+	.mobile-brand-logo {
+		width: 24px;
+		height: 24px;
+		object-fit: contain;
+		flex-shrink: 0;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+	}
+
+	.mobile-sub-link--ext {
+		gap: 12px;
+	}
+
+	.mobile-sub-link__text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.mobile-sub-link__tag {
+		font-size: 11px;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.7);
+		background: rgba(255, 255, 255, 0.08);
+		border-radius: 4px;
+		padding: 3px 7px;
+		letter-spacing: 0.04em;
+		white-space: nowrap;
+	}
+
+	.mobile-sub-link:hover .mobile-sub-link__tag {
+		background: #ffffff;
+		color: #000000;
+	}
+
 	.mobile-sub-link:hover {
 		background: rgba(255, 255, 255, 0.05);
 		color: #ffffff;
@@ -954,6 +1092,13 @@ const corporateLinks = [
 
 	.brand-sub-name {
 		font-weight: 600;
+	}
+
+	.brand-sub-period {
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.45);
+		font-weight: 400;
+		margin-left: 4px;
 	}
 
 	.brand-sub-corp {
@@ -967,6 +1112,10 @@ const corporateLinks = [
 		padding: 14px 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		text-decoration: none;
+	}
+
+	.mobile-nav-item:last-child .mobile-main-link {
+		border-bottom: none;
 	}
 
 	.mobile-main-link span:first-child {

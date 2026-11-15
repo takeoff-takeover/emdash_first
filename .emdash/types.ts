@@ -3,6 +3,50 @@
 
 import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
 
+export interface Homepage {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  hero_video_enabled?: boolean;
+  hero_video_mp4?: string;
+  hero_video_url?: string;
+  hero_video_start?: number;
+  hero_video_end?: number;
+  hero_video_brightness?: string;
+  hero_poster_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  banner_recruit_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  banner_recruit_title?: string;
+  banner_recruit_desc?: string;
+  banner_recruit_btn_label?: string;
+  banner_recruit_btn_style?: string;
+  banner_recruit_url?: string;
+  banner_philosophy_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  banner_philosophy_title?: string;
+  banner_philosophy_desc?: string;
+  banner_philosophy_btn_label?: string;
+  banner_philosophy_btn_style?: string;
+  banner_philosophy_url?: string;
+  banner_esg_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  banner_esg_title?: string;
+  banner_esg_desc?: string;
+  banner_esg_btn_label?: string;
+  banner_esg_btn_style?: string;
+  banner_esg_url?: string;
+  banner_store_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  banner_store_title?: string;
+  banner_store_desc?: string;
+  banner_store_btn_label?: string;
+  banner_store_btn_style?: string;
+  banner_store_url?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface Magazine {
   id: string;
   slug: string | null;
@@ -46,7 +90,6 @@ export interface Location {
   gallery_caption_5?: string;
   gallery_image_6?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   gallery_caption_6?: string;
-  sales_title?: string;
   sales_subtitle?: string;
   sales_tel?: string;
   sales_fax?: string;
@@ -55,7 +98,6 @@ export interface Location {
   sales_desc?: string;
   sales_cta_label?: string;
   sales_cta_url?: string;
-  used_title?: string;
   used_subtitle?: string;
   used_tel?: string;
   used_fax?: string;
@@ -64,7 +106,6 @@ export interface Location {
   used_desc?: string;
   used_cta_label?: string;
   used_cta_url?: string;
-  service_title?: string;
   service_subtitle?: string;
   service_tel?: string;
   service_fax?: string;
@@ -88,8 +129,6 @@ export interface Location {
   access_train?: string;
   google_maps_url?: string;
   google_place_id?: string;
-  google_rating_override?: string;
-  google_reviews_count_override?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -112,6 +151,44 @@ export interface Campaign {
   category: string;
   cta_label?: string;
   cta_url?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Company {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  name_en?: string;
+  role_badge?: string;
+  hero_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  hero_phrase?: string;
+  about_title?: string;
+  about_lead?: string;
+  about_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  about_image_caption?: string;
+  about_text?: string;
+  highlight_1_num?: string;
+  highlight_1_label?: string;
+  highlight_2_num?: string;
+  highlight_2_label?: string;
+  highlight_3_num?: string;
+  highlight_3_label?: string;
+  award_title?: string;
+  award_badge?: string;
+  award_desc?: string;
+  established?: string;
+  representative?: string;
+  postal?: string;
+  address?: string;
+  tel?: string;
+  business_desc?: string;
+  content?: PortableTextBlock[];
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

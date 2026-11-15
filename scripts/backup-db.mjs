@@ -8,7 +8,13 @@ if (!fs.existsSync(d1Dir)) {
 }
 
 const files = fs.readdirSync(d1Dir);
-const dbFile = files.find(f => f.endsWith('.sqlite') && !f.includes('metadata') && !f.includes('bak'));
+// Get all candidate sqlite files sorted by mtime descending (most recently modified first)
+const candidates = files
+  .filter(f => f.endsWith('.sqlite') && !f.includes('metadata') && !f.includes('bak'))
+  .map(f => ({ name: f, mtime: fs.statSync(path.join(d1Dir, f)).mtimeMs }))
+  .sort((a, b) => b.mtime - a.mtime);
+
+const dbFile = candidates[0]?.name;
 
 if (!dbFile) {
   console.error('No D1 SQLite database file found in', d1Dir);

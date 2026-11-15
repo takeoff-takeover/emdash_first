@@ -1,6 +1,326 @@
 {
   "collections": [
     {
+      "slug": "homepage",
+      "label": "トップページ設定",
+      "labelSingular": "トップページ設定",
+      "description": "トップページのヒーロー動画や主要設定を管理します",
+      "icon": "house",
+      "supports": [
+        "revisions"
+      ],
+      "hidden": false,
+      "sortOrder": 0,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "設定名称",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_enabled",
+          "label": "【ヒーロー動画】動画の有効化（OFF時はカバー写真を表示）",
+          "type": "boolean",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_mp4",
+          "label": "【ヒーロー動画】MP4動画ファイルURL/パス（設定時はYouTubeより優先しアイコンゼロで即時再生）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_url",
+          "label": "【ヒーロー動画】YouTube動画URL / 動画ID",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_start",
+          "label": "【ヒーロー動画】再生開始位置（秒）",
+          "type": "integer",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_end",
+          "label": "【ヒーロー動画】ループ終了位置（秒）",
+          "type": "integer",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_video_brightness",
+          "label": "【ヒーロー動画】動画の明るさ調整",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "標準（85%・シネマ風）",
+              "value": "0.85"
+            },
+            {
+              "label": "暗め（70%・重厚感重視）",
+              "value": "0.70"
+            },
+            {
+              "label": "通常（100%・そのまま）",
+              "value": "1.00"
+            }
+          ]
+        },
+        {
+          "slug": "hero_poster_image",
+          "label": "【ヒーロー動画】フォールバック画像 / 読込中カバー写真",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "banner_recruit_image",
+          "label": "【採用情報バナー】写真",
+          "type": "image",
+          "required": false,
+          "unique": false,
+          "widget": "media"
+        },
+        {
+          "slug": "banner_recruit_title",
+          "label": "【採用情報バナー】見出し",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_recruit_desc",
+          "label": "【採用情報バナー】説明文",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "textarea"
+        },
+        {
+          "slug": "banner_recruit_btn_label",
+          "label": "【採用情報バナー】ボタン文言",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_recruit_btn_style",
+          "label": "【採用情報バナー】ボタンスタイル",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_recruit_url",
+          "label": "【採用情報バナー】リンク先URL",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_philosophy_image",
+          "label": "【私たちの志バナー】写真",
+          "type": "image",
+          "required": false,
+          "unique": false,
+          "widget": "media"
+        },
+        {
+          "slug": "banner_philosophy_title",
+          "label": "【私たちの志バナー】見出し",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_philosophy_desc",
+          "label": "【私たちの志バナー】説明文",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "textarea"
+        },
+        {
+          "slug": "banner_philosophy_btn_label",
+          "label": "【私たちの志バナー】ボタン文言",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_philosophy_btn_style",
+          "label": "【私たちの志バナー】ボタンスタイル",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_philosophy_url",
+          "label": "【私たちの志バナー】リンク先URL",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_esg_image",
+          "label": "【ESG / SDGsバナー】背景写真",
+          "type": "image",
+          "required": false,
+          "unique": false,
+          "widget": "media"
+        },
+        {
+          "slug": "banner_esg_title",
+          "label": "【ESG / SDGsバナー】見出し",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_esg_desc",
+          "label": "【ESG / SDGsバナー】説明文",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "textarea"
+        },
+        {
+          "slug": "banner_esg_btn_label",
+          "label": "【ESG / SDGsバナー】ボタン文言",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_esg_btn_style",
+          "label": "【ESG / SDGsバナー】ボタンスタイル",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・Nicole Red・高視認性）",
+              "value": "red"
+            },
+            {
+              "label": "白枠アウトラインボタン（上品な白枠・半透明背景）",
+              "value": "white_outline"
+            },
+            {
+              "label": "白ソリッドボタン（白背景・黒文字）",
+              "value": "white_solid"
+            },
+            {
+              "label": "黒枠アウトラインボタン",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_esg_url",
+          "label": "【ESG / SDGsバナー】リンク先URL",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_store_image",
+          "label": "【オンラインストアバナー】写真",
+          "type": "image",
+          "required": false,
+          "unique": false,
+          "widget": "media"
+        },
+        {
+          "slug": "banner_store_title",
+          "label": "【オンラインストアバナー】見出し",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_store_desc",
+          "label": "【オンラインストアバナー】説明文",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "textarea"
+        },
+        {
+          "slug": "banner_store_btn_label",
+          "label": "【オンラインストアバナー】ボタン文言",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        },
+        {
+          "slug": "banner_store_btn_style",
+          "label": "【オンラインストアバナー】ボタンスタイル",
+          "type": "select",
+          "required": false,
+          "unique": false,
+          "options": [
+            {
+              "label": "赤色ボタン（推奨・重要CTA）",
+              "value": "red"
+            },
+            {
+              "label": "アウトラインボタン（上品な枠線）",
+              "value": "outline"
+            }
+          ]
+        },
+        {
+          "slug": "banner_store_url",
+          "label": "【オンラインストアバナー】リンク先URL",
+          "type": "string",
+          "required": false,
+          "unique": false,
+          "widget": "text"
+        }
+      ]
+    },
+    {
       "slug": "magazine",
       "label": "マガジン",
       "labelSingular": "マガジン記事",
@@ -341,13 +661,6 @@
           "unique": false
         },
         {
-          "slug": "sales_title",
-          "label": "【新車窓口】窓口見出し（例: MINI 新車ショールーム）",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
           "slug": "sales_subtitle",
           "label": "【新車窓口】名称（例: MINI 新百合ヶ丘）",
           "type": "string",
@@ -404,13 +717,6 @@
           "unique": false
         },
         {
-          "slug": "used_title",
-          "label": "【中古車窓口】窓口見出し（例: MINI 認定中古車）",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
           "slug": "used_subtitle",
           "label": "【中古車窓口】名称（例: MINI NEXT 新百合ヶ丘）",
           "type": "string",
@@ -462,13 +768,6 @@
         {
           "slug": "used_cta_url",
           "label": "【中古車窓口】ボタンリンクURL",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "service_title",
-          "label": "【サービス窓口】窓口見出し（例: 本社サービス工場）",
           "type": "string",
           "required": false,
           "unique": false
@@ -633,20 +932,6 @@
           "type": "string",
           "required": false,
           "unique": false
-        },
-        {
-          "slug": "google_rating_override",
-          "label": "【Google連携】評価スコア（手動設定時・空欄可）",
-          "type": "string",
-          "required": false,
-          "unique": false
-        },
-        {
-          "slug": "google_reviews_count_override",
-          "label": "【Google連携】クチコミ件数（手動設定時・空欄可）",
-          "type": "string",
-          "required": false,
-          "unique": false
         }
       ]
     },
@@ -758,9 +1043,209 @@
       ]
     },
     {
+      "slug": "companies",
+      "label": "会社案内",
+      "labelSingular": "会社情報",
+      "description": "ニコル・グループ各社の企業情報・代表メッセージ・拠点・受賞歴等の管理コレクション",
+      "icon": "building",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "sortOrder": 3,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "会社名（正式日本語表記）",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "name_en",
+          "label": "会社名（英語表記）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "role_badge",
+          "label": "役割・取扱ブランド（例: フェラーリ正規販売代理店）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_image",
+          "label": "メインカバー写真（ヒーロー画像）",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "hero_phrase",
+          "label": "ヒーロー導入メッセージ・キャッチコピー",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "about_title",
+          "label": "【会社紹介】見出し（大）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "about_lead",
+          "label": "【会社紹介】サブリード",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "about_image",
+          "label": "【会社紹介】メディア写真（例: アトリエ・ショールーム）",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "about_image_caption",
+          "label": "【会社紹介】写真キャプション",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "about_text",
+          "label": "【会社紹介】ストーリー紹介本文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_1_num",
+          "label": "【実績ハイライト1】数値（例: 2年連続）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_1_label",
+          "label": "【実績ハイライト1】ラベル（例: 最優秀ディーラー賞）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_2_num",
+          "label": "【実績ハイライト2】数値（例: 2014年）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_2_label",
+          "label": "【実績ハイライト2】ラベル（例: 設立・正規指名）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_3_num",
+          "label": "【実績ハイライト3】数値（例: 3拠点）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "highlight_3_label",
+          "label": "【実績ハイライト3】ラベル（例: 新車・認定中古車・サービス）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "award_title",
+          "label": "【受賞実績】賞名（例: 全国フェラーリ最優秀ディーラー賞）",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "award_badge",
+          "label": "【受賞実績】バッジ（例: 2年連続受賞（2024・2025））",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "award_desc",
+          "label": "【受賞実績】説明文",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "established",
+          "label": "【基本データ】設立年月",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "representative",
+          "label": "【基本データ】代表者名・役職",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "postal",
+          "label": "【基本データ】郵便番号",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "address",
+          "label": "【基本データ】所在地住所",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "tel",
+          "label": "【基本データ】代表電話番号 / FAX",
+          "type": "string",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "business_desc",
+          "label": "【基本データ】事業内容（改行区切り）",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "【自由ブロック】追加コンテンツ・詳細ブロック",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        }
+      ]
+    },
+    {
       "slug": "pages",
-      "label": "Pages",
-      "labelSingular": "Page",
+      "label": "固定ページ",
+      "labelSingular": "固定ページ",
       "supports": [
         "drafts",
         "revisions",
@@ -788,8 +1273,10 @@
     },
     {
       "slug": "posts",
-      "label": "Posts",
-      "labelSingular": "Post",
+      "label": "お知らせ",
+      "labelSingular": "お知らせ記事",
+      "description": "ニコル・グループ公式のお知らせ・ニュース・営業案内管理コレクション",
+      "icon": "newspaper",
       "supports": [
         "drafts",
         "revisions",
@@ -890,5 +1377,5 @@
       ]
     }
   ],
-  "version": "f1bbe41041ddde78"
+  "version": "060c883015f194b0"
 }

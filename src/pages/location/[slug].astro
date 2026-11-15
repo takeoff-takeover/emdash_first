@@ -6,9 +6,11 @@ import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import GoogleRatingBadge from "../../components/GoogleRatingBadge.astro";
+import MapBadge from "../../components/MapBadge.astro";
 import { getGooglePlaceReviews } from "../../utils/google-places";
 import { env } from "cloudflare:workers";
 import { protectPhrases, formatTitleHtml } from "../../utils/locationHelper";
+import { getSiteUrl } from "../../utils/siteUrl";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -445,7 +447,7 @@ const placeData = isOfficeLocation ? null : await getGooglePlaceReviews({
 });
 
 // 拠点種別に応じた構造化データ（JSON-LD）とパンくずリスト（BreadcrumbList）の生成
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : (import.meta.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev").replace(/\/$/, "");
+const siteUrl = getSiteUrl(Astro.site);
 const pageUrl = `${siteUrl}/location/${slug}`;
 
 const schemaType = isOfficeLocation 
@@ -699,9 +701,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 								</div>
 								<div class="dealer-summary-address">
 									<span class="dealer-address-text">{d.postal} {d.address}</span>
-									<a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" class="link-inline-gmap" title="Googleマップで地図を見る">
-										MAP
-									</a>
+									<MapBadge href={googleMapsUrl} title="Googleマップで地図を見る" ariaLabel={`${d.title}の地図をGoogleマップで開く`} />
 								</div>
 							</div>
 
@@ -1795,29 +1795,6 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.dealer-address-text {
 		font-size: 0.875rem;
 		color: #94a3b8;
-	}
-
-	.link-inline-gmap {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.6875rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		color: #d1d5db;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.16);
-		padding: 2px 8px;
-		border-radius: 3px;
-		text-decoration: none;
-		line-height: 1.4;
-		transition: all 0.2s ease;
-	}
-
-	.link-inline-gmap:hover {
-		color: #ffffff;
-		background: rgba(255, 255, 255, 0.12);
-		border-color: rgba(255, 255, 255, 0.35);
 	}
 
 	/* 営業状況に関する注記 */

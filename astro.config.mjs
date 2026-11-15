@@ -6,6 +6,7 @@ import emdash from "emdash/astro";
 import { editorialToolsPlugin } from "./src/plugins/editorial-tools/index";
 
 export default defineConfig({
+	site: process.env.SITE_URL || process.env.PUBLIC_SITE_URL || "https://my-emdash-site.kaz130.workers.dev",
 	output: "server",
 	adapter: cloudflare(),
 	image: {

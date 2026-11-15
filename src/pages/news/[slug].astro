@@ -6,12 +6,20 @@ import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import RichPortableText from "../../components/blocks/RichPortableText.astro";
+import { getSiteUrl } from "../../utils/siteUrl";
+
+const siteUrl = getSiteUrl(Astro.site);
 
 const rawSlug = Astro.params.slug;
 const slug = decodeSlug(rawSlug);
 
 if (!slug) {
 	return Astro.rewrite("/404");
+}
+
+// 日本語URLからの301恒久リダイレクト
+if (slug === "ニコル・グループ-2026年-夏季休業のお知らせ" || rawSlug === encodeURIComponent("ニコル・グループ-2026年-夏季休業のお知らせ") || rawSlug === "ニコル・グループ-2026年-夏季休業のお知らせ") {
+	return Astro.redirect("/news/202607_nicole_summer-holiday", 301);
 }
 
 let cmsPost: any = null;
@@ -127,19 +135,19 @@ const jsonLd = [
 				"@type": "ListItem",
 				"position": 1,
 				"name": "HOME",
-				"item": "https://my-emdash-site.kaz130.workers.dev/"
+				"item": `${siteUrl}/`
 			},
 			{
 				"@type": "ListItem",
 				"position": 2,
 				"name": "お知らせ",
-				"item": "https://my-emdash-site.kaz130.workers.dev/news"
+				"item": `${siteUrl}/news`
 			},
 			{
 				"@type": "ListItem",
 				"position": 3,
 				"name": title,
-				"item": `https://my-emdash-site.kaz130.workers.dev/news/${slug}`
+				"item": `${siteUrl}/news/${slug}`
 			}
 		]
 	},
@@ -155,7 +163,7 @@ const jsonLd = [
 			"name": "ニコル・グループ (Nicole Group)",
 			"logo": {
 				"@type": "ImageObject",
-				"url": "https://my-emdash-site.kaz130.workers.dev/uploads/2026/01/NICOLE_N_LOGO_neg.svg"
+				"url": `${siteUrl}/uploads/2026/01/NICOLE_N_LOGO_neg.svg`
 			}
 		}
 	}
