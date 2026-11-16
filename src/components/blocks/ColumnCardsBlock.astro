@@ -70,7 +70,7 @@ const cardStyle = (rawCardStyle === "flat" && !hasAnyImage) ? "box" : rawCardSty
 				<article class={`cms-col-card ${c.image ? "has-image" : "is-text-only"}`}>
 					{c.image && (
 						<div class={`cms-col-card__media ${c.image.toLowerCase().includes('.svg') ? 'is-svg-icon' : ''}`}>
-							<img src={c.image} alt={c.title || ""} loading="lazy" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
+							<img src={c.image} alt={c.title || ""} loading="lazy" onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" />
 							{cardStyle === "step" && (
 								<span class="cms-col-card__step-badge is-on-media">
 									{String(idx + 1).padStart(2, "0")}

@@ -90,7 +90,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 		{allImages.map((item, idx) => (
 			<figure class="cms-photo-grid__item">
 				<div class="cms-photo-grid__media">
-					<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading="lazy" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
+					<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading="lazy" onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" />
 				</div>
 				{item.caption && <figcaption class="cms-photo-grid__caption">{item.caption}</figcaption>}
 			</figure>
@@ -105,7 +105,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			<div class="filmstrip-track" id={`${blockId}-track`}>
 				{allImages.map((item, idx) => (
 					<div class={`filmstrip-slide ${idx === 0 ? 'is-active' : ''}`} data-index={idx}>
-						<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading={idx === 0 ? "eager" : "lazy"} onerror="this.onerror=null;this.src='/images/no-image.svg';" />
+						<img src={item.image} alt={item.caption || `写真 ${idx + 1}`} loading={idx === 0 ? "eager" : "lazy"} onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" />
 						<span class="filmstrip-badge">{idx + 1} / {allImages.length}</span>
 					</div>
 				))}
@@ -133,7 +133,7 @@ const blockId = `slider-${node._key || Math.random().toString(36).slice(2, 9)}`;
 			<div class="filmstrip-thumbs" id={`${blockId}-thumbs`}>
 				{allImages.map((item, idx) => (
 					<button type="button" class={`filmstrip-thumb ${idx === 0 ? 'is-active' : ''}`} data-thumb={idx} aria-label={`写真 ${idx + 1}`}>
-						<img src={item.image} alt="" onerror="this.onerror=null;this.src='/images/no-image.svg';" />
+						<img src={item.image} alt="" onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" />
 					</button>
 				))}
 			</div>

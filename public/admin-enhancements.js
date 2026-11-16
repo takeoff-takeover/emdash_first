@@ -1363,11 +1363,201 @@
 				}
 
 				// ─────────────────────────────────────────────────────────────
-				// マガジン一覧画面でのカテゴリ・ブランド別フィルタタブUI
+				// マガジン一覧画面でのツールバー連動フィルター（ブランド・カテゴリー・ステータス）
 				// ─────────────────────────────────────────────────────────────
-				let activeMagazineFilter = 'all';
+				let activeBrandFilter = 'all';
+				let activeCategoryFilter = 'all';
+				let activeUserKeyword = '';
 
-				function applyMagazineFilterTabs() {
+				let dynamicBrands = [
+					{ slug: 'all-brands', label: 'ALL BRANDS' },
+					{ slug: 'alpina', label: 'ALPINA' },
+					{ slug: 'bmw', label: 'BMW' },
+					{ slug: 'ferrari', label: 'Ferrari' },
+					{ slug: 'mini', label: 'MINI' },
+					{ slug: 'rolls-royce', label: 'Rolls-Royce' }
+				];
+
+				let dynamicCategories = [
+					{ slug: 'cars', label: 'Cars' },
+					{ slug: 'people', label: 'People' },
+					{ slug: 'buyers-guide', label: "Buyer's Guide" },
+					{ slug: 'esg', label: 'ESG / SDGs' },
+					{ slug: 'announcement', label: 'Announcement' }
+				];
+
+				let lastTaxonomyFetchTime = 0;
+
+				async function refreshDynamicTaxonomies() {
+					const now = Date.now();
+					if (now - lastTaxonomyFetchTime < 5000) return;
+					lastTaxonomyFetchTime = now;
+
+					try {
+						const [brandRes, catRes] = await Promise.all([
+							fetch('/_emdash/api/taxonomies/brand/terms?limit=100').then(r => r.ok ? r.json() : null),
+							fetch('/_emdash/api/taxonomies/category/terms?limit=100').then(r => r.ok ? r.json() : null)
+						]);
+
+						if (brandRes?.success && Array.isArray(brandRes.data?.terms)) {
+							dynamicBrands = brandRes.data.terms.map(t => ({
+								slug: t.slug,
+								label: t.label
+							}));
+							updateBrandSelectOptions();
+						}
+
+						if (catRes?.success && Array.isArray(catRes.data?.terms)) {
+							dynamicCategories = catRes.data.terms.map(t => ({
+								slug: t.slug,
+								label: t.slug === 'esg' ? 'ESG / SDGs' : t.label
+							}));
+							updateCategorySelectOptions();
+						}
+					} catch (err) {
+						console.warn('[admin-enhancements] Failed to fetch dynamic taxonomies:', err);
+					}
+				}
+
+				function updateBrandSelectOptions() {
+					const menu = document.getElementById('emdash-brand-menu');
+					if (!menu) return;
+					renderBrandMenuOptions();
+					const bText = document.getElementById('emdash-filter-brand-text');
+					if (bText) {
+						const found = dynamicBrands.find(b => b.slug === activeBrandFilter);
+						bText.textContent = activeBrandFilter === 'all' || !found ? 'すべてのブランド' : found.label;
+					}
+				}
+
+				function updateCategorySelectOptions() {
+					const menu = document.getElementById('emdash-category-menu');
+					if (!menu) return;
+					renderCategoryMenuOptions();
+					const cText = document.getElementById('emdash-filter-category-text');
+					if (cText) {
+						const found = dynamicCategories.find(c => c.slug === activeCategoryFilter);
+						cText.textContent = activeCategoryFilter === 'all' || !found ? 'すべてのカテゴリー' : found.label;
+					}
+				}
+
+				const CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256" class="shrink-0 text-kumo-brand" style="color: var(--text-color-kumo-brand, #f6821f);"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg>';
+
+				function renderBrandMenuOptions() {
+					const menu = document.getElementById('emdash-brand-menu');
+					if (!menu) return;
+					const options = [{ slug: 'all', label: 'すべてのブランド' }, ...dynamicBrands];
+					menu.innerHTML = options.map(opt => {
+						const isSelected = activeBrandFilter === opt.slug;
+						return `
+							<div class="emdash-dropdown-opt mx-1 px-2.5 py-1.5 text-xs rounded cursor-pointer flex items-center justify-between gap-2 text-kumo-default hover:bg-kumo-tint transition-colors ${isSelected ? 'bg-kumo-tint font-medium' : ''}" data-brand-val="${opt.slug}">
+								<span class="truncate">${opt.label}</span>
+								${isSelected ? CHECK_ICON_SVG : ''}
+							</div>
+						`;
+					}).join('');
+
+					menu.querySelectorAll('.emdash-dropdown-opt').forEach(el => {
+						el.addEventListener('click', (e) => {
+							e.stopPropagation();
+							activeBrandFilter = el.dataset.brandVal;
+							menu.style.display = 'none';
+							const btn = document.getElementById('emdash-filter-brand-btn');
+							if (btn) btn.setAttribute('data-state', 'closed');
+							updateBrandSelectOptions();
+							syncFiltersToServerSearch();
+						});
+					});
+				}
+
+				function renderCategoryMenuOptions() {
+					const menu = document.getElementById('emdash-category-menu');
+					if (!menu) return;
+					const options = [{ slug: 'all', label: 'すべてのカテゴリー' }, ...dynamicCategories];
+					menu.innerHTML = options.map(opt => {
+						const isSelected = activeCategoryFilter === opt.slug;
+						return `
+							<div class="emdash-dropdown-opt mx-1 px-2.5 py-1.5 text-xs rounded cursor-pointer flex items-center justify-between gap-2 text-kumo-default hover:bg-kumo-tint transition-colors ${isSelected ? 'bg-kumo-tint font-medium' : ''}" data-cat-val="${opt.slug}">
+								<span class="truncate">${opt.label}</span>
+								${isSelected ? CHECK_ICON_SVG : ''}
+							</div>
+						`;
+					}).join('');
+
+					menu.querySelectorAll('.emdash-dropdown-opt').forEach(el => {
+						el.addEventListener('click', (e) => {
+							e.stopPropagation();
+							activeCategoryFilter = el.dataset.catVal;
+							menu.style.display = 'none';
+							const btn = document.getElementById('emdash-filter-category-btn');
+							if (btn) btn.setAttribute('data-state', 'closed');
+							updateCategorySelectOptions();
+							syncFiltersToServerSearch();
+						});
+					});
+				}
+
+				// ドキュメント外側クリックでメニューを閉じる
+				document.addEventListener('click', (e) => {
+					const bWrap = document.getElementById('emdash-filter-brand-wrapper');
+					const cWrap = document.getElementById('emdash-filter-category-wrapper');
+					if (bWrap && !bWrap.contains(e.target)) {
+						const bMenu = document.getElementById('emdash-brand-menu');
+						const bBtn = document.getElementById('emdash-filter-brand-btn');
+						if (bMenu) bMenu.style.display = 'none';
+						if (bBtn) bBtn.setAttribute('data-state', 'closed');
+					}
+					if (cWrap && !cWrap.contains(e.target)) {
+						const cMenu = document.getElementById('emdash-category-menu');
+						const cBtn = document.getElementById('emdash-filter-category-btn');
+						if (cMenu) cMenu.style.display = 'none';
+						if (cBtn) cBtn.setAttribute('data-state', 'closed');
+					}
+				});
+
+				document.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') {
+						const bMenu = document.getElementById('emdash-brand-menu');
+						const cMenu = document.getElementById('emdash-category-menu');
+						if (bMenu) bMenu.style.display = 'none';
+						if (cMenu) cMenu.style.display = 'none';
+						const bBtn = document.getElementById('emdash-filter-brand-btn');
+						const cBtn = document.getElementById('emdash-filter-category-btn');
+						if (bBtn) bBtn.setAttribute('data-state', 'closed');
+						if (cBtn) cBtn.setAttribute('data-state', 'closed');
+					}
+				});
+
+				// 検索窓に値をセットしてReactのonChangeを発火させるヘルパー
+				function triggerServerSearch(val) {
+					const searchInput = document.querySelector('input[placeholder*="マガジンを検索"], input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
+					if (searchInput) {
+						const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+						if (nativeSetter) {
+							nativeSetter.call(searchInput, val);
+						} else {
+							searchInput.value = val;
+						}
+						searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+						searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+					}
+				}
+
+				function syncFiltersToServerSearch() {
+					const parts = [];
+					if (activeBrandFilter && activeBrandFilter !== 'all') {
+						parts.push('brand:' + activeBrandFilter);
+					}
+					if (activeCategoryFilter && activeCategoryFilter !== 'all') {
+						parts.push('category:' + activeCategoryFilter);
+					}
+					if (activeUserKeyword) {
+						parts.push(activeUserKeyword);
+					}
+					triggerServerSearch(parts.join(' '));
+				}
+
+				function applyMagazineToolbarFilters() {
 					try {
 						const rawPath = window.location.pathname || '';
 						const isMagazineDetail = new RegExp('/magazine/[a-zA-Z0-9_-]+$').test(rawPath);
@@ -1380,139 +1570,191 @@
 							document.querySelector('.tiptap, [data-slate-editor], .emdash-editor')
 						);
 
+						// 旧ピルタブがあれば確実に削除
+						const oldTabs = document.getElementById('magazine-filter-bar');
+						if (oldTabs) oldTabs.remove();
+
 						if (!isMagazineList || isEditor) {
-							const existingTabs = document.getElementById('magazine-filter-bar');
-							if (existingTabs) existingTabs.remove();
+							const bWrap = document.getElementById('emdash-filter-brand-wrapper');
+							if (bWrap) bWrap.remove();
+							const cWrap = document.getElementById('emdash-filter-category-wrapper');
+							if (cWrap) cWrap.remove();
 							return;
 						}
 
-						// 挿入ターゲット：テーブル、または検索バー、または見出し
-						let target = document.querySelector('table');
-						if (target) {
-							target = target.closest('.overflow-x-auto') || target.parentElement || target;
-						}
-						if (!target) {
-							target = document.querySelector('input[placeholder*="Search"], input[placeholder*="検索"]');
-							if (target) target = target.closest('div');
-						}
-						if (!target) {
-							target = document.querySelector('main h1, h1');
-							if (target) target = target.parentElement;
+						// ツールバーの検索入力とコンテナの特定
+						const searchInput = document.querySelector('input[placeholder*="マガジンを検索"], input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
+						if (!searchInput) return;
+
+						const searchLabel = searchInput.closest('label[data-slot="input-group"]') || searchInput.closest('label') || searchInput.parentElement;
+						if (!searchLabel) return;
+
+						const toolbarContainer = searchLabel.parentElement;
+						if (!toolbarContainer) return;
+
+						// 動的タクソノミー取得の発火
+						refreshDynamicTaxonomies();
+
+						// ツールバーのFlexレイアウト調整
+						toolbarContainer.style.display = 'flex';
+						toolbarContainer.style.alignItems = 'center';
+						toolbarContainer.style.gap = '8px';
+						toolbarContainer.style.width = '100%';
+
+						// 検索窓を一番右に配置 (order: 99, marginLeft: auto)
+						searchLabel.style.order = '99';
+						searchLabel.style.marginLeft = 'auto';
+
+						// 既存のステータスボタンの親（.grid.gap-2）を order: 3 に設定
+						const statusTrigger = toolbarContainer.querySelector('.emdash-status-filter-trigger, button[aria-label*="ステータス"]');
+						if (statusTrigger) {
+							const statusGrid = statusTrigger.closest('.grid.gap-2') || statusTrigger;
+							statusGrid.style.order = '3';
+							statusGrid.style.flexShrink = '0';
 						}
 
-						if (!target || !target.parentNode) return;
+						// 作成日時 (order: 4)
+						const dateFieldTrigger = toolbarContainer.querySelector('.emdash-date-field-filter-trigger, button[aria-label*="日付"], button[aria-label*="作成日時"]');
+						if (dateFieldTrigger) {
+							const dateGrid = dateFieldTrigger.closest('.grid.gap-2') || dateFieldTrigger;
+							dateGrid.style.order = '4';
+							dateGrid.style.flexShrink = '0';
+						}
 
-						let tabContainer = document.getElementById('magazine-filter-bar');
-						if (!tabContainer || !document.body.contains(tabContainer)) {
-							if (tabContainer) tabContainer.remove();
-							tabContainer = document.createElement('div');
-							tabContainer.id = 'magazine-filter-bar';
-							tabContainer.style.cssText = `
-								display: flex;
-								align-items: center;
-								gap: 8px;
-								margin-top: 12px;
-								margin-bottom: 16px;
-								padding: 10px 14px;
-								background: var(--color-kumo-elevated);
-								border: 1px solid var(--color-kumo-line);
-								border-radius: 8px;
-								overflow-x: auto;
-								z-index: 10;
+						// 期間 (order: 5)
+						const dateRangeTrigger = toolbarContainer.querySelector('.emdash-date-range-trigger, button[aria-label*="期間"]');
+						if (dateRangeTrigger) {
+							const rangeGrid = dateRangeTrigger.closest('.grid.gap-2') || dateRangeTrigger;
+							rangeGrid.style.order = '5';
+							rangeGrid.style.flexShrink = '0';
+						}
+
+						// 投稿者 (order: 6)
+						const authorTrigger = toolbarContainer.querySelector('button[aria-label*="投稿者"]');
+						if (authorTrigger) {
+							const authorGrid = authorTrigger.closest('.grid.gap-2') || authorTrigger;
+							authorGrid.style.order = '6';
+							authorGrid.style.flexShrink = '0';
+						}
+
+						// 執筆者 (order: 7)
+						const bylineTrigger = toolbarContainer.querySelector('.emdash-byline-filter-trigger, button[aria-label*="執筆者"]');
+						if (bylineTrigger) {
+							const bylineGrid = bylineTrigger.closest('.grid.gap-2') || bylineTrigger;
+							bylineGrid.style.order = '7';
+							bylineGrid.style.flexShrink = '0';
+						}
+
+						// ブランドフィルター要素の生成・挿入 (order: 1)
+						let brandWrapper = document.getElementById('emdash-filter-brand-wrapper');
+						if (!brandWrapper || !document.body.contains(brandWrapper)) {
+							if (brandWrapper) brandWrapper.remove();
+							brandWrapper = document.createElement('div');
+							brandWrapper.id = 'emdash-filter-brand-wrapper';
+							brandWrapper.className = 'grid gap-2 relative';
+							brandWrapper.style.cssText = 'position: relative; display: inline-flex; align-items: center; order: 1; flex-shrink: 0;';
+
+							brandWrapper.innerHTML = `
+								<button type="button" id="emdash-filter-brand-btn" role="combobox" aria-label="ブランドで絞り込む" data-kumo-component="Select" class="group flex w-max shrink-0 items-center select-none border-0 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-kumo-brand cursor-pointer h-6.5 gap-1 rounded-md px-2 text-xs !text-kumo-default ring ring-kumo-line bg-kumo-control hover:bg-kumo-tint justify-between font-normal min-w-32 ps-3.5" style="height: 26px !important; min-height: 26px !important; font-size: 12px !important; font-weight: 400 !important; line-height: 1 !important; padding-left: 14px !important; padding-right: 8px !important; border-radius: 6px !important;">
+									<span id="emdash-filter-brand-text" class="min-w-0 truncate" style="font-size: 12px !important; font-weight: 400 !important;">すべてのブランド</span>
+									<span aria-hidden="true" class="flex shrink-0 items-center text-kumo-subtle ml-1">
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256" class="fill-current"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+									</span>
+								</button>
+								<div id="emdash-brand-menu" class="bg-kumo-base text-kumo-default ring-1 ring-kumo-line rounded-lg shadow-lg py-1.5" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 140px; max-height: 280px; overflow-y: auto; z-index: 100;"></div>
 							`;
 
-							const label = document.createElement('span');
-							label.textContent = '絞り込み:';
-							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle); margin-right: 4px; white-space: nowrap;';
-							tabContainer.appendChild(label);
+							const bBtn = brandWrapper.querySelector('#emdash-filter-brand-btn');
+							const bMenu = brandWrapper.querySelector('#emdash-brand-menu');
+							bBtn.addEventListener('click', (e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								const isOpen = bMenu.style.display !== 'none';
+								const cMenu = document.getElementById('emdash-category-menu');
+								if (cMenu) cMenu.style.display = 'none';
+								const cBtn = document.getElementById('emdash-filter-category-btn');
+								if (cBtn) cBtn.setAttribute('data-state', 'closed');
 
-							const filters = [
-								{ label: 'すべて', value: 'all' },
-								{ label: 'BMW', value: 'BMW' },
-								{ label: 'MINI', value: 'MINI' },
-								{ label: 'Rolls-Royce', value: 'Rolls-Royce' },
-								{ label: 'Ferrari', value: 'Ferrari' },
-								{ label: 'ALPINA', value: 'ALPINA' },
-								{ label: 'SDGs・地域活動', value: 'SDGs' },
-								{ label: 'イベント', value: 'イベント' }
-							];
-
-							filters.forEach(f => {
-								const btn = document.createElement('button');
-								btn.type = 'button';
-								btn.dataset.magFilter = f.value;
-								btn.textContent = f.label;
-								btn.style.cssText = `
-									padding: 6px 14px;
-									font-size: 12px;
-									font-weight: 600;
-									border-radius: 6px;
-									cursor: pointer;
-									transition: all 0.2s ease;
-									white-space: nowrap;
-									border: 1px solid ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)'};
-									background: ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)'};
-									color: ${activeMagazineFilter === f.value ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)'};
-								`;
-
-								btn.addEventListener('click', (e) => {
-									e.preventDefault();
-									e.stopPropagation();
-									activeMagazineFilter = f.value;
-									updateMagazineTabButtons();
-									filterMagazineTableRows();
-								});
-
-								tabContainer.appendChild(btn);
+								if (isOpen) {
+									bMenu.style.display = 'none';
+									bBtn.setAttribute('data-state', 'closed');
+								} else {
+									renderBrandMenuOptions();
+									bMenu.style.display = 'block';
+									bBtn.setAttribute('data-state', 'open');
+								}
 							});
 
-							target.parentNode.insertBefore(tabContainer, target);
+							toolbarContainer.appendChild(brandWrapper);
+						}
+
+						// カテゴリーフィルター要素の生成・挿入 (order: 2)
+						let catWrapper = document.getElementById('emdash-filter-category-wrapper');
+						if (!catWrapper || !document.body.contains(catWrapper)) {
+							if (catWrapper) catWrapper.remove();
+							catWrapper = document.createElement('div');
+							catWrapper.id = 'emdash-filter-category-wrapper';
+							catWrapper.className = 'grid gap-2 relative';
+							catWrapper.style.cssText = 'position: relative; display: inline-flex; align-items: center; order: 2; flex-shrink: 0;';
+
+							catWrapper.innerHTML = `
+								<button type="button" id="emdash-filter-category-btn" role="combobox" aria-label="カテゴリーで絞り込む" data-kumo-component="Select" class="group flex w-max shrink-0 items-center select-none border-0 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-kumo-brand cursor-pointer h-6.5 gap-1 rounded-md px-2 text-xs !text-kumo-default ring ring-kumo-line bg-kumo-control hover:bg-kumo-tint justify-between font-normal min-w-32 ps-3.5" style="height: 26px !important; min-height: 26px !important; font-size: 12px !important; font-weight: 400 !important; line-height: 1 !important; padding-left: 14px !important; padding-right: 8px !important; border-radius: 6px !important;">
+									<span id="emdash-filter-category-text" class="min-w-0 truncate" style="font-size: 12px !important; font-weight: 400 !important;">すべてのカテゴリー</span>
+									<span aria-hidden="true" class="flex shrink-0 items-center text-kumo-subtle ml-1">
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256" class="fill-current"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+									</span>
+								</button>
+								<div id="emdash-category-menu" class="bg-kumo-base text-kumo-default ring-1 ring-kumo-line rounded-lg shadow-lg py-1.5" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 140px; max-height: 280px; overflow-y: auto; z-index: 100;"></div>
+							`;
+
+							const cBtn = catWrapper.querySelector('#emdash-filter-category-btn');
+							const cMenu = catWrapper.querySelector('#emdash-category-menu');
+							cBtn.addEventListener('click', (e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								const isOpen = cMenu.style.display !== 'none';
+								const bMenu = document.getElementById('emdash-brand-menu');
+								if (bMenu) bMenu.style.display = 'none';
+								const bBtn = document.getElementById('emdash-filter-brand-btn');
+								if (bBtn) bBtn.setAttribute('data-state', 'closed');
+
+								if (isOpen) {
+									cMenu.style.display = 'none';
+									cBtn.setAttribute('data-state', 'closed');
+								} else {
+									renderCategoryMenuOptions();
+									cMenu.style.display = 'block';
+									cBtn.setAttribute('data-state', 'open');
+								}
+							});
+
+							toolbarContainer.appendChild(catWrapper);
+						}
+
+						// 検索入力欄の入力監視
+						if (!searchInput.dataset.hasToolbarSync) {
+							searchInput.dataset.hasToolbarSync = 'true';
+							searchInput.placeholder = 'タイトルやキーワードで検索…';
+							searchInput.addEventListener('input', (e) => {
+								const cur = (searchInput.value || '').trim();
+								const clean = cur
+									.replace(/(?:tax_brand|brand):[a-zA-Z0-9_-]+/gi, '')
+									.replace(/(?:tax_cat|cat|category):[a-zA-Z0-9_-]+/gi, '')
+									.trim();
+								activeUserKeyword = clean;
+							});
 						}
 
 						filterMagazineTableRows();
 					} catch (e) {
-						console.error('[patch-admin-ui] Error in applyMagazineFilterTabs:', e);
+						console.error('[patch-admin-ui] Error in applyMagazineToolbarFilters:', e);
 					}
-				}
-
-				function updateMagazineTabButtons() {
-					const btns = document.querySelectorAll('#magazine-filter-bar button[data-mag-filter]');
-					btns.forEach(btn => {
-						const isSelected = btn.dataset.magFilter === activeMagazineFilter;
-						btn.style.background = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)';
-						btn.style.color = isSelected ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)';
-						btn.style.borderColor = isSelected ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)';
-					});
 				}
 
 				function filterMagazineTableRows() {
 					const rows = document.querySelectorAll('table tbody tr');
 					rows.forEach(tr => {
-						if (activeMagazineFilter === 'all') {
-							tr.style.display = '';
-							return;
-						}
-						const rowText = (tr.textContent || '').toLowerCase();
-						const target = activeMagazineFilter.toLowerCase();
-
-						if (target === 'sdgs') {
-							if (rowText.includes('sdgs') || rowText.includes('美化') || rowText.includes('クリーンアップ') || rowText.includes('交通安全') || rowText.includes('寄付')) {
-								tr.style.display = '';
-								return;
-							}
-						}
-						if (target === 'イベント') {
-							if (rowText.includes('イベント') || rowText.includes('united') || rowText.includes('ミーティング') || rowText.includes('体験')) {
-								tr.style.display = '';
-								return;
-							}
-						}
-
-						if (rowText.includes(target)) {
-							tr.style.display = '';
-						} else {
-							tr.style.display = 'none';
-						}
+						tr.style.display = '';
 					});
 				}
 
@@ -2531,7 +2773,7 @@
 					try { applyHomepageSections(); } catch(e){}
 					try { applyCompaniesSections(); } catch(e){}
 					try { applyCampaignBrandFilterTabs(); } catch(e){}
-					try { applyMagazineFilterTabs(); } catch(e){}
+					try { applyMagazineToolbarFilters(); } catch(e){}
 					try { enhancePluginBlockModal(); } catch(e){}
 					try { enhanceEditorPluginBlocks(); } catch(e){}
 				}, 350);
@@ -2541,7 +2783,7 @@
 						try { applyHomepageSections(); } catch(e){}
 						try { applyCompaniesSections(); } catch(e){}
 						try { applyCampaignBrandFilterTabs(); } catch(e){}
-						try { applyMagazineFilterTabs(); } catch(e){}
+						try { applyMagazineToolbarFilters(); } catch(e){}
 					}, 100);
 				});
 			})();

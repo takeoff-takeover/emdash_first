@@ -3,7 +3,7 @@
  * CustomImageBlock.astro
  * Portable Text 単体画像ブロック
  * - node.asset, node.src, node.url 等の多様な入力形式に対応
- * - 画像未設定または読込エラー時は自動的に /images/no-image.svg をフォールバック表示
+ * - 画像未設定または読込エラー時は自動的に /images/placeholder-replace.jpg をフォールバック表示
  * - 車両写真のトリミング厳禁（全景カットの欠損禁止）ルールに準拠
  */
 interface Props {
@@ -43,7 +43,7 @@ function resolveSrc(node: any): string {
 }
 
 const resolvedSrc = resolveSrc(node);
-const imgSrc = resolvedSrc || "/images/no-image.svg";
+const imgSrc = resolvedSrc || "/images/placeholder-replace.jpg";
 const isPlaceholder = !resolvedSrc || imgSrc.includes("no-image");
 const altText = node.alt || (isPlaceholder ? "写真未設定（NO IMAGE）" : "");
 const captionText = node.caption || node.title || "";
@@ -62,7 +62,7 @@ const isBlank = typeof rawLink === "object" && rawLink?.blank;
 				alt={altText}
 				loading="lazy"
 				class="article-image-img"
-				onerror="this.onerror=null;this.src='/images/no-image.svg';"
+				onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 			/>
 		</a>
 	) : (
@@ -71,7 +71,7 @@ const isBlank = typeof rawLink === "object" && rawLink?.blank;
 			alt={altText}
 			loading="lazy"
 			class="article-image-img"
-			onerror="this.onerror=null;this.src='/images/no-image.svg';"
+			onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 		/>
 	)}
 	{captionText && <figcaption class="article-image-caption">{captionText}</figcaption>}

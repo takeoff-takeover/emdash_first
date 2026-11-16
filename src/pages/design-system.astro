@@ -11,10 +11,10 @@
 	<meta name="robots" content="noindex, nofollow, noarchive" />
 	<title>Nicole Design System — Internal Guidelines</title>
 	
-	<!-- Fonts: Inter & JetBrains Mono -->
+	<!-- Fonts: Helvetica & JetBrains Mono -->
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 	<link rel="icon" href="/uploads/2026/01/NICOLE_N_LOGO_neg.svg" />
 
 	<!-- Core Tokens & Theme -->
@@ -267,8 +267,27 @@
 					<span class="ds-section-num">03 / TYPOGRAPHY</span>
 					<h2 class="ds-section-heading">タイポグラフィ体系</h2>
 					<p class="ds-section-lead">
-						欧文は <strong>Inter</strong>、コード・メタラベルは <strong>JetBrains Mono</strong> を厳格に適用。
+						欧文は <strong>Helvetica Neue / Helvetica</strong>（ヘルベチカ）を基調とし、和文には洗練されたモダンゴシック（Mac/iOS: <strong>ヒラギノ角ゴ ProN</strong>、Windows: <strong>游ゴシック</strong>）を調和。コード・メタラベルは <strong>JetBrains Mono</strong> を適用。
 					</p>
+
+					<!-- 和文・欧文フォント詳細仕様カード -->
+					<div class="ds-type-rule-banner">
+						<div class="ds-type-rule-item">
+							<span class="ds-type-rule-tag">欧文（Primary Latin）</span>
+							<div class="ds-type-rule-val">Helvetica Neue / Helvetica</div>
+							<p class="ds-type-rule-note">全見出し・英数字に最優先適用。不朽の品格とニュートラルな美学。</p>
+						</div>
+						<div class="ds-type-rule-item">
+							<span class="ds-type-rule-tag">和文（Japanese System Stack）</span>
+							<div class="ds-type-rule-val">ヒラギノ角ゴ ProN / 游ゴシック</div>
+							<p class="ds-type-rule-note">Mac/iOSはヒラギノ、Winは游ゴシック。Webフォント遅延・レイアウトシフト（CLS）ゼロの最速高精細描画。</p>
+						</div>
+						<div class="ds-type-rule-item">
+							<span class="ds-type-rule-tag">コード・メタ（Monospace）</span>
+							<div class="ds-type-rule-val">JetBrains Mono</div>
+							<p class="ds-type-rule-note">スペック諸元、型式、メタラベル（.eyebrow）に適用。高い可読性を担保。</p>
+						</div>
+					</div>
 				</div>
 
 				<div class="ds-type-list">
@@ -495,8 +514,11 @@
 						<button type="button" class="ds-btn-ui ds-btn-ui--secondary">
 							Secondary Fill
 						</button>
-						<button type="button" class="ds-btn-ui ds-btn-ui--accent">
-							★ Strategic Accent Red
+						<button type="button" class="ds-btn-ui ds-btn-ui--accent-b">
+							★ Crimson Chassis (Style B)
+						</button>
+						<button type="button" class="ds-btn-ui ds-btn-ui--accent-c">
+							★ Satin Crimson (Style C)
 						</button>
 						<a href="tel:0445413011" class="ds-btn-ui ds-btn-ui--tel">
 							📞 044-541-3011 (Utility Blue)
@@ -510,6 +532,72 @@
 						<button type="button" class="ds-btn-ui ds-btn-ui--disabled" disabled>
 							Disabled
 						</button>
+					</div>
+				</div>
+
+				<!-- 公式採用アクセントレッド 2大スタイル（B & C） -->
+				<div class="ds-comp-block ds-comp-block--highlight" id="red-patterns">
+					<div class="ds-pattern-header">
+						<div class="ds-pattern-badge-wrap">
+							<span class="ds-pattern-badge" style="background: #e11d48;">OFFICIAL SPECIFICATION</span>
+							<span class="ds-pattern-status">公式採用仕様（発光・ボケ感の完全排除）</span>
+						</div>
+						<h3 class="ds-group-title" style="margin: 0.5rem 0 0.25rem 0; font-size: 1.15rem;">アクセントレッド公式仕様：Style B ＆ Style C</h3>
+						<p class="ds-pattern-desc">「光る赤・ボケ感」を完全に廃止し、Nicoleグループの品格あるモノトーン世界観に調和する公式赤色ボタンです。目的や配置箇所に応じて使い分けられます。</p>
+					</div>
+
+					<div class="ds-pattern-grid" style="grid-template-columns: repeat(2, 1fr);">
+						<!-- スタイルB -->
+						<div class="ds-pattern-card">
+							<div class="ds-pattern-card__head">
+								<span class="ds-pattern-num">STYLE B（公式採用・推奨）</span>
+								<h4 class="ds-pattern-name">ダークシャシー＆クリムゾン枠</h4>
+								<span class="ds-pattern-tag">漆黒ベース ＆ 鮮明な1.5px真紅枠</span>
+							</div>
+							<div class="ds-pattern-preview">
+								<button type="button" class="ds-btn-ui ds-btn-ui--accent-b">
+									<span>Web商談予約をする</span>
+									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								</button>
+							</div>
+							<div class="ds-pattern-details">
+								<p class="ds-pattern-summary"><strong>【用途】</strong> 記事末尾の相談予約・重要導線。ドット（・）のないクリーンな先頭揃えと1.5pxソリッド真紅枠。</p>
+								<ul class="ds-pattern-points">
+									<li>黒・白・グレーのモノトーン空間に100%馴染み、ストイックで知的な佇まい</li>
+									<li>ホバー時に深紅（#881326）へと滑らかに反転する心地よいインタラクション</li>
+									<li>発光・拡散影を一切排除し、文字の視認性が極限まで高い</li>
+								</ul>
+								<div class="ds-pattern-specs">
+									<code>CMS識別子: border-red | BG: #14151a | Border: 1.5px #e11d48</code>
+								</div>
+							</div>
+						</div>
+
+						<!-- スタイルC -->
+						<div class="ds-pattern-card">
+							<div class="ds-pattern-card__head">
+								<span class="ds-pattern-num">STYLE C（公式採用・推奨）</span>
+								<h4 class="ds-pattern-name">サテンマット・クリムゾン</h4>
+								<span class="ds-pattern-tag">立体感を極限まで薄めた上質マット真紅</span>
+							</div>
+							<div class="ds-pattern-preview">
+								<button type="button" class="ds-btn-ui ds-btn-ui--accent-c">
+									<span>Web商談予約をする</span>
+									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								</button>
+							</div>
+							<div class="ds-pattern-details">
+								<p class="ds-pattern-summary"><strong>【用途】</strong> 勝負所の強いアイキャッチCTA。厚い3D押し出し感を削ぎ落とし、上品に引き締めたマット仕上げ。</p>
+								<ul class="ds-pattern-points">
+									<li>過度な立体感を排除し、ほぼフラットに近づけた深みのある真紅（#ad1428）</li>
+									<li>上端に0.5px相当の極薄ハイラインのみを微細に残し、ベタ塗り感を防止</li>
+									<li>外側へのボケ光彩ゼロで、ソリッドな存在感を発揮</li>
+								</ul>
+								<div class="ds-pattern-specs">
+									<code>CMS識別子: bezel | BG: #ad1428 | Inset Top: 0.5px subtle</code>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -1052,6 +1140,50 @@
 		color: var(--color-muted);
 	}
 
+	/* 03 Typography Rules Banner */
+	.ds-type-rule-banner {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-4);
+		margin-top: var(--spacing-6);
+		margin-bottom: var(--spacing-6);
+	}
+	@media (max-width: 900px) {
+		.ds-type-rule-banner {
+			grid-template-columns: 1fr;
+		}
+	}
+	.ds-type-rule-item {
+		background: #111216;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-5);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-2);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+	}
+	.ds-type-rule-tag {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #e11d48;
+		font-weight: 600;
+	}
+	.ds-type-rule-val {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #ffffff;
+		line-height: 1.35;
+	}
+	.ds-type-rule-note {
+		font-size: 0.8125rem;
+		color: var(--color-muted);
+		line-height: 1.5;
+		margin: 0;
+	}
+
 	/* 03 Typography Cards */
 	.ds-type-list {
 		display: flex;
@@ -1377,14 +1509,191 @@
 	}
 
 	.ds-btn-ui--accent {
-		background: var(--color-accent-red);
-		color: var(--color-on-accent-red);
-		box-shadow: 0 4px 18px rgba(225, 29, 72, 0.4);
+		background: #b81424;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 	}
 	.ds-btn-ui--accent:hover {
-		background: var(--color-accent-red-hover);
-		box-shadow: 0 6px 24px rgba(225, 29, 72, 0.6);
+		background: #cf1b2d;
+		border-color: rgba(255, 255, 255, 0.35);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
 		transform: translateY(-1px);
+	}
+
+	/* Pattern A: クリスプ・ソリッド（Crisp Solid） */
+	.ds-btn-ui--accent-a {
+		background: #b81424;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+	.ds-btn-ui--accent-a:hover {
+		background: #cf1b2d;
+		border-color: rgba(255, 255, 255, 0.35);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+	}
+
+	/* Pattern B: ダークシャシー＆クリムゾンボーダー（ドットなし・すっきり精密版） */
+	.ds-btn-ui--accent-b {
+		background: #14151a;
+		color: #ffffff;
+		border: 1.5px solid #e11d48;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+	.ds-btn-ui--accent-b:hover {
+		background: #881326;
+		border-color: #ff3366;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+	}
+
+	/* Pattern C: サテンマット・クリムゾン（立体感オフ・薄型仕様） */
+	.ds-btn-ui--accent-c {
+		background: #ad1428;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 5px rgba(0, 0, 0, 0.35);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+	.ds-btn-ui--accent-c:hover {
+		background: #be1830;
+		border-color: rgba(255, 255, 255, 0.25);
+		transform: translateY(-1px);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 10px rgba(0, 0, 0, 0.45);
+	}
+
+	/* 3パターン選定ブロック用スタイル */
+	.ds-comp-block--highlight {
+		background: #111216;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-6);
+		margin-top: var(--spacing-6);
+	}
+	.ds-pattern-header {
+		margin-bottom: var(--spacing-6);
+	}
+	.ds-pattern-badge-wrap {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.ds-pattern-badge {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		padding: 2px 8px;
+		background: #b81424;
+		color: #ffffff;
+		border-radius: var(--radius-xs);
+		font-weight: 600;
+	}
+	.ds-pattern-status {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--color-muted);
+	}
+	.ds-pattern-desc {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		margin: var(--spacing-2) 0 0 0;
+		line-height: 1.6;
+	}
+	.ds-pattern-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-4);
+	}
+	@media (max-width: 1024px) {
+		.ds-pattern-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+	.ds-pattern-card {
+		background: #18191f;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-5);
+		display: flex;
+		flex-direction: column;
+		transition: border-color 0.2s ease;
+	}
+	.ds-pattern-card:hover {
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+	.ds-pattern-card__head {
+		margin-bottom: var(--spacing-4);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		padding-bottom: var(--spacing-3);
+	}
+	.ds-pattern-num {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: #a0a0aa;
+		letter-spacing: 0.08em;
+		display: block;
+		margin-bottom: 2px;
+	}
+	.ds-pattern-name {
+		font-size: 1rem;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 4px 0;
+	}
+	.ds-pattern-tag {
+		font-size: 11px;
+		color: #e52d27;
+		display: inline-block;
+	}
+	.ds-pattern-preview {
+		padding: var(--spacing-5) 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: #0f1014;
+		border-radius: var(--radius-sm);
+		margin-bottom: var(--spacing-4);
+	}
+	.ds-pattern-details {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	.ds-pattern-summary {
+		font-size: 12px;
+		color: var(--color-text-secondary);
+		line-height: 1.55;
+		margin: 0 0 var(--spacing-3) 0;
+	}
+	.ds-pattern-points {
+		margin: 0 0 var(--spacing-4) 0;
+		padding-left: 1.2rem;
+		font-size: 11.5px;
+		color: #a0a0aa;
+		line-height: 1.6;
+	}
+	.ds-pattern-specs {
+		margin-top: auto;
+		background: #0d0e12;
+		border-radius: 4px;
+		padding: 6px 8px;
+		font-family: var(--font-mono);
+		font-size: 10px;
+		color: #71717a;
+		word-break: break-all;
 	}
 
 	/* 機能色ボタン（青・緑） */

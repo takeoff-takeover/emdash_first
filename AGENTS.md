@@ -48,7 +48,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 - **Design principles (デザイン基本原則)**:
-  1. *モノトーン基調＋アクセントレッド*: 「黒・白・グレー」を基調とし、日常テキストや通常の装飾に赤色を乱用しない。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトのみに限定。
+  1. *モノトーン基調＋アクセントレッド*: 「黒・白・グレー」を基調とし、日常テキストや通常の装飾に赤色を乱用しない。「赤色（アクセントレッド）」は最重要CTAや勝負所のハイライトのみに限定。発光・ボケ感のあるグロー影（カラーハロー）は厳禁とし、ソリッドな真紅枠（Dark Chassis / Style B）または薄型サテンマット（Satin Crimson / Style C）を公式仕様とする。
   2. *品格のある自然なテキスト（不要な装飾の排除）*: 「SPECIAL BENEFITS」等のAI特有の英字ラベルや、ギャラリーの「PHOTO GALLERY」「全○点」「【エクステリア】」等の冗長な宣伝文句は入れず、シンプルで品格ある日本語表現にする。
   3. *最適な幅・余白と情報密度*: 無理に画面いっぱいに広げて無駄な余白を作らず、コンテンツに応じた幅を選択する。スマートフォン表示でも要素が無駄に縦延びせず、左右バランス良く密度の高い洗練されたレイアウトにする。
   4. *車両写真のトリミング厳禁（全景カットの欠損禁止）*: 車の写真が中途半端に切れるようなトリミングやレイアウトは厳禁。意図的なディテール寄り（エンブレム、ライト、ホイール等のクローズアップ）はOKだが、車体の8割など全景が写っているのにバンパーやタイヤ、ルーフ、前後端が切れてしまうトリミング・レイアウトは絶対に避けること。車両全体像を見せる写真は、車体全体が美しく完全に収まるようアスペクト比・レイアウト（`object-fit: contain` や全幅表示など）を設計すること。
@@ -73,10 +73,11 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - **Article Slug Naming Rule (記事スラッグ命名規則・公開年月プレフィックス原則)**: 記事（マガジン `magazine`、お知らせ `posts`、キャンペーン `campaigns` 等）のスラッグ（URL識別子）を新規作成・命名する際は、必ず公開年月（`YYYYMM` 4桁年+2桁月）を先頭に付与し、アンダースコアに続けて英小文字・ハイフンで簡潔に記述すること（例: `202611_xxxxxxx`）。日（DAY `DD`）までは含めず、公開月（`YYYYMM`）で統一すること。また、全ブランド対象記事（特定単一ブランドに属さない記事）にはブランド分類として「`ALL BRANDS`」を割り当てること。
 - **Constructive Pushback & Advisory Partnership Rule (プロフェッショナル助言・安全ブレーキ原則)**: ユーザーからの指示・希望を単に盲目的に実装するのではなく、プロフェッショナルな視点で一度立ち止まり、技術的・運用上・デザイン上のデメリットやリスク（CMS管理画面の手動編集との衝突、モバイル/タブレット表示の破綻、過度な共通化によるコード肥大化、ブランド品格・一貫性の毀損、表示速度/SEO低下など）が生じる恐れがある場合は、必ず作業を進める前に「リスクの理由」と「本来の目的を安全に達成できる代替案」を率直に提示し、ユーザーに確認・相談した上で進めること。
 - **Question-First Response Rule (質問優先・作業前回答原則)**: ユーザーから「なぜ〜か」「どうして」「おしえて」「どういうこと」などの質問・理由の確認・疑問を投げかけられた際は、先回りして勝手にコード編集や修正作業を行ってはならない。まずは純粋な質問への理由・背景・現状の分析・選択肢をテキストで回答し、ユーザーの理解・確認および次の方針指示を待ってから作業に移ること。
+- **Typography & Font rule (欧文・和文フォント設計原則)**: 欧文は Helvetica Neue / Helvetica（ヘルベチカ）を基調として最優先適用。和文（日本語）はシステムフォントスタック（Mac/iOS:「ヒラギノ角ゴ ProN」、Windows:「游ゴシック」、Android:「Noto Sans JP」/システムゴシック）を採用し、Webフォント遅延・レイアウトシフト（CLS）ゼロの最速高精細描画を担保すること。コード・メタラベルには JetBrains Mono を適用する。
 
 ## This Template
 
-A blog with posts, pages, categories, tags, full-text search, and RSS. Designed for personal writing, technical writing, indie newsletters, and anything where the writing is the product. Neutral editorial aesthetic: a framed layout with hairline rails, white cards on an off-white canvas, Inter with JetBrains Mono labels, and real article structure with bylines and reading time.
+A blog with posts, pages, categories, tags, full-text search, and RSS. Designed for personal writing, technical writing, indie newsletters, and anything where the writing is the product. Neutral editorial aesthetic: a framed layout with hairline rails, white cards on an off-white canvas, Helvetica / Helvetica Neue with JetBrains Mono labels, and real article structure with bylines and reading time.
 
 ## Pages
 
@@ -106,7 +107,7 @@ The palette is neutral: an off-white canvas (`--color-bg`), white surfaces (`--c
 
 Every page sits in a frame: two hairline rails run the full height of the page, and each full-width section (`.band`) is ruled off with a hairline that meets the rails at a small crosshair. Cards are white with a 1px ring and a soft shadow, and their images are inset so the corners stay concentric (`--radius-xl` card = `--radius-lg` image + `--card-padding`).
 
-Type is **Inter** on `--font-body` for everything, with weight and size carrying the hierarchy. **JetBrains Mono** on `--font-mono` sets code and the small uppercase labels (`.eyebrow`) used for section names and meta. Page titles use `--font-size-display` with tight tracking; the home intro pairs the site title with the tagline as a muted second line.
+Type is **Helvetica** / **Helvetica Neue** on `--font-body` for everything, with weight and size carrying the hierarchy. **JetBrains Mono** on `--font-mono` sets code and the small uppercase labels (`.eyebrow`) used for section names and meta. Page titles use `--font-size-display` with tight tracking; the home intro pairs the site title with the tagline as a muted second line.
 
 The article layout is the standout feature: a meta rail (authors, date, reading time), a 680px body column, and a rail with the table of contents and sidebar widgets. Below 1100px it collapses to one column, the table of contents is hidden, and the widgets move under the article. Don't flatten it on desktop -- the layout signals "this is something to read".
 
@@ -138,7 +139,7 @@ CSS variables worth knowing (see `tokens.css` for the full list):
 ## What not to do
 
 - Don't add a second accent colour or coloured section backgrounds. If the site needs a colour, it goes in `--color-brand`.
-- Don't replace Inter with a display sans (Bebas, Anton, etc.). Headings rely on weight and size, not novelty faces.
+- Don't replace Helvetica with a display sans (Bebas, Anton, etc.). Headings rely on weight and size, not novelty faces.
 - Don't break the frame: new sections should be `.band` elements with their content in a `.frame`, so the rails and rules line up.
 - Don't collapse the article rails on desktop -- they're part of the reading experience.
 - Don't use stock blog copy ("Welcome to my blog", "Stay tuned for more"). Write a real tagline that says what this blog is about.

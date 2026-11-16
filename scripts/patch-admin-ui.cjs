@@ -146,5 +146,13 @@ for (const bundlePath of bundleCandidates) {
   }
 }
 
+// 5. バックエンド検索の「部分一致（LIKE）＋タクソノミー（カテゴリ・タグ）連動」パッチ
+try {
+  const { execSync } = require('child_process');
+  execSync('node ' + path.join(__dirname, 'patch-search.mjs'), { stdio: 'inherit' });
+} catch (e) {
+  console.error('[patch-admin-ui] Failed to run patch-search.mjs', e);
+}
+
 // Also apply repeater blocks accordion patch
 try { require("./patch-repeater-blocks.cjs"); } catch (e) { console.error("[patch-admin-ui] Failed to run patch-repeater-blocks.cjs", e); }

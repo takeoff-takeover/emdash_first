@@ -385,11 +385,13 @@ export const editorialBlocks = [
 				label: "【デザイン・色】ボタンの基本色（任意カラーも選択可）",
 				initial_value: "secondary",
 				options: [
-					{ label: "シックグレー（上品なグレー背景 / 白文字・基本）", value: "secondary" },
+					{ label: "★ 公式B：ダークシャシー（漆黒背景 × 1.5px真紅枠・ドットなし）", value: "border-red" },
+					{ label: "★ 公式C：サテンマット真紅（薄型ソリッド真紅・控えめハイライト）", value: "bezel" },
 					{ label: "シックブラック（黒背景 / 白文字）", value: "black" },
 					{ label: "ピュアホワイト（白背景 / 黒文字・高コントラスト）", value: "white" },
+					{ label: "シックグレー（上品なグレー背景 / 白文字・基本）", value: "secondary" },
 					{ label: "アウトライン（上品な白枠線 / 背景透過）", value: "outline" },
-					{ label: "アクセントレッド（注目度No.1・最重要CTA推奨）", value: "primary" },
+					{ label: "アクセントレッド（精密エッジ・ソリッド真紅）", value: "primary" },
 					{ label: "ブランドブルー（BMW / MINIブルー #0066b1）", value: "blue" },
 					{ label: "任意カラー（下のカラーコード／カラーピッカーで自由指定）", value: "custom" }
 				]

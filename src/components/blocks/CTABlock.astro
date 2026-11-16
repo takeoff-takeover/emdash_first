@@ -54,9 +54,9 @@ if (node.target_blank === "blank") {
 // カスタム色・プリセット色のインラインスタイル
 let customInlineStyle = "";
 if (styleType === "custom" && customColor) {
-	customInlineStyle = `background: ${customColor}; border-color: ${customColor}; box-shadow: 0 4px 20px ${customColor}44; color: #ffffff !important;`;
+	customInlineStyle = `background: ${customColor}; border-color: ${customColor}; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); color: #ffffff !important;`;
 } else if (styleType === "blue") {
-	customInlineStyle = "background: #0066b1; border-color: #0066b1; box-shadow: 0 4px 20px rgba(0, 102, 177, 0.35); color: #ffffff !important;";
+	customInlineStyle = "background: #0066b1; border-color: #0066b1; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); color: #ffffff !important;";
 }
 ---
 
@@ -187,17 +187,57 @@ if (styleType === "custom" && customColor) {
 		border-radius: 0;
 	}
 
-	/* スタイル1：アクセントレッド */
-	.cms-cta-btn--primary {
-		background: #e52d27;
+	/* スタイル1：アクセントレッド / ブランド（ネオン発光感を完全排除し、落ち着いた高級マット陰影に - パターンA） */
+	.cms-cta-btn--primary,
+	.cms-cta-btn--brand,
+	.cms-cta-btn--accent-a {
+		background: #b81424;
 		color: #ffffff !important;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 4px 20px rgba(229, 45, 39, 0.38);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
-	.cms-cta-btn--primary:hover {
-		background: #d0201a;
+	.cms-cta-btn--primary:hover,
+	.cms-cta-btn--brand:hover,
+	.cms-cta-btn--accent-a:hover {
+		background: #9f111f;
 		transform: translateY(-2px);
-		box-shadow: 0 8px 28px rgba(229, 45, 39, 0.5);
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+		color: #ffffff !important;
+	}
+
+	/* パターンB：ダークシャシー＆クリムゾンボーダー */
+	.cms-cta-btn--border-red,
+	.cms-cta-btn--dark-red,
+	.cms-cta-btn--accent-b {
+		background: #14151a;
+		color: #ffffff !important;
+		border: 1.5px solid #e11d48;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+	}
+	.cms-cta-btn--border-red:hover,
+	.cms-cta-btn--dark-red:hover,
+	.cms-cta-btn--accent-b:hover {
+		background: #881326;
+		border-color: #ff3366;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+		color: #ffffff !important;
+	}
+
+	/* パターンC：サテンマット・クリムゾン（立体感オフ・薄型仕様） */
+	.cms-cta-btn--bezel,
+	.cms-cta-btn--accent-c {
+		background: #ad1428;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 5px rgba(0, 0, 0, 0.35);
+	}
+	.cms-cta-btn--bezel:hover,
+	.cms-cta-btn--accent-c:hover {
+		background: #be1830;
+		border-color: rgba(255, 255, 255, 0.25);
+		transform: translateY(-1px);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 10px rgba(0, 0, 0, 0.45);
 		color: #ffffff !important;
 	}
 

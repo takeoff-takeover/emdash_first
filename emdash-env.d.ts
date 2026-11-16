@@ -175,12 +175,6 @@ export interface Company {
   about_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   about_image_caption?: string;
   about_text?: string;
-  highlight_1_num?: string;
-  highlight_1_label?: string;
-  highlight_2_num?: string;
-  highlight_2_label?: string;
-  highlight_3_num?: string;
-  highlight_3_label?: string;
   established?: string;
   representative?: string;
   postal?: string;

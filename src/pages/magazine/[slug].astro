@@ -5,6 +5,8 @@ import { getEmDashEntry, getEmDashCollection, getTermsForEntries, decodeSlug } f
 import { PortableText, Image } from "emdash/ui";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
+import path from "node:path";
+import { env } from "cloudflare:workers";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import "../../styles/magazine-text.css";
 import { isNoticeArticle, isESGArticle } from "../../lib/magazinePolicy";
@@ -910,7 +912,7 @@ const hasShowrooms = matchedShowrooms.length > 0;
 
 const featuredImage = post.data.featured_image;
 const featuredImageSp = (post.data as any).featured_image_sp;
-const heroImageUrl = getImageUrl(featuredImage) || "/images/no-image.svg";
+const heroImageUrl = getImageUrl(featuredImage) || "/images/placeholder-replace.jpg";
 const heroImageUrlSp = getImageUrl(featuredImageSp);
 
 // 本文内に注釈ブロックが存在するか判定
@@ -1018,12 +1020,39 @@ const latestStories = allStories.slice(0, 5);
 const relatedStoriesUrl = `/magazine/?brand=${encodeURIComponent(detectedBrand)}#magazine-archive`;
 
 // 人気記事ランキング（上位5件）の取得
+function getLocalMagazineDb() {
+	try {
+		const root = process.cwd();
+		const d1Dir = path.resolve(root, ".wrangler/state/v3/d1/miniflare-D1DatabaseObject");
+		if (fs.existsSync(d1Dir)) {
+			const files = fs.readdirSync(d1Dir);
+			const candidates = files
+				.filter(f => f.endsWith(".sqlite") && !f.includes("metadata") && !f.includes("bak"))
+				.map(f => ({ path: path.join(d1Dir, f), mtime: fs.statSync(path.join(d1Dir, f)).mtimeMs }))
+				.sort((a, b) => b.mtime - a.mtime);
+			if (candidates[0]) {
+				return new DatabaseSync(candidates[0].path);
+			}
+		}
+		const backupPath = path.resolve(root, "seed/backup.sqlite");
+		if (fs.existsSync(backupPath)) {
+			return new DatabaseSync(backupPath);
+		}
+	} catch (e) {
+		console.error("Local SQLite init error in [slug]:", e);
+	}
+	return null;
+}
+
 let popularStories: any[] = [];
 try {
-	const DB_PATH = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/c5f74f54de1b54dfe248af0cae042e755774e9e90fc1e7dc6e84e3d6d7130474.sqlite';
-	if (fs.existsSync(DB_PATH)) {
-		const db = new DatabaseSync(DB_PATH);
-		const rows = db.prepare(`
+	let db: any = null;
+	try {
+		db = (env as any)?.DB;
+	} catch (e) {}
+
+	if (db) {
+		const rows = await db.prepare(`
 			SELECT m.slug, m.title, m.featured_image, COALESCE(v.views, 0) as views,
 			       COALESCE(m.published_at, m.created_at) as sort_date
 			FROM ec_magazine m
@@ -1032,9 +1061,10 @@ try {
 			  AND m.slug != ?
 			ORDER BY views DESC, sort_date DESC
 			LIMIT 5
-		`).all(slug) as any[];
+		`).bind(slug).all();
 
-		popularStories = rows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
+		const records = rows.results || [];
+		popularStories = records.filter((r: any) => !isNoticeArticle(r) && !isESGArticle(r)).map((r: any) => {
 			let brand = "BMW";
 			const t = (r.title || "").toLowerCase();
 			if (t.includes("mini")) brand = "MINI";
@@ -1052,16 +1082,48 @@ try {
 				url: `/magazine/${r.slug}/`
 			};
 		});
+	} else {
+		const localDb = getLocalMagazineDb();
+		if (localDb) {
+			const rows = localDb.prepare(`
+				SELECT m.slug, m.title, m.featured_image, COALESCE(v.views, 0) as views,
+				       COALESCE(m.published_at, m.created_at) as sort_date
+				FROM ec_magazine m
+				LEFT JOIN article_views v ON m.slug = v.slug
+				WHERE (m.status = 'published' OR m.status IS NULL) AND m.deleted_at IS NULL
+				  AND m.slug != ?
+				ORDER BY views DESC, sort_date DESC
+				LIMIT 5
+			`).all(slug) as any[];
+
+			popularStories = rows.filter(r => !isNoticeArticle(r) && !isESGArticle(r)).map(r => {
+				let brand = "BMW";
+				const t = (r.title || "").toLowerCase();
+				if (t.includes("mini")) brand = "MINI";
+				else if (t.includes("ferrari") || t.includes("フェラーリ")) brand = "Ferrari";
+				else if (t.includes("alpina") || t.includes("アルピナ")) brand = "ALPINA";
+				else if (t.includes("rolls") || t.includes("ロールス")) brand = "Rolls-Royce";
+
+				const storyObj = storiesBySlug.get(r.slug);
+				return {
+					slug: r.slug,
+					title: r.title,
+					brand,
+					views: typeof r.views === 'number' ? r.views : 0,
+					image: storyObj?.image || r.featured_image,
+					url: `/magazine/${r.slug}/`
+				};
+			});
+		}
 	}
 } catch (e) {
 	// フォールバック
 }
 
 if (!popularStories.length) {
-	// フォールバック: 全記事の中から上位5件を人気記事として表示
 	popularStories = allStories.slice(0, 5).map((s, idx) => ({
 		...s,
-		views: 2400 - (idx * 320)
+		views: s.viewsCount || (2400 - (idx * 320))
 	}));
 }
 
@@ -1147,6 +1209,18 @@ const articleDate = (post.data as any).publishedAt || (post.data as any).publish
 const formattedArticleDate = articleDate
 	? new Date(articleDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
 	: "";
+
+const articleUpdated = (post.data as any).updatedAt || (post.data as any).updated_at;
+let formattedUpdateDate = "";
+if (articleUpdated) {
+	const pubTime = articleDate ? new Date(articleDate).getTime() : 0;
+	const updTime = new Date(articleUpdated).getTime();
+	const pubDateStr = articleDate ? new Date(articleDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".") : "";
+	const updDateStr = new Date(articleUpdated).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".");
+	if (updDateStr && updDateStr !== pubDateStr && updTime > pubTime) {
+		formattedUpdateDate = updDateStr;
+	}
+}
 const editUrl = postDbId 
 	? `/_emdash/admin/content/${contentCollection}/${postDbId}`
 	: `/_emdash/admin/content/${contentCollection}`;
@@ -1224,7 +1298,7 @@ if (Array.isArray(post.data?.content)) {
 					alt={post.data.title} 
 					class="article-hero-img" 
 					loading="eager" 
-					onerror="this.onerror=null;this.src='/images/no-image.svg';"
+					onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 				/>
 			</picture>
 		</div>
@@ -1272,7 +1346,7 @@ if (Array.isArray(post.data?.content)) {
 						{articleCategories.join(" / ") || "PEOPLE & CAR LIFE"}
 					</span>
 					<time class="meta-date">
-						{formattedArticleDate}
+						{formattedArticleDate}{formattedUpdateDate && <span class="meta-update">（update：{formattedUpdateDate}）</span>}
 					</time>
 					<span class="meta-views" id="metaViewsBadge" title="閲覧数" style="display: none;">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="meta-views-icon" aria-hidden="true">
@@ -1459,10 +1533,10 @@ if (Array.isArray(post.data?.content)) {
 												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
 											) : (
 												<img
-													src={getImageUrl(story.image) || '/images/no-image.svg'}
+													src={getImageUrl(story.image) || '/images/placeholder-replace.jpg'}
 													alt={story.title}
 													loading="lazy"
-													onerror="this.onerror=null;this.src='/images/no-image.svg';"
+													onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 												/>
 											)}
 										</div>
@@ -1531,10 +1605,10 @@ if (Array.isArray(post.data?.content)) {
 												<Image image={story.image} alt={story.image?.alt || story.title} loading="lazy" />
 											) : (
 												<img
-													src={getImageUrl(story.image) || '/images/no-image.svg'}
+													src={getImageUrl(story.image) || '/images/placeholder-replace.jpg'}
 													alt={story.title}
 													loading="lazy"
-													onerror="this.onerror=null;this.src='/images/no-image.svg';"
+													onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 												/>
 											)}
 										</div>
@@ -1854,6 +1928,12 @@ if (Array.isArray(post.data?.content)) {
 		font-size: 12px;
 		color: var(--magazine-text-muted, #71717a);
 		letter-spacing: 0.08em;
+	}
+
+	.meta-update {
+		font-size: 0.92em;
+		color: var(--magazine-text-muted, #8e8e93);
+		margin-left: 2px;
 	}
 
 	.meta-views {
