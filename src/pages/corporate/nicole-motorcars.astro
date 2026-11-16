@@ -1,89 +1,350 @@
 ---
 // src/pages/corporate/nicole-motorcars.astro
 // Nicole MotorCars合同会社 会社案内（Nicole Connect マガジン同等の黒背景エディトリアルデザイン）
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import MapBadge from "../../components/MapBadge.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import svgs from "../../data/corporate-svgs.json";
+import "../../styles/corporate.css";
 
-const pageTitle = "Nicole MotorCars合同会社 | ロールス・ロイス・モーター・カーズ正規ディーラー | Nicole Group 公式";
-const pageDescription = "英国ロールス・ロイス・モーター・カーズ正規販売代理店 Nicole MotorCars合同会社の企業情報です。横浜みなとみらいに日本初となる最新CIショールームを構え、2024年には世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。卓越したクラフトマンシップと比類なきビスポーク体験をご提供いたします。";
+// CMS 'companies' コレクションからデータを優先取得
+let companyEntry: any = null;
+try {
+	const res = await getEmDashEntry("companies" as any, "nicole-motorcars");
+	if (res?.entry) {
+		companyEntry = res.entry.data || res.entry;
+	}
+} catch (e) {}
 
-// ショールームフォトギャラリー写真（Gallery format rule準拠: シンプルな番号と説明のみ）
-const showroomGallery = [
+// 管理画面で追加された自由ブロック（Portable Text）のパース
+let parsedContent: any[] = [];
+if (companyEntry?.content) {
+	if (Array.isArray(companyEntry.content)) {
+		parsedContent = companyEntry.content;
+	} else if (typeof companyEntry.content === "string") {
+		try {
+			const parsed = JSON.parse(companyEntry.content);
+			if (Array.isArray(parsed)) parsedContent = parsed;
+		} catch (e) {}
+	}
+}
+
+const companyTitle = companyEntry?.title || "Nicole MotorCars合同会社";
+
+const pageTitle = companyEntry?.title
+	? `${companyEntry.title} | ロールス・ロイス・モーター・カーズ正規ディーラー | Nicole Group 公式`
+	: "Nicole MotorCars合同会社 | ロールス・ロイス・モーター・カーズ正規ディーラー | Nicole Group 公式";
+
+const pageDescription = companyEntry?.hero_phrase
+	? companyEntry.hero_phrase
+	: "英国ロールス・ロイス・モーター・カーズ正規販売代理店 Nicole MotorCars合同会社の企業情報です。横浜みなとみらいに日本初となる最新CIショールームを構え、2024年には世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。卓越したクラフトマンシップと比類なきビスポーク体験をご提供いたします。";
+
+// ヒーロー
+const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/02/20240119RRYokohama_Photo07-scaled.avif";
+const heroPhrase = companyEntry?.hero_phrase || "英国ロールス・ロイス・モーター・カーズ正規販売代理店。横浜みなとみらいに日本初となる最新CIショールームを構え、2024年には世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。比類なき頂点のクラフトマンシップと、選ばれたお客様のための至高の体験をお届けします。";
+
+// 会社紹介
+const aboutTitle = companyEntry?.about_title || "世界最高峰のラグジュアリーと、<br />比類なき歓びをお届けする。";
+const aboutLead = companyEntry?.about_lead || "2009年の設立以来、卓越した実績と信頼を積み重ねてきた正規ディーラー";
+const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/2026/02/DSC07169-scaled.avif";
+const aboutImageCaption = companyEntry?.about_image_caption || "ビスポーク・アトリエ（Bespoke Atelier Yokohama）";
+const aboutText = companyEntry?.about_text || "Nicole MotorCars合同会社は、2009年に英国ロールス・ロイス・モーター・カーズより神奈川エリアの正規ディーラーとして指名を受け設立されました。\n\n以来、世界最高峰の自動車ブランドにふさわしい最高水準のホスピタリティと技術力を磨き続け、横浜みなとみらいの地でお客様一人ひとりの想いに寄り添うパーソナルなサービスを展開してまいりました。\n\n2024年には、日本初となる最新CIに基づいた新ショールームをオープン。開放感あふれる最新鋭の空間には、特別なビスポーク・アトリエを完備し、素材やペイントカラー、ステッチの細部に至るまで妥協なく追求できる環境を整えています。\n\n同年、全世界のロールス・ロイス正規代理店を対象としたアワードにおいて、世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。世界基準で認められた提案力と情熱をもって、限られたお客様へ一生涯記憶に残る感動をお届けしています。";
+
+// ハイライト
+const highlight1Num = companyEntry?.highlight_1_num || "世界一";
+const highlight1Label = companyEntry?.highlight_1_label || "Bespoke Dealer of the Year 2024";
+const highlight2Num = companyEntry?.highlight_2_num || "日本初";
+const highlight2Label = companyEntry?.highlight_2_label || "新世代CIショールーム開設";
+const highlight3Num = companyEntry?.highlight_3_num || "2009年";
+const highlight3Label = companyEntry?.highlight_3_label || "設立・正規指名";
+
+// ショールーム拠点初期値
+const fallbackShowroom = {
+	name: "ロールス・ロイス・モーター・カーズ横浜",
+	type: "正規ショールーム / ビスポーク・ラウンジ",
+	postal: "〒220-0012",
+	address: "神奈川県横浜市西区みなとみらい4-2-1",
+	tel: "045-680-4500",
+	fax: "045-680-4501",
+	hours: "10:00～18:00",
+	closed: "水曜日",
+	image: "/uploads/2026/02/rr_20261008-1024x683.jpg",
+	mapUrl: "https://maps.google.com/?q=ロールス・ロイス・モーター・カーズ横浜+横浜市西区みなとみらい4-2-1",
+	desc: "国内初となる最新CIショールーム。世界に一台だけのビスポークを仕立てるアトリエとラウンジを完備。"
+};
+
+// CMS 'locations' コレクションからロールス・ロイス拠点を動的取得
+let showroomData = fallbackShowroom;
+try {
+	const locResult = await getEmDashCollection("locations" as any, { limit: 50 });
+	if (locResult?.entries && locResult.entries.length > 0) {
+		const rrLoc = locResult.entries.find((e: any) => {
+			const slug = (e.id || e.slug || "").toLowerCase();
+			const b = ((e.data?.brand || e.brand || "")).toLowerCase();
+			return slug.includes("rolls-royce") || b.includes("rolls-royce");
+		});
+		if (rrLoc) {
+			const d = rrLoc.data || rrLoc;
+			let imgSrc = fallbackShowroom.image;
+			if (d.featured_image) {
+				const feat = typeof d.featured_image === "string" ? (() => { try { return JSON.parse(d.featured_image); } catch { return d.featured_image; } })() : d.featured_image;
+				if (feat?.src) imgSrc = feat.src;
+				else if (typeof feat === "string" && feat.trim()) imgSrc = feat.trim();
+			}
+			showroomData = {
+				name: d.title || fallbackShowroom.name,
+				type: "正規ショールーム / ビスポーク・ラウンジ",
+				postal: d.postal || fallbackShowroom.postal,
+				address: d.address || fallbackShowroom.address,
+				tel: d.sales_tel || d.tel || fallbackShowroom.tel,
+				fax: d.sales_fax || d.fax || fallbackShowroom.fax,
+				hours: d.sales_hours || fallbackShowroom.hours,
+				closed: d.sales_closed || fallbackShowroom.closed,
+				image: imgSrc,
+				mapUrl: d.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(d.title + " " + d.address)}`,
+				desc: d.sales_desc || d.concept_text || fallbackShowroom.desc
+			};
+		}
+	}
+} catch (e) {}
+
+// ショールームフォトギャラリー写真
+let showroomGallery = [
 	{
 		src: "/uploads/2026/02/20240119RRYokohama_Photo07-scaled.avif",
 		alt: "ロールス・ロイス・モーター・カーズ横浜 最新CIショールーム展示スペース",
 		num: "01",
+		title: "メインショールーム",
 		caption: "最新CIに基づき設計されたメインショールーム展示フロア"
 	},
 	{
 		src: "/uploads/2026/02/DSC07169-scaled.avif",
 		alt: "ロールス・ロイス・モーター・カーズ横浜 ビスポーク・アトリエ",
 		num: "02",
+		title: "ビスポーク・アトリエ",
 		caption: "世界に一台だけの車を仕立てるビスポーク・アトリエ"
 	},
 	{
 		src: "/uploads/2026/02/20240119RRYokohama_Photo10-scaled.avif",
 		alt: "ロールス・ロイス・モーター・カーズ横浜 プライベート商談ラウンジ",
 		num: "03",
+		title: "プライベートラウンジ",
 		caption: "優雅で落ち着いた対話をお届けするプライベート商談ラウンジ"
 	},
 	{
 		src: "/uploads/2026/02/DSC07532-scaled.avif",
 		alt: "ロールス・ロイス ビスポーク マテリアルサンプルコレクション",
 		num: "04",
+		title: "マテリアルサンプル",
 		caption: "最高品質のレザー、ウッド、ペイントカラーのマテリアルサンプル"
 	},
 	{
 		src: "/uploads/2026/02/DSC07521-scaled.avif",
 		alt: "ロールス・ロイス・モーター・カーズ横浜 ショールームエントランス",
 		num: "05",
+		title: "エントランス",
 		caption: "洗練されたラグジュアリーの世界観へと誘うエントランス"
 	},
 	{
 		src: "/uploads/2026/02/O0A0165-scaled.avif",
 		alt: "ロールス・ロイス ディテール クラフトマンシップ",
 		num: "06",
+		title: "クラフトマンシップ",
 		caption: "比類なき頂点のクラフトマンシップが息づく車両ディテール"
-	},
-	{
-		src: "/uploads/2026/02/DSC07535-scaled.avif",
-		alt: "ロールス・ロイス ビスポーク サンプルディスプレイウォール",
-		num: "07",
-		caption: "無限のパーソナライゼーションを体感できるサンプルウォール"
 	}
 ];
 
-// 関連記事データ
-const relatedArticles = [
-	{
-		title: "ロールス・ロイス認定中古車は買い？プロビナンスの保証と価値",
-		date: "2026.09.03",
-		tag: "Rolls-Royce",
-		url: "/posts202609_rolls-royce_provenance-worth-it/",
-		img: "/uploads/2026/08/Rolls-Royce-Cullinan-Series-II-Captain-Finished-in-Monteverde-Image-9-2025-scaled-e1787725475530.jpg"
-	},
-	{
-		title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・点検・選び方について",
-		date: "2026.07.06",
-		tag: "Certified Pre-Owned",
-		url: "/posts202607_nicole_certified-used-cars-guide/",
-		img: "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg"
-	},
-	{
-		title: "愛車の輝きを10年守る。プロテクションフィルムの選び方と「メーカー直結施工」の真価",
-		date: "2026.06.25",
-		tag: "Service & Bodycare",
-		url: "/posts202606_nicole_protection-film/",
-		img: "/uploads/2026/06/DSC8395-e1782193339640.jpg"
-	},
-	{
-		title: "2026年版 ロールス・ロイス スペクター補助金ガイド（CEV補助金・助成情報）",
-		date: "2026.06.03",
-		tag: "Rolls-Royce Spectre",
-		url: "/posts202606_rolls-royce_ev-subsidy-guide/",
-		img: "/uploads/2026/06/cq5dam.web_-e1780380151979.jpg"
+if (companyEntry) {
+	const dynamicGallery: any[] = [];
+	for (let i = 1; i <= 6; i++) {
+		const rawImg = companyEntry[`gallery_image_${i}`];
+		if (rawImg) {
+			let src = "";
+			let alt = companyEntry[`gallery_title_${i}`] || `${companyTitle} 写真 ${i}`;
+			if (typeof rawImg === "string") {
+				try {
+					const parsed = JSON.parse(rawImg);
+					src = parsed.src || rawImg;
+					if (parsed.alt) alt = parsed.alt;
+				} catch {
+					src = rawImg;
+				}
+			} else if (typeof rawImg === "object" && rawImg !== null) {
+				src = rawImg.src || "";
+				if (rawImg.alt) alt = rawImg.alt;
+			}
+			if (src) {
+				const num = String(dynamicGallery.length + 1).padStart(2, "0");
+				dynamicGallery.push({
+					src,
+					alt,
+					num,
+					title: companyEntry[`gallery_title_${i}`] || `ギャラリー ${num}`,
+					caption: companyEntry[`gallery_caption_${i}`] || ""
+				});
+			}
+		}
 	}
-];
+	if (dynamicGallery.length > 0) {
+		showroomGallery = dynamicGallery;
+	}
+}
+
+// 会社基本データ
+const companyNameEn = companyEntry?.name_en || "Nicole MotorCars LLC";
+const established = companyEntry?.established || "2009年";
+const representative = companyEntry?.representative || "代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）";
+const postal = companyEntry?.postal || showroomData?.postal || "〒220-0012";
+const address = companyEntry?.address || showroomData?.address || "神奈川県横浜市西区みなとみらい4-2-1";
+const tel = companyEntry?.tel || (showroomData?.tel ? `${showroomData.tel}（代表） / FAX：${showroomData.fax || '045-680-4501'}` : "045-680-4500（代表） / FAX：045-680-4501");
+const telDisplay = tel.startsWith("TEL") ? tel : `TEL：${tel}`;
+const businessList = companyEntry?.business_desc
+	? companyEntry.business_desc.split("\n").filter(Boolean)
+	: [
+		"ロールス・ロイス・モーター・カーズ新車販売およびアフターセールス",
+		"ロールス・ロイス認定中古車「プロビナンス（Provenance）」の販売・査定・買取",
+		"ロールス・ロイス純正部品・アクセサリーの販売",
+		"ビスポーク（完全オーダーメイド）のご相談・オーダー受付",
+		"自動車保険代理店業務"
+	];
+
+// 記事カテゴリー判定ヘルパー（マガジン「Nicole Connect」と完全共通）
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
+
+	if (slug.includes("campaign") || slug.includes("fair") || slug.includes("debut") || title.includes("フェア") || title.includes("キャンペーン")) {
+		return "Campaign";
+	}
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
+		return "Buyer's Guide";
+	}
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"norimonofes", "sdgs", "summerconference", "esg", "美化活動", "クリーンアップ", "交通安全", "防災", "寄付"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic.includes("esg") || topic.includes("sdgs")) {
+		return "ESG";
+	}
+	const peopleKeywords = [
+		"people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー",
+		"ストーリー", "story", "マイスター", "junior_high", "work-experience", "international-employee",
+		"fire-department", "mochitsuki", "餅つき", "交流会", "感謝状", "職場体験", "alpina-heritage", "rolls-royce-bespoke"
+	];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic === "people") {
+		return "People";
+	}
+	return "Cars";
+}
+
+// マガジンコレクションからロールス・ロイス関連最新記事を動的取得
+let relatedArticles: Array<{
+	title: string;
+	date: string;
+	category: string;
+	brand: string;
+	url: string;
+	img: string;
+}> = [];
+
+try {
+	const magResult = await getEmDashCollection("magazine" as any, {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (magResult?.entries && magResult.entries.length > 0) {
+		const filtered = magResult.entries.filter((entry: any) => {
+			const slug = (entry.id || entry.slug || "").toLowerCase();
+			const title = (entry.data?.title || entry.title || "").toLowerCase();
+			return slug.includes("rolls-royce") || slug.includes("rollsroyce") || title.includes("ロールス") || title.includes("rolls-royce");
+		});
+
+		const selectedEntries = (filtered.length >= 4 ? filtered : magResult.entries.filter((e: any) => {
+			const s = (e.id || e.slug || "").toLowerCase();
+			const t = (e.data?.title || e.title || "").toLowerCase();
+			return s.includes("rolls") || t.includes("ロールス");
+		})).slice(0, 4);
+
+		const entryIds = selectedEntries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+
+		let categoryTermsByEntry = new Map<string, any[]>();
+		try {
+			if (entryIds.length > 0) {
+				categoryTermsByEntry = await getTermsForEntries("magazine", entryIds, "category");
+			}
+		} catch (e) {}
+
+		relatedArticles = selectedEntries.map((entry: any) => {
+			const slug = entry.id || entry.slug;
+			const title = entry.data?.title || entry.title || "ロールス・ロイス特集記事";
+			const entryDbId = entry.data?.id || entry.id;
+			const publishedAt = new Date(entry.data?.publishedAt ?? entry.data?.createdAt ?? entry.published_at ?? 0).getTime() || 0;
+			const dateStr = publishedAt 
+				? new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
+				: "2026.09.03";
+			
+			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/2026/02/20240119RRYokohama_Photo07-scaled.avif";
+			if (imgPath.includes("nicole.co.jp/wp/wp-content")) {
+				imgPath = imgPath.replace(/https?:\/\/[^\/]+\/wp\/wp-content/, "/uploads/wp");
+			}
+
+			const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+			const inferredCat = determineArticleCategory({ slug, title, topic: entry.data?.topic || entry.topic });
+			const category = assignedCategories.length > 0 ? assignedCategories[0] : inferredCat;
+
+			return {
+				title,
+				date: dateStr,
+				category,
+				brand: "Rolls-Royce",
+				url: `/magazine/${slug}/`,
+				img: imgPath
+			};
+		});
+	}
+} catch (e) {}
+
+// フォールバック（ロールス・ロイス厳選4記事・実在画像保証）
+if (relatedArticles.length === 0) {
+	relatedArticles = [
+		{
+			title: "世界が認めた「究極の一台」を創る場所。ロールス・ロイス・モーター・カーズ横浜が体現するビスポークの真髄",
+			date: "2026.03.20",
+			category: "People",
+			brand: "Rolls-Royce",
+			url: "/magazine/202603_rolls-royce_yokohama_bespoke/",
+			img: "/uploads/2026/02/DSC07169-scaled.avif"
+		},
+		{
+			title: "ロールス・ロイス認定中古車は買い？プロビナンスの保証と価値",
+			date: "2026.09.03",
+			category: "Buyer's Guide",
+			brand: "Rolls-Royce",
+			url: "/magazine/202609_rolls-royce_provenance-worth-it/",
+			img: "/uploads/2026/08/Rolls-Royce-Cullinan-Series-II-Captain-Finished-in-Monteverde-Image-9-2025-scaled-e1787725475530.jpg"
+		},
+		{
+			title: "2026年版 ロールス・ロイス スペクター補助金ガイド（CEV補助金・助成情報）",
+			date: "2026.06.03",
+			category: "Buyer's Guide",
+			brand: "Rolls-Royce",
+			url: "/magazine/202606_rolls-royce_ev-subsidy-guide/",
+			img: "/uploads/2026/06/cq5dam.web_-e1780380151979.jpg"
+		},
+		{
+			title: "ロールス・ロイス・モーター・カーズ横浜、名誉あるディーラー・アワード受賞",
+			date: "2026.04.15",
+			category: "Cars",
+			brand: "Rolls-Royce",
+			url: "/magazine/202604_rollsroyce_award2025/",
+			img: "/uploads/2026/02/20240119RRYokohama_Photo07-scaled.avif"
+		}
+	];
+}
 
 // Schema.org 構造化データ（JSON-LD）
 const jsonLd = {
@@ -152,18 +413,7 @@ const jsonLd = {
 <NicoleLayout title={pageTitle} description={pageDescription}>
 	<Fragment slot="head">
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-		<style is:global>
-			body:has(.corporate-magazine-main),
-			body:has(.corporate-magazine-main) #page,
-			body:has(.corporate-magazine-main) #content,
-			body:has(.corporate-magazine-main) .site-content,
-			body:has(.corporate-magazine-main) #primary,
-			body:has(.corporate-magazine-main) .content-area,
-			body:has(.corporate-magazine-main) .ast-container {
-				background-color: #040507 !important;
-				background-image: none !important;
-			}
-		</style>
+		
 	</Fragment>
 
 	<main class="corporate-magazine-main">
@@ -171,7 +421,7 @@ const jsonLd = {
 		<header class="corp-hero">
 			<div class="corp-hero__media">
 				<img 
-					src="/uploads/2026/02/20240119RRYokohama_Photo07-scaled.avif" 
+					src={heroImageSrc} 
 					alt="ロールス・ロイス・モーター・カーズ横浜 ショールーム展示フロア" 
 					class="corp-hero__img" 
 					loading="eager" 
@@ -192,28 +442,23 @@ const jsonLd = {
 					</ol>
 				</nav>
 
-				<div class="corp-hero__logo-wrap">
-					<div class="corp-hero__brand-logo" set:html={svgs[6]} />
-				</div>
-
-				<h1 class="corp-hero__title">Nicole MotorCars合同会社</h1>
+				<h1 class="corp-hero__title">{companyTitle}</h1>
 				<p class="corp-hero__subtitle">
-					<span class="corp-hero__phrase">英国ロールス・ロイス・モーター・カーズ正規販売代理店。</span>
-					<span class="corp-hero__phrase">横浜みなとみらいに日本初となる最新CIショールームを構え、</span>
-					<span class="corp-hero__phrase">2024年には世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。</span><br class="corp-hero__br" />
-					<span class="corp-hero__phrase">比類なき頂点のクラフトマンシップと、</span>
-					<span class="corp-hero__phrase">選ばれたお客様のための至高の体験をお届けします。</span>
+					{heroPhrase.split("。").filter(Boolean).map((phrase: string) => (
+						<span class="corp-hero__phrase">{phrase}。</span>
+					))}
 				</p>
 
 				<!-- ページ内クイックナビゲーション -->
 				<nav class="corp-subnav" aria-label="ページ内目次">
 					<ul class="corp-subnav__list">
 						<li><a href="#about" class="corp-subnav__pill">会社紹介</a></li>
-						<li><a href="#showroom" class="corp-subnav__pill">ショールーム</a></li>
-						<li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>
-						<li><a href="#awards" class="corp-subnav__pill">受賞実績</a></li>
-						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
+						{parsedContent.length > 0 && <li><a href="#additional-content" class="corp-subnav__pill">詳細情報</a></li>}
+						<li><a href="#showroom" class="corp-subnav__pill">ショールーム案内</a></li>
 						<li><a href="#profile" class="corp-subnav__pill">会社基本データ</a></li>
+						<li><a href="#awards" class="corp-subnav__pill">受賞実績</a></li>
+						{showroomGallery.length > 0 && <li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>}
+						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -227,56 +472,43 @@ const jsonLd = {
 					<div class="corp-narrative-visual">
 						<div class="corp-narrative-card">
 							<img 
-								src="/uploads/2026/02/DSC07169-scaled.avif" 
-								alt="ロールス・ロイス・モーター・カーズ横浜 ビスポーク・アトリエ内観" 
+								src={aboutImageSrc} 
+								alt={aboutImageCaption} 
 								class="corp-narrative-img" 
-								width="1200" 
-								height="800" 
+								width="1024" 
+								height="683" 
 								loading="lazy" 
 								decoding="async" 
 							/>
-							<div class="corp-narrative-caption">
-								<span class="corp-narrative-caption-title">ビスポーク・アトリエ</span>
-								<span class="corp-narrative-caption-sub">Bespoke Atelier Yokohama</span>
-							</div>
 						</div>
 					</div>
 
 					<!-- 右列: ストーリー本文 -->
 					<div class="corp-narrative-content">
 						<header class="corp-section-header">
-							<h2 class="corp-section-title">世界最高峰のラグジュアリーと、<br />比類なき歓びをお届けする。</h2>
-							<p class="corp-section-lead">2009年の設立以来、卓越した実績と信頼を積み重ねてきた正規ディーラー</p>
+							<h2 class="corp-section-title" set:html={aboutTitle} />
+							<p class="corp-section-lead">{aboutLead}</p>
 						</header>
 
 						<div class="corp-narrative-body">
-							<p>Nicole MotorCars合同会社は、2009年に英国ロールス・ロイス・モーター・カーズより神奈川エリアの正規ディーラーとして指名を受け設立されました。</p>
-
-							<p>以来、世界最高峰の自動車ブランドにふさわしい最高水準のホスピタリティと技術力を磨き続け、横浜みなとみらいの地でお客様一人ひとりの想いに寄り添うパーソナルなサービスを展開してまいりました。</p>
-
-							<p>2024年には、日本初となる最新CIに基づいた新ショールームをオープン。開放感あふれる最新鋭の空間には、特別なビスポーク・アトリエを完備し、素材やペイントカラー、ステッチの細部に至るまで妥協なく追求できる環境を整えています。</p>
-
-							<p>同年、全世界のロールス・ロイス正規代理店を対象としたアワードにおいて、世界一となる「グローバル・ビスポーク・オブ・ザ・イヤー」を受賞。世界基準で認められた提案力と情熱をもって、限られたお客様へ一生涯記憶に残る感動をお届けしています。</p>
-						</div>
-
-						<div class="corp-narrative-highlights">
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">2009</div>
-								<div class="corp-highlight-item__label">設立・正規指名</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">No.1</div>
-								<div class="corp-highlight-item__label">2024年世界一受賞</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">New CI</div>
-								<div class="corp-highlight-item__label">日本初最新ショールーム</div>
-							</div>
+							{aboutText.split("\n\n").map((p: string) => (
+								<p>{p}</p>
+							))}
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
+		<!-- 自由ブロック（Portable Text: 管理画面から自由に追加・上下並び替え可能） -->
+		{parsedContent.length > 0 && (
+			<section id="additional-content" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<div class="corp-additional-blocks">
+						<RichPortableText value={parsedContent} />
+					</div>
+				</div>
+			</section>
+		)}
 
 		<!-- 3. ショールーム案内（SHOWROOM & SERVICES） -->
 		<section id="showroom" class="corp-section corp-section--bordered">
@@ -291,25 +523,21 @@ const jsonLd = {
 					<div class="corp-showroom-visual">
 						<div class="corp-showroom-photo-wrap">
 							<img 
-								src="/uploads/2026/02/rr_20261008.jpg" 
-								alt="ロールス・ロイス・モーター・カーズ横浜 ショールーム外観" 
+								src={showroomData.image} 
+								alt={`${showroomData.name} 外観写真`} 
 								class="corp-showroom-photo" 
 								loading="lazy" 
 								decoding="async" 
 							/>
-							<div class="corp-showroom-photo-badge">最新CI正規ショールーム</div>
 						</div>
 					</div>
 
 					<!-- 拠点詳細カード -->
 					<div class="corp-showroom-info">
 						<header class="corp-showroom-header">
-							<div class="corp-showroom-brand-mark">
-								<img src="/brands/rolls-royce.svg" alt="Rolls-Royce Motor Cars" width="36" height="48" class="rr-mark-img" />
-							</div>
 							<div>
-								<span class="corp-showroom-type">正規ショールーム / ビスポーク・ラウンジ</span>
-								<h3 class="corp-showroom-name">ロールス・ロイス・モーター・カーズ横浜</h3>
+								<span class="corp-showroom-type">{showroomData.type}</span>
+								<h3 class="corp-showroom-name">{showroomData.name}</h3>
 							</div>
 						</header>
 
@@ -317,17 +545,8 @@ const jsonLd = {
 							<div class="corp-showroom-row">
 								<dt class="corp-showroom-dt">所在地</dt>
 								<dd class="corp-showroom-dd">
-									<span>〒220-0012 神奈川県横浜市西区みなとみらい4-2-1</span>
-									<a 
-										href="https://www.google.com/maps/place/%E3%83%AD%E3%83%BC%E3%83%AB%E3%82%B9%E3%83%BB%E3%83%AD%E3%82%A4%E3%82%B9%E3%83%BB%E3%83%A2%E3%83%BC%E3%82%BF%E3%83%BC%E3%83%BB%E3%82%AB%E3%83%BC%E3%82%BA%E6%A8%AA%E6%B5%9C/@35.4581904,139.626748,16z/data=!3m1!4b1!4m6!3m5!1s0x60185c5d101eaf3f:0x9f2fbe48141851fc!8m2!3d35.4581904!4d139.626748!16s%2Fg%2F1vgqd1jr?entry=ttu" 
-										target="_blank" 
-										rel="noopener noreferrer" 
-										class="corp-map-link"
-										aria-label="ロールス・ロイス・モーター・カーズ横浜のGoogleマップを開く（外部サイト）"
-									>
-										<span>Google Mapsで地図を見る</span>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-svg" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-									</a>
+									<span>{showroomData.postal} {showroomData.address}</span>
+									<MapBadge href={showroomData.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${showroomData.name}の地図をGoogleマップで開く`} />
 								</dd>
 							</div>
 
@@ -335,80 +554,107 @@ const jsonLd = {
 								<dt class="corp-showroom-dt">連絡先</dt>
 								<dd class="corp-showroom-dd">
 									<div class="corp-showroom-contacts">
-										<a href="tel:045-680-4500" class="corp-tel-link">TEL：045-680-4500</a>
-										<span class="corp-contact-sep">/</span>
-										<span class="corp-fax-text">FAX：045-680-4501</span>
+										<a href={`tel:${showroomData.tel.replace(/-/g, '')}`} class="corp-tel-link">TEL：{showroomData.tel}</a>
+										{showroomData.fax && <span class="corp-contact-sep">/</span>}
+										{showroomData.fax && <span class="corp-fax-text">FAX：{showroomData.fax}</span>}
 									</div>
 								</dd>
 							</div>
 
 							<div class="corp-showroom-row">
 								<dt class="corp-showroom-dt">営業時間</dt>
-								<dd class="corp-showroom-dd">10:00～18:00</dd>
+								<dd class="corp-showroom-dd">{showroomData.hours}</dd>
 							</div>
 
 							<div class="corp-showroom-row">
 								<dt class="corp-showroom-dt">定休日</dt>
-								<dd class="corp-showroom-dd">水曜日</dd>
+								<dd class="corp-showroom-dd">{showroomData.closed}</dd>
 							</div>
 						</dl>
-
-						<!-- 公式アクションボタン -->
-						<div class="corp-showroom-actions">
-							<a 
-								href="https://www.rolls-roycemotorcars.com/yokohama/ja_JP/showroom.html" 
-								target="_blank" 
-								rel="noopener noreferrer" 
-								class="corp-btn corp-btn--primary"
-								aria-label="ロールス・ロイス・モーター・カーズ横浜 オフィシャル・サイトへ（外部サイト）"
-							>
-								<span>オフィシャル・サイト</span>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-							</a>
-
-							<a 
-								href="https://pre-owned.rolls-roycemotorcars.com/ja_jp/dealer_127669_rolls_royce_motor_cars_yokohama/searchresults" 
-								target="_blank" 
-								rel="noopener noreferrer" 
-								class="corp-btn corp-btn--outline"
-								aria-label="ロールス・ロイス プロビナンス 認定中古車検索へ（外部サイト）"
-							>
-								<span>プロビナンス 認定中古車</span>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-svg" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-							</a>
-						</div>
-						<p class="corp-showroom-note">※外部サイトへ遷移し、別ウィンドウで表示されます。</p>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- 4. ショールームギャラリー（GALLERY: Gallery format rule準拠） -->
-		<section id="gallery" class="corp-section corp-section--bordered">
+		<!-- 4. 会社基本データ -->
+		<section id="profile" class="corp-section corp-section--bordered">
 			<div class="corp-container">
 				<header class="corp-section-header">
-					<h2 class="corp-section-title">ショールーム</h2>
-					<p class="corp-section-subtitle">日本初となる最新CIを導入したショールームの内観とビスポーク空間。</p>
+					<h2 class="corp-section-title">会社基本データ</h2>
+					<p class="corp-section-subtitle">Nicole MotorCars合同会社の企業概要データです。</p>
 				</header>
 
-				<div class="corp-gallery-grid">
-					{showroomGallery.map((item) => (
-						<figure class="corp-gallery-card">
-							<div class="corp-gallery-card__media">
-								<img 
-									src={item.src} 
-									alt={item.alt} 
-									class="corp-gallery-card__img" 
-									loading="lazy" 
-									decoding="async" 
-								/>
-								<div class="corp-gallery-card__count">{item.num}</div>
-							</div>
-							<figcaption class="corp-gallery-card__caption">
-								{item.caption}
-							</figcaption>
-						</figure>
-					))}
+				<div class="corp-profile-card">
+					<table class="corp-profile-table">
+						<tbody>
+							<tr>
+								<th scope="row">会社名</th>
+								<td>{companyTitle}（{companyNameEn}）</td>
+							</tr>
+							<tr>
+								<th scope="row">設立</th>
+								<td>{established}</td>
+							</tr>
+							<tr>
+								<th scope="row">代表者</th>
+								<td>{representative}</td>
+							</tr>
+							<tr>
+								<th scope="row">所在地</th>
+								<td>
+									<span>{postal} {address}</span>
+									<MapBadge href="https://maps.google.com/?q=ロールス・ロイス・モーター・カーズ横浜+横浜市西区みなとみらい4-2-1" title="Googleマップで地図を見る" ariaLabel="本社の地図をGoogleマップで開く" />
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">電話番号</th>
+								<td>{telDisplay}</td>
+							</tr>
+							<tr>
+								<th scope="row">事業内容</th>
+								<td>
+									<ul class="corp-business-list">
+										{businessList.map((item: string) => (
+											<li>{item}</li>
+										))}
+									</ul>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">運営拠点</th>
+								<td>
+									<span class="corp-facility-summary">全1拠点（神奈川県横浜市）</span>
+									<ul class="corp-profile-facilities">
+										<li>
+											<span class="corp-facility-type">正規ショールーム / ビスポーク・アトリエ：</span>
+											<strong class="corp-facility-name">ロールス・ロイス・モーター・カーズ横浜</strong>
+											<span class="corp-facility-addr">（{postal} {address}）</span>
+											<MapBadge href="https://maps.google.com/?q=ロールス・ロイス・モーター・カーズ横浜+横浜市西区みなとみらい4-2-1" title="Googleマップで地図を見る" ariaLabel="ロールス・ロイス・モーター・カーズ横浜の地図をGoogleマップで開く" />
+										</li>
+									</ul>
+								</td>
+							</tr>
+							
+							<tr>
+								<th scope="row">取扱ブランド</th>
+								<td>Rolls-Royce Motor Cars（ロールス・ロイス・モーター・カーズ）</td>
+							</tr>
+							<tr>
+								<th scope="row">関連ページ</th>
+								<td>
+									<div class="corp-related-links">
+										<a href="/corporate" class="corp-inline-link">会社概要（グループ総合）</a>
+										<span class="corp-inline-link-sep">/</span>
+										<a href="/philosophy" class="corp-inline-link">企業理念</a>
+										<span class="corp-inline-link-sep">/</span>
+										<a href="/locations" class="corp-inline-link">グループ拠点一覧</a>
+										<span class="corp-inline-link-sep">/</span>
+										<a href="/magazine" class="corp-inline-link">Web Magazine</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</section>
@@ -445,8 +691,70 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 6. 関連記事（WEB MAGAZINE） -->
-		<section id="articles" class="corp-section corp-section--bordered">
+		<!-- 6. ショールームギャラリー（GALLERY - カルーセルスライダー） -->
+		{showroomGallery.length > 0 && (
+			<section id="gallery" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<header class="corp-section-header">
+						<h2 class="corp-section-title">ショールーム</h2>
+						<p class="corp-section-subtitle">日本初となる最新CIを導入したショールームの内観とビスポーク空間。</p>
+					</header>
+
+					<div class="corp-slider-wrapper">
+						<div class="corp-slider-viewport">
+							<div class="corp-slider-track" id="corpSliderTrack">
+								{showroomGallery.map((item, idx) => (
+									<div class={`corp-slider-slide ${idx === 0 ? "is-active" : ""}`} data-slide-index={idx}>
+										<div class="corp-slider-media">
+											<img 
+												src={item.src} 
+												alt={item.alt} 
+												class="corp-slider-img" 
+												loading={idx === 0 ? "eager" : "lazy"} 
+												decoding="async" 
+											/>
+											<span class="corp-slider-badge">{item.num} / {String(showroomGallery.length).padStart(2, "0")}</span>
+										</div>
+										<div class="corp-slider-caption">
+											<h3 class="corp-slider-title">{item.title}</h3>
+											<p class="corp-slider-desc">{item.caption}</p>
+										</div>
+									</div>
+								))}
+							</div>
+
+							<!-- 左右ナビゲーション矢印 -->
+							<button type="button" class="corp-slider-btn corp-slider-btn--prev" id="corpSliderPrev" aria-label="前の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+							</button>
+							<button type="button" class="corp-slider-btn corp-slider-btn--next" id="corpSliderNext" aria-label="次の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+							</button>
+						</div>
+
+						<!-- サムネイルナビゲーション -->
+						<div class="corp-slider-thumbs" id="corpSliderThumbs" role="tablist" aria-label="サムネイル一覧">
+							{showroomGallery.map((item, idx) => (
+								<button 
+									type="button" 
+									class={`corp-slider-thumb ${idx === 0 ? "is-active" : ""}`} 
+									data-thumb-index={idx}
+									aria-label={`スライド ${idx + 1} (${item.title}) を表示`}
+								>
+									<img src={item.src} alt={item.title} class="corp-slider-thumb-img" loading="lazy" decoding="async" />
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- 7. 追加コンテンツ（CMS Portable Text 自由ブロック） -->
+		
+
+		<!-- 8. 関連記事（RELATED ARTICLES） -->
+		<section id="articles" class="corp-section">
 			<div class="corp-container">
 				<header class="corp-section-header">
 					<h2 class="corp-section-title">関連記事</h2>
@@ -455,1182 +763,65 @@ const jsonLd = {
 
 				<div class="corp-articles-grid">
 					{relatedArticles.map((art) => (
-						<article class="corp-article-card">
-							<a href={art.url} class="corp-article-card__link">
-								<div class="corp-article-card__media">
-									<img 
-										src={art.img} 
-										alt={art.title} 
-										class="corp-article-card__img" 
-										loading="lazy" 
-										decoding="async" 
-									/>
-									<span class="corp-article-card__badge">{art.tag}</span>
-								</div>
-								<div class="corp-article-card__content">
-									<time class="corp-article-card__date" datetime={art.date}>{art.date}</time>
-									<h3 class="corp-article-card__title">{art.title}</h3>
-								</div>
-							</a>
-						</article>
+						<ArticleCard
+							title={art.title}
+							url={art.url}
+							image={art.img}
+							date={art.date}
+							topic={art.category}
+							brand={art.brand}
+							showBrandPill={false}
+						/>
 					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- 7. 会社基本データ（テーブル崩れ完全修正・クリーン定義リスト型セマンティックテーブル） -->
-		<section id="profile" class="corp-section">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">会社基本データ</h2>
-					<p class="corp-section-subtitle">Nicole MotorCars合同会社の企業概要データです。</p>
-				</header>
-
-				<div class="corp-profile-card">
-					<table class="corp-profile-table">
-						<tbody>
-							<tr>
-								<th scope="row">会社名</th>
-								<td>Nicole MotorCars合同会社（Nicole MotorCars LLC）</td>
-							</tr>
-							<tr>
-								<th scope="row">設立</th>
-								<td>2009年</td>
-							</tr>
-							<tr>
-								<th scope="row">代表者</th>
-								<td>代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）</td>
-							</tr>
-							<tr>
-								<th scope="row">所在地</th>
-								<td>〒220-0012 神奈川県横浜市西区みなとみらい4-2-1</td>
-							</tr>
-							<tr>
-								<th scope="row">電話番号</th>
-								<td>045-680-4500（代表） / FAX：045-680-4501</td>
-							</tr>
-							<tr>
-								<th scope="row">事業内容</th>
-								<td>
-									<ul class="corp-business-list">
-										<li>ロールス・ロイス・モーター・カーズ新車販売およびアフターセールス</li>
-										<li>ロールス・ロイス認定中古車「プロビナンス（Provenance）」の販売・査定・買取</li>
-										<li>ロールス・ロイス純正部品・アクセサリーの販売</li>
-										<li>ビスポーク（完全オーダーメイド）のご相談・オーダー受付</li>
-										<li>自動車保険代理店業務</li>
-									</ul>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">運営拠点</th>
-								<td>
-									<div class="corp-location-info">
-										<strong>ロールス・ロイス・モーター・カーズ横浜</strong><br />
-										〒220-0012 神奈川県横浜市西区みなとみらい4-2-1<br />
-										ショールーム・認定中古車・サービス受付
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">親会社・グループ</th>
-								<td>
-									ニコル・グループ（Nicole Group）<br />
-									ペンスキー・オートモーティブ・グループ（Penske Automotive Group, Inc. / 米国NYSE上場：PAG）
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">取扱ブランド</th>
-								<td>Rolls-Royce Motor Cars（ロールス・ロイス・モーター・カーズ）</td>
-							</tr>
-							<tr>
-								<th scope="row">関連ページ</th>
-								<td>
-									<div class="corp-related-links">
-										<a href="/corporate" class="corp-inline-link">会社概要（グループ総合）</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/philosophy" class="corp-inline-link">企業理念</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/locations" class="corp-inline-link">拠点一覧</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/magazine" class="corp-inline-link">Web Magazine</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/contact" class="corp-inline-link">お問い合わせ</a>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
 				</div>
 			</div>
 		</section>
 	</main>
 </NicoleLayout>
 
-<style>
-	/* ============================================================== */
-	/* Nicole Corporate - 黒背景エディトリアルデザインシステム */
-	/* ============================================================== */
-	.corporate-magazine-main {
-		background-color: #040507;
-		color: #ffffff;
-		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-		min-height: 100vh;
-		position: relative;
-		overflow-x: hidden;
-		padding-top: 80px; /* NicoleHeader分の余白 */
-	}
 
-	.corp-container {
-		width: 100%;
-		max-width: 1440px;
-		margin: 0 auto;
-		padding: 0 40px;
-		box-sizing: border-box;
-	}
 
-	@media (max-width: 1024px) {
-		.corp-container {
-			padding: 0 24px;
+<!-- ギャラリー カルーセルスライダースクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const track = document.getElementById('corpSliderTrack');
+		const prevBtn = document.getElementById('corpSliderPrev');
+		const nextBtn = document.getElementById('corpSliderNext');
+		const thumbs = document.querySelectorAll('.corp-slider-thumb');
+		const slides = document.querySelectorAll('.corp-slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) {
+						t.classList.add('is-active');
+						t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+					} else {
+						t.classList.remove('is-active');
+					}
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
 		}
-	}
-
-	@media (max-width: 480px) {
-		.corp-container {
-			padding: 0 16px;
-		}
-	}
-
-	/* ============================================================== */
-	/* 共通セクション設定 */
-	/* ============================================================== */
-	.corp-section {
-		padding: 90px 0;
-		position: relative;
-	}
-
-	.corp-section--bordered {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	@media (max-width: 768px) {
-		.corp-section {
-			padding: 60px 0;
-		}
-	}
-
-	.corp-section-header {
-		margin-bottom: 48px;
-	}
-
-	.corp-section-title {
-		font-size: clamp(26px, 3.2vw, 38px);
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: -0.01em;
-		line-height: 1.3;
-		margin: 0 0 14px 0;
-		text-wrap: balance;
-	}
-
-	.corp-section-subtitle {
-		font-size: 15px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.65);
-		margin: 0;
-		max-width: 760px;
-	}
-
-	.corp-section-lead {
-		font-size: clamp(16px, 1.8vw, 20px);
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
-		line-height: 1.5;
-		margin: 0;
-	}
-
-	/* ============================================================== */
-	/* 1. HERO COVER */
-	/* ============================================================== */
-	.corp-hero {
-		position: relative;
-		min-height: 560px;
-		display: flex;
-		align-items: flex-end;
-		padding: 120px 0 60px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		overflow: hidden;
-		background: #000000;
-	}
-
-	@media (max-width: 768px) {
-		.corp-hero {
-			min-height: 460px;
-			padding: 90px 0 40px 0;
-		}
-	}
-
-	.corp-hero__media {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-		overflow: hidden;
-	}
-
-	.corp-hero__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center 30%;
-		filter: brightness(0.62) contrast(1.08);
-		transform: scale(1.02);
-	}
-
-	.corp-hero__gradient {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(
-			180deg,
-			rgba(4, 5, 7, 0.5) 0%,
-			rgba(4, 5, 7, 0.2) 35%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
-		);
-		pointer-events: none;
-	}
-
-	.corp-hero__side-vignette {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: radial-gradient(
-			circle at center,
-			transparent 40%,
-			rgba(4, 5, 7, 0.6) 100%
-		);
-		pointer-events: none;
-	}
-
-	.corp-hero__inner {
-		position: relative;
-		z-index: 2;
-	}
-
-	.corp-breadcrumbs {
-		margin-bottom: 24px;
-	}
-
-	.corp-breadcrumbs__list {
-		list-style: none;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-		margin: 0;
-		padding: 0;
-		font-size: 12px;
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.55);
-	}
-
-	.corp-breadcrumbs__link {
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.corp-breadcrumbs__link:hover {
-		color: #ffffff;
-	}
-
-	.corp-breadcrumbs__separator {
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.corp-hero__logo-wrap {
-		margin-bottom: 20px;
-	}
-
-	.corp-hero__brand-logo {
-		display: inline-flex;
-		align-items: center;
-		max-width: 320px;
-		height: 24px;
-	}
-
-	.corp-hero__brand-logo :global(svg) {
-		width: auto;
-		height: 22px;
-		max-width: 100%;
-		fill: #ffffff;
-	}
-
-	.corp-hero__title {
-		font-size: clamp(32px, 4.8vw, 56px);
-		font-weight: 700;
-		line-height: 1.15;
-		letter-spacing: -0.02em;
-		margin: 0 0 16px 0;
-		color: #ffffff;
-		text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-	}
-
-	.corp-hero__subtitle {
-		font-size: clamp(14px, 1.4vw, 16px);
-		line-height: 1.9;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 36px 0;
-		max-width: 900px;
-		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-	}
-
-	.corp-hero__phrase {
-		display: inline-block;
-	}
-
-	.corp-hero__br {
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	@media (max-width: 768px) {
-		.corp-hero__br {
-			display: none;
-		}
-	}
-
-	/* クイックナビゲーション */
-	.corp-subnav {
-		margin-top: 10px;
-	}
-
-	.corp-subnav__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-
-	.corp-subnav__pill {
-		display: inline-flex;
-		align-items: center;
-		padding: 8px 16px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 9999px;
-		color: rgba(255, 255, 255, 0.85);
-		font-size: 12.5px;
-		font-weight: 500;
-		text-decoration: none;
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-subnav__pill:hover {
-		background: rgba(255, 255, 255, 0.18);
-		border-color: rgba(255, 255, 255, 0.3);
-		color: #ffffff;
-		transform: translateY(-2px);
-	}
-
-	/* ============================================================== */
-	/* 2. 会社紹介（ABOUT & PHILOSOPHY） */
-	/* ============================================================== */
-	.corp-narrative-grid {
-		display: grid;
-		grid-template-columns: 480px 1fr;
-		gap: 56px;
-		align-items: center;
-	}
-
-	@media (max-width: 1024px) {
-		.corp-narrative-grid {
-			grid-template-columns: 1fr;
-			gap: 40px;
-		}
-	}
-
-	.corp-narrative-card {
-		position: relative;
-		border-radius: 18px;
-		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		background: rgba(255, 255, 255, 0.02);
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-	}
-
-	.corp-narrative-img {
-		width: 100%;
-		height: auto;
-		display: block;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-narrative-card:hover .corp-narrative-img {
-		transform: scale(1.03);
-	}
-
-	.corp-narrative-caption {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		padding: 24px 20px 16px 20px;
-		background: linear-gradient(to top, rgba(4, 5, 7, 0.9) 0%, transparent 100%);
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.corp-narrative-caption-title {
-		font-size: 14px;
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.corp-narrative-caption-sub {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.6);
-		letter-spacing: 0.05em;
-	}
-
-	.corp-narrative-body p {
-		font-size: 15px;
-		line-height: 1.9;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 18px 0;
-	}
-
-	.corp-narrative-body p:last-child {
-		margin-bottom: 0;
-	}
-
-	.corp-narrative-highlights {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 16px;
-		margin-top: 36px;
-		padding-top: 28px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	@media (max-width: 600px) {
-		.corp-narrative-highlights {
-			grid-template-columns: repeat(3, 1fr);
-			gap: 8px;
-		}
-	}
-
-	.corp-highlight-item {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 12px;
-		padding: 16px 14px;
-		text-align: center;
-	}
-
-	@media (max-width: 600px) {
-		.corp-highlight-item {
-			padding: 12px 6px;
-		}
-	}
-
-	.corp-highlight-item__num {
-		font-size: clamp(18px, 2.2vw, 24px);
-		font-weight: 700;
-		color: #ffffff;
-		line-height: 1.2;
-		margin-bottom: 4px;
-		letter-spacing: -0.01em;
-	}
-
-	.corp-highlight-item__label {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.6);
-		line-height: 1.4;
-	}
-
-	/* ============================================================== */
-	/* 3. ショールーム案内（SHOWROOM & SERVICES） */
-	/* ============================================================== */
-	.corp-showroom-grid {
-		display: grid;
-		grid-template-columns: 520px 1fr;
-		gap: 40px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		padding: 32px;
-		align-items: center;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-	}
-
-	@media (max-width: 1024px) {
-		.corp-showroom-grid {
-			grid-template-columns: 1fr;
-			padding: 24px;
-		}
-	}
-
-	.corp-showroom-photo-wrap {
-		position: relative;
-		border-radius: 14px;
-		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.corp-showroom-photo {
-		width: 100%;
-		height: auto;
-		aspect-ratio: 16 / 10;
-		object-fit: cover;
-		display: block;
-	}
-
-	.corp-showroom-photo-badge {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		padding: 4px 12px;
-		border-radius: 9999px;
-		font-size: 11px;
-		color: #ffffff;
-		letter-spacing: 0.03em;
-		backdrop-filter: blur(6px);
-		-webkit-backdrop-filter: blur(6px);
-	}
-
-	.corp-showroom-header {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		margin-bottom: 24px;
-		padding-bottom: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.corp-showroom-brand-mark {
-		width: 48px;
-		height: 48px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 10px;
-		flex-shrink: 0;
-	}
-
-	.rr-mark-img {
-		width: 28px;
-		height: auto;
-		display: block;
-		filter: brightness(0) invert(1);
-	}
-
-	.corp-showroom-type {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.55);
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.corp-showroom-name {
-		font-size: clamp(20px, 2.2vw, 24px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0;
-		line-height: 1.3;
-	}
-
-	.corp-showroom-details {
-		margin: 0 0 28px 0;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-
-	.corp-showroom-row {
-		display: grid;
-		grid-template-columns: 80px 1fr;
-		gap: 16px;
-		align-items: baseline;
-		font-size: 14.5px;
-	}
-
-	@media (max-width: 600px) {
-		.corp-showroom-row {
-			grid-template-columns: 1fr;
-			gap: 4px;
-		}
-	}
-
-	.corp-showroom-dt {
-		color: rgba(255, 255, 255, 0.5);
-		font-weight: 600;
-		font-size: 13px;
-	}
-
-	.corp-showroom-dd {
-		margin: 0;
-		color: rgba(255, 255, 255, 0.9);
-		line-height: 1.6;
-	}
-
-	.corp-map-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 12.5px;
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		margin-top: 4px;
-		transition: color 0.2s ease;
-	}
-
-	.corp-map-link:hover {
-		color: #ffffff;
-	}
-
-	.external-svg {
-		width: 13px;
-		height: 13px;
-		opacity: 0.8;
-	}
-
-	.corp-showroom-contacts {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.corp-tel-link {
-		color: #ffffff;
-		font-weight: 600;
-		text-decoration: none;
-		transition: opacity 0.2s ease;
-	}
-
-	.corp-tel-link:hover {
-		opacity: 0.8;
-	}
-
-	.corp-contact-sep {
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.corp-fax-text {
-		color: rgba(255, 255, 255, 0.7);
-	}
-
-	.corp-showroom-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		margin-bottom: 12px;
-	}
-
-	.corp-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		padding: 13px 24px;
-		border-radius: 9999px;
-		font-size: 13.5px;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-		min-width: 180px;
-	}
-
-	@media (max-width: 600px) {
-		.corp-btn {
-			width: 100%;
-		}
-	}
-
-	.corp-btn--primary {
-		background: #ffffff;
-		color: #040507;
-		border: 1px solid #ffffff;
-	}
-
-	.corp-btn--primary:hover {
-		background: rgba(255, 255, 255, 0.88);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
-	}
-
-	.corp-btn--outline {
-		background: transparent;
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.25);
-	}
-
-	.corp-btn--outline:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.5);
-		transform: translateY(-2px);
-	}
-
-	.arrow-svg {
-		width: 14px;
-		height: 14px;
-		transition: transform 0.2s ease;
-	}
-
-	.corp-btn:hover .arrow-svg {
-		transform: translateX(3px);
-	}
-
-	.corp-showroom-note {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.45);
-		margin: 0;
-	}
-
-	/* ============================================================== */
-	/* 4. ショールームギャラリー（GALLERY: Gallery format rule準拠） */
-	/* ============================================================== */
-	.corp-gallery-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 1024px) {
-		.corp-gallery-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 18px;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.corp-gallery-grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
-	}
-
-	.corp-gallery-card {
-		margin: 0;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 14px;
-		overflow: hidden;
-		transition: transform 0.3s ease, border-color 0.3s ease;
-	}
-
-	.corp-gallery-card:hover {
-		transform: translateY(-3px);
-		border-color: rgba(255, 255, 255, 0.16);
-	}
-
-	.corp-gallery-card__media {
-		position: relative;
-		aspect-ratio: 16 / 10;
-		overflow: hidden;
-		background: #000000;
-	}
-
-	.corp-gallery-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-gallery-card:hover .corp-gallery-card__img {
-		transform: scale(1.05);
-	}
-
-	.corp-gallery-card__count {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		background: rgba(4, 5, 7, 0.75);
-		padding: 3px 8px;
-		border-radius: 6px;
-		font-size: 11px;
-		font-family: var(--font-mono, monospace);
-		color: rgba(255, 255, 255, 0.8);
-		letter-spacing: 0.05em;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.corp-gallery-card__caption {
-		padding: 14px 16px;
-		font-size: 13.5px;
-		color: rgba(255, 255, 255, 0.85);
-		line-height: 1.5;
-	}
-
-	/* ============================================================== */
-	/* 5. 受賞実績（AWARDS） */
-	/* ============================================================== */
-	.corp-awards-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 900px) {
-		.corp-awards-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.corp-award-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		padding: 36px 32px;
-		display: flex;
-		gap: 28px;
-		align-items: flex-start;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-		min-width: 0;
-		box-sizing: border-box;
-		overflow: hidden;
-	}
-
-	.corp-award-card:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.16);
-		transform: translateY(-3px);
-	}
-
-	@media (max-width: 600px) {
-		.corp-award-card {
-			padding: 24px 20px;
-			gap: 18px;
-		}
-	}
-
-	.corp-award-card__wreath {
-		width: 72px;
-		height: 72px;
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.corp-award-card__wreath :global(svg) {
-		width: 100%;
-		height: 100%;
-		fill: #ffffff;
-		opacity: 0.92;
-	}
-
-	.corp-award-card__info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.corp-award-card__badge-tag {
-		display: inline-block;
-		padding: 4px 10px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 9999px;
-		font-size: 11.5px;
-		font-weight: 600;
-		color: #ffffff;
-		letter-spacing: 0.02em;
-		margin-bottom: 10px;
-	}
-
-	.corp-award-card__title {
-		font-size: clamp(17px, 1.8vw, 20px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 10px 0;
-		line-height: 1.35;
-		white-space: normal !important;
-		word-break: break-word;
-		overflow-wrap: break-word;
-	}
-
-	.corp-award-card__desc {
-		font-size: 14px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0;
-	}
-
-	/* ============================================================== */
-	/* 6. 関連記事（WEB MAGAZINE） */
-	/* ============================================================== */
-	.corp-articles-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 1100px) {
-		.corp-articles-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 20px;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.corp-articles-grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
-	}
-
-	.corp-article-card {
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 14px;
-		overflow: hidden;
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-article-card:hover {
-		transform: translateY(-4px);
-		border-color: rgba(255, 255, 255, 0.18);
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	.corp-article-card__link {
-		display: block;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.corp-article-card__media {
-		position: relative;
-		aspect-ratio: 16 / 9;
-		overflow: hidden;
-		background: #000000;
-	}
-
-	.corp-article-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-article-card:hover .corp-article-card__img {
-		transform: scale(1.06);
-	}
-
-	.corp-article-card__badge {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		padding: 3px 8px;
-		border-radius: 4px;
-		font-size: 10.5px;
-		color: #ffffff;
-		letter-spacing: 0.02em;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.corp-article-card__content {
-		padding: 16px 18px 20px 18px;
-	}
-
-	.corp-article-card__date {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.5);
-		display: block;
-		margin-bottom: 8px;
-		font-family: var(--font-mono, monospace);
-	}
-
-	.corp-article-card__title {
-		font-size: 14.5px;
-		font-weight: 600;
-		line-height: 1.5;
-		color: #ffffff;
-		margin: 0;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	/* ============================================================== */
-	/* 7. 会社基本データ（テーブル崩れ完全修正） */
-	/* ============================================================== */
-	.corp-profile-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		overflow: hidden;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-	}
-
-	.corp-profile-card table.corp-profile-table {
-		width: 100% !important;
-		border-collapse: collapse !important;
-		border-spacing: 0 !important;
-		border: none !important;
-		margin: 0 !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tbody {
-		border: none !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tr {
-		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tr:last-child {
-		border-bottom: none !important;
-	}
-
-	.corp-profile-card table.corp-profile-table th,
-	.corp-profile-card table.corp-profile-table td {
-		border: none !important;
-		box-shadow: none !important;
-		outline: none !important;
-	}
-
-	.corp-profile-card table.corp-profile-table th {
-		width: 240px !important;
-		padding: 22px 30px !important;
-		font-size: 14px !important;
-		font-weight: 600 !important;
-		color: rgba(255, 255, 255, 0.65) !important;
-		background: rgba(255, 255, 255, 0.02) !important;
-		vertical-align: top !important;
-		text-align: left !important;
-		white-space: nowrap !important;
-	}
-
-	.corp-profile-card table.corp-profile-table td {
-		padding: 22px 30px !important;
-		font-size: 14.5px !important;
-		color: rgba(255, 255, 255, 0.9) !important;
-		line-height: 1.8 !important;
-		background: transparent !important;
-		vertical-align: top !important;
-		text-align: left !important;
-	}
-
-	@media (max-width: 768px) {
-		.corp-profile-card table.corp-profile-table,
-		.corp-profile-card table.corp-profile-table tbody,
-		.corp-profile-card table.corp-profile-table tr,
-		.corp-profile-card table.corp-profile-table th,
-		.corp-profile-card table.corp-profile-table td {
-			display: block !important;
-			width: 100% !important;
-			box-sizing: border-box !important;
-		}
-
-		.corp-profile-card table.corp-profile-table tr {
-			border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-			padding: 16px 20px !important;
-		}
-
-		.corp-profile-card table.corp-profile-table th {
-			width: 100% !important;
-			padding: 0 0 6px 0 !important;
-			background: transparent !important;
-			color: rgba(255, 255, 255, 0.5) !important;
-			font-size: 12px !important;
-			font-weight: 600 !important;
-			white-space: normal !important;
-		}
-
-		.corp-profile-card table.corp-profile-table td {
-			width: 100% !important;
-			padding: 0 !important;
-			color: rgba(255, 255, 255, 0.92) !important;
-			font-size: 14px !important;
-			line-height: 1.7 !important;
-		}
-	}
-
-	.corp-business-list {
-		list-style: none !important;
-		padding: 0 !important;
-		margin: 0 !important;
-		display: flex !important;
-		flex-direction: column !important;
-		gap: 6px !important;
-	}
-
-	.corp-business-list li {
-		position: relative;
-		padding-left: 14px;
-		color: rgba(255, 255, 255, 0.85);
-	}
-
-	.corp-business-list li::before {
-		content: "・";
-		position: absolute;
-		left: 0;
-		color: rgba(255, 255, 255, 0.4);
-	}
-
-	.corp-location-info strong {
-		color: #ffffff;
-		font-size: 15px;
-	}
-
-	.corp-related-links {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 10px;
-	}
-
-	.corp-inline-link {
-		color: #ffffff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-		text-decoration-color: rgba(255, 255, 255, 0.3);
-		transition: text-decoration-color 0.2s ease, color 0.2s ease;
-	}
-
-	.corp-inline-link:hover {
-		text-decoration-color: #ffffff;
-		color: #ffffff;
-	}
-
-	.corp-inline-link-sep {
-		color: rgba(255, 255, 255, 0.25);
-	}
-</style>
+	});
+</script>

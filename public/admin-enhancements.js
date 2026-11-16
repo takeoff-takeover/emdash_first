@@ -22,7 +22,7 @@
 						style.id = 'emdash-editor-note-style';
 						document.head.appendChild(style);
 					}
-					style.textContent = '.ProseMirror p.is-note, .ProseMirror p[data-pt-style="note"] { font-size: 12.5px !important; line-height: 1.45 !important; color: #555e6d !important; margin-top: 6px !important; margin-bottom: 6px !important; letter-spacing: 0.02em !important; border-left: 2px solid #cbd5e1 !important; padding-left: 8px !important; } :is(.dark, [data-theme="dark"]) .ProseMirror p.is-note, :is(.dark, [data-theme="dark"]) .ProseMirror p[data-pt-style="note"] { color: rgba(255, 255, 255, 0.55) !important; border-left-color: rgba(255, 255, 255, 0.25) !important; }';
+					style.textContent = '.ProseMirror p.is-note, .ProseMirror p[data-pt-style="note"] { font-size: 12.5px !important; line-height: 1.45 !important; color: #555e6d !important; margin-top: 6px !important; margin-bottom: 6px !important; letter-spacing: 0.02em !important; border-left: 2px solid #cbd5e1 !important; padding-left: 8px !important; } :is(.dark, [data-mode="dark"], [data-theme="dark"]) .ProseMirror p.is-note, :is(.dark, [data-mode="dark"], [data-theme="dark"]) .ProseMirror p[data-pt-style="note"] { color: rgba(255, 255, 255, 0.55) !important; border-left-color: rgba(255, 255, 255, 0.25) !important; }';
 				}
 				injectEditorNoteStyles();
 
@@ -981,9 +981,10 @@
 								margin-top: 24px;
 								margin-bottom: 12px;
 								padding: 12px 18px;
-								background: var(--color-kumo-elevated, #18181b);
-								border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
-								border-radius: 8px;
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
+								border-left: 4px solid var(--color-kumo-line);
+								border-radius: 6px;
 								cursor: pointer;
 								display: flex;
 								align-items: center;
@@ -992,28 +993,27 @@
 								transition: background 0.15s ease, border-color 0.15s ease;
 							}
 							[data-comp-header]:hover {
-								background: var(--color-kumo-tint, rgba(255,255,255,0.05));
-								border-color: var(--color-kumo-line-focus, rgba(255,255,255,0.25));
+								background: var(--color-kumo-tint) !important;
+								border-color: var(--color-kumo-line) !important;
 							}
 							[data-comp-header][data-is-open="true"] {
-								border-bottom-left-radius: 0;
-								border-bottom-right-radius: 0;
-								margin-bottom: 0;
-								border-bottom: 1px dashed var(--color-kumo-line, rgba(255,255,255,0.1));
+								background: var(--color-kumo-tint);
+								border-left-color: var(--color-kumo-contrast);
+								margin-bottom: 12px;
 							}
 							.emdash-comp-field-open {
-								padding-left: 16px !important;
-								padding-right: 16px !important;
-								border-left: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
-								border-right: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
-								background: var(--color-kumo-surface, #09090b);
+								padding-left: 12px !important;
+								border-left: 2px solid var(--color-kumo-tint) !important;
+								margin-left: 4px !important;
 							}
 							.emdash-comp-field-last {
-								border-bottom: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1)) !important;
-								border-bottom-left-radius: 8px !important;
-								border-bottom-right-radius: 8px !important;
 								margin-bottom: 24px !important;
-								padding-bottom: 16px !important;
+							}
+							#emdash-companies-toolbar button {
+								transition: background 0.15s ease, color 0.15s ease;
+							}
+							#emdash-companies-toolbar button:hover {
+								background: var(--color-kumo-line) !important;
 							}
 						`;
 						document.head.appendChild(styleEl);
@@ -1078,15 +1078,15 @@
 							justify-content: space-between;
 							margin-bottom: 16px;
 							padding: 10px 14px;
-							background: var(--color-kumo-elevated, #18181b);
-							border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+							background: var(--color-kumo-elevated);
+							border: 1px solid var(--color-kumo-line);
 							border-radius: 8px;
 							flex-wrap: wrap;
 							gap: 8px;
 						`;
 
 						const infoText = document.createElement('span');
-						infoText.style.cssText = 'font-size: 13px; color: var(--text-color-kumo-subtle, #a1a1aa); font-weight: 500;';
+						infoText.style.cssText = 'font-size: 13px; color: var(--text-color-kumo-subtle); font-weight: 500;';
 						infoText.innerHTML = '<span style="color: var(--text-color-kumo-default); font-weight: 700;">会社案内設定</span>';
 
 						const btnGroup = document.createElement('div');
@@ -1161,11 +1161,11 @@
 
 							const h3 = document.createElement('h3');
 							h3.className = 'comp-title-text';
-							h3.style.cssText = 'margin: 0; font-size: 14px; font-weight: 700; color: var(--text-color-kumo-default, #f4f4f5); display: flex; align-items: center; gap: 8px;';
+							h3.style.cssText = 'margin: 0; font-size: 14px; font-weight: 700; color: var(--text-color-kumo-default); display: flex; align-items: center; gap: 8px;';
 							h3.textContent = sec.title;
 
 							const desc = document.createElement('span');
-							desc.style.cssText = 'font-size: 11px; color: var(--text-color-kumo-subtle, #a1a1aa);';
+							desc.style.cssText = 'font-size: 11px; color: var(--text-color-kumo-subtle);';
 							desc.textContent = sec.desc;
 
 							titleWrap.appendChild(h3);
@@ -1173,7 +1173,7 @@
 
 							const arrow = document.createElement('span');
 							arrow.className = 'comp-arrow';
-							arrow.style.cssText = 'font-size: 11px; font-weight: 600; color: var(--text-color-kumo-subtle, #a1a1aa);';
+							arrow.style.cssText = 'font-size: 11px; font-weight: 600; color: var(--text-color-kumo-subtle);';
 
 							header.appendChild(titleWrap);
 							header.appendChild(arrow);
@@ -1277,8 +1277,8 @@
 								margin-top: 12px;
 								margin-bottom: 16px;
 								padding: 10px 14px;
-								background: var(--color-kumo-elevated, #18181b);
-								border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
 								border-radius: 8px;
 								overflow-x: auto;
 								z-index: 10;
@@ -1286,7 +1286,7 @@
 
 							const label = document.createElement('span');
 							label.textContent = 'ブランド絞り込み:';
-							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle, #a1a1aa); margin-right: 4px; white-space: nowrap;';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle); margin-right: 4px; white-space: nowrap;';
 							tabContainer.appendChild(label);
 
 							const brands = [
@@ -1311,9 +1311,9 @@
 									cursor: pointer;
 									transition: all 0.2s ease;
 									white-space: nowrap;
-									border: 1px solid ${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast, #fff)' : 'var(--color-kumo-line, rgba(255,255,255,0.1))'};
-									background: ${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast, #fff)' : 'var(--color-kumo-tint, rgba(255,255,255,0.05))'};
-									color: ${activeCampaignBrand === b.value ? 'var(--color-kumo-base, #000)' : 'var(--text-color-kumo-default, #fff)'};
+									border: 1px solid ${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)'};
+									background: ${activeCampaignBrand === b.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)'};
+									color: ${activeCampaignBrand === b.value ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)'};
 								`;
 
 								btn.addEventListener('click', (e) => {
@@ -1414,8 +1414,8 @@
 								margin-top: 12px;
 								margin-bottom: 16px;
 								padding: 10px 14px;
-								background: var(--color-kumo-elevated, #18181b);
-								border: 1px solid var(--color-kumo-line, rgba(255,255,255,0.1));
+								background: var(--color-kumo-elevated);
+								border: 1px solid var(--color-kumo-line);
 								border-radius: 8px;
 								overflow-x: auto;
 								z-index: 10;
@@ -1423,7 +1423,7 @@
 
 							const label = document.createElement('span');
 							label.textContent = '絞り込み:';
-							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle, #a1a1aa); margin-right: 4px; white-space: nowrap;';
+							label.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text-color-kumo-subtle); margin-right: 4px; white-space: nowrap;';
 							tabContainer.appendChild(label);
 
 							const filters = [
@@ -1450,9 +1450,9 @@
 									cursor: pointer;
 									transition: all 0.2s ease;
 									white-space: nowrap;
-									border: 1px solid ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast, #fff)' : 'var(--color-kumo-line, rgba(255,255,255,0.1))'};
-									background: ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast, #fff)' : 'var(--color-kumo-tint, rgba(255,255,255,0.05))'};
-									color: ${activeMagazineFilter === f.value ? 'var(--color-kumo-base, #000)' : 'var(--text-color-kumo-default, #fff)'};
+									border: 1px solid ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-line)'};
+									background: ${activeMagazineFilter === f.value ? 'var(--color-kumo-contrast)' : 'var(--color-kumo-tint)'};
+									color: ${activeMagazineFilter === f.value ? 'var(--color-kumo-base)' : 'var(--text-color-kumo-default)'};
 								`;
 
 								btn.addEventListener('click', (e) => {

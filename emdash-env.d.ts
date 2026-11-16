@@ -181,16 +181,15 @@ export interface Company {
   highlight_2_label?: string;
   highlight_3_num?: string;
   highlight_3_label?: string;
-  award_title?: string;
-  award_badge?: string;
-  award_desc?: string;
   established?: string;
   representative?: string;
   postal?: string;
   address?: string;
   tel?: string;
   business_desc?: string;
-  content?: PortableTextBlock[];
+  award_title?: string;
+  award_badge?: string;
+  award_desc?: string;
   gallery_image_1?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   gallery_title_1?: string;
   gallery_caption_1?: string;
@@ -209,6 +208,7 @@ export interface Company {
   gallery_image_6?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   gallery_title_6?: string;
   gallery_caption_6?: string;
+  content?: PortableTextBlock[];
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

@@ -1,11 +1,98 @@
 ---
 // src/pages/corporate/nicole-cars.astro
 // ニコル・カーズ合同会社 会社案内（Nicole Connect マガジン同等の黒背景エディトリアルデザイン）
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import MapBadge from "../../components/MapBadge.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import svgs from "../../data/corporate-svgs.json";
+import "../../styles/corporate.css";
 
-const pageTitle = "ニコル・カーズ合同会社 | BMW・MINI正規ディーラー | Nicole Group 公式";
-const pageDescription = "BMWならびにMINI正規ディーラー ニコル・カーズ合同会社の企業情報です。東京・神奈川エリアにBMW新車ショールーム5拠点、MINIショールーム3拠点、サービスセンター1拠点、認定中古車センター4拠点を展開。全国BMW最優秀ディーラー賞7度受賞（全国唯一）、全国BMW最優秀・優秀ディーラー賞通算23回獲得の実績を誇ります。";
+// CMS 'companies' コレクションからデータを優先取得
+let companyEntry: any = null;
+try {
+	const res = await getEmDashEntry("companies" as any, "nicole-cars");
+	if (res?.entry) {
+		companyEntry = res.entry.data || res.entry;
+	}
+} catch (e) {}
+
+// 管理画面で追加された自由ブロック（Portable Text）のパース
+let parsedContent: any[] = [];
+if (companyEntry?.content) {
+	if (Array.isArray(companyEntry.content)) {
+		parsedContent = companyEntry.content;
+	} else if (typeof companyEntry.content === "string") {
+		try {
+			const parsed = JSON.parse(companyEntry.content);
+			if (Array.isArray(parsed)) parsedContent = parsed;
+		} catch (e) {}
+	}
+}
+
+const companyTitle = companyEntry?.title || "ニコル・カーズ合同会社";
+
+const pageTitle = companyEntry?.title 
+	? `${companyEntry.title} | BMW・MINI正規ディーラー | Nicole Group 公式`
+	: "ニコル・カーズ合同会社 | BMW・MINI正規ディーラー | Nicole Group 公式";
+
+const pageDescription = companyEntry?.hero_phrase
+	? companyEntry.hero_phrase
+	: "BMWならびにMINI正規ディーラー ニコル・カーズ合同会社の企業情報です。東京・神奈川エリアにBMW新車ショールーム5拠点、MINIショールーム3拠点、サービスセンター1拠点、認定中古車センター4拠点を展開。全国BMW最優秀ディーラー賞7度受賞（全国唯一）、全国BMW最優秀・優秀ディーラー賞通算23回獲得の実績を誇ります。";
+
+// ヒーロー
+const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/01/Nicole-BMW-本社.jpg";
+const heroPhrase = companyEntry?.hero_phrase || "BMWならびにMINIの正規ディーラーとして、東京・神奈川エリアに13拠点のネットワークを展開。全国唯一となる「全国BMW最優秀ディーラー賞7度受賞」、通算23回におよぶ最優秀・優秀ディーラー賞の栄誉とともに、走る歓びと安心をお届けします。";
+
+// 会社紹介
+const aboutTitle = companyEntry?.about_title || "走る歓びと最高の安心を。<br />全国屈指の実績を誇る正規ディーラー。";
+const aboutLead = companyEntry?.about_lead || "1988年の設立以来、選ばれ続ける最高峰のホスピタリティと技術力";
+const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/2026/02/DSC2390-scaled-e1772189662282.avif";
+const aboutImageCaption = companyEntry?.about_image_caption || "Nicole BMW ショールーム";
+const aboutText = companyEntry?.about_text || "ニコル・カーズ合同会社は、1988年にBMW正規ディーラーとして設立され、現在ではMINI正規ディーラー事業も含めて東京都内にBMW新車ショールーム1拠点、神奈川エリアにBMW新車ショールーム4拠点、MINIショールーム3拠点、総合サービスセンター1拠点、ならびに認定中古車センター4拠点の計13拠点を展開しています。\n\n国内の全BMW正規ディーラーを対象としたアワードにおいて、全国唯一となる「全国BMW最優秀ディーラー賞」を前人未到の7度受賞。最優秀・優秀ディーラー賞を通算23回獲得し、MINI部門においても最優秀・優秀ディーラー賞を通算3度獲得するなど、販売実績、顧客満足度、アフターセールス技術のすべてにおいて国内最高峰の信頼を確立してまいりました。\n\n最新鋭の設備を備えた指定サービス工場と多数のBMWマイスターが常駐し、新車のご検討から日々の点検・車検、メンテナンス、認定中古車のお乗り換えまで、お客様の豊かなカーライフを一貫してサポートいたします。";
+
+// ハイライト
+const highlight1Num = companyEntry?.highlight_1_num || "23回";
+const highlight1Label = companyEntry?.highlight_1_label || "BMW最優秀・優秀賞";
+const highlight2Num = companyEntry?.highlight_2_num || "7度";
+const highlight2Label = companyEntry?.highlight_2_label || "全国唯一 最優秀ディーラー";
+const highlight3Num = companyEntry?.highlight_3_num || "13拠点";
+const highlight3Label = companyEntry?.highlight_3_label || "東京・神奈川ネットワーク";
+
+// ショールームフォトギャラリー写真（CMS 'companies' コレクションから動的生成）
+let showroomGallery: any[] = [];
+if (companyEntry) {
+	for (let i = 1; i <= 6; i++) {
+		const rawImg = companyEntry[`gallery_image_${i}`];
+		if (rawImg) {
+			let src = "";
+			let alt = companyEntry[`gallery_title_${i}`] || `${companyTitle} 写真 ${i}`;
+			if (typeof rawImg === "string") {
+				try {
+					const parsed = JSON.parse(rawImg);
+					src = parsed.src || rawImg;
+					if (parsed.alt) alt = parsed.alt;
+				} catch {
+					src = rawImg;
+				}
+			} else if (typeof rawImg === "object" && rawImg !== null) {
+				src = rawImg.src || "";
+				if (rawImg.alt) alt = rawImg.alt;
+			}
+			if (src) {
+				const num = String(showroomGallery.length + 1).padStart(2, "0");
+				showroomGallery.push({
+					src,
+					alt,
+					num,
+					title: companyEntry[`gallery_title_${i}`] || `ギャラリー ${num}`,
+					caption: companyEntry[`gallery_caption_${i}`] || ""
+				});
+			}
+		}
+	}
+}
 
 // 拠点マスターデータ（Official location naming rule準拠: 正式英語・日本語表記を厳格適用）
 const networkSections = [
@@ -197,6 +284,68 @@ const networkSections = [
 	}
 ];
 
+// CMS 'locations' コレクションからBMW & MINI拠点を動的取得
+let activeNetworkSections = networkSections;
+try {
+	const locResult = await getEmDashCollection("locations" as any, { limit: 50 });
+	if (locResult?.entries && locResult.entries.length > 0) {
+		activeNetworkSections = activeNetworkSections.map(sec => ({
+			...sec,
+			locations: sec.locations.map(loc => {
+				const found = locResult.entries.find((e: any) => {
+					const slug = (e.id || e.slug || "").toLowerCase();
+					const title = ((e.data?.title || e.title || "")).toLowerCase();
+					// match by name keywords
+					const cleanName = loc.name.replace(/Nicole BMW|MINI NEXT|MINI|BMW Premium Selection|BMW|s+/g, "");
+					return title.includes(cleanName) || (cleanName.length > 2 && slug.includes(cleanName));
+				});
+				if (!found) return loc;
+				const d = found.data || found;
+				let imgSrc = loc.image;
+				if (d.featured_image) {
+					const feat = typeof d.featured_image === "string" ? (() => { try { return JSON.parse(d.featured_image); } catch { return d.featured_image; } })() : d.featured_image;
+					if (feat?.src) imgSrc = feat.src;
+					else if (typeof feat === "string" && feat.trim()) imgSrc = feat.trim();
+				}
+				return {
+					...loc,
+					name: d.title || loc.name,
+					postal: d.postal || loc.postal,
+					address: d.address || loc.address,
+					tel: d.sales_tel || d.tel || loc.tel,
+					fax: d.sales_fax || d.fax || loc.fax,
+					hours: d.sales_hours || loc.hours,
+					closed: d.sales_closed || loc.closed,
+					image: imgSrc,
+					mapUrl: d.google_maps_url || loc.mapUrl
+				};
+			})
+		}));
+	}
+} catch (e) {}
+
+// 会社基本データ
+const companyNameEn = companyEntry?.name_en || "Nicole Cars LLC";
+const established = companyEntry?.established || "1988年";
+const representative = companyEntry?.representative || "代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）";
+const mainLoc = activeNetworkSections[0]?.locations[0];
+const postal = companyEntry?.postal || mainLoc?.postal || "〒212-0005";
+const address = companyEntry?.address || mainLoc?.address || "神奈川県川崎市幸区戸手2-5-7";
+const tel = companyEntry?.tel || (mainLoc?.tel ? `${mainLoc.tel}（代表） / FAX：${mainLoc.fax || '044-541-2400'}` : "044-511-2000（代表） / FAX：044-541-2400");
+const telDisplay = tel.startsWith("TEL") ? tel : `TEL：${tel}`;
+const businessList = companyEntry?.business_desc
+	? companyEntry.business_desc.split("\n").filter(Boolean)
+	: [
+		"BMW新車およびMINI新車の販売",
+		"BMW Premium Selection / MINI NEXT 認定中古車の販売・査定・買取",
+		"車検・法定点検・一般整備・リコール対応・板金塗装修理",
+		"BMW / MINI 純正部品・アクセサリー・ライフスタイルコレクション販売",
+		"自動車保険代理店業務"
+	];
+
+
+
+
 // 受賞歴データ
 const awardsList = [
 	{
@@ -219,37 +368,145 @@ const awardsList = [
 	}
 ];
 
-// 関連記事データ
-const relatedArticles = [
-	{
-		title: "i7・740徹底比較！新型7シリーズ後悔しない選び方",
-		date: "2026.10.22",
-		tag: "BMW 7 Series",
-		url: "/posts/202610_bmw-7series-i7-740-comparison-guide/",
-		img: "/uploads/2026/10/169P90636141_lowRes_bmw-i7-60-xdrive-04--scaled-e1792659841606.jpg"
-	},
-	{
-		title: "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃",
-		date: "2026.10.15",
-		tag: "BMW Technology",
-		url: "/posts/202610_bmw-7series-passenger-display-features/",
-		img: "/uploads/2026/10/P90638737_lowRes_the-display-and-oper-1.jpg"
-	},
-	{
-		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
-		date: "2026.10.08",
-		tag: "MINI Event",
-		url: "/posts/202610_mini-big-love-event-report/",
-		img: "/uploads/2026/10/DSC6593-1-scaled.jpg"
-	},
-	{
-		title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・点検・選び方について",
-		date: "2026.07.06",
-		tag: "Certified Pre-Owned",
-		url: "/posts/202607_nicole_certified-used-cars-guide/",
-		img: "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg"
+// 記事カテゴリー判定ヘルパー（マガジン「Nicole Connect」と完全共通）
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
+
+	if (slug.includes("campaign") || slug.includes("fair") || slug.includes("debut") || title.includes("フェア") || title.includes("キャンペーン")) {
+		return "Campaign";
 	}
-];
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
+		return "Buyer's Guide";
+	}
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"norimonofes", "sdgs", "summerconference", "esg", "美化活動", "クリーンアップ", "交通安全", "防災", "寄付"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic.includes("esg") || topic.includes("sdgs")) {
+		return "ESG";
+	}
+	const peopleKeywords = [
+		"people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー",
+		"ストーリー", "story", "マイスター", "junior_high", "work-experience", "international-employee",
+		"fire-department", "mochitsuki", "餅つき", "交流会", "感謝状", "職場体験", "alpina-heritage", "rolls-royce-bespoke"
+	];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic === "people") {
+		return "People";
+	}
+	return "Cars";
+}
+
+// マガジンコレクションからBMW/MINI関連最新記事を動的取得
+let relatedArticles: Array<{
+	title: string;
+	date: string;
+	category: string;
+	brand: string;
+	url: string;
+	img: string;
+}> = [];
+
+try {
+	const magResult = await getEmDashCollection("magazine" as any, {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (magResult?.entries && magResult.entries.length > 0) {
+		const filtered = magResult.entries.filter((entry: any) => {
+			const slug = (entry.id || entry.slug || "").toLowerCase();
+			const title = (entry.data?.title || entry.title || "").toLowerCase();
+			const isBmwOrMini = slug.includes("bmw") || slug.includes("mini") || title.includes("bmw") || title.includes("mini");
+			const isExclusive = !slug.includes("ferrari") && !slug.includes("rolls-royce") && !title.includes("フェラーリ") && !title.includes("ロールス");
+			return isBmwOrMini && isExclusive;
+		});
+
+		const selectedEntries = (filtered.length >= 4 ? filtered : magResult.entries.filter((e: any) => {
+			const s = (e.id || e.slug || "").toLowerCase();
+			const t = (e.data?.title || e.title || "").toLowerCase();
+			return s.includes("bmw") || s.includes("mini") || t.includes("bmw") || t.includes("mini");
+		})).slice(0, 4);
+
+		const entryIds = selectedEntries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+
+		let categoryTermsByEntry = new Map<string, any[]>();
+		try {
+			if (entryIds.length > 0) {
+				categoryTermsByEntry = await getTermsForEntries("magazine", entryIds, "category");
+			}
+		} catch (e) {}
+
+		relatedArticles = selectedEntries.map((entry: any) => {
+			const slug = entry.id || entry.slug;
+			const title = entry.data?.title || entry.title || "BMW & MINI 特集記事";
+			const entryDbId = entry.data?.id || entry.id;
+			const publishedAt = new Date(entry.data?.publishedAt ?? entry.data?.createdAt ?? entry.published_at ?? 0).getTime() || 0;
+			const dateStr = publishedAt 
+				? new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
+				: "2026.10.22";
+			
+			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/2026/02/DSC2293-scaled.avif";
+			if (imgPath.includes("nicole.co.jp/wp/wp-content")) {
+				imgPath = imgPath.replace(/https?:\/\/[^\/]+\/wp\/wp-content/, "/uploads/wp");
+			}
+
+			const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+			const inferredCat = determineArticleCategory({ slug, title, topic: entry.data?.topic || entry.topic });
+			const category = assignedCategories.length > 0 ? assignedCategories[0] : inferredCat;
+
+			const brandName = (slug.includes("mini") || title.includes("mini") || title.includes("MINI")) ? "MINI" : "BMW";
+
+			return {
+				title,
+				date: dateStr,
+				category,
+				brand: brandName,
+				url: `/magazine/${slug}/`,
+				img: imgPath
+			};
+		});
+	}
+} catch (e) {}
+
+// フォールバック（BMW/MINI厳選4記事・実在画像保証）
+if (relatedArticles.length === 0) {
+	relatedArticles = [
+		{
+			title: "i7・740徹底比較！新型7シリーズ後悔しない選び方",
+			date: "2026.10.22",
+			category: "Buyer's Guide",
+			brand: "BMW",
+			url: "/magazine/202610_bmw-7series-i7-740-comparison-guide/",
+			img: "/uploads/2026/10/169P90636141_lowRes_bmw-i7-60-xdrive-04--scaled-e1792659841606.jpg"
+		},
+		{
+			title: "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃",
+			date: "2026.10.15",
+			category: "Cars",
+			brand: "BMW",
+			url: "/magazine/202610_bmw-7series-passenger-display-features/",
+			img: "/uploads/2026/10/P90638737_lowRes_the-display-and-oper-1.jpg"
+		},
+		{
+			title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
+			date: "2026.10.08",
+			category: "People",
+			brand: "MINI",
+			url: "/magazine/202610_mini-big-love-event-report/",
+			img: "/uploads/2026/10/DSC6593-1-scaled.jpg"
+		},
+		{
+			title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・点検・選び方について",
+			date: "2026.07.06",
+			category: "Buyer's Guide",
+			brand: "BMW",
+			url: "/magazine/202607_nicole_certified-used-cars-guide/",
+			img: "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg"
+		}
+	];
+}
 
 // Schema.org 構造化データ（JSON-LD）
 const jsonLd = {
@@ -316,18 +573,7 @@ const jsonLd = {
 <NicoleLayout title={pageTitle} description={pageDescription}>
 	<Fragment slot="head">
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-		<style is:global>
-			body:has(.corporate-magazine-main),
-			body:has(.corporate-magazine-main) #page,
-			body:has(.corporate-magazine-main) #content,
-			body:has(.corporate-magazine-main) .site-content,
-			body:has(.corporate-magazine-main) #primary,
-			body:has(.corporate-magazine-main) .content-area,
-			body:has(.corporate-magazine-main) .ast-container {
-				background-color: #040507 !important;
-				background-image: none !important;
-			}
-		</style>
+		
 	</Fragment>
 
 	<main class="corporate-magazine-main">
@@ -335,7 +581,7 @@ const jsonLd = {
 		<header class="corp-hero">
 			<div class="corp-hero__media">
 				<img 
-					src="/uploads/2026/02/DSC2293-scaled.avif" 
+					src={heroImageSrc} 
 					alt="ニコル・カーズ合同会社 BMW / MINI 正規ディーラー" 
 					class="corp-hero__img" 
 					loading="eager" 
@@ -356,27 +602,23 @@ const jsonLd = {
 					</ol>
 				</nav>
 
-				<div class="corp-hero__logo-wrap">
-					<div class="corp-hero__brand-logo" set:html={svgs[4]} />
-				</div>
-
-				<h1 class="corp-hero__title">ニコル・カーズ合同会社</h1>
+				<h1 class="corp-hero__title">{companyTitle}</h1>
 				<p class="corp-hero__subtitle">
-					<span class="corp-hero__phrase">BMWならびにMINIの正規ディーラーとして、</span>
-					<span class="corp-hero__phrase">東京・神奈川エリアに13拠点のネットワークを展開。</span><br class="corp-hero__br" />
-					<span class="corp-hero__phrase">全国唯一となる「全国BMW最優秀ディーラー賞7度受賞」、</span>
-					<span class="corp-hero__phrase">通算23回におよぶ最優秀・優秀ディーラー賞の栄誉とともに、</span>
-					<span class="corp-hero__phrase">走る歓びと安心をお届けします。</span>
+					{heroPhrase.split("。").filter(Boolean).map((phrase: string) => (
+						<span class="corp-hero__phrase">{phrase}。</span>
+					))}
 				</p>
 
 				<!-- ページ内クイックナビゲーション -->
 				<nav class="corp-subnav" aria-label="ページ内目次">
 					<ul class="corp-subnav__list">
 						<li><a href="#about" class="corp-subnav__pill">会社紹介</a></li>
-						<li><a href="#awards" class="corp-subnav__pill">受賞実績</a></li>
+						{parsedContent.length > 0 && <li><a href="#additional-content" class="corp-subnav__pill">詳細情報</a></li>}
 						<li><a href="#network" class="corp-subnav__pill">拠点ネットワーク</a></li>
-						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 						<li><a href="#profile" class="corp-subnav__pill">会社基本データ</a></li>
+						<li><a href="#awards" class="corp-subnav__pill">受賞実績</a></li>
+						{showroomGallery.length > 0 && <li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>}
+						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -390,79 +632,45 @@ const jsonLd = {
 					<div class="corp-narrative-visual">
 						<div class="corp-narrative-card">
 							<img 
-								src="/uploads/2026/02/DSC2390-scaled-e1772189662282.avif" 
-								alt="Nicole BMW ショールーム展示フロア" 
+								src={aboutImageSrc} 
+								alt={aboutImageCaption} 
 								class="corp-narrative-img" 
-								width="1200" 
-								height="800" 
+								width="1024" 
+								height="683" 
 								loading="lazy" 
 								decoding="async" 
 							/>
-							<div class="corp-narrative-caption">
-								<span class="corp-narrative-caption-title">Nicole BMW ショールーム</span>
-								<span class="corp-narrative-caption-sub">BMW & MINI Authorized Dealer Network</span>
-							</div>
 						</div>
 					</div>
 
 					<!-- 右列: ストーリー本文 -->
 					<div class="corp-narrative-content">
 						<header class="corp-section-header">
-							<h2 class="corp-section-title">走る歓びと最高の安心を。<br />全国屈指の実績を誇る正規ディーラー。</h2>
-							<p class="corp-section-lead">1988年の設立以来、選ばれ続ける最高峰のホスピタリティと技術力</p>
+							<h2 class="corp-section-title" set:html={aboutTitle} />
+							<p class="corp-section-lead">{aboutLead}</p>
 						</header>
 
 						<div class="corp-narrative-body">
-							<p>ニコル・カーズ合同会社は、1988年にBMW正規ディーラーとして設立され、現在ではMINI正規ディーラー事業も含めて東京都内にBMW新車ショールーム1拠点、神奈川エリアにBMW新車ショールーム4拠点、MINIショールーム3拠点、総合サービスセンター1拠点、ならびに認定中古車センター4拠点の計13拠点を展開しています。</p>
-
-							<p>国内の全BMW正規ディーラーを対象としたアワードにおいて、全国唯一となる「全国BMW最優秀ディーラー賞」を前人未到の7度受賞。最優秀・優秀ディーラー賞を通算23回獲得し、MINI部門においても最優秀・優秀ディーラー賞を通算3度獲得するなど、販売実績、顧客満足度、アフターセールス技術のすべてにおいて国内最高峰の信頼を確立してまいりました。</p>
-
-							<p>最新鋭の設備を備えた指定サービス工場と多数のBMWマイスターが常駐し、新車のご検討から日々の点検・車検、メンテナンス、認定中古車のお乗り換えまで、お客様の豊かなカーライフを一貫してサポートいたします。</p>
-						</div>
-
-						<div class="corp-narrative-highlights">
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">23回</div>
-								<div class="corp-highlight-item__label">BMW最優秀・優秀賞</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">7度</div>
-								<div class="corp-highlight-item__label">全国唯一 最優秀ディーラー</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">13拠点</div>
-								<div class="corp-highlight-item__label">東京・神奈川ネットワーク</div>
-							</div>
+							{aboutText.split("\n\n").map((p: string) => (
+								<p>{p}</p>
+							))}
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-
-		<!-- 3. 受賞実績（AWARDS） -->
-		<section id="awards" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">受賞実績</h2>
-					<p class="corp-section-subtitle">卓越したサービス品質と確かな信頼に裏打ちされた、数々の受賞歴をご紹介します。</p>
-				</header>
-
-				<div class="corp-awards-grid">
-					{awardsList.map((award) => (
-						<div class="corp-award-card">
-							<div class="corp-award-card__wreath" set:html={svgs[award.svgIndex]} />
-							<div class="corp-award-card__info">
-								<div class="corp-award-card__badge-tag">{award.badge}</div>
-								<h3 class="corp-award-card__title">{award.title}</h3>
-								<p class="corp-award-card__desc">{award.desc}</p>
-							</div>
-						</div>
-					))}
+		<!-- 自由ブロック（Portable Text: 管理画面から自由に追加・上下並び替え可能） -->
+		{parsedContent.length > 0 && (
+			<section id="additional-content" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<div class="corp-additional-blocks">
+						<RichPortableText value={parsedContent} />
+					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		)}
 
-		<!-- 4. 拠点ネットワーク（NETWORK & SHOWROOMS: 全13拠点） -->
+		<!-- 3. 拠点ネットワーク（NETWORK & SHOWROOMS: 全13拠点） -->
 		<section id="network" class="corp-section corp-section--bordered">
 			<div class="corp-container">
 				<header class="corp-section-header">
@@ -471,7 +679,7 @@ const jsonLd = {
 				</header>
 
 				<div class="corp-network-stack">
-					{networkSections.map((sec) => (
+					{activeNetworkSections.map((sec) => (
 						<div class="corp-network-group">
 							<div class="corp-network-group__header">
 								<h3 class="corp-network-group__title">{sec.category}</h3>
@@ -489,7 +697,7 @@ const jsonLd = {
 												loading="lazy" 
 												decoding="async" 
 											/>
-											<span class="corp-loc-card__badge">{loc.type}</span>
+											
 										</div>
 
 										<div class="corp-loc-card__content">
@@ -520,16 +728,7 @@ const jsonLd = {
 											</dl>
 
 											<footer class="corp-loc-card__footer">
-												<a 
-													href={loc.mapUrl} 
-													target="_blank" 
-													rel="noopener noreferrer" 
-													class="corp-loc-card__map-link"
-													aria-label={`${loc.name} のGoogle Mapsを開く（外部サイト）`}
-												>
-													<span>Google Mapsで地図を見る</span>
-													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-svg" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-												</a>
+												<MapBadge href={loc.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${loc.name}の地図をGoogleマップで開く`} />
 											</footer>
 										</div>
 									</article>
@@ -561,41 +760,8 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 5. 関連記事（WEB MAGAZINE） -->
-		<section id="articles" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">関連記事</h2>
-					<p class="corp-section-subtitle">BMWおよびMINIの最新モデル解説、テクノロジー、認定中古車の選び方に関する特集記事をご紹介します。</p>
-				</header>
-
-				<div class="corp-articles-grid">
-					{relatedArticles.map((art) => (
-						<article class="corp-article-card">
-							<a href={art.url} class="corp-article-card__link">
-								<div class="corp-article-card__media">
-									<img 
-										src={art.img} 
-										alt={art.title} 
-										class="corp-article-card__img" 
-										loading="lazy" 
-										decoding="async" 
-									/>
-									<span class="corp-article-card__badge">{art.tag}</span>
-								</div>
-								<div class="corp-article-card__content">
-									<time class="corp-article-card__date" datetime={art.date}>{art.date}</time>
-									<h3 class="corp-article-card__title">{art.title}</h3>
-								</div>
-							</a>
-						</article>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- 6. 会社基本データ（テーブル崩れ完全修正） -->
-		<section id="profile" class="corp-section">
+		<!-- 4. 会社基本データ -->
+		<section id="profile" class="corp-section corp-section--bordered">
 			<div class="corp-container">
 				<header class="corp-section-header">
 					<h2 class="corp-section-title">会社基本データ</h2>
@@ -607,53 +773,64 @@ const jsonLd = {
 						<tbody>
 							<tr>
 								<th scope="row">会社名</th>
-								<td>ニコル・カーズ合同会社（Nicole Cars LLC）</td>
+								<td>{companyTitle}（{companyNameEn}）</td>
 							</tr>
 							<tr>
 								<th scope="row">設立</th>
-								<td>1988年</td>
+								<td>{established}</td>
 							</tr>
 							<tr>
 								<th scope="row">代表者</th>
-								<td>代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）</td>
+								<td>{representative}</td>
 							</tr>
 							<tr>
 								<th scope="row">所在地</th>
-								<td>〒212-0005 神奈川県川崎市幸区戸手2-5-7</td>
+								<td>
+									<span>{postal} {address}</span>
+									<MapBadge href="https://maps.app.goo.gl/LRAu7RxGhwoWZJLk7" title="Googleマップで地図を見る" ariaLabel="本社の地図をGoogleマップで開く" />
+								</td>
 							</tr>
 							<tr>
 								<th scope="row">電話番号</th>
-								<td>044-511-2000（代表） / FAX：044-541-2400</td>
+								<td>{telDisplay}</td>
 							</tr>
 							<tr>
 								<th scope="row">事業内容</th>
 								<td>
 									<ul class="corp-business-list">
-										<li>BMW新車およびMINI新車の販売</li>
-										<li>BMW Premium Selection / MINI NEXT 認定中古車の販売・査定・買取</li>
-										<li>車検・法定点検・一般整備・リコール対応・板金塗装修理</li>
-										<li>BMW / MINI 純正部品・アクセサリー・ライフスタイルコレクション販売</li>
-										<li>自動車保険代理店業務</li>
+										{businessList.map((item: string) => (
+											<li>{item}</li>
+										))}
 									</ul>
 								</td>
 							</tr>
 							<tr>
 								<th scope="row">運営拠点</th>
 								<td>
-									全13拠点（東京都1拠点・神奈川県12拠点）<br />
-									BMW新車ショールーム（本社川崎・横浜港北・青葉宮前・新百合ヶ丘・大田）<br />
-									MINI新車ショールーム（港北・都筑・新百合ヶ丘）<br />
-									総合サービス拠点（Nicole BMW Service Centre）<br />
-									認定中古車センター（BPS横浜港北・BPS新百合ヶ丘・MINI NEXT横浜港北・MINI NEXT新百合ヶ丘）
+									<span class="corp-facility-summary">全13拠点（東京都1拠点・神奈川県12拠点）</span>
+									<ul class="corp-profile-facilities">
+										<li>
+											<span class="corp-facility-type">BMW新車ショールーム：</span>
+											<strong class="corp-facility-name">本社川崎・横浜港北・青葉宮前・新百合ヶ丘・大田</strong>
+										</li>
+										<li>
+											<span class="corp-facility-type">MINI新車ショールーム：</span>
+											<strong class="corp-facility-name">港北・都筑・新百合ヶ丘</strong>
+										</li>
+										<li>
+											<span class="corp-facility-type">総合サービス拠点：</span>
+											<strong class="corp-facility-name">Nicole BMW Service Centre</strong>
+											<span class="corp-facility-addr">（神奈川県横浜市都筑区川向町2003-4）</span>
+											<MapBadge href="https://maps.app.goo.gl/9U1z1L75mvdq5oVs9" title="Googleマップで地図を見る" ariaLabel="Nicole BMW Service Centreの地図をGoogleマップで開く" />
+										</li>
+										<li>
+											<span class="corp-facility-type">認定中古車センター：</span>
+											<strong class="corp-facility-name">BPS横浜港北・BPS新百合ヶ丘・MINI NEXT横浜港北・MINI NEXT新百合ヶ丘</strong>
+										</li>
+									</ul>
 								</td>
 							</tr>
-							<tr>
-								<th scope="row">親会社・グループ</th>
-								<td>
-									ニコル・グループ（Nicole Group）<br />
-									ペンスキー・オートモーティブ・グループ（Penske Automotive Group, Inc. / 米国NYSE上場：PAG）
-								</td>
-							</tr>
+							
 							<tr>
 								<th scope="row">取扱ブランド</th>
 								<td>BMW、MINI</td>
@@ -666,11 +843,9 @@ const jsonLd = {
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/philosophy" class="corp-inline-link">企業理念</a>
 										<span class="corp-inline-link-sep">/</span>
-										<a href="/locations" class="corp-inline-link">拠点一覧（全22拠点）</a>
+										<a href="/locations" class="corp-inline-link">グループ拠点一覧</a>
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/magazine" class="corp-inline-link">Web Magazine</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/contact" class="corp-inline-link">お問い合わせ</a>
 									</div>
 								</td>
 							</tr>
@@ -679,1037 +854,161 @@ const jsonLd = {
 				</div>
 			</div>
 		</section>
+
+		<!-- 5. 受賞実績（AWARDS） -->
+		<section id="awards" class="corp-section corp-section--bordered">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">受賞実績</h2>
+					<p class="corp-section-subtitle">卓越したサービス品質と確かな信頼に裏打ちされた、数々の受賞歴をご紹介します。</p>
+				</header>
+
+				<div class="corp-awards-grid">
+					{awardsList.map((award) => (
+						<div class="corp-award-card">
+							<div class="corp-award-card__wreath" set:html={svgs[award.svgIndex]} />
+							<div class="corp-award-card__info">
+								<div class="corp-award-card__badge-tag">{award.badge}</div>
+								<h3 class="corp-award-card__title">{award.title}</h3>
+								<p class="corp-award-card__desc">{award.desc}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- 6. ギャラリー（GALLERY - カルーセルスライダー） -->
+		{showroomGallery.length > 0 && (
+			<section id="gallery" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<header class="corp-section-header">
+						<h2 class="corp-section-title">ギャラリー</h2>
+						<p class="corp-section-subtitle">Nicole BMW・MINIが誇るショールーム空間と最新鋭サービスファシリティ。</p>
+					</header>
+
+					<div class="corp-slider-wrapper">
+						<div class="corp-slider-viewport">
+							<div class="corp-slider-track" id="corpSliderTrack">
+								{showroomGallery.map((item, idx) => (
+									<div class={`corp-slider-slide ${idx === 0 ? "is-active" : ""}`} data-slide-index={idx}>
+										<div class="corp-slider-media">
+											<img 
+												src={item.src} 
+												alt={item.alt} 
+												class="corp-slider-img" 
+												loading={idx === 0 ? "eager" : "lazy"} 
+												decoding="async" 
+											/>
+											<span class="corp-slider-badge">{item.num} / {String(showroomGallery.length).padStart(2, "0")}</span>
+										</div>
+										<div class="corp-slider-caption">
+											<h3 class="corp-slider-title">{item.title}</h3>
+											<p class="corp-slider-desc">{item.caption}</p>
+										</div>
+									</div>
+								))}
+							</div>
+
+							<!-- 左右ナビゲーション矢印 -->
+							<button type="button" class="corp-slider-btn corp-slider-btn--prev" id="corpSliderPrev" aria-label="前の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+							</button>
+							<button type="button" class="corp-slider-btn corp-slider-btn--next" id="corpSliderNext" aria-label="次の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+							</button>
+						</div>
+
+						<!-- サムネイルナビゲーション -->
+						<div class="corp-slider-thumbs" id="corpSliderThumbs" role="tablist" aria-label="サムネイル一覧">
+							{showroomGallery.map((item, idx) => (
+								<button 
+									type="button" 
+									class={`corp-slider-thumb ${idx === 0 ? "is-active" : ""}`} 
+									data-thumb-index={idx}
+									aria-label={`スライド ${idx + 1} (${item.title}) を表示`}
+								>
+									<img src={item.src} alt={item.title} class="corp-slider-thumb-img" loading="lazy" decoding="async" />
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- 7. 追加コンテンツ（CMS Portable Text 自由ブロック） -->
+		
+
+		<!-- 8. 関連記事（RELATED ARTICLES） -->
+		<section id="articles" class="corp-section">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">関連記事</h2>
+					<p class="corp-section-subtitle">BMWおよびMINIの最新モデル解説、テクノロジー、認定中古車の選び方に関する特集記事をご紹介します。</p>
+				</header>
+
+				<div class="corp-articles-grid">
+					{relatedArticles.map((art) => (
+						<ArticleCard
+							title={art.title}
+							url={art.url}
+							image={art.img}
+							date={art.date}
+							topic={art.category}
+							brand={art.brand}
+							showBrandPill={false}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
 	</main>
 </NicoleLayout>
 
-<style>
-	/* ============================================================== */
-	/* Nicole Corporate - 黒背景エディトリアルデザインシステム */
-	/* ============================================================== */
-	.corporate-magazine-main {
-		background-color: #040507;
-		color: #ffffff;
-		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-		min-height: 100vh;
-		position: relative;
-		overflow-x: hidden;
-		padding-top: 80px;
-	}
 
-	.corp-container {
-		width: 100%;
-		max-width: 1440px;
-		margin: 0 auto;
-		padding: 0 40px;
-		box-sizing: border-box;
-	}
 
-	@media (max-width: 1024px) {
-		.corp-container {
-			padding: 0 24px;
+<!-- ギャラリー カルーセルスライダースクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const track = document.getElementById('corpSliderTrack');
+		const prevBtn = document.getElementById('corpSliderPrev');
+		const nextBtn = document.getElementById('corpSliderNext');
+		const thumbs = document.querySelectorAll('.corp-slider-thumb');
+		const slides = document.querySelectorAll('.corp-slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) {
+						t.classList.add('is-active');
+						t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+					} else {
+						t.classList.remove('is-active');
+					}
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
 		}
-	}
-
-	@media (max-width: 480px) {
-		.corp-container {
-			padding: 0 16px;
-		}
-	}
-
-	/* 共通セクション設定 */
-	.corp-section {
-		padding: 90px 0;
-		position: relative;
-	}
-
-	.corp-section--bordered {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	@media (max-width: 768px) {
-		.corp-section {
-			padding: 60px 0;
-		}
-	}
-
-	.corp-section-header {
-		margin-bottom: 48px;
-	}
-
-	.corp-section-title {
-		font-size: clamp(26px, 3.2vw, 38px);
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: -0.01em;
-		line-height: 1.3;
-		margin: 0 0 14px 0;
-		text-wrap: balance;
-	}
-
-	.corp-section-subtitle {
-		font-size: 15px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.65);
-		margin: 0;
-		max-width: 760px;
-	}
-
-	.corp-section-lead {
-		font-size: clamp(16px, 1.8vw, 20px);
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.9);
-		line-height: 1.5;
-		margin: 0;
-	}
-
-	/* 1. HERO COVER */
-	.corp-hero {
-		position: relative;
-		min-height: 560px;
-		display: flex;
-		align-items: flex-end;
-		padding: 120px 0 60px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		overflow: hidden;
-		background: #000000;
-	}
-
-	@media (max-width: 768px) {
-		.corp-hero {
-			min-height: 460px;
-			padding: 90px 0 40px 0;
-		}
-	}
-
-	.corp-hero__media {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-		overflow: hidden;
-	}
-
-	.corp-hero__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center 38%;
-		filter: brightness(0.62) contrast(1.08);
-		transform: scale(1.02);
-	}
-
-	.corp-hero__gradient {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(
-			180deg,
-			rgba(4, 5, 7, 0.5) 0%,
-			rgba(4, 5, 7, 0.2) 35%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
-		);
-		pointer-events: none;
-	}
-
-	.corp-hero__side-vignette {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: radial-gradient(
-			circle at center,
-			transparent 40%,
-			rgba(4, 5, 7, 0.6) 100%
-		);
-		pointer-events: none;
-	}
-
-	.corp-hero__inner {
-		position: relative;
-		z-index: 2;
-	}
-
-	.corp-breadcrumbs {
-		margin-bottom: 24px;
-	}
-
-	.corp-breadcrumbs__list {
-		list-style: none;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-		margin: 0;
-		padding: 0;
-		font-size: 12px;
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.55);
-	}
-
-	.corp-breadcrumbs__link {
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.corp-breadcrumbs__link:hover {
-		color: #ffffff;
-	}
-
-	.corp-breadcrumbs__separator {
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.corp-hero__logo-wrap {
-		margin-bottom: 20px;
-	}
-
-	.corp-hero__brand-logo {
-		display: inline-flex;
-		align-items: center;
-		max-width: 320px;
-		height: 24px;
-	}
-
-	.corp-hero__brand-logo :global(svg) {
-		width: auto;
-		height: 22px;
-		max-width: 100%;
-		fill: #ffffff;
-	}
-
-	.corp-hero__title {
-		font-size: clamp(32px, 4.8vw, 56px);
-		font-weight: 700;
-		line-height: 1.15;
-		letter-spacing: -0.02em;
-		margin: 0 0 16px 0;
-		color: #ffffff;
-		text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-	}
-
-	.corp-hero__subtitle {
-		font-size: clamp(14px, 1.4vw, 16px);
-		line-height: 1.9;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 36px 0;
-		max-width: 900px;
-		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-	}
-
-	.corp-hero__phrase {
-		display: inline-block;
-	}
-
-	.corp-hero__br {
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	@media (max-width: 768px) {
-		.corp-hero__br {
-			display: none;
-		}
-	}
-
-	/* クイックナビゲーション */
-	.corp-subnav {
-		margin-top: 10px;
-	}
-
-	.corp-subnav__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-
-	.corp-subnav__pill {
-		display: inline-flex;
-		align-items: center;
-		padding: 8px 16px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 9999px;
-		color: rgba(255, 255, 255, 0.85);
-		font-size: 12.5px;
-		font-weight: 500;
-		text-decoration: none;
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-subnav__pill:hover {
-		background: rgba(255, 255, 255, 0.18);
-		border-color: rgba(255, 255, 255, 0.3);
-		color: #ffffff;
-		transform: translateY(-2px);
-	}
-
-	/* 2. 会社紹介 */
-	.corp-narrative-grid {
-		display: grid;
-		grid-template-columns: 480px 1fr;
-		gap: 56px;
-		align-items: center;
-	}
-
-	@media (max-width: 1024px) {
-		.corp-narrative-grid {
-			grid-template-columns: 1fr;
-			gap: 40px;
-		}
-	}
-
-	.corp-narrative-card {
-		position: relative;
-		border-radius: 18px;
-		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		background: rgba(255, 255, 255, 0.02);
-		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-	}
-
-	.corp-narrative-img {
-		width: 100%;
-		height: auto;
-		display: block;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-narrative-card:hover .corp-narrative-img {
-		transform: scale(1.03);
-	}
-
-	.corp-narrative-caption {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		padding: 24px 20px 16px 20px;
-		background: linear-gradient(to top, rgba(4, 5, 7, 0.9) 0%, transparent 100%);
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.corp-narrative-caption-title {
-		font-size: 14px;
-		font-weight: 700;
-		color: #ffffff;
-	}
-
-	.corp-narrative-caption-sub {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.6);
-		letter-spacing: 0.05em;
-	}
-
-	.corp-narrative-body p {
-		font-size: 15px;
-		line-height: 1.9;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 18px 0;
-	}
-
-	.corp-narrative-body p:last-child {
-		margin-bottom: 0;
-	}
-
-	.corp-narrative-highlights {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 16px;
-		margin-top: 36px;
-		padding-top: 28px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	@media (max-width: 600px) {
-		.corp-narrative-highlights {
-			grid-template-columns: repeat(3, 1fr);
-			gap: 8px;
-		}
-	}
-
-	.corp-highlight-item {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 12px;
-		padding: 16px 14px;
-		text-align: center;
-	}
-
-	@media (max-width: 600px) {
-		.corp-highlight-item {
-			padding: 12px 6px;
-		}
-	}
-
-	.corp-highlight-item__num {
-		font-size: clamp(18px, 2.2vw, 24px);
-		font-weight: 700;
-		color: #ffffff;
-		line-height: 1.2;
-		margin-bottom: 4px;
-		letter-spacing: -0.01em;
-	}
-
-	.corp-highlight-item__label {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.6);
-		line-height: 1.4;
-	}
-
-	/* 3. 受賞実績 */
-	.corp-awards-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 1024px) {
-		.corp-awards-grid {
-			grid-template-columns: 1fr;
-			gap: 20px;
-		}
-	}
-
-	.corp-award-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		padding: 32px 28px;
-		display: flex;
-		gap: 22px;
-		align-items: flex-start;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-		min-width: 0;
-		box-sizing: border-box;
-		overflow: hidden;
-	}
-
-	.corp-award-card:hover {
-		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.16);
-		transform: translateY(-3px);
-	}
-
-	@media (max-width: 600px) {
-		.corp-award-card {
-			padding: 24px 20px;
-			gap: 16px;
-		}
-	}
-
-	.corp-award-card__wreath {
-		width: 64px;
-		height: 64px;
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.corp-award-card__wreath :global(svg) {
-		width: 100%;
-		height: 100%;
-		fill: #ffffff;
-		opacity: 0.92;
-	}
-
-	.corp-award-card__info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.corp-award-card__badge-tag {
-		display: inline-block;
-		padding: 4px 10px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 9999px;
-		font-size: 11.5px;
-		font-weight: 600;
-		color: #ffffff;
-		letter-spacing: 0.02em;
-		margin-bottom: 10px;
-	}
-
-	.corp-award-card__title {
-		font-size: clamp(16px, 1.6vw, 19px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 10px 0;
-		line-height: 1.35;
-		white-space: normal !important;
-		word-break: break-word;
-		overflow-wrap: break-word;
-	}
-
-	.corp-award-card__desc {
-		font-size: 13.5px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0;
-	}
-
-	/* 4. 拠点ネットワーク */
-	.corp-network-stack {
-		display: flex;
-		flex-direction: column;
-		gap: 56px;
-	}
-
-	.corp-network-group {
-		position: relative;
-	}
-
-	.corp-network-group__header {
-		margin-bottom: 24px;
-		padding-bottom: 12px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		display: flex;
-		align-items: baseline;
-		gap: 14px;
-	}
-
-	.corp-network-group__title {
-		font-size: clamp(18px, 2vw, 22px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0;
-		letter-spacing: -0.01em;
-	}
-
-	.corp-network-group__sub {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.45);
-		font-family: var(--font-mono, monospace);
-		letter-spacing: 0.05em;
-	}
-
-	.corp-locations-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 1100px) {
-		.corp-locations-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 20px;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.corp-locations-grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
-	}
-
-	.corp-loc-card {
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		border-radius: 14px;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-loc-card:hover {
-		transform: translateY(-3px);
-		border-color: rgba(255, 255, 255, 0.18);
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	.corp-loc-card__media {
-		position: relative;
-		aspect-ratio: 16 / 10;
-		background: #000000;
-		overflow: hidden;
-	}
-
-	.corp-loc-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-loc-card:hover .corp-loc-card__img {
-		transform: scale(1.05);
-	}
-
-	.corp-loc-card__badge {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		padding: 3px 8px;
-		border-radius: 4px;
-		font-size: 11px;
-		font-weight: 500;
-		color: #ffffff;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.corp-loc-card__content {
-		padding: 20px 20px 24px 20px;
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.corp-loc-card__name {
-		font-size: 16.5px;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 10px 0;
-		line-height: 1.4;
-	}
-
-	.corp-loc-card__addr {
-		font-size: 13px;
-		line-height: 1.6;
-		color: rgba(255, 255, 255, 0.85);
-		margin: 0 0 16px 0;
-	}
-
-	.corp-loc-card__postal {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 12px;
-	}
-
-	.corp-loc-card__meta {
-		margin: 0 0 18px 0;
-		padding-top: 14px;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		font-size: 12.5px;
-		flex: 1;
-	}
-
-	.corp-loc-card__row {
-		display: grid;
-		grid-template-columns: 56px 1fr;
-		gap: 8px;
-		align-items: baseline;
-	}
-
-	.corp-loc-card__row dt {
-		color: rgba(255, 255, 255, 0.45);
-		font-weight: 500;
-	}
-
-	.corp-loc-card__row dd {
-		margin: 0;
-		color: rgba(255, 255, 255, 0.85);
-	}
-
-	.corp-loc-card__tel {
-		color: #ffffff;
-		font-weight: 600;
-		text-decoration: none;
-	}
-
-	.corp-loc-card__tel:hover {
-		text-decoration: underline;
-	}
-
-	.corp-loc-card__fax {
-		color: rgba(255, 255, 255, 0.5);
-		margin-left: 6px;
-		font-size: 11.5px;
-	}
-
-	.corp-loc-card__footer {
-		margin-top: auto;
-		padding-top: 12px;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.corp-loc-card__map-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.corp-loc-card__map-link:hover {
-		color: #ffffff;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-	}
-
-	.external-svg {
-		width: 12px;
-		height: 12px;
-		opacity: 0.8;
-	}
-
-	/* アクションバナー */
-	.corp-brand-action-banner {
-		margin-top: 56px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		padding: 32px 36px;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-	}
-
-	@media (max-width: 768px) {
-		.corp-brand-action-banner {
-			padding: 24px 20px;
-		}
-	}
-
-	.corp-brand-action-banner__inner {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 24px;
-		flex-wrap: wrap;
-	}
-
-	.corp-brand-action-title {
-		font-size: 18px;
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 6px 0;
-	}
-
-	.corp-brand-action-desc {
-		font-size: 13.5px;
-		color: rgba(255, 255, 255, 0.65);
-		margin: 0;
-	}
-
-	.corp-brand-action-links {
-		display: flex;
-		gap: 12px;
-		flex-wrap: wrap;
-	}
-
-	.corp-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		padding: 12px 22px;
-		border-radius: 9999px;
-		font-size: 13px;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-		min-width: 180px;
-	}
-
-	@media (max-width: 600px) {
-		.corp-btn {
-			width: 100%;
-		}
-	}
-
-	.corp-btn--primary {
-		background: #ffffff;
-		color: #040507;
-		border: 1px solid #ffffff;
-	}
-
-	.corp-btn--primary:hover {
-		background: rgba(255, 255, 255, 0.88);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
-	}
-
-	.corp-btn--outline {
-		background: transparent;
-		color: #ffffff;
-		border: 1px solid rgba(255, 255, 255, 0.25);
-	}
-
-	.corp-btn--outline:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.5);
-		transform: translateY(-2px);
-	}
-
-	.arrow-svg {
-		width: 14px;
-		height: 14px;
-		transition: transform 0.2s ease;
-	}
-
-	.corp-btn:hover .arrow-svg {
-		transform: translateX(3px);
-	}
-
-	/* 5. 関連記事 */
-	.corp-articles-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 1100px) {
-		.corp-articles-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 20px;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.corp-articles-grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
-	}
-
-	.corp-article-card {
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 14px;
-		overflow: hidden;
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-article-card:hover {
-		transform: translateY(-4px);
-		border-color: rgba(255, 255, 255, 0.18);
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	.corp-article-card__link {
-		display: block;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.corp-article-card__media {
-		position: relative;
-		aspect-ratio: 16 / 9;
-		overflow: hidden;
-		background: #000000;
-	}
-
-	.corp-article-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.corp-article-card:hover .corp-article-card__img {
-		transform: scale(1.06);
-	}
-
-	.corp-article-card__badge {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		padding: 3px 8px;
-		border-radius: 4px;
-		font-size: 10.5px;
-		color: #ffffff;
-		letter-spacing: 0.02em;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.corp-article-card__content {
-		padding: 16px 18px 20px 18px;
-	}
-
-	.corp-article-card__date {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.5);
-		display: block;
-		margin-bottom: 8px;
-		font-family: var(--font-mono, monospace);
-	}
-
-	.corp-article-card__title {
-		font-size: 14.5px;
-		font-weight: 600;
-		line-height: 1.5;
-		color: #ffffff;
-		margin: 0;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	/* 6. 会社基本データ */
-	.corp-profile-card {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 18px;
-		overflow: hidden;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-	}
-
-	.corp-profile-card table.corp-profile-table {
-		width: 100% !important;
-		border-collapse: collapse !important;
-		border-spacing: 0 !important;
-		border: none !important;
-		margin: 0 !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tbody {
-		border: none !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tr {
-		border: none !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-		background: transparent !important;
-	}
-
-	.corp-profile-card table.corp-profile-table tr:last-child {
-		border-bottom: none !important;
-	}
-
-	.corp-profile-card table.corp-profile-table th,
-	.corp-profile-card table.corp-profile-table td {
-		border: none !important;
-		box-shadow: none !important;
-		outline: none !important;
-	}
-
-	.corp-profile-card table.corp-profile-table th {
-		width: 240px !important;
-		padding: 22px 30px !important;
-		font-size: 14px !important;
-		font-weight: 600 !important;
-		color: rgba(255, 255, 255, 0.65) !important;
-		background: rgba(255, 255, 255, 0.02) !important;
-		vertical-align: top !important;
-		text-align: left !important;
-		white-space: nowrap !important;
-	}
-
-	.corp-profile-card table.corp-profile-table td {
-		padding: 22px 30px !important;
-		font-size: 14.5px !important;
-		color: rgba(255, 255, 255, 0.9) !important;
-		line-height: 1.8 !important;
-		background: transparent !important;
-		vertical-align: top !important;
-		text-align: left !important;
-	}
-
-	@media (max-width: 768px) {
-		.corp-profile-card table.corp-profile-table,
-		.corp-profile-card table.corp-profile-table tbody,
-		.corp-profile-card table.corp-profile-table tr,
-		.corp-profile-card table.corp-profile-table th,
-		.corp-profile-card table.corp-profile-table td {
-			display: block !important;
-			width: 100% !important;
-			box-sizing: border-box !important;
-		}
-
-		.corp-profile-card table.corp-profile-table tr {
-			border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-			padding: 16px 20px !important;
-		}
-
-		.corp-profile-card table.corp-profile-table th {
-			width: 100% !important;
-			padding: 0 0 6px 0 !important;
-			background: transparent !important;
-			color: rgba(255, 255, 255, 0.5) !important;
-			font-size: 12px !important;
-			font-weight: 600 !important;
-			white-space: normal !important;
-		}
-
-		.corp-profile-card table.corp-profile-table td {
-			width: 100% !important;
-			padding: 0 !important;
-			color: rgba(255, 255, 255, 0.92) !important;
-			font-size: 14px !important;
-			line-height: 1.7 !important;
-		}
-	}
-
-	.corp-business-list {
-		list-style: none !important;
-		padding: 0 !important;
-		margin: 0 !important;
-		display: flex !important;
-		flex-direction: column !important;
-		gap: 6px !important;
-	}
-
-	.corp-business-list li {
-		position: relative;
-		padding-left: 14px;
-		color: rgba(255, 255, 255, 0.85);
-	}
-
-	.corp-business-list li::before {
-		content: "・";
-		position: absolute;
-		left: 0;
-		color: rgba(255, 255, 255, 0.4);
-	}
-
-	.corp-related-links {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 10px;
-	}
-
-	.corp-inline-link {
-		color: #ffffff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-		text-decoration-color: rgba(255, 255, 255, 0.3);
-		transition: text-decoration-color 0.2s ease, color 0.2s ease;
-	}
-
-	.corp-inline-link:hover {
-		text-decoration-color: #ffffff;
-		color: #ffffff;
-	}
-
-	.corp-inline-link-sep {
-		color: rgba(255, 255, 255, 0.25);
-	}
-</style>
+	});
+</script>

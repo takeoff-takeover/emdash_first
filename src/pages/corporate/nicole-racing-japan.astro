@@ -1,30 +1,98 @@
 ---
 // src/pages/corporate/nicole-racing-japan.astro
 // ニコル・レーシング・ジャパン合同会社 会社案内（Nicole Connect マガジン同等の黒背景エディトリアルデザイン）
+import { getEmDashEntry, getEmDashCollection, getTermsForEntries } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import MapBadge from "../../components/MapBadge.astro";
+import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import svgs from "../../data/corporate-svgs.json";
+import "../../styles/corporate.css";
 
-const pageTitle = "ニコル・レーシング・ジャパン合同会社 | グループ中枢・シェアードサービス | Nicole Group 公式";
-const pageDescription = "ニコル・グループの創業母体であるニコル・レーシング・ジャパン合同会社の企業情報です。1977年の設立以来、グループ全体の経営資源最適化、シェアードサービス（経理・財務・総務・人事・法務）、マーケティング戦略、IT基盤統括などの中枢機能を担っています。";
-
-// 中枢機能（CORE FUNCTIONS）
-const coreFunctions = [
-	{
-		num: "01",
-		title: "シェアードサービス（経営管理統轄）",
-		desc: "経理・財務、人事・労務、総務、法務など、グループ各社の管理部門業務を一元的に集約。標準化と高度な専門性により業務効率を最大化し、現場の事業会社がお客様対応に専念できる強固なバックボーンを築きます。"
-	},
-	{
-		num: "02",
-		title: "グループ・マーケティング戦略",
-		desc: "BMW、MINI、Rolls-Royce、Ferrari、ALPINAといった世界最高峰のブランドを扱うグループ全体の価値向上を牽引。オウンドメディア「Nicole Connect」の運営、デジタルマーケティング、CRM、特別イベントの企画・実行を統括します。"
-	},
-	{
-		num: "03",
-		title: "ITインフラ・ガバナンス＆DX推進",
-		desc: "高度な情報セキュリティ環境の維持、基幹業務システムの最適化、顧客接点のデジタル化など、次世代のラグジュアリーモビリティ体験を支えるITインフラとコーポレートガバナンス体制を推進・管理しています。"
+// CMS 'companies' コレクションからデータを優先取得
+let companyEntry: any = null;
+try {
+	const res = await getEmDashEntry("companies" as any, "nicole-racing-japan");
+	if (res?.entry) {
+		companyEntry = res.entry.data || res.entry;
 	}
-];
+} catch (e) {}
+
+// 管理画面で追加された自由ブロック（Portable Text）のパース
+let parsedContent: any[] = [];
+if (companyEntry?.content) {
+	if (Array.isArray(companyEntry.content)) {
+		parsedContent = companyEntry.content;
+	} else if (typeof companyEntry.content === "string") {
+		try {
+			const parsed = JSON.parse(companyEntry.content);
+			if (Array.isArray(parsed)) parsedContent = parsed;
+		} catch (e) {}
+	}
+}
+
+const companyTitle = companyEntry?.title || "ニコル・レーシング・ジャパン合同会社";
+
+const pageTitle = companyEntry?.title
+	? `${companyEntry.title} | グループ中枢・シェアードサービス | Nicole Group 公式`
+	: "ニコル・レーシング・ジャパン合同会社 | グループ中枢・シェアードサービス | Nicole Group 公式";
+
+const pageDescription = companyEntry?.hero_phrase
+	? companyEntry.hero_phrase
+	: "ニコル・グループの創業母体であるニコル・レーシング・ジャパン合同会社の企業情報です。1977年の設立以来、グループ全体の経営資源最適化、シェアードサービス（経理・財務・総務・人事・法務）、マーケティング戦略、IT基盤統括などの中枢機能を担っています。";
+
+// ヒーロー
+const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/01/ニコルレーシングジャパン合同会社-scaled.jpg";
+const heroPhrase = companyEntry?.hero_phrase || "1977年設立。ニコル・グループの創業母体であり、グループの事業成長を支える中枢機能。シェアードサービス機能（経理・財務・総務・人事・法務）と戦略的マーケティングを集約し、各事業会社がお客様へのサービス提供に専念できる強固な経営支援とシナジー最大化を推進しています。";
+
+// 会社紹介
+const aboutTitle = companyEntry?.about_title || "グループの経営資源を最適化し、<br />未来の持続的成長を牽引する。";
+const aboutLead = companyEntry?.about_lead || "1977年の創業以来、グループ各社の自律とシナジーを両立させる中枢基盤";
+const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/2026/01/Nicole-BMW-本社-1.jpg";
+const aboutImageCaption = companyEntry?.about_image_caption || "ニコル・グループ 川崎本社";
+const aboutText = companyEntry?.about_text || "ニコル・レーシング・ジャパン合同会社は、1977年3月、レーシングドライバーであり創業者のC. H. ニコルによって設立されたニコル・グループの創業母体です。\n\n以来、BMW、MINI、Rolls-Royce、Ferrari、ALPINAといった世界最高峰のモビリティブランドを展開するグループ各社の中枢として、経営企画、コーポレートガバナンス、ITシステム基盤の構築・統括を担ってまいりました。\n\nまた、経理・財務、人事・労務、総務、法務などの管理部門機能を「シェアードサービス」として集約。各事業会社の業務効率化と標準化を推進することで、現場のディーラー各拠点がお客様への最高峰のホスピタリティとサービス提供に専念できる強固な組織体制を確立しています。";
+
+// ハイライト
+const highlight1Num = companyEntry?.highlight_1_num || "1977年";
+const highlight1Label = companyEntry?.highlight_1_label || "グループ創業の原点";
+const highlight2Num = companyEntry?.highlight_2_num || "4社";
+const highlight2Label = companyEntry?.highlight_2_label || "事業会社の中枢統轄";
+const highlight3Num = companyEntry?.highlight_3_num || "2拠点";
+const highlight3Label = companyEntry?.highlight_3_label || "横浜・川崎オフィス";
+
+// オフィスフォトギャラリー写真（CMS 'companies' コレクションから動的生成）
+let officeGallery: any[] = [];
+if (companyEntry) {
+	for (let i = 1; i <= 6; i++) {
+		const rawImg = companyEntry[`gallery_image_${i}`];
+		if (rawImg) {
+			let src = "";
+			let alt = companyEntry[`gallery_title_${i}`] || `${companyTitle} 写真 ${i}`;
+			if (typeof rawImg === "string") {
+				try {
+					const parsed = JSON.parse(rawImg);
+					src = parsed.src || rawImg;
+					if (parsed.alt) alt = parsed.alt;
+				} catch {
+					src = rawImg;
+				}
+			} else if (typeof rawImg === "object" && rawImg !== null) {
+				src = rawImg.src || "";
+				if (rawImg.alt) alt = rawImg.alt;
+			}
+			if (src) {
+				const num = String(officeGallery.length + 1).padStart(2, "0");
+				officeGallery.push({
+					src,
+					alt,
+					num,
+					title: companyEntry[`gallery_title_${i}`] || `ギャラリー ${num}`,
+					caption: companyEntry[`gallery_caption_${i}`] || ""
+				});
+			}
+		}
+	}
+}
 
 // オフィス拠点データ（locations.json準拠）
 const offices = [
@@ -56,37 +124,196 @@ const offices = [
 	}
 ];
 
-// 関連記事データ
-const relatedArticles = [
-	{
-		title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・点検・選び方について",
-		date: "2026.07.06",
-		tag: "Nicole Group",
-		url: "/posts/202607_nicole_certified-used-cars-guide/",
-		img: "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg"
-	},
-	{
-		title: "愛車の輝きを10年守る。プロテクションフィルムの選び方と「メーカー直結施工」の真価",
-		date: "2026.06.25",
-		tag: "Service & Bodycare",
-		url: "/posts/202606_nicole_protection-film/",
-		img: "/uploads/2026/06/DSC8395-e1782193339640.jpg"
-	},
-	{
-		title: "フェラーリスタの心を揺さぶる体験。その世界観を支えるマーケターの視点",
-		date: "2026.08.07",
-		tag: "Marketing & Strategy",
-		url: "/posts/202608_ferrari_marketing/",
-		img: "/uploads/2026/02/24_0206_nicol_kohoku_35084_re_web.avif"
-	},
-	{
-		title: "一時代の終幕、ミュンヘンのBMW工場からの旅立ち",
-		date: "2026.01.10",
-		tag: "ALPINA History",
-		url: "/posts/202601_alpina_departure-from-munich/",
-		img: "/uploads/2026/02/DSC2802-scaled.avif"
+// CMS 'locations' コレクションからオフィス拠点を動的取得
+let facilities = offices;
+try {
+	const locResult = await getEmDashCollection("locations" as any, { limit: 50 });
+	if (locResult?.entries && locResult.entries.length > 0) {
+		facilities = facilities.map(ofc => {
+			const found = locResult.entries.find((e: any) => {
+				const slug = (e.id || e.slug || "").toLowerCase();
+				const title = ((e.data?.title || e.title || "")).toLowerCase();
+				return (slug.includes("yokohama") || slug.includes("office-yokohama")) && ofc.name.includes("横浜") ||
+				       (slug.includes("kawasaki") || slug.includes("office-kawasaki")) && ofc.name.includes("川崎");
+			});
+			if (!found) return ofc;
+			const d = found.data || found;
+			let imgSrc = ofc.image;
+			if (d.featured_image) {
+				const feat = typeof d.featured_image === "string" ? (() => { try { return JSON.parse(d.featured_image); } catch { return d.featured_image; } })() : d.featured_image;
+				if (feat?.src) imgSrc = feat.src;
+				else if (typeof feat === "string" && feat.trim()) imgSrc = feat.trim();
+			}
+			return {
+				...ofc,
+				name: d.title || ofc.name,
+				postal: d.postal || ofc.postal,
+				address: d.address || ofc.address,
+				tel: d.sales_tel || d.tel || ofc.tel,
+				fax: d.sales_fax || d.fax || ofc.fax,
+				hours: d.sales_hours || ofc.hours,
+				closed: d.sales_closed || ofc.closed,
+				image: imgSrc,
+				mapUrl: d.google_maps_url || ofc.mapUrl,
+				desc: d.sales_desc || d.concept_text || ofc.desc
+			};
+		});
 	}
-];
+} catch (e) {}
+
+// 会社基本データ
+const companyNameEn = companyEntry?.name_en || "Nicole Racing Japan LLC";
+const established = companyEntry?.established || "1977年3月（グループ創業母体）";
+const representative = companyEntry?.representative || "代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）";
+const postal = companyEntry?.postal || facilities[0]?.postal || "〒220-0012";
+const address = companyEntry?.address || facilities[0]?.address || "神奈川県横浜市西区みなとみらい4-4-2 横浜ブルーアベニュー13F";
+const tel = companyEntry?.tel || (facilities[0]?.tel ? `${facilities[0].tel}（代表） / FAX：${facilities[0].fax || '045-228-8361'}` : "045-228-8360（代表） / FAX：045-228-8361");
+const telDisplay = tel.startsWith("TEL") ? tel : `TEL：${tel}`;
+const businessList = companyEntry?.business_desc
+	? companyEntry.business_desc.split("\n").filter(Boolean)
+	: [
+		"ニコル・グループ各社の経営企画・事業統轄",
+		"シェアードサービス業務（経理、財務、総務、人事、労務、法務等の管理部門機能の集約・受託）",
+		"グループ全体のブランディングおよびマーケティング戦略の立案・実行",
+		"オウンドメディア「Nicole Connect」の企画・運営",
+		"ITシステムインフラの企画・構築・運用およびデジタルトランスフォーメーション（DX）推進",
+		"損害保険・生命保険代理店業務"
+	];
+
+
+
+
+
+// 記事カテゴリー判定ヘルパー（マガジン「Nicole Connect」と完全共通）
+function determineArticleCategory(p: any): string {
+	const slug = (p.slug || p.id || "").toLowerCase();
+	const title = (p.title || p.data?.title || "").toLowerCase();
+	const topic = (p.topic || "").toLowerCase();
+
+	if (slug.includes("campaign") || slug.includes("fair") || slug.includes("debut") || title.includes("フェア") || title.includes("キャンペーン")) {
+		return "Campaign";
+	}
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び方") || title.includes("購入") || topic === "guide") {
+		return "Buyer's Guide";
+	}
+	const esgKeywords = [
+		"tamagawa", "cleanup", "japanesenight", "inspire_hub", "traffic-safety",
+		"food-for-community", "sustainable", "emergency", "kids-mechanic", "haruhinofes",
+		"norimonofes", "sdgs", "summerconference", "esg", "美化活動", "クリーンアップ", "交通安全", "防災", "寄付"
+	];
+	if (esgKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic.includes("esg") || topic.includes("sdgs")) {
+		return "ESG";
+	}
+	const peopleKeywords = [
+		"people", "interview", "staff", "mechanic", "craft", "職人", "社員", "インタビュー",
+		"ストーリー", "story", "マイスター", "junior_high", "work-experience", "international-employee",
+		"fire-department", "mochitsuki", "餅つき", "交流会", "感謝状", "職場体験", "alpina-heritage", "rolls-royce-bespoke"
+	];
+	if (peopleKeywords.some(kw => slug.includes(kw) || title.includes(kw)) || topic === "people") {
+		return "People";
+	}
+	return "Cars";
+}
+
+// マガジンコレクションからグループ・カルチャー・企業最新記事を動的取得
+let relatedArticles: Array<{
+	title: string;
+	date: string;
+	category: string;
+	brand: string;
+	url: string;
+	img: string;
+}> = [];
+
+try {
+	const magResult = await getEmDashCollection("magazine" as any, {
+		orderBy: { published_at: "desc" },
+		limit: 100,
+	});
+	if (magResult?.entries && magResult.entries.length > 0) {
+		const filtered = magResult.entries.filter((entry: any) => {
+			const slug = (entry.id || entry.slug || "").toLowerCase();
+			const title = (entry.data?.title || entry.title || "").toLowerCase();
+			return slug.includes("nicole") || slug.includes("welcome") || slug.includes("award") || title.includes("ニコル") || title.includes("グループ") || title.includes("認定中古車");
+		});
+
+		const selectedEntries = (filtered.length >= 4 ? filtered : magResult.entries).slice(0, 4);
+		const entryIds = selectedEntries.map((e: any) => e.data?.id || e.id).filter(Boolean);
+
+		let categoryTermsByEntry = new Map<string, any[]>();
+		try {
+			if (entryIds.length > 0) {
+				categoryTermsByEntry = await getTermsForEntries("magazine", entryIds, "category");
+			}
+		} catch (e) {}
+
+		relatedArticles = selectedEntries.map((entry: any) => {
+			const slug = entry.id || entry.slug;
+			const title = entry.data?.title || entry.title || "Nicole Group 特集記事";
+			const entryDbId = entry.data?.id || entry.id;
+			const publishedAt = new Date(entry.data?.publishedAt ?? entry.data?.createdAt ?? entry.published_at ?? 0).getTime() || 0;
+			const dateStr = publishedAt 
+				? new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
+				: "2026.07.06";
+			
+			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg";
+			if (imgPath.includes("nicole.co.jp/wp/wp-content")) {
+				imgPath = imgPath.replace(/https?:\/\/[^\/]+\/wp\/wp-content/, "/uploads/wp");
+			}
+
+			const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+			const inferredCat = determineArticleCategory({ slug, title, topic: entry.data?.topic || entry.topic });
+			const category = assignedCategories.length > 0 ? assignedCategories[0] : inferredCat;
+
+			return {
+				title,
+				date: dateStr,
+				category,
+				brand: "Nicole Group",
+				url: `/magazine/${slug}/`,
+				img: imgPath
+			};
+		});
+	}
+} catch (e) {}
+
+// フォールバック（グループ厳選4記事・実在画像保証）
+if (relatedArticles.length === 0) {
+	relatedArticles = [
+		{
+			title: "BMW / MINI / Rolls-Royce / Ferrari｜認定中古車とは？メリット・保証・点検・選び方について",
+			date: "2026.07.06",
+			category: "Buyer's Guide",
+			brand: "Nicole Group",
+			url: "/magazine/202607_nicole_certified-used-cars-guide/",
+			img: "/uploads/2026/07/★ALL_Generated_Image_whwtoswhwtoswhwt.jpg"
+		},
+		{
+			title: "愛車の輝きを10年守る。プロテクションフィルムの選び方と「メーカー直結施工」の真価",
+			date: "2026.06.25",
+			category: "Cars",
+			brand: "Nicole Group",
+			url: "/magazine/202606_nicole_protection-film/",
+			img: "/uploads/2026/06/DSC8395-e1782193339640.jpg"
+		},
+		{
+			title: "Webマガジン 「Nicole Connect」へようこそ",
+			date: "2026.03.01",
+			category: "People",
+			brand: "Nicole Group",
+			url: "/magazine/202603_welcome_nicoleconnect/",
+			img: "/uploads/2026/02/DSC8585-scaled.avif"
+		},
+		{
+			title: "ニコル・グループが「ウルトラ・ラグジュアリー・パフォーマンス・アワード」を受賞",
+			date: "2026.07.20",
+			category: "Cars",
+			brand: "Nicole Group",
+			url: "/magazine/202607_ultra_luxury_performance_award/",
+			img: "/uploads/2026/02/DSC2390-scaled-e1772189662282.avif"
+		}
+	];
+}
 
 // Schema.org 構造化データ（JSON-LD）
 const jsonLd = {
@@ -153,18 +380,7 @@ const jsonLd = {
 <NicoleLayout title={pageTitle} description={pageDescription}>
 	<Fragment slot="head">
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-		<style is:global>
-			body:has(.corporate-magazine-main),
-			body:has(.corporate-magazine-main) #page,
-			body:has(.corporate-magazine-main) #content,
-			body:has(.corporate-magazine-main) .site-content,
-			body:has(.corporate-magazine-main) #primary,
-			body:has(.corporate-magazine-main) .content-area,
-			body:has(.corporate-magazine-main) .ast-container {
-				background-color: #040507 !important;
-				background-image: none !important;
-			}
-		</style>
+		
 	</Fragment>
 
 	<main class="corporate-magazine-main">
@@ -172,7 +388,7 @@ const jsonLd = {
 		<header class="corp-hero">
 			<div class="corp-hero__media">
 				<img 
-					src="/uploads/2026/01/ニコルレーシングジャパン合同会社-scaled.jpg" 
+					src={heroImageSrc} 
 					alt="ニコル・レーシング・ジャパン合同会社 横浜本社オフィス" 
 					class="corp-hero__img" 
 					loading="eager" 
@@ -193,25 +409,22 @@ const jsonLd = {
 					</ol>
 				</nav>
 
-				<div class="corp-hero__logo-wrap">
-					<div class="corp-hero__brand-logo" set:html={svgs[0]} />
-				</div>
-
-				<h1 class="corp-hero__title">ニコル・レーシング・ジャパン合同会社</h1>
+				<h1 class="corp-hero__title">{companyTitle}</h1>
 				<p class="corp-hero__subtitle">
-					<span class="corp-hero__phrase">1977年設立。ニコル・グループの創業母体であり、グループの事業成長を支える中枢機能。</span><br class="corp-hero__br" />
-					<span class="corp-hero__phrase">シェアードサービス機能（経理・財務・総務・人事・法務）と戦略的マーケティングを集約し、</span>
-					<span class="corp-hero__phrase">各事業会社がお客様へのサービス提供に専念できる強固な経営支援とシナジー最大化を推進しています。</span>
+					{heroPhrase.split("。").filter(Boolean).map((phrase: string) => (
+						<span class="corp-hero__phrase">{phrase}。</span>
+					))}
 				</p>
 
 				<!-- ページ内クイックナビゲーション -->
 				<nav class="corp-subnav" aria-label="ページ内目次">
 					<ul class="corp-subnav__list">
 						<li><a href="#about" class="corp-subnav__pill">会社紹介</a></li>
-						<li><a href="#functions" class="corp-subnav__pill">中枢機能</a></li>
+						{parsedContent.length > 0 && <li><a href="#additional-content" class="corp-subnav__pill">詳細情報</a></li>}
 						<li><a href="#offices" class="corp-subnav__pill">オフィス案内</a></li>
-						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 						<li><a href="#profile" class="corp-subnav__pill">会社基本データ</a></li>
+						{officeGallery.length > 0 && <li><a href="#gallery" class="corp-subnav__pill">ギャラリー</a></li>}
+						<li><a href="#articles" class="corp-subnav__pill">関連記事</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -225,76 +438,45 @@ const jsonLd = {
 					<div class="corp-narrative-visual">
 						<div class="corp-narrative-card">
 							<img 
-								src="/uploads/2026/01/Nicole-BMW-本社-1.jpg" 
-								alt="ニコル・グループ 川崎本社オフィス 外観" 
+								src={aboutImageSrc} 
+								alt={aboutImageCaption} 
 								class="corp-narrative-img" 
-								width="1200" 
-								height="800" 
+								width="1024" 
+								height="683" 
 								loading="lazy" 
 								decoding="async" 
 							/>
-							<div class="corp-narrative-caption">
-								<span class="corp-narrative-caption-title">ニコル・グループ 川崎本社</span>
-								<span class="corp-narrative-caption-sub">Nicole Group Head Office</span>
-							</div>
 						</div>
 					</div>
 
 					<!-- 右列: ストーリー本文 -->
 					<div class="corp-narrative-content">
 						<header class="corp-section-header">
-							<h2 class="corp-section-title">グループの経営資源を最適化し、<br />未来の持続的成長を牽引する。</h2>
-							<p class="corp-section-lead">1977年の創業以来、グループ各社の自律とシナジーを両立させる中枢基盤</p>
+							<h2 class="corp-section-title" set:html={aboutTitle} />
+							<p class="corp-section-lead">{aboutLead}</p>
 						</header>
 
 						<div class="corp-narrative-body">
-							<p>ニコル・レーシング・ジャパン合同会社は、1977年にニコル・グループの創業母体として設立されました。半世紀近い歴史のなかで、モータースポーツへの情熱から始まった事業は、今日では世界最高峰のプレミアム＆ラグジュアリーカーを取り扱う総合モビリティグループへと進化を遂げました。</p>
-
-							<p>当社はグループの中枢として、経理・財務、人事、総務、法務といった管理部門業務を集約するシェアードサービス機能を提供。各事業会社（ニコル・カーズ、ニコル・オートモビルズ、Nicole MotorCars、Nicole Competizione）が、お客様への最高水準の接客とアフターサービスの充実に専念できる体制を構築しています。</p>
-
-							<p>さらに、グループ全体のブランド価値向上を担うマーケティング戦略の立案・実行、ITインフラとコーポレートガバナンスの統轄を担い、グループ全体の持続的成長と価値創造を牽引しています。</p>
-						</div>
-
-						<div class="corp-narrative-highlights">
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">1977年</div>
-								<div class="corp-highlight-item__label">グループ創業母体</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">5社</div>
-								<div class="corp-highlight-item__label">グループ事業会社統括</div>
-							</div>
-							<div class="corp-highlight-item">
-								<div class="corp-highlight-item__num">400名</div>
-								<div class="corp-highlight-item__label">グループ従業員支援</div>
-							</div>
+							{aboutText.split("\n\n").map((p: string) => (
+								<p>{p}</p>
+							))}
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-
-		<!-- 3. 中枢機能（CORE FUNCTIONS） -->
-		<section id="functions" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">グループ中枢としての3大機能</h2>
-					<p class="corp-section-subtitle">専門性に特化した機能集約により、経営効率の向上とブランドシナジーの最大化を両立しています。</p>
-				</header>
-
-				<div class="corp-functions-grid">
-					{coreFunctions.map((fn) => (
-						<article class="corp-function-card">
-							<div class="corp-function-card__header">
-								<span class="corp-function-card__num">{fn.num}</span>
-								<h3 class="corp-function-card__title">{fn.title}</h3>
-							</div>
-							<p class="corp-function-card__desc">{fn.desc}</p>
-						</article>
-					))}
+		<!-- 自由ブロック（Portable Text: 管理画面から自由に追加・上下並び替え可能） -->
+		{parsedContent.length > 0 && (
+			<section id="additional-content" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<div class="corp-additional-blocks">
+						<RichPortableText value={parsedContent} />
+					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		)}
+
+		
 
 		<!-- 4. オフィス案内（OFFICES） -->
 		<section id="offices" class="corp-section corp-section--bordered">
@@ -305,7 +487,7 @@ const jsonLd = {
 				</header>
 
 				<div class="corp-showrooms-stack">
-					{offices.map((ofc) => (
+					{facilities.map((ofc) => (
 						<div class="corp-showroom-grid">
 							<div class="corp-showroom-visual">
 								<div class="corp-showroom-photo-wrap">
@@ -316,7 +498,7 @@ const jsonLd = {
 										loading="lazy" 
 										decoding="async" 
 									/>
-									<div class="corp-showroom-photo-badge">{ofc.type}</div>
+									
 								</div>
 							</div>
 
@@ -334,8 +516,8 @@ const jsonLd = {
 									<div class="corp-showroom-row">
 										<dt class="corp-showroom-dt">所在地</dt>
 										<dd class="corp-showroom-dd">
-											{ofc.postal} {ofc.address}
-											<a href={ofc.mapUrl} target="_blank" rel="noopener noreferrer" class="corp-map-link">Google Mapsで開く</a>
+											<span>{ofc.postal} {ofc.address}</span>
+											<MapBadge href={ofc.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${ofc.name}の地図をGoogleマップで開く`} />
 										</dd>
 									</div>
 									<div class="corp-showroom-row">
@@ -361,39 +543,8 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 5. 関連記事（RELATED ARTICLES） -->
-		<section id="articles" class="corp-section corp-section--bordered">
-			<div class="corp-container">
-				<header class="corp-section-header">
-					<h2 class="corp-section-title">関連記事</h2>
-					<p class="corp-section-subtitle">オウンドメディア「Nicole Connect」より、ニコル・グループの活動やカルチャーに関する特集記事をお届けします。</p>
-				</header>
-
-				<div class="corp-articles-grid">
-					{relatedArticles.map((art) => (
-						<a href={art.url} class="corp-article-card">
-							<div class="corp-article-card__thumb-wrap">
-								<img 
-									src={art.img} 
-									alt={art.title} 
-									class="corp-article-card__thumb" 
-									loading="lazy" 
-									decoding="async" 
-								/>
-								<span class="corp-article-card__tag">{art.tag}</span>
-							</div>
-							<div class="corp-article-card__content">
-								<time class="corp-article-card__date">{art.date}</time>
-								<h3 class="corp-article-card__title">{art.title}</h3>
-							</div>
-						</a>
-					))}
-				</div>
-			</div>
-		</section>
-
-		<!-- 6. 会社基本データ -->
-		<section id="profile" class="corp-section">
+		<!-- 5. 会社基本データ -->
+		<section id="profile" class="corp-section corp-section--bordered">
 			<div class="corp-container">
 				<header class="corp-section-header">
 					<h2 class="corp-section-title">会社基本データ</h2>
@@ -405,37 +556,39 @@ const jsonLd = {
 						<tbody>
 							<tr>
 								<th scope="row">会社名</th>
-								<td>ニコル・レーシング・ジャパン合同会社（Nicole Racing Japan LLC）</td>
+								<td>{companyTitle}（{companyNameEn}）</td>
 							</tr>
 							<tr>
 								<th scope="row">設立</th>
-								<td>1977年3月（グループ創業母体）</td>
+								<td>{established}</td>
 							</tr>
 							<tr>
 								<th scope="row">代表者</th>
-								<td>代表職務執行者 社長 ミヒャエル・ヴィット（Michael Witt）</td>
+								<td>{representative}</td>
 							</tr>
 							<tr>
-								<th scope="row">本社所在地</th>
+								<th scope="row">所在地</th>
 								<td>
-									<strong>横浜本社オフィス：</strong><br />
-									〒220-0012 神奈川県横浜市西区みなとみらい4-4-2 横浜ブルーアベニュー13F<br />
-									TEL：045-228-8360（代表） / FAX：045-228-8361<br /><br />
-									<strong>川崎本社オフィス：</strong><br />
-									〒212-0005 神奈川県川崎市幸区戸手2-5-7<br />
-									TEL：044-541-3011（代表） / FAX：044-541-3036
+									<span class="corp-facility-summary">全{facilities.length}拠点（神奈川県横浜市・川崎市）</span>
+									<ul class="corp-profile-facilities">
+										{facilities.map((ofc) => (
+											<li>
+												<span class="corp-facility-type">{ofc.type}：</span>
+												<strong class="corp-facility-name">{ofc.name}</strong>
+												<span class="corp-facility-addr">（{ofc.postal} {ofc.address}）</span>
+												<MapBadge href={ofc.mapUrl} title="Googleマップで地図を見る" ariaLabel={`${ofc.name}の地図をGoogleマップで開く`} />
+											</li>
+										))}
+									</ul>
 								</td>
 							</tr>
 							<tr>
 								<th scope="row">事業内容</th>
 								<td>
 									<ul class="corp-business-list">
-										<li>ニコル・グループ各社の経営企画・事業統轄</li>
-										<li>シェアードサービス業務（経理、財務、総務、人事、労務、法務等の管理部門機能の集約・受託）</li>
-										<li>グループ全体のブランディングおよびマーケティング戦略の立案・実行</li>
-										<li>オウンドメディア「Nicole Connect」の企画・運営</li>
-										<li>ITシステムインフラの企画・構築・運用およびデジタルトランスフォーメーション（DX）推進</li>
-										<li>損害保険・生命保険代理店業務</li>
+										{businessList.map((item: string) => (
+											<li>{item}</li>
+										))}
 									</ul>
 								</td>
 							</tr>
@@ -448,13 +601,7 @@ const jsonLd = {
 									Nicole Competizione合同会社（フェラーリ正規ディーラー）
 								</td>
 							</tr>
-							<tr>
-								<th scope="row">親会社・グループ</th>
-								<td>
-									ニコル・グループ（Nicole Group）<br />
-									ペンスキー・オートモーティブ・グループ（Penske Automotive Group, Inc. / 米国NYSE上場：PAG）
-								</td>
-							</tr>
+							
 							<tr>
 								<th scope="row">関連ページ</th>
 								<td>
@@ -463,11 +610,9 @@ const jsonLd = {
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/philosophy" class="corp-inline-link">企業理念</a>
 										<span class="corp-inline-link-sep">/</span>
-										<a href="/locations" class="corp-inline-link">拠点一覧（全22拠点）</a>
+										<a href="/locations" class="corp-inline-link">グループ拠点一覧</a>
 										<span class="corp-inline-link-sep">/</span>
 										<a href="/magazine" class="corp-inline-link">Web Magazine</a>
-										<span class="corp-inline-link-sep">/</span>
-										<a href="/contact" class="corp-inline-link">お問い合わせ</a>
 									</div>
 								</td>
 							</tr>
@@ -476,745 +621,138 @@ const jsonLd = {
 				</div>
 			</div>
 		</section>
+
+		<!-- 6. オフィスギャラリー（GALLERY - カルーセルスライダー） -->
+		{officeGallery.length > 0 && (
+			<section id="gallery" class="corp-section corp-section--bordered">
+				<div class="corp-container">
+					<header class="corp-section-header">
+						<h2 class="corp-section-title">オフィスギャラリー</h2>
+						<p class="corp-section-subtitle">ニコル・グループの中枢機能を担う横浜および川崎オフィスの空間。</p>
+					</header>
+
+					<div class="corp-slider-wrapper">
+						<div class="corp-slider-viewport">
+							<div class="corp-slider-track" id="corpSliderTrack">
+								{officeGallery.map((item, idx) => (
+									<div class={`corp-slider-slide ${idx === 0 ? "is-active" : ""}`} data-slide-index={idx}>
+										<div class="corp-slider-media">
+											<img 
+												src={item.src} 
+												alt={item.alt} 
+												class="corp-slider-img" 
+												loading={idx === 0 ? "eager" : "lazy"} 
+												decoding="async" 
+											/>
+											<span class="corp-slider-badge">{item.num} / {String(officeGallery.length).padStart(2, "0")}</span>
+										</div>
+										<div class="corp-slider-caption">
+											<h3 class="corp-slider-title">{item.title}</h3>
+											<p class="corp-slider-desc">{item.caption}</p>
+										</div>
+									</div>
+								))}
+							</div>
+
+							<!-- 左右ナビゲーション矢印 -->
+							<button type="button" class="corp-slider-btn corp-slider-btn--prev" id="corpSliderPrev" aria-label="前の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+							</button>
+							<button type="button" class="corp-slider-btn corp-slider-btn--next" id="corpSliderNext" aria-label="次の写真へ">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+							</button>
+						</div>
+
+						<!-- サムネイルナビゲーション -->
+						<div class="corp-slider-thumbs" id="corpSliderThumbs" role="tablist" aria-label="サムネイル一覧">
+							{officeGallery.map((item, idx) => (
+								<button 
+									type="button" 
+									class={`corp-slider-thumb ${idx === 0 ? "is-active" : ""}`} 
+									data-thumb-index={idx}
+									aria-label={`スライド ${idx + 1} (${item.title}) を表示`}
+								>
+									<img src={item.src} alt={item.title} class="corp-slider-thumb-img" loading="lazy" decoding="async" />
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+		)}
+
+		<!-- 7. 追加コンテンツ（CMS Portable Text 自由ブロック） -->
+		
+
+		<!-- 8. 関連記事（RELATED ARTICLES） -->
+		<section id="articles" class="corp-section">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">関連記事</h2>
+					<p class="corp-section-subtitle">オウンドメディア「Nicole Connect」より、ニコル・グループの活動やカルチャーに関する特集記事をお届けします。</p>
+				</header>
+
+				<div class="corp-articles-grid">
+					{relatedArticles.map((art) => (
+						<ArticleCard
+							title={art.title}
+							url={art.url}
+							image={art.img}
+							date={art.date}
+							topic={art.category}
+							brand={art.brand}
+							showBrandPill={false}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
 	</main>
 </NicoleLayout>
 
-<style>
-	/* ============================================================== */
-	/* Nicole Corporate - 黒背景エディトリアルデザインシステム */
-	/* ============================================================== */
-	.corporate-magazine-main {
-		background-color: #040507;
-		color: #ffffff;
-		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-		min-height: 100vh;
-		position: relative;
-		overflow-x: hidden;
-		padding-top: 80px;
-	}
 
-	.corp-container {
-		width: 100%;
-		max-width: 1440px;
-		margin: 0 auto;
-		padding: 0 40px;
-		box-sizing: border-box;
-	}
 
-	@media (max-width: 1024px) {
-		.corp-container {
-			padding: 0 24px;
+<!-- ギャラリー カルーセルスライダースクリプト -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const track = document.getElementById('corpSliderTrack');
+		const prevBtn = document.getElementById('corpSliderPrev');
+		const nextBtn = document.getElementById('corpSliderNext');
+		const thumbs = document.querySelectorAll('.corp-slider-thumb');
+		const slides = document.querySelectorAll('.corp-slider-slide');
+
+		if (track && prevBtn && nextBtn && slides.length > 0) {
+			let currentIndex = 0;
+			const total = slides.length;
+
+			function goToSlide(idx) {
+				currentIndex = (idx + total) % total;
+				track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+				slides.forEach((s, i) => {
+					if (i === currentIndex) s.classList.add('is-active');
+					else s.classList.remove('is-active');
+				});
+
+				thumbs.forEach((t, i) => {
+					if (i === currentIndex) {
+						t.classList.add('is-active');
+						t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+					} else {
+						t.classList.remove('is-active');
+					}
+				});
+			}
+
+			prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+			nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+			thumbs.forEach(thumb => {
+				thumb.addEventListener('click', () => {
+					const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+					goToSlide(idx);
+				});
+			});
 		}
-	}
-
-	@media (max-width: 480px) {
-		.corp-container {
-			padding: 0 16px;
-		}
-	}
-
-	/* 共通セクション設定 */
-	.corp-section {
-		padding: 90px 0;
-		position: relative;
-	}
-
-	.corp-section--bordered {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	@media (max-width: 768px) {
-		.corp-section {
-			padding: 60px 0;
-		}
-	}
-
-	.corp-section-header {
-		margin-bottom: 48px;
-	}
-
-	.corp-section-title {
-		font-size: clamp(26px, 3.2vw, 38px);
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: -0.01em;
-		line-height: 1.3;
-		margin: 0 0 14px 0;
-		text-wrap: balance;
-	}
-
-	.corp-section-subtitle {
-		font-size: 15px;
-		color: rgba(255, 255, 255, 0.65);
-		line-height: 1.7;
-		max-width: 820px;
-		margin: 0;
-	}
-
-	.corp-section-lead {
-		font-size: 15px;
-		color: rgba(255, 255, 255, 0.6);
-		margin: 0;
-		line-height: 1.7;
-	}
-
-	/* ============================================================== */
-	/* 1. HERO COVER */
-	/* ============================================================== */
-	.corp-hero {
-		position: relative;
-		min-height: 82vh;
-		display: flex;
-		align-items: flex-end;
-		padding-bottom: 70px;
-		padding-top: 60px;
-		box-sizing: border-box;
-		overflow: hidden;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.corp-hero__media {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-	}
-
-	.corp-hero__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center 35%;
-		filter: brightness(0.65) contrast(1.05);
-	}
-
-	.corp-hero__gradient {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(
-			180deg,
-			rgba(4, 5, 7, 0.45) 0%,
-			rgba(4, 5, 7, 0.25) 40%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
-		);
-	}
-
-	.corp-hero__side-vignette {
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(
-			ellipse at 20% 50%,
-			rgba(4, 5, 7, 0.1) 0%,
-			rgba(4, 5, 7, 0.75) 100%
-		);
-		pointer-events: none;
-	}
-
-	.corp-hero__inner {
-		position: relative;
-		z-index: 1;
-	}
-
-	/* パンくずリスト */
-	.corp-breadcrumbs {
-		margin-bottom: 28px;
-	}
-
-	.corp-breadcrumbs__list {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		font-size: 12px;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.5);
-	}
-
-	.corp-breadcrumbs__link {
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	.corp-breadcrumbs__link:hover {
-		color: #ffffff;
-	}
-
-	.corp-breadcrumbs__separator {
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	/* ブランドロゴ */
-	.corp-hero__logo-wrap {
-		margin-bottom: 24px;
-	}
-
-	.corp-hero__brand-logo {
-		display: inline-block;
-		max-width: 320px;
-	}
-
-	.corp-hero__brand-logo :global(svg) {
-		width: 100%;
-		height: auto;
-		max-height: 48px;
-		fill: #ffffff;
-		display: block;
-	}
-
-	.corp-hero__title {
-		font-size: clamp(34px, 4.8vw, 56px);
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.15;
-		margin: 0 0 18px 0;
-		color: #ffffff;
-		text-wrap: balance;
-	}
-
-	.corp-hero__subtitle {
-		font-size: clamp(14px, 1.4vw, 17px);
-		line-height: 1.85;
-		color: rgba(255, 255, 255, 0.85);
-		max-width: 920px;
-		margin: 0 0 36px 0;
-	}
-
-	.corp-hero__phrase {
-		display: inline-block;
-	}
-
-	.corp-hero__br {
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	/* サブナビゲーションピル */
-	.corp-subnav {
-		margin-top: 24px;
-	}
-
-	.corp-subnav__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-
-	.corp-subnav__pill {
-		display: inline-block;
-		padding: 8px 18px;
-		font-size: 13px;
-		color: rgba(255, 255, 255, 0.85);
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		text-decoration: none;
-		border-radius: 4px;
-		transition: all 0.25s ease;
-	}
-
-	.corp-subnav__pill:hover {
-		color: #ffffff;
-		background: rgba(255, 255, 255, 0.2);
-		border-color: rgba(255, 255, 255, 0.35);
-	}
-
-	/* ============================================================== */
-	/* 2. ABOUT（NARRATIVE） */
-	/* ============================================================== */
-	.corp-narrative-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 60px;
-		align-items: center;
-	}
-
-	@media (max-width: 992px) {
-		.corp-narrative-grid {
-			grid-template-columns: 1fr;
-			gap: 40px;
-		}
-	}
-
-	.corp-narrative-card {
-		position: relative;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		background: #0a0c10;
-		overflow: hidden;
-	}
-
-	.corp-narrative-img {
-		width: 100%;
-		height: auto;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		display: block;
-	}
-
-	.corp-narrative-caption {
-		padding: 16px 20px;
-		background: rgba(10, 12, 16, 0.95);
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.corp-narrative-caption-title {
-		font-size: 14px;
-		font-weight: 600;
-		color: #ffffff;
-	}
-
-	.corp-narrative-caption-sub {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.5);
-		letter-spacing: 0.04em;
-	}
-
-	.corp-narrative-body {
-		font-size: 15px;
-		line-height: 1.95;
-		color: rgba(255, 255, 255, 0.8);
-		margin-bottom: 36px;
-	}
-
-	.corp-narrative-body p {
-		margin: 0 0 1.4em 0;
-	}
-
-	.corp-narrative-body p:last-child {
-		margin-bottom: 0;
-	}
-
-	.corp-narrative-highlights {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 16px;
-		padding-top: 28px;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	@media (max-width: 540px) {
-		.corp-narrative-highlights {
-			grid-template-columns: 1fr;
-			gap: 14px;
-		}
-	}
-
-	.corp-highlight-item {
-		padding: 14px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.corp-highlight-item__num {
-		font-size: clamp(20px, 2.2vw, 26px);
-		font-weight: 700;
-		color: #ffffff;
-		letter-spacing: -0.01em;
-		margin-bottom: 4px;
-	}
-
-	.corp-highlight-item__label {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.55);
-		line-height: 1.4;
-	}
-
-	/* ============================================================== */
-	/* 3. CORE FUNCTIONS */
-	/* ============================================================== */
-	.corp-functions-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 24px;
-	}
-
-	@media (max-width: 992px) {
-		.corp-functions-grid {
-			grid-template-columns: 1fr;
-			gap: 20px;
-		}
-	}
-
-	.corp-function-card {
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		padding: 32px;
-		display: flex;
-		flex-direction: column;
-		transition: border-color 0.3s ease;
-	}
-
-	.corp-function-card:hover {
-		border-color: rgba(255, 255, 255, 0.2);
-	}
-
-	.corp-function-card__header {
-		margin-bottom: 16px;
-	}
-
-	.corp-function-card__num {
-		display: inline-block;
-		font-size: 13px;
-		font-weight: 700;
-		font-family: monospace;
-		color: #e52d27;
-		margin-bottom: 10px;
-		letter-spacing: 0.05em;
-	}
-
-	.corp-function-card__title {
-		font-size: clamp(17px, 1.8vw, 20px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0;
-		line-height: 1.4;
-	}
-
-	.corp-function-card__desc {
-		font-size: 14px;
-		line-height: 1.85;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0;
-	}
-
-	/* ============================================================== */
-	/* 4. OFFICES */
-	/* ============================================================== */
-	.corp-showrooms-stack {
-		display: flex;
-		flex-direction: column;
-		gap: 36px;
-	}
-
-	.corp-showroom-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 40px;
-		padding: 32px;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		align-items: center;
-	}
-
-	@media (max-width: 900px) {
-		.corp-showroom-grid {
-			grid-template-columns: 1fr;
-			gap: 24px;
-			padding: 24px;
-		}
-	}
-
-	.corp-showroom-photo-wrap {
-		position: relative;
-		overflow: hidden;
-		background: #000000;
-		aspect-ratio: 16 / 10;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.corp-showroom-photo {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.4s ease;
-	}
-
-	.corp-showroom-grid:hover .corp-showroom-photo {
-		transform: scale(1.02);
-	}
-
-	.corp-showroom-photo-badge {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		padding: 4px 10px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(4px);
-		color: #ffffff;
-		font-size: 11px;
-		letter-spacing: 0.06em;
-	}
-
-	.corp-showroom-type {
-		display: inline-block;
-		font-size: 12px;
-		letter-spacing: 0.06em;
-		color: rgba(255, 255, 255, 0.5);
-		margin-bottom: 6px;
-		text-transform: uppercase;
-	}
-
-	.corp-showroom-name {
-		font-size: clamp(20px, 2.2vw, 24px);
-		font-weight: 700;
-		color: #ffffff;
-		margin: 0 0 12px 0;
-		line-height: 1.35;
-	}
-
-	.corp-showroom-desc {
-		font-size: 14px;
-		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0 0 20px 0;
-	}
-
-	.corp-showroom-details {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		margin: 0;
-		padding-top: 16px;
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-	}
-
-	.corp-showroom-row {
-		display: grid;
-		grid-template-columns: 80px 1fr;
-		gap: 14px;
-		font-size: 13.5px;
-		line-height: 1.6;
-	}
-
-	.corp-showroom-dt {
-		color: rgba(255, 255, 255, 0.5);
-		font-weight: 500;
-	}
-
-	.corp-showroom-dd {
-		margin: 0;
-		color: rgba(255, 255, 255, 0.9);
-	}
-
-	.corp-map-link {
-		display: inline-block;
-		margin-left: 10px;
-		font-size: 12px;
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: underline;
-		text-underline-offset: 3px;
-	}
-
-	.corp-map-link:hover {
-		color: #ffffff;
-	}
-
-	.corp-tel-link {
-		color: #ffffff;
-		text-decoration: none;
-		font-weight: 600;
-	}
-
-	.corp-tel-link:hover {
-		text-decoration: underline;
-	}
-
-	.corp-fax {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 12px;
-	}
-
-	/* ============================================================== */
-	/* 5. ARTICLES */
-	/* ============================================================== */
-	.corp-articles-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
-	}
-
-	@media (max-width: 1024px) {
-		.corp-articles-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 540px) {
-		.corp-articles-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.corp-article-card {
-		background: #0a0c10;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		text-decoration: none;
-		color: inherit;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		transition: all 0.3s ease;
-	}
-
-	.corp-article-card:hover {
-		border-color: rgba(255, 255, 255, 0.25);
-		transform: translateY(-2px);
-	}
-
-	.corp-article-card__thumb-wrap {
-		position: relative;
-		aspect-ratio: 16 / 10;
-		background: #000000;
-		overflow: hidden;
-	}
-
-	.corp-article-card__thumb {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform 0.4s ease;
-	}
-
-	.corp-article-card:hover .corp-article-card__thumb {
-		transform: scale(1.04);
-	}
-
-	.corp-article-card__tag {
-		position: absolute;
-		top: 10px;
-		left: 10px;
-		padding: 3px 8px;
-		background: rgba(4, 5, 7, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: #ffffff;
-		font-size: 10px;
-		letter-spacing: 0.04em;
-	}
-
-	.corp-article-card__content {
-		padding: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		flex-grow: 1;
-	}
-
-	.corp-article-card__date {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.5);
-		letter-spacing: 0.04em;
-	}
-
-	.corp-article-card__title {
-		font-size: 14px;
-		font-weight: 600;
-		color: #ffffff;
-		line-height: 1.5;
-		margin: 0;
-	}
-
-	/* ============================================================== */
-	/* 6. PROFILE TABLE */
-	/* ============================================================== */
-	.corp-profile-card {
-		background: #0a0c10;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		padding: 40px;
-	}
-
-	@media (max-width: 768px) {
-		.corp-profile-card {
-			padding: 20px;
-		}
-	}
-
-	.corp-profile-table {
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-	.corp-profile-table tr {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.corp-profile-table tr:last-child {
-		border-bottom: none;
-	}
-
-	.corp-profile-table th {
-		width: 220px;
-		padding: 18px 20px 18px 0;
-		text-align: left;
-		vertical-align: top;
-		font-size: 14px;
-		font-weight: 600;
-		color: rgba(255, 255, 255, 0.7);
-		letter-spacing: 0.02em;
-	}
-
-	.corp-profile-table td {
-		padding: 18px 0;
-		font-size: 14px;
-		line-height: 1.8;
-		color: rgba(255, 255, 255, 0.9);
-	}
-
-	@media (max-width: 768px) {
-		.corp-profile-table th,
-		.corp-profile-table td {
-			display: block;
-			width: 100%;
-			padding: 10px 0;
-		}
-
-		.corp-profile-table th {
-			padding-bottom: 4px;
-			color: rgba(255, 255, 255, 0.5);
-			font-size: 13px;
-		}
-
-		.corp-profile-table tr {
-			display: block;
-			padding: 14px 0;
-		}
-	}
-
-	.corp-business-list {
-		margin: 0;
-		padding-left: 20px;
-	}
-
-	.corp-business-list li {
-		margin-bottom: 6px;
-	}
-
-	.corp-business-list li:last-child {
-		margin-bottom: 0;
-	}
-
-	.corp-related-links {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.corp-inline-link {
-		color: rgba(255, 255, 255, 0.8);
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		transition: color 0.2s ease;
-	}
-
-	.corp-inline-link:hover {
-		color: #ffffff;
-	}
-
-	.corp-inline-link-sep {
-		color: rgba(255, 255, 255, 0.25);
-	}
-</style>
+	});
+</script>
