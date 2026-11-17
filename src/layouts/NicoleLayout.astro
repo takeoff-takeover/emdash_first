@@ -150,6 +150,15 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 			background-color: #000000 !important;
 		}
 
+		/* Astraテーマの不要なマージン・パディングを完全リセット（ヘッダーとヒーローの隙間・横余白の排除） */
+		#content, .site-content, .ast-container, #primary, .content-area {
+			margin: 0 !important;
+			padding: 0 !important;
+			max-width: 100% !important;
+			width: 100% !important;
+			border: none !important;
+		}
+
 		/* 1. スマホ表示時の横スクロールおよび強制拡大の完全防止 */
 		html, body {
 			overflow-x: clip !important;
@@ -216,7 +225,7 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<slot name="head" />
 </head>
 
-<body class={`nicole-brand ast-desktop elementor-default elementor-kit-8 ${isHome ? 'home page' : 'page'} ${isMagazine ? 'is-magazine-page' : ''}`}>
+<body class={`nicole-brand ast-desktop elementor-default elementor-kit-8 ast-page-builder-template ${isHome ? 'home page' : 'page'} ${isMagazine ? 'is-magazine-page' : ''}`}>
 	<div class="hfeed site" id="page">
 		<NicoleHeader />
 		{isMagazine && <NicoleConnectSubnav currentSlug={currentSlug} />}
