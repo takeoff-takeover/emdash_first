@@ -444,8 +444,8 @@ const corporateLinks = [
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 140px;
-		background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.22) 45%, rgba(0, 0, 0, 0.06) 75%, rgba(0, 0, 0, 0) 100%);
+		height: 180px;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.35) 48%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0) 100%);
 		pointer-events: none;
 		z-index: -1;
 		transition: opacity 0.4s ease;
@@ -473,7 +473,7 @@ const corporateLinks = [
 		width: 100%;
 		max-width: 1440px;
 		margin: 0 auto;
-		padding: 24px 40px;
+		padding: 24px 40px 32px 40px;
 		display: flex;
 		align-items: flex-end;
 		justify-content: space-between;
@@ -481,7 +481,7 @@ const corporateLinks = [
 	}
 
 	.nicole-header.is-scrolled .header-container {
-		padding: 18px 40px;
+		padding: 16px 40px 18px 40px;
 	}
 
 	/* ロゴ */
@@ -587,19 +587,26 @@ const corporateLinks = [
 	}
 
 	/* CTAボタン（CONTACT） */
+	.nav-item--cta {
+		display: flex;
+		align-items: flex-end;
+	}
+
 	.nav-cta-btn {
 		display: inline-flex;
 		align-items: center;
-		padding: 8px 18px;
-		margin-bottom: -3px;
+		justify-content: center;
+		padding: 4px 14px;
+		margin-bottom: -2.5px;
 		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		border: 1px solid rgba(255, 255, 255, 0.24);
 		border-radius: 999px;
 		font-family: 'Inter', -apple-system, sans-serif;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.18em;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.16em;
 		color: #ffffff;
+		line-height: 1.2;
 		text-decoration: none;
 		backdrop-filter: blur(8px);
 		transition: all 0.3s ease;
@@ -610,7 +617,6 @@ const corporateLinks = [
 		border-color: #ffffff;
 		color: #000000;
 		box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
-		transform: translateY(-1px);
 	}
 
 
