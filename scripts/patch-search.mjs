@@ -23,23 +23,25 @@ export function applySearchPatch() {
 		let catSlug = null;
 		let cleanTerm = rawTerm;
 
-		// brand:<slug> または tax_brand:<slug> を抽出
-		const brandMatch = cleanTerm.match(/(?:tax_brand|brand):([a-zA-Z0-9_-]+)/i);
-		if (brandMatch) {
-			brandSlug = brandMatch[1].toLowerCase();
-			cleanTerm = cleanTerm.replace(brandMatch[0], ' ').trim();
-		}
+		// brand:<slug> または tax_brand:<slug> を抽出（magazineコレクション専用のタクソノミー連動）
+		if (type === 'magazine') {
+			const brandMatch = cleanTerm.match(/(?:tax_brand|brand):([a-zA-Z0-9_-]+)/i);
+			if (brandMatch) {
+				brandSlug = brandMatch[1].toLowerCase();
+				cleanTerm = cleanTerm.replace(brandMatch[0], ' ').trim();
+			}
 
-		// category:<slug> または tax_cat:<slug> または cat:<slug> を抽出
-		const catMatch = cleanTerm.match(/(?:tax_cat|cat|category):([a-zA-Z0-9_-]+)/i);
-		if (catMatch) {
-			catSlug = catMatch[1].toLowerCase();
-			cleanTerm = cleanTerm.replace(catMatch[0], ' ').trim();
-		}
+			// category:<slug> または tax_cat:<slug> または cat:<slug> を抽出
+			const catMatch = cleanTerm.match(/(?:tax_cat|cat|category):([a-zA-Z0-9_-]+)/i);
+			if (catMatch) {
+				catSlug = catMatch[1].toLowerCase();
+				cleanTerm = cleanTerm.replace(catMatch[0], ' ').trim();
+			}
 
-		// ALL BRANDS 正規化
-		if (brandSlug && /^all[\\s\\-_]?brands$/i.test(brandSlug)) {
-			brandSlug = 'all-brands';
+			// ALL BRANDS 正規化
+			if (brandSlug && /^all[\\s\\-_]?brands$/i.test(brandSlug)) {
+				brandSlug = 'all-brands';
+			}
 		}
 
 		return query.where((eb) => {

@@ -90,8 +90,7 @@ const cardStyle = (rawCardStyle === "flat" && !hasAnyImage) ? "box" : rawCardSty
 							{c.button_label && c.button_url && (
 								<div class="cms-col-card__footer">
 									<a href={c.button_url} class="cms-col-card__btn">
-										{c.button_label}
-										<span class="cms-col-card__btn-arrow" aria-hidden="true">→</span>
+										<span>{c.button_label.replace(/\s*([→▶]|&rarr;|&gt;)\s*$/g, "")}</span>
 									</a>
 								</div>
 							)}
@@ -275,21 +274,16 @@ const cardStyle = (rawCardStyle === "flat" && !hasAnyImage) ? "box" : rawCardSty
 	.cms-col-card__btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
 		font-size: 0.875rem;
-		font-weight: 700;
-		color: var(--cms-card-heading, #ffffff) !important;
-		text-decoration: none !important;
-		transition: opacity 0.15s ease;
+		font-weight: 600;
+		color: var(--color-nicole-red, #e60012) !important;
+		text-decoration: underline !important;
+		text-underline-offset: 3px;
+		transition: opacity 0.2s ease, color 0.2s ease;
 	}
 	.cms-col-card__btn:hover {
-		opacity: 0.75;
-	}
-	.cms-col-card__btn-arrow {
-		transition: transform 0.2s ease;
-	}
-	.cms-col-card__btn:hover .cms-col-card__btn-arrow {
-		transform: translateX(3px);
+		opacity: 0.8;
+		color: var(--color-nicole-red-hover, #d60000) !important;
 	}
 
 	/* 明るい背景（白・ライトグレー背景帯）の中にある場合のカード配色 */

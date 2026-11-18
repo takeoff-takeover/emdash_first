@@ -54,27 +54,16 @@ try {
 			}
 		}
 	} else {
-		const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
-		let dbPath = "";
-		if (fs.existsSync(d1Dir)) {
-			const files = fs.readdirSync(d1Dir);
-			const candidates = files
-				.filter((name: string) => name.endsWith(".sqlite") && !name.includes("metadata") && !name.includes("bak"))
-				.map((name: string) => ({ name, mtime: fs.statSync(`${d1Dir}/${name}`).mtimeMs }))
-				.sort((a, b) => b.mtime - a.mtime);
-			if (candidates[0]) dbPath = `${d1Dir}/${candidates[0].name}`;
-		}
-		if (!dbPath && fs.existsSync("seed/backup.sqlite")) {
-			dbPath = "seed/backup.sqlite";
-		}
-		if (dbPath) {
-			const localDb = new DatabaseSync(dbPath);
-			const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
-			for (const r of rows) {
-				if (r.slug && typeof r.views === "number") {
-					viewsMap.set(r.slug, r.views);
+		if (fs.existsSync("seed/backup.sqlite")) {
+			try {
+				const localDb = new DatabaseSync("seed/backup.sqlite", { readOnly: true });
+				const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
+				for (const r of rows) {
+					if (r.slug && typeof r.views === "number") {
+						viewsMap.set(r.slug, r.views);
+					}
 				}
-			}
+			} catch (e) {}
 		}
 	}
 } catch (e) {
@@ -86,13 +75,13 @@ try {
 // 本文からリード文（2〜3行の冒頭テキスト）を自動抽出するヘルパー
 function extractLead(p: any): string {
 	if (p.data?.excerpt && p.data.excerpt.trim()) {
-		return p.data.excerpt.trim();
+		return p.data.excerpt.trim().replace(/\[&hellip;\]/g, '…').replace(/&hellip;/g, '…');
 	}
 	const content = p.data?.content;
 	if (Array.isArray(content)) {
 		for (const block of content) {
 			if (block._type === 'block' && block.style === 'normal' && Array.isArray(block.children)) {
-				const text = block.children.map((c: any) => c.text || '').join('').trim();
+				const text = block.children.map((c: any) => c.text || '').join('').trim().replace(/\[&hellip;\]/g, '…').replace(/&hellip;/g, '…');
 				if (text.length > 20) {
 					return text.length > 140 ? text.slice(0, 137) + '...' : text;
 				}
@@ -446,65 +435,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 4. インタラクティブ・フィルターバー（Stickyナビゲーション） -->
-		<!-- ============================================================== -->
-		<section class="filter-sticky-bar" id="magazine-archive">
-			<div class="mag-container">
-				<div class="filter-wrap">
-					<!-- ブランドフィルター（メインタブ） -->
-					<div class="filter-group filter-group--brand">
-						<span class="filter-group__label">ブランド</span>
-						<div class="filter-pills" id="brand-filters">
-							{brandsList.map((b) => (
-								<button 
-									type="button" 
-									class={`filter-pill ${b === 'ALL' ? 'is-active' : ''}`} 
-									data-filter-type="brand" 
-									data-value={b}
-								>
-									{b}
-								</button>
-							))}
-						</div>
-					</div>
-
-					<!-- トピックフィルター ＆ 検索バー -->
-					<div class="filter-controls-right">
-						<div class="filter-group filter-group--topic">
-							<span class="filter-group__label">カテゴリー</span>
-							<div class="filter-pills" id="topic-filters">
-								{topicsList.map((t) => (
-									<button 
-										type="button" 
-										class={`filter-pill ${t === 'ALL' ? 'is-active' : ''}`} 
-										data-filter-type="topic" 
-										data-value={t}
-									>
-										{t}
-									</button>
-								))}
-							</div>
-						</div>
-
-						<!-- キーワード検索 -->
-						<div class="filter-search-box">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-							<input 
-								type="text" 
-								id="article-search-input" 
-								placeholder="記事をキーワード検索..." 
-								aria-label="記事をキーワード検索"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ============================================================== -->
 		<!-- 4. 全記事エディトリアルグリッド（LIBRARY / ARCHIVE） -->
 		<!-- ============================================================== -->
-		<section class="all-articles-section">
+		<section class="all-articles-section" id="magazine-archive">
 			<div class="mag-container">
 				<div class="section-title-bar">
 					<div>
@@ -512,6 +445,58 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 					</div>
 					<div class="count-display">
 						収録記事：<span id="current-article-count">{initialArchiveCount}</span>篇
+					</div>
+				</div>
+
+				<!-- インタラクティブ・フィルターバー（ブランド＆カテゴリー・検索） -->
+				<div class="filter-sticky-bar" id="interactive-filter">
+					<div class="filter-wrap">
+						<!-- ブランドフィルター（メインタブ） -->
+						<div class="filter-group filter-group--brand">
+							<span class="filter-group__label">ブランド</span>
+							<div class="filter-pills" id="brand-filters">
+								{brandsList.map((b) => (
+									<button 
+										type="button" 
+										class={`filter-pill ${b === 'ALL' ? 'is-active' : ''}`} 
+										data-filter-type="brand" 
+										data-value={b}
+									>
+										{b}
+									</button>
+								))}
+							</div>
+						</div>
+
+						<!-- トピックフィルター ＆ 検索バー -->
+						<div class="filter-controls-right">
+							<div class="filter-group filter-group--topic">
+								<span class="filter-group__label">カテゴリー</span>
+								<div class="filter-pills" id="topic-filters">
+									{topicsList.map((t) => (
+										<button 
+											type="button" 
+											class={`filter-pill ${t === 'ALL' ? 'is-active' : ''}`} 
+											data-filter-type="topic" 
+											data-value={t}
+										>
+											{t}
+										</button>
+									))}
+								</div>
+							</div>
+
+							<!-- キーワード検索 -->
+							<div class="filter-search-box">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+								<input 
+									type="text" 
+									id="article-search-input" 
+									placeholder="記事をキーワード検索..." 
+									aria-label="記事をキーワード検索"
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -807,17 +792,52 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 					moreWrap.style.display = 'none';
 				}
 			}
+
+			// フィルター切り替え後の表示カードをスクロール監視対象に追加
+			if (typeof observeCards === 'function') {
+				observeCards();
+			}
+		}
+
+		// ==============================================================
+		// 4. カードのスクロール連動ふわっと表示（Scroll Reveal Observer）
+		// ==============================================================
+		const cardObserver = new IntersectionObserver((entries, observer) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('is-revealed');
+					observer.unobserve(entry.target);
+				}
+			});
+		}, {
+			root: null,
+			rootMargin: '0px 0px -40px 0px',
+			threshold: 0.05
+		});
+
+		function observeCards() {
+			const cards = document.querySelectorAll(
+				'.toc-card:not(.is-revealed), .popular-card:not(.is-revealed), .article-item:not(.is-revealed), .esg-card:not(.is-revealed)'
+			);
+			cards.forEach((card) => {
+				// 非表示要素（display: none や is-collapsed）は除外して監視
+				if (window.getComputedStyle(card).display !== 'none' && !card.classList.contains('is-collapsed')) {
+					cardObserver.observe(card);
+				}
+			});
 		}
 
 		// 初期ロード時の実行（初期9件表示）
 		brandPills.forEach(pill => pill.classList.toggle('is-active', pill.getAttribute('data-value') === currentBrand));
 		applyFilters(true);
+		observeCards();
 
 		// 「もっと見る」ボタンクリックで古い記事を9件ずつ追加表示
 		if (loadMoreBtn) {
 			loadMoreBtn.addEventListener('click', () => {
 				visibleCount += LOAD_STEP;
 				applyFilters(false);
+				setTimeout(observeCards, 50);
 			});
 		}
 
@@ -913,6 +933,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 					}
 				} else {
 					if (esgMoreWrap) esgMoreWrap.style.display = 'none';
+				}
+
+				if (typeof observeCards === 'function') {
+					observeCards();
 				}
 			}
 
@@ -1260,16 +1284,65 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		gap: 32px;
 	}
 
+	/* ============================================================== */
+	/* スクロール連動ふわっと表示（Scroll Reveal）共通定義 */
+	/* ============================================================== */
+	.toc-card,
+	.popular-card,
+	.article-item,
+	.esg-card {
+		opacity: 0;
+		transform: translateY(28px);
+		transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), 
+		            transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), 
+		            border-color 0.35s ease, 
+		            box-shadow 0.35s ease;
+		will-change: opacity, transform;
+	}
+
+	.toc-card.is-revealed,
+	.popular-card.is-revealed,
+	.article-item.is-revealed,
+	.esg-card.is-revealed {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.toc-card.is-revealed:hover {
+		transform: translateY(-6px);
+	}
+
+	.popular-card.is-revealed:hover {
+		transform: translateY(-4px);
+	}
+
+	.article-item.is-revealed:hover {
+		transform: translateY(-5px);
+	}
+
+	.esg-card.is-revealed:hover {
+		transform: translateY(-5px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toc-card,
+		.popular-card,
+		.article-item,
+		.esg-card {
+			opacity: 1 !important;
+			transform: none !important;
+			transition: none !important;
+		}
+	}
+
 	.toc-card {
 		background: #0a0d12;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 14px;
 		overflow: hidden;
-		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
 	}
 
 	.toc-card:hover {
-		transform: translateY(-6px);
 		border-color: rgba(255, 255, 255, 0.35);
 		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 	}
@@ -1462,11 +1535,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border-radius: 8px;
 		overflow: hidden;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
 	}
 
 	.popular-card:hover {
-		transform: translateY(-4px);
 		border-color: rgba(0, 0, 0, 0.18);
 		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 	}
@@ -1614,29 +1685,15 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	/* ============================================================== */
 	.filter-sticky-bar {
 		position: sticky;
-		top: 70px;
+		top: 60px;
 		z-index: 500;
-		background: rgba(6, 7, 10, 0.94);
+		background: rgba(4, 5, 7, 0.96);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		padding: 24px 0;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-	}
-
-	/* すぐ下の1ピクセルの線：モニタ全幅ではなく、ページレイアウト最大幅（コンテンツ端）と完全に一致 */
-	.filter-sticky-bar .mag-container {
-		position: relative;
-	}
-
-	.filter-sticky-bar .mag-container::after {
-		content: "";
-		position: absolute;
-		bottom: -24px;
-		left: 40px;
-		right: 40px;
-		height: 1px;
-		background: var(--mag-color-border);
-		pointer-events: none;
+		padding: 16px 0 20px 0;
+		margin-bottom: 32px;
+		border-bottom: 1px solid var(--mag-color-border);
+		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 	}
 
 	.filter-wrap {
@@ -1737,7 +1794,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border: 1px solid var(--mag-color-border);
 		border-radius: 999px;
 		padding: 0 14px;
-		width: 170px;
+		width: 210px;
 		flex-shrink: 0;
 		transition: border-color 0.25s ease, box-shadow 0.25s ease, width 0.3s ease;
 	}
@@ -1745,7 +1802,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.filter-search-box:focus-within {
 		border-color: rgba(255, 255, 255, 0.5);
 		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
-		width: 210px;
+		width: 250px;
 	}
 
 	.search-icon {
@@ -1779,9 +1836,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-end;
-		margin-bottom: 36px;
-		padding-bottom: 16px;
-		border-bottom: 1px solid var(--mag-color-border);
+		margin-bottom: 20px;
+		padding-bottom: 4px;
+		border-bottom: none;
 	}
 
 	.section-num {
@@ -1825,14 +1882,12 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border: 1px solid var(--mag-color-border);
 		border-radius: 12px;
 		overflow: hidden;
-		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 		display: flex;
 		flex-direction: column;
 		height: 100%;
 	}
 
 	.article-item:hover {
-		transform: translateY(-5px);
 		border-color: rgba(255, 255, 255, 0.35);
 		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 	}
@@ -2245,11 +2300,6 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		.mag-container {
 			padding: 0 24px;
 		}
-
-		.filter-sticky-bar .mag-container::after {
-			left: 24px;
-			right: 24px;
-		}
 	}
 
 	@media (max-width: 768px) {
@@ -2258,13 +2308,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		}
 
 		.filter-sticky-bar {
-			padding: 18px 0;
-		}
-
-		.filter-sticky-bar .mag-container::after {
-			bottom: -18px;
-			left: 20px;
-			right: 20px;
+			top: 52px;
+			padding: 12px 0 14px 0;
+			margin-bottom: 24px;
 		}
 
 		.apple-hero {
@@ -2286,17 +2332,28 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		}
 
 		.hero-masthead {
-			margin-bottom: 32px;
+			margin-bottom: 28px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			max-width: 100%;
 		}
 
 		.hero-masthead__brand {
-			font-size: clamp(48px, 11vw, 68px);
-			line-height: 1.0;
+			font-size: clamp(62px, 17vw, 84px);
+			line-height: 0.92;
+			letter-spacing: -0.04em;
+			margin: 0 0 12px 0;
 		}
 
 		.hero-masthead__tagline {
-			font-size: 13px;
-			line-height: 1.45;
+			font-size: clamp(11px, 2.9vw, 12.5px);
+			line-height: 1.4;
+			letter-spacing: 0.02em;
+			max-width: 250px; /* タイトルの幅（Nicole / Connect）からはみ出ないサイズ */
+			margin: 0;
+			word-break: keep-all;
+			overflow-wrap: break-word;
 		}
 
 		.hero-story-title {
@@ -2597,7 +2654,6 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border: 1px solid rgba(0, 0, 0, 0.08);
 		overflow: hidden;
 		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-		transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 	}
 
 	.esg-card.is-collapsed {
@@ -2605,7 +2661,6 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.esg-card:hover {
-		transform: translateY(-3px);
 		border-color: rgba(0, 0, 0, 0.18);
 		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 	}

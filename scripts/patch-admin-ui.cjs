@@ -140,7 +140,55 @@ for (const bundlePath of bundleCandidates) {
     }
   }
 
-  if (modified) {
+
+  // 6. プラグインブロックの名前空間付きtype（editorial-tools:xxx）の完全解決
+  // 6-1. registerPluginBlocks でプレフィックス付き（editorial-tools:type）もregistryに登録
+  if (js.includes('for (const block of blocks) registry.set(block.type, block);') && !js.includes('if (block.pluginId) registry.set(`${block.pluginId}:${block.type}`, block);')) {
+    js = js.replace(
+      'for (const block of blocks) registry.set(block.type, block);',
+      'for (const block of blocks) { registry.set(block.type, block); if (block.pluginId) registry.set(`${block.pluginId}:${block.type}`, block); }'
+    );
+    modified = true;
+  }
+
+  // 6-2. getEmbedMeta でプレフィックス付き・なし両方のフォールバック
+  if (js.includes('function getEmbedMeta(blockType, registry) {\n\tconst def = registry.get(blockType);')) {
+    js = js.replace(
+      'function getEmbedMeta(blockType, registry) {\n\tconst def = registry.get(blockType);',
+      'function getEmbedMeta(blockType, registry) {\n\tconst def = registry.get(blockType) || (blockType.includes(":") ? registry.get(blockType.split(":")[1]) : void 0);'
+    );
+    modified = true;
+  }
+
+  // 6-3. PluginBlockNodeView でプレフィックス付き・なし両方のフォールバック
+  if (js.includes('\tconst blockDef = registry.get(blockType);') && !js.includes('\tconst blockDef = registry.get(blockType) || (blockType.includes(":") ? registry.get(blockType.split(":")[1]) : void 0);')) {
+    js = js.replace(
+      '\tconst blockDef = registry.get(blockType);',
+      '\tconst blockDef = registry.get(blockType) || (blockType.includes(":") ? registry.get(blockType.split(":")[1]) : void 0);'
+    );
+    modified = true;
+  }
+
+  // 6-4. PluginBlockNodeView に data-nicole-block-type / data-nicole-block-data を注入
+  if (!js.includes('"data-nicole-block-type": blockType')) {
+    const cardTarget = 'className: "rounded-lg border bg-kumo-base",\n\t\t\t\tchildren: [/* @__PURE__ */ jsxs("div", {';
+    const cardRepl = 'className: "rounded-lg border bg-kumo-base",\n\t\t\t\t"data-nicole-block-type": blockType,\n\t\t\t\t"data-nicole-block-data": JSON.stringify(data),\n\t\t\t\tchildren: [/* @__PURE__ */ jsxs("div", {';
+    if (js.includes(cardTarget)) {
+      js = js.replace(cardTarget, cardRepl);
+      modified = true;
+    }
+  }
+
+  // 6-5. storage.onEditBlock でブロック定義を検索する際にプレフィックス（editorial-tools:）付きも解決
+  if (js.includes('pluginBlocks.find((b) => b.type === attrs.blockType)') && !js.includes('b.type === attrs.blockType.split(\':\').pop()')) {
+    js = js.replace(
+      'pluginBlocks.find((b) => b.type === attrs.blockType)',
+      'pluginBlocks.find((b) => b.type === attrs.blockType || b.type === attrs.blockType.split(\':\').pop())'
+    );
+    modified = true;
+  }
+
+    if (modified) {
     fs.writeFileSync(bundlePath, js, 'utf8');
     console.log('[patch-admin-ui] Patched admin bundle:', path.relative(path.join(__dirname, '..'), bundlePath));
   }

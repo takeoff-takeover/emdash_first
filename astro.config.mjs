@@ -38,4 +38,5 @@ export default defineConfig({
 		},
 	],
 	devToolbar: { enabled: false },
+	server: { host: true, port: 4321 },
 });

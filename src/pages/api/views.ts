@@ -3,19 +3,12 @@ import { env } from "cloudflare:workers";
 import fs from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 
-// ローカル開発用DBパスの検索
+// ローカル開発用DB（読み取り専用フォールバック）
 function getLocalDb() {
 	try {
-		const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
-		if (fs.existsSync(d1Dir)) {
-			const files = fs.readdirSync(d1Dir);
-			const dbFile = files.find((f: string) => f.endsWith(".sqlite") && !f.includes("metadata") && !f.includes("bak"));
-			if (dbFile) {
-				return new DatabaseSync(`${d1Dir}/${dbFile}`);
-			}
-		}
+		// 注意: Miniflare稼働中の .wrangler 配下のSQLiteファイルはWorkerdとロック競合してクラッシュするため直接開かない
 		if (fs.existsSync("seed/backup.sqlite")) {
-			return new DatabaseSync("seed/backup.sqlite");
+			return new DatabaseSync("seed/backup.sqlite", { readOnly: true });
 		}
 	} catch (e) {
 		console.error("Local SQLite init error:", e);
@@ -24,13 +17,13 @@ function getLocalDb() {
 }
 
 // 閲覧数の取得 (GET /api/views?slug=xxx または GET /api/views?top=5)
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, locals }) => {
 	try {
 		const slug = url.searchParams.get("slug");
 		const top = url.searchParams.get("top");
 		let db: any = null;
 		try {
-			db = (env as any)?.DB;
+			db = (locals as any)?.runtime?.env?.DB || (env as any)?.DB;
 		} catch (e) {}
 
 		// ランキング取得（上位 N 件）
@@ -92,7 +85,7 @@ export const GET: APIRoute = async ({ url }) => {
 };
 
 // 閲覧数のインクリメント (POST /api/views, body: { slug: string, collection?: string })
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
 	try {
 		const body = (await request.json().catch(() => ({}))) as Record<string, any>;
 		const slug = body?.slug;
@@ -109,7 +102,7 @@ export const POST: APIRoute = async ({ request }) => {
 		let currentViews = 1;
 		let db: any = null;
 		try {
-			db = (env as any)?.DB;
+			db = (locals as any)?.runtime?.env?.DB || (env as any)?.DB;
 		} catch (e) {}
 
 		if (db) {
@@ -124,22 +117,6 @@ export const POST: APIRoute = async ({ request }) => {
 			const updated = await db.prepare("SELECT views FROM article_views WHERE slug = ?").bind(slug).first();
 			if (updated && typeof (updated as any).views === "number") {
 				currentViews = (updated as any).views;
-			}
-		} else {
-			const localDb = getLocalDb();
-			if (localDb) {
-				localDb.prepare(`
-					INSERT INTO article_views (slug, collection, views, created_at, updated_at)
-					VALUES (?, ?, 1, ?, ?)
-					ON CONFLICT(slug) DO UPDATE SET
-						views = views + 1,
-						updated_at = excluded.updated_at
-				`).run(slug, collection, now, now);
-
-				const updated: any = localDb.prepare("SELECT views FROM article_views WHERE slug = ?").get(slug);
-				if (updated && typeof updated.views === "number") {
-					currentViews = updated.views;
-				}
 			}
 		}
 

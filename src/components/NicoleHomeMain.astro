@@ -198,24 +198,16 @@ if (SHOW_ARTICLE_VIEWS) {
 				}
 			}
 		} else {
-			const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
-			let dbPath = "";
-			if (fs.existsSync(d1Dir)) {
-				const files = fs.readdirSync(d1Dir);
-				const f = files.find((name: string) => name.endsWith(".sqlite") && !name.includes("metadata") && !name.includes("bak"));
-				if (f) dbPath = `${d1Dir}/${f}`;
-			}
-			if (!dbPath && fs.existsSync("seed/backup.sqlite")) {
-				dbPath = "seed/backup.sqlite";
-			}
-			if (dbPath) {
-				const localDb = new DatabaseSync(dbPath);
-				const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
-				for (const r of rows) {
-					if (r.slug && typeof r.views === "number") {
-						viewsMap.set(r.slug, r.views);
+			if (fs.existsSync("seed/backup.sqlite")) {
+				try {
+					const localDb = new DatabaseSync("seed/backup.sqlite", { readOnly: true });
+					const rows = localDb.prepare("SELECT slug, views FROM article_views").all() as any[];
+					for (const r of rows) {
+						if (r.slug && typeof r.views === "number") {
+							viewsMap.set(r.slug, r.views);
+						}
 					}
-				}
+				} catch (e) {}
 			}
 		}
 	} catch (e) {}
@@ -743,26 +735,19 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	</section>
 
 	<!-- ============================================================== -->
-	<!-- 2. 特集マガジン：The latest from Nicole Magazine.（Nicole Connect 抜粋） -->
+	<!-- 2. 特集マガジン：The latest from Nicole Connect.（抜粋） -->
 	<!-- ============================================================== -->
-	<section class="bmw-insights-section" id="magazine-section" aria-label="The latest from Nicole Magazine">
+	<section class="bmw-insights-section" id="magazine-section" aria-label="The latest from Nicole Connect">
 		<div class="editorial-container">
 			<div class="bmw-insights-header">
 				<div class="bmw-insights-header__title-group editorial-reveal">
-					<h2 class="bmw-insights-title">The latest from Nicole Magazine.</h2>
+					<h2 class="bmw-insights-title">
+						<span class="bmw-insights-title__text">The latest from Nicole Connect.</span>
+						<span class="bmw-insights-title__line" aria-hidden="true"></span>
+					</h2>
 					<p class="bmw-insights-subtitle">
-						公式Webマガジン『Nicole Connect』の最新エピソードより抜粋。試乗インプレッションから職人のクラフトマンシップまで。
+						<span class="phrase">公式Webマガジン『Nicole Connect』の最新エピソードより抜粋。</span><span class="phrase">試乗インプレッションから職人のクラフトマンシップまで。</span>
 					</p>
-				</div>
-				<div class="bmw-insights-header__actions editorial-reveal" data-delay="150">
-					<a href="/magazine/" class="bmw-insights-cta" title="公式Webマガジン Nicole Connect へ">
-						<span>Nicole Connect Magazine</span>
-						<span class="bmw-insights-cta__icon">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-svg">
-								<path d="M5 12h14M12 5l7 7-7 7"/>
-							</svg>
-						</span>
-					</a>
 				</div>
 			</div>
 
@@ -862,11 +847,6 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 				<div class="insights-bottom-action editorial-reveal" data-delay="200">
 					<a href="/magazine/" class="btn-magazine-more">
 						<span>Nicole Connect - Web Magazineを見る</span>
-						<span class="btn-magazine-more__icon">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-arrow-svg">
-								<path d="M5 12h14M12 5l7 7-7 7"/>
-							</svg>
-						</span>
 					</a>
 				</div>
 			</div>
@@ -973,16 +953,11 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	<!-- ============================================================== -->
 	<section class="editorial-news" id="info-section">
 		<div class="editorial-container">
-			<div class="editorial-header">
-				<div class="editorial-header__left editorial-reveal">
-					<h2 class="editorial-title">INFORMATION</h2>
-				</div>
-				<div class="editorial-header__right editorial-reveal">
-					<a href="/news" class="editorial-header__more">
-						<span>すべてのお知らせを見る</span>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-					</a>
-				</div>
+			<div class="editorial-header editorial-reveal">
+				<h2 class="editorial-title">
+					<span class="editorial-title__text">INFORMATION</span>
+					<span class="editorial-title__line" aria-hidden="true"></span>
+				</h2>
 			</div>
 
 			<div class="news-list">
@@ -1594,10 +1569,12 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		align-items: flex-end;
 		gap: 32px;
 		margin-bottom: 48px;
+		width: 100%;
 	}
 
 	.bmw-insights-header__title-group {
-		max-width: 760px;
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.bmw-insights-header__meta {
@@ -1616,19 +1593,49 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	}
 
 	.bmw-insights-title {
+		display: flex;
+		align-items: center;
+		gap: 24px;
+		width: 100%;
 		font-size: clamp(30px, 3.8vw, 44px);
 		font-weight: 800;
 		letter-spacing: -0.02em;
 		color: #ffffff;
 		line-height: 1.15;
-		margin: 0 0 12px 0;
+		margin: 0 0 14px 0;
+	}
+
+	.bmw-insights-title__text {
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+
+	.bmw-insights-title__line {
+		flex: 1;
+		height: 2px;
+		background: var(--color-nicole-red, #E60012);
+		border-radius: 2px;
+		transform: scaleX(0);
+		transform-origin: left center;
+		transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+		will-change: transform;
+	}
+
+	.editorial-reveal.is-visible .bmw-insights-title__line {
+		transform: scaleX(1);
 	}
 
 	.bmw-insights-subtitle {
 		font-size: 15px;
-		line-height: 1.7;
+		line-height: 1.75;
 		color: #9ea4b0;
 		margin: 0;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.bmw-insights-subtitle .phrase {
+		display: inline-block;
 	}
 
 	.bmw-insights-header__actions {
@@ -1992,47 +1999,31 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 12px;
-		padding: 13px 32px;
-		border-radius: var(--radius-full);
+		text-align: center;
+		padding: 16px 44px;
+		border-radius: 40px;
 		font-family: var(--font-body);
 		font-size: var(--font-size-sm);
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		color: #ffffff !important;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.28);
+		background: var(--color-nicole-red);
+		border: 1px solid var(--color-nicole-red);
 		text-decoration: none;
-		transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 4px 14px rgba(255, 0, 0, 0.25);
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.btn-magazine-more > span {
+		text-align: center;
 	}
 
 	.btn-magazine-more:hover {
-		background: var(--color-brand);
-		color: var(--color-on-brand);
-		border-color: var(--color-brand);
+		background: var(--color-nicole-red-hover);
+		border-color: var(--color-nicole-red-hover);
+		color: #ffffff !important;
 		transform: translateY(-2px);
-		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
-	}
-
-	.btn-magazine-more__icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 22px;
-		height: 22px;
-		border-radius: var(--radius-full);
-		background: var(--color-brand);
-		color: var(--color-on-brand);
-		transition: transform 0.3s ease, background 0.3s ease;
-	}
-
-	.btn-magazine-more:hover .btn-magazine-more__icon {
-		background: var(--color-on-brand);
-	}
-
-	.btn-magazine-more:hover .cta-arrow-svg {
-		stroke: var(--color-brand);
-		transform: translateX(2px);
+		box-shadow: 0 8px 22px rgba(255, 0, 0, 0.35);
 	}
 
 	/* ============================================================== */
@@ -2218,12 +2209,11 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 	.editorial-header {
 		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		gap: 32px;
-		margin-bottom: 56px;
-		padding-bottom: 24px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+		align-items: center;
+		width: 100%;
+		margin-bottom: 48px;
+		padding-bottom: 0;
+		border-bottom: none;
 	}
 
 	.editorial-num {
@@ -2248,6 +2238,10 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	}
 
 	.editorial-title {
+		display: flex;
+		align-items: center;
+		gap: 28px;
+		width: 100%;
 		font-family: var(--font-helvetica);
 		font-size: clamp(32px, 4vw, 48px);
 		font-weight: 700;
@@ -2255,6 +2249,26 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		color: #ffffff;
 		margin: 0;
 		line-height: 1.1;
+	}
+
+	.editorial-title__text {
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+
+	.editorial-title__line {
+		flex: 1;
+		height: 2px;
+		background: var(--color-nicole-red, #E60012);
+		border-radius: 2px;
+		transform: scaleX(0);
+		transform-origin: left center;
+		transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+		will-change: transform;
+	}
+
+	.editorial-reveal.is-visible .editorial-title__line {
+		transform: scaleX(1);
 	}
 
 	.editorial-tagline {
@@ -3023,14 +3037,19 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 		/* インフォメーションスマホ */
 		.editorial-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 16px;
-			margin-bottom: 36px;
+			margin-bottom: 32px;
+			padding-bottom: 0;
+			border-bottom: none;
 		}
 
-		.editorial-header__right {
-			display: none;
+		.editorial-title {
+			gap: 16px;
+			font-size: clamp(24px, 5.5vw, 32px);
+		}
+
+		.editorial-title__line {
+			flex: 1;
+			height: 2px;
 		}
 
 		.news-row__link {
@@ -3094,6 +3113,24 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 		.bmw-insights-title {
 			font-size: 26px;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+
+		.bmw-insights-title__text {
+			white-space: normal;
+			width: 100%;
+		}
+
+		.bmw-insights-title__line {
+			width: 100%;
+			flex: none;
+			margin-left: 0;
+		}
+
+		.bmw-insights-subtitle {
+			font-size: 14px;
+			line-height: 1.7;
 		}
 
 		.bmw-insights-header__actions {
@@ -3121,8 +3158,10 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 		.btn-magazine-more {
 			width: 100%;
-			max-width: 340px;
-			padding: 12px 24px;
+			max-width: 360px;
+			padding: 13px 20px;
+			justify-content: center;
+			text-align: center;
 		}
 
 		.nicole-philosophy-brand-section {
@@ -3131,12 +3170,23 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 
 		.nicole-we-are {
 			margin-bottom: 80px;
+			text-align: center;
+			align-items: center;
+		}
+
+		.nicole-we-are-title,
+		.nicole-group-title {
+			text-align: center;
 		}
 
 		.nicole-we-are-body {
 			font-size: 15px;
 			line-height: 1.7;
-			text-align: start;
+			text-align: center;
+		}
+
+		.nicole-we-are-body p {
+			text-align: center;
 		}
 
 		.btn-nicole-outline {

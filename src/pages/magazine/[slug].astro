@@ -1023,20 +1023,10 @@ const relatedStoriesUrl = `/magazine/?brand=${encodeURIComponent(detectedBrand)}
 function getLocalMagazineDb() {
 	try {
 		const root = process.cwd();
-		const d1Dir = path.resolve(root, ".wrangler/state/v3/d1/miniflare-D1DatabaseObject");
-		if (fs.existsSync(d1Dir)) {
-			const files = fs.readdirSync(d1Dir);
-			const candidates = files
-				.filter(f => f.endsWith(".sqlite") && !f.includes("metadata") && !f.includes("bak"))
-				.map(f => ({ path: path.join(d1Dir, f), mtime: fs.statSync(path.join(d1Dir, f)).mtimeMs }))
-				.sort((a, b) => b.mtime - a.mtime);
-			if (candidates[0]) {
-				return new DatabaseSync(candidates[0].path);
-			}
-		}
+		// 注意: Miniflare稼働中の .wrangler SQLiteファイルはWorkerdとロック競合してクラッシュするため直接開かない
 		const backupPath = path.resolve(root, "seed/backup.sqlite");
 		if (fs.existsSync(backupPath)) {
-			return new DatabaseSync(backupPath);
+			return new DatabaseSync(backupPath, { readOnly: true });
 		}
 	} catch (e) {
 		console.error("Local SQLite init error in [slug]:", e);

@@ -363,6 +363,7 @@ const jsonLd = {
 							<header class="corp-company-card__header">
 								<div class="corp-company-card__logo-wrap">
 									<div class="corp-company-card__main-logo" set:html={svgs[comp.logoIndex]} />
+									<div class="corp-company-card__logo-line" aria-hidden="true" />
 								</div>
 								<div class="corp-company-card__badges">
 									<span class="corp-badge corp-badge--subtle">{comp.role}</span>
@@ -1113,23 +1114,36 @@ const jsonLd = {
 
 	.corp-company-card__logo-wrap {
 		display: flex;
-		align-items: center;
-		margin-bottom: 20px;
-		height: 28px;
+		flex-direction: column;
+		align-items: flex-start;
+		margin-bottom: 22px;
 	}
 
 	.corp-company-card__main-logo {
-		height: 15px;
+		height: 16px;
 		display: flex;
 		align-items: center;
 		color: #ffffff;
 	}
 
 	.corp-company-card__main-logo :global(svg) {
-		height: 15px !important;
+		height: 16px !important;
 		width: auto !important;
 		max-width: 100% !important;
 		fill: currentColor;
+	}
+
+	.corp-company-card__logo-line {
+		width: 40px;
+		height: 2px;
+		background: var(--color-accent, #E60012);
+		margin-top: 14px;
+		border-radius: 2px;
+		transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+	}
+
+	.corp-company-card:hover .corp-company-card__logo-line {
+		width: 64px;
 	}
 
 	.corp-company-card__badges {

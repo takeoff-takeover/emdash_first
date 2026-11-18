@@ -1363,6 +1363,154 @@
 				}
 
 				// ─────────────────────────────────────────────────────────────
+				// コレクション・タブ独立管理マネージャー
+				// （マガジンや他コレクションでの絞り込み・検索条件が拠点一覧等の別タブに絶対に波及・残留しないよう完全分離保護）
+				// ─────────────────────────────────────────────────────────────
+				function getAdminCurrentCollection() {
+					const rawPath = window.location.pathname || '';
+					const m = rawPath.match(/\/content\/([a-zA-Z0-9_-]+)/);
+					if (m) return m[1];
+					return null;
+				}
+
+				let previousAdminCollection = getAdminCurrentCollection();
+				const adminCollectionSearchStore = {};
+
+				function cleanAdminSearchUrlParams() {
+					try {
+						const url = new URL(window.location.href);
+						let changed = false;
+						for (const key of ['q', 'search', 'filter']) {
+							if (url.searchParams.has(key)) {
+								url.searchParams.delete(key);
+								changed = true;
+							}
+						}
+						if (changed) {
+							window.history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + url.hash);
+						}
+					} catch(e) {}
+				}
+
+				function setAdminSearchInputValue(val, forceEvent = true) {
+					const searchInput = document.querySelector('input[placeholder*="マガジンを検索"], input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
+					if (!searchInput) return;
+					if (searchInput.value === val && !forceEvent) return;
+
+					const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+					if (nativeSetter) {
+						nativeSetter.call(searchInput, val);
+					} else {
+						searchInput.value = val;
+					}
+					if (forceEvent) {
+						searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+						searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+					}
+				}
+
+				function handleAdminCollectionSwitching() {
+					const currentCollection = getAdminCurrentCollection();
+					if (!currentCollection) {
+						previousAdminCollection = null;
+						return;
+					}
+
+					if (previousAdminCollection && previousAdminCollection !== currentCollection) {
+						// コレクション（タブ）切り替えが発生！
+						// 1. 前のコレクションでの状態を退避
+						if (previousAdminCollection === 'magazine') {
+							adminCollectionSearchStore['magazine'] = {
+								brand: activeBrandFilter,
+								category: activeCategoryFilter,
+								keyword: activeUserKeyword
+							};
+						} else {
+							const prevInput = document.querySelector('input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
+							if (prevInput && !/(?:brand|category):/i.test(prevInput.value || '')) {
+								adminCollectionSearchStore[previousAdminCollection] = {
+									searchValue: prevInput.value || ''
+								};
+							}
+						}
+
+						// 2. 新しいコレクションへの遷移に伴う検索窓・URLパラメータの厳格な独立化
+						cleanAdminSearchUrlParams();
+
+						if (currentCollection === 'magazine') {
+							// マガジンに戻ってきた場合：保存状態を復元（なければ初期状態）
+							const saved = adminCollectionSearchStore['magazine'];
+							if (saved) {
+								activeBrandFilter = saved.brand || 'all';
+								activeCategoryFilter = saved.category || 'all';
+								activeUserKeyword = saved.keyword || '';
+							} else {
+								activeBrandFilter = 'all';
+								activeCategoryFilter = 'all';
+								activeUserKeyword = '';
+							}
+							updateBrandSelectOptions();
+							updateCategorySelectOptions();
+							syncFiltersToServerSearch();
+						} else {
+							// マガジン以外のコレクション（拠点一覧 locations, ニュース news, 固定ページ pages 等）へ移動した場合：
+							// 前のコレクション（特にマガジンのbrand:xxxやキーワード）は絶対に引き継がせず、完全に空にして全件表示状態を確立！
+							const saved = adminCollectionSearchStore[currentCollection];
+							const targetVal = saved?.searchValue || '';
+							setAdminSearchInputValue(targetVal);
+						}
+
+						previousAdminCollection = currentCollection;
+					} else if (!previousAdminCollection && currentCollection) {
+						previousAdminCollection = currentCollection;
+					}
+				}
+
+				// SPAルーティングのHistory APIをフックしてコレクション切り替えをゼロ遅延で即座に処理
+				if (!window.__nicoleAdminRouteHooked) {
+					window.__nicoleAdminRouteHooked = true;
+					const origPushState = history.pushState;
+					history.pushState = function(...args) {
+						const res = origPushState.apply(this, args);
+						try { handleAdminCollectionSwitching(); } catch(e){}
+						return res;
+					};
+					const origReplaceState = history.replaceState;
+					history.replaceState = function(...args) {
+						const res = origReplaceState.apply(this, args);
+						try { handleAdminCollectionSwitching(); } catch(e){}
+						return res;
+					};
+				}
+
+				// サイドバーナビゲーションリンクのクリックを検知して即時クリーンアップ
+				document.addEventListener('click', (e) => {
+					const link = e.target.closest('a[href*="/_emdash/admin/content/"]');
+					if (link) {
+						const href = link.getAttribute('href') || '';
+						const m = href.match(/\/content\/([a-zA-Z0-9_-]+)/);
+						if (m) {
+							const nextCol = m[1];
+							const curCol = getAdminCurrentCollection();
+							if (curCol && nextCol && curCol !== nextCol) {
+								if (curCol === 'magazine') {
+									adminCollectionSearchStore['magazine'] = {
+										brand: activeBrandFilter,
+										category: activeCategoryFilter,
+										keyword: activeUserKeyword
+									};
+									setAdminSearchInputValue('');
+									cleanAdminSearchUrlParams();
+								} else {
+									setAdminSearchInputValue('');
+									cleanAdminSearchUrlParams();
+								}
+							}
+						}
+					}
+				}, true);
+
+				// ─────────────────────────────────────────────────────────────
 				// マガジン一覧画面でのツールバー連動フィルター（ブランド・カテゴリー・ステータス）
 				// ─────────────────────────────────────────────────────────────
 				let activeBrandFilter = 'all';
@@ -1530,17 +1678,7 @@
 
 				// 検索窓に値をセットしてReactのonChangeを発火させるヘルパー
 				function triggerServerSearch(val) {
-					const searchInput = document.querySelector('input[placeholder*="マガジンを検索"], input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
-					if (searchInput) {
-						const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-						if (nativeSetter) {
-							nativeSetter.call(searchInput, val);
-						} else {
-							searchInput.value = val;
-						}
-						searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-						searchInput.dispatchEvent(new Event('change', { bubbles: true }));
-					}
+					setAdminSearchInputValue(val, true);
 				}
 
 				function syncFiltersToServerSearch() {
@@ -1579,6 +1717,14 @@
 							if (bWrap) bWrap.remove();
 							const cWrap = document.getElementById('emdash-filter-category-wrapper');
 							if (cWrap) cWrap.remove();
+
+							// 重要：マガジン以外の画面（拠点一覧 locations, news等）にいる場合、
+							// もし検索窓にマガジン由来の文字列（brand: や category:）が残っていたら、即座に完全除去して全件表示に戻す！
+							const strayInput = document.querySelector('input[placeholder*="Filter entries"], input[placeholder*="Search"], input[placeholder*="検索"]');
+							if (strayInput && /(?:tax_brand|brand|tax_cat|category):/i.test(strayInput.value || '')) {
+								setAdminSearchInputValue('');
+								cleanAdminSearchUrlParams();
+							}
 							return;
 						}
 
@@ -2769,6 +2915,7 @@
 				// 定期実行とイベント監視でSPA遷移に完全追従
 				setInterval(() => {
 					try { if (checkLocalAutoLogin()) return; } catch(e){}
+					try { handleAdminCollectionSwitching(); } catch(e){}
 					try { applyAccordion(); } catch(e){}
 					try { applyHomepageSections(); } catch(e){}
 					try { applyCompaniesSections(); } catch(e){}
@@ -2779,6 +2926,7 @@
 				}, 350);
 				window.addEventListener('popstate', () => {
 					setTimeout(() => {
+						try { handleAdminCollectionSwitching(); } catch(e){}
 						try { applyAccordion(); } catch(e){}
 						try { applyHomepageSections(); } catch(e){}
 						try { applyCompaniesSections(); } catch(e){}
