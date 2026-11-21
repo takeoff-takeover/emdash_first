@@ -1,127 +1,380 @@
 ---
 // src/pages/customer-policy.astro
-// ニコル・グループ 公式固定ページ（WordPress/Elementor デザインレイアウト完全継承）
+// ニコル・グループ お客さま本位の業務運営方針（FD宣言）（完全モダン・脱Elementor）
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お客さま本位の業務運営方針（FD宣言） | Nicole Group 公式";
 const pageDescription = "ニコル・グループ各社が定める「お客さま本位の業務運営方針（FD宣言）」をご案内いたします。";
 
-// Elementor 完全継承HTMLコンテンツ
-const elementorHtml = "<div data-elementor-type=\"wp-page\" data-elementor-id=\"3970\" class=\"elementor elementor-3970\" data-elementor-post-type=\"page\">\n\t\t\t\t<div class=\"elementor-element elementor-element-36f2fa2 e-flex e-con-boxed e-con e-parent\" data-id=\"36f2fa2\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;background_background&quot;:&quot;classic&quot;}\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-0af75ae elementor-widget elementor-widget-heading\" data-id=\"0af75ae\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h1 class=\"elementor-heading-title elementor-size-default\">お客さま本位の業務運営方針（FD宣言）</h1>\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-6cb0702 e-flex e-con-boxed e-con e-parent\" data-id=\"6cb0702\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-119f84c elementor-widget elementor-widget-text-editor\" data-id=\"119f84c\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<div class=\"row justify-content-center\">\n<div class=\"col-md-10 mt-sm-0 mt-md-5 pt-2 pb-1 px-4\">\n<p class=\"fs-6 text-black text-start text-md-start\">私たち、Nicole Groupは、経営理念に「私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。」を掲げ、お客様本位の業務運営方針を策定・公表・実践してまいります。</p>\n</div>\n</div>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-931e771 elementor-widget elementor-widget-heading\" data-id=\"931e771\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h3 class=\"elementor-heading-title elementor-size-default\">方針1. お客様本位の業務運営の徹底について</h3>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-99720e4 elementor-widget elementor-widget-text-editor\" data-id=\"99720e4\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>私たちは、経営理念と本方針に基づき、全社員がお客様本位で行動していく企業風土を醸成します。 また、本方針の定期的な見直しは、社会情勢や経営環境の変化を踏まえ行います。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-161a1cc elementor-widget elementor-widget-heading\" data-id=\"161a1cc\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h3 class=\"elementor-heading-title elementor-size-default\">方針2.お客様の最善の利益の追求について</h3>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-949faf9 elementor-widget elementor-widget-text-editor\" data-id=\"949faf9\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>具体的取組内容</p>\n<ol>\n<li> <strong>最適な自動車保険のご提案</strong>\n<ul>\n<li> お客様のカーライフニーズを把握し、ご意向にお応えした最適な自動車保険をご提案し、損保制度遵守の上、実践します。</li>\n</ul>\n</li>\n<li> <strong>より分かりやすいデジタルでのお手続き</strong>\n<ul>\n<li>自動車保険のお手続きは、原則パソコンやタブレットのデジタル機器を使用し分かりやすく実施します。</li>\n</ul>\n</li>\n<li> <strong>重要事項のご説明</strong>\n<ul>\n<li>自動車保険の重要事項説明書を使用し、お客様の最善の利益を図るために保険商品、並びに不利益となる可能性がある情報について分かりやすく説明します。</li>\n</ul>\n</li>\n</ol>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-569339a elementor-widget elementor-widget-heading\" data-id=\"569339a\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h3 class=\"elementor-heading-title elementor-size-default\">方針3.ガバナンス体制整備について</h3>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-ac6bb49 elementor-widget elementor-widget-text-editor\" data-id=\"ac6bb49\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>具体的取組内容</p>\n<ol>\n<li><strong> 人材育成</strong>\n<ul>\n<li>各種階層研修(入社時、コンプライアンス、保険勉強会など）を実施し、当グループにふさわしい人材育成に取り組みます。</li>\n</ul>\n</li>\n<li><strong> 内部監査の実施</strong>\n<ul>\n<li>定期的な内部監査(施設、保険)を行い、PDCAサイクルを運営することでコンプライアンス意識の醸成と企業倫理観の保持を実現します。</li>\n</ul>\n</li>\n</ol>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-fd9dc5c elementor-widget elementor-widget-heading\" data-id=\"fd9dc5c\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h3 class=\"elementor-heading-title elementor-size-default\">方針4.実現化するためのKPIについて</h3>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-4d493e9 elementor-widget elementor-widget-text-editor\" data-id=\"4d493e9\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>具体的取組内容</p>\n<ol>\n<li>私たちは、お客様アンケート満足度指数をKPIとして定め、数値向上を追求します。</li>\n<li>保険募集でいただく「ご指摘」「改善のご要望」などを当グループ内で集約し、定例で共有し、お客様満足度向上に繋げてまいります。</li>\n</ol>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-f2b2fc4 elementor-widget elementor-widget-text-editor\" data-id=\"f2b2fc4\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>制定日：2025年5月</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-858921f elementor-widget elementor-widget-text-editor\" data-id=\"858921f\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>&lt; Nicole Group of Companies &gt;</p><p>ニコル・レーシング・ジャパン合同会社<br />ニコル・オートモビルズ合同会社<br />ニコル・カーズ合同会社<br />Nicole MotorCars合同会社<br />Nicole Competizione合同会社</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>";
+const policies = [
+	{
+		num: "01",
+		title: "方針1. お客様本位の業務運営の徹底について",
+		desc: "私たちは、経営理念と本方針に基づき、全社員がお客様本位で行動していく企業風土を醸成します。また、本方針の定期的な見直しは、社会情勢や経営環境の変化を踏まえ行います。"
+	},
+	{
+		num: "02",
+		title: "方針2. お客様の最善の利益の追求について",
+		desc: "お客様の立場に立ち、最適な提案と安心を提供するため、以下の取り組みを実践します。",
+		initiatives: [
+			{
+				label: "最適な自動車保険のご提案",
+				text: "お客様のカーライフニーズを把握し、ご意向にお応えした最適な自動車保険をご提案し、損保制度遵守の上、実践します。"
+			},
+			{
+				label: "より分かりやすいデジタルでのお手続き",
+				text: "自動車保険のお手続きは、原則パソコンやタブレットのデジタル機器を使用し分かりやすく実施します。"
+			},
+			{
+				label: "重要事項のご説明",
+				text: "自動車保険の重要事項説明書を使用し、お客様の最善の利益を図るために保険商品、並びに不利益となる可能性がある情報について分かりやすく説明します。"
+			}
+		]
+	},
+	{
+		num: "03",
+		title: "方針3. ガバナンス体制整備について",
+		desc: "高い企業倫理と専門性を維持し、健全な業務運営を推進します。",
+		initiatives: [
+			{
+				label: "人材育成",
+				text: "各種階層研修（入社時、コンプライアンス、保険勉強会など）を実施し、当グループにふさわしい人材育成に取り組みます。"
+			},
+			{
+				label: "内部監査の実施",
+				text: "定期的な内部監査（施設、保険）を行い、PDCAサイクルを運営することでコンプライアンス意識の醸成と企業倫理観の保持を実現します。"
+			}
+		]
+	},
+	{
+		num: "04",
+		title: "方針4. 実現化するためのKPIについて",
+		desc: "本方針の定着とさらなる品質向上のため、以下のKPIを設定・検証します。",
+		initiatives: [
+			{
+				label: "顧客満足度指数の向上",
+				text: "私たちは、お客様アンケート満足度指数をKPIとして定め、数値向上を追求します。"
+			},
+			{
+				label: "改善要望の集約と共有",
+				text: "保険募集でいただく「ご指摘」「改善のご要望」などを当グループ内で集約し、定例で共有し、お客様満足度向上に繋げてまいります。"
+			}
+		]
+	}
+];
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-  <slot name="head" slot="head">
-	<link rel="stylesheet" href="/wp-content/themes/astra/assets/css/minified/main.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/reviews-feed/vendor/smashballoon/framework/Packages/Blocks/css/sb-elementor.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/astra-addon/astra-addon-6ad82db3390588-53003025.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/frontend.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-image.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-spacer.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeIn.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-grow.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-mega-menu.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-pop.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInRight.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-breadcrumbs.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-divider.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-8.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-heading.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-3970.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-6801.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-12887.css" />
-    <style is:global>
-      /* Elementor 余白・レイアウト完全適合スタイル */
-      .elementor {
-        box-sizing: border-box;
-      }
-      .entry-content {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      .elementor img {
-        height: auto;
-        max-width: 100%;
-      }
-      /* コンテナ幅・表示崩れ防止 */
-      .elementor-element {
-        --flex-direction: initial;
-        --flex-wrap: initial;
-        --justify-content: initial;
-        --align-items: initial;
-      }
+	<main class="policy-page">
+		<!-- ヒーローヘッダー -->
+		<header class="policy-hero">
+			<div class="policy-hero__inner">
+				<p class="policy-hero__sub">FIDUCIARY DUTY</p>
+				<h1 class="policy-hero__title">お客さま本位の業務運営方針<br class="sp-only" />（FD宣言）</h1>
+			</div>
+		</header>
 
-      /* ============================================================== */
-      /* グローバルヘッダーの左右端（max-width: 1440px / padding: 0 40px）に揃えるスタイル */
-      /* ============================================================== */
+		<div class="policy-container">
+			<article class="policy-article">
+				<!-- リード文 -->
+				<div class="policy-intro">
+					<p>
+						私たち、Nicole Groupは、経営理念に<strong>「私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。」</strong>を掲げ、お客様本位の業務運営方針を策定・公表・実践してまいります。
+					</p>
+				</div>
 
-      /* ① FD宣言 ヒーローバナー */
-      .elementor-3970 .elementor-element.elementor-element-36f2fa2 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-3970 .elementor-element.elementor-element-36f2fa2 > .e-con-inner {
-        max-width: 1440px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
+				<!-- 各方針ブロック -->
+				<div class="policy-list">
+					{policies.map((p) => (
+						<section class="policy-card">
+							<div class="policy-card__header">
+								<span class="policy-card__num">{p.num}</span>
+								<h2 class="policy-card__title">{p.title}</h2>
+							</div>
+							<p class="policy-card__desc">{p.desc}</p>
 
-      /* ② 方針本文コンテナ: 1440px / 40px で左右一杯に展開 */
-      .elementor-3970 .elementor-element.elementor-element-6cb0702 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-3970 .elementor-element.elementor-element-6cb0702 > .e-con-inner {
-        max-width: 1440px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
-      .elementor-3970 .col-md-10 {
-        max-width: 100% !important;
-        width: 100% !important;
-        flex: 0 0 100% !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
+							{p.initiatives && (
+								<div class="initiatives-block">
+									<h3 class="initiatives-block__heading">【具体的取組内容】</h3>
+									<div class="initiatives-list">
+										{p.initiatives.map((init) => (
+											<div class="initiative-item">
+												<h4 class="initiative-item__label">{init.label}</h4>
+												<p class="initiative-item__text">{init.text}</p>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</section>
+					))}
+				</div>
 
-      /* 見出しの改行最適化（単語分断・孤立文字防止） */
-      .elementor-3970 .elementor-heading-title,
-      .elementor-3970 h1, .elementor-3970 h2, .elementor-3970 h3, .elementor-3970 h4 {
-        text-wrap: balance !important;
-        word-break: auto-phrase !important;
-        overflow-wrap: break-word !important;
-      }
-
-      /* レスポンシブ対応 (グローバルヘッダーと同一のパディング推移) */
-      @media (max-width: 1024px) {
-        .elementor-3970 .elementor-element.elementor-element-36f2fa2 > .e-con-inner,
-        .elementor-3970 .elementor-element.elementor-element-6cb0702 > .e-con-inner {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .elementor-3970 .elementor-element.elementor-element-36f2fa2 > .e-con-inner,
-        .elementor-3970 .elementor-element.elementor-element-6cb0702 > .e-con-inner {
-          padding-left: 16px !important;
-          padding-right: 16px !important;
-        }
-      }
-    </style>
-  </slot>
-
-  <div class="elementor-page-wrapper">
-    <div class="entry-content" set:html={elementorHtml} />
-  </div>
+				<!-- 結び・制定情報 -->
+				<footer class="policy-footer">
+					<p class="policy-enacted">制定日：2025年5月</p>
+					<div class="policy-companies">
+						<p class="policy-companies__title">&lt; Nicole Group of Companies &gt;</p>
+						<p>
+							ニコル・レーシング・ジャパン合同会社<br />
+							ニコル・オートモビルズ合同会社<br />
+							ニコル・カーズ合同会社<br />
+							Nicole MotorCars合同会社<br />
+							Nicole Competizione合同会社
+						</p>
+					</div>
+				</footer>
+			</article>
+		</div>
+	</main>
 </NicoleLayout>
+
+<style>
+/* ============================================================== */
+/* お客さま本位の業務運営方針（FD宣言）：完全モダン＆セマンティックデザイン */
+/* ============================================================== */
+.policy-page {
+	width: 100%;
+	background-color: #fcfcfc;
+	color: #111111;
+	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+	line-height: 1.85;
+	padding-bottom: 96px;
+}
+
+.policy-container {
+	width: 100%;
+	max-width: 920px;
+	margin: 0 auto;
+	padding: 64px 40px 0;
+	box-sizing: border-box;
+}
+
+.sp-only {
+	display: none;
+}
+
+/* --- ヒーローヘッダー --- */
+.policy-hero {
+	width: 100%;
+	background-color: #000000;
+	color: #ffffff;
+	padding: 88px 0 72px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	text-align: center;
+}
+
+.policy-hero__inner {
+	width: 100%;
+	max-width: 1440px;
+	margin: 0 auto;
+	padding: 0 40px;
+	box-sizing: border-box;
+}
+
+.policy-hero__sub {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	letter-spacing: 0.28em;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0 0 16px;
+	text-transform: uppercase;
+}
+
+.policy-hero__title {
+	font-size: clamp(26px, 3.6vw, 40px);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	margin: 0;
+	color: #ffffff;
+	line-height: 1.35;
+}
+
+/* --- メインコンテンツ --- */
+.policy-article {
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
+	padding: 48px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.policy-intro {
+	background-color: #f9f9f9;
+	border-left: 3px solid #000000;
+	padding: 24px 28px;
+	margin-bottom: 48px;
+	border-radius: 0 4px 4px 0;
+}
+
+.policy-intro p {
+	font-size: 16px;
+	line-height: 1.9;
+	color: #222222;
+	margin: 0;
+}
+
+.policy-list {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+}
+
+.policy-card {
+	padding-bottom: 40px;
+	border-bottom: 1px solid #eeeeee;
+}
+
+.policy-card:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.policy-card__header {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.policy-card__num {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+	color: #dc2626;
+	letter-spacing: 0.1em;
+}
+
+.policy-card__title {
+	font-size: 20px;
+	font-weight: 600;
+	color: #000000;
+	margin: 0;
+	letter-spacing: 0.02em;
+}
+
+.policy-card__desc {
+	font-size: 15px;
+	line-height: 1.85;
+	color: #333333;
+	margin: 0 0 20px;
+}
+
+/* --- 具体的取組ブロック --- */
+.initiatives-block {
+	background-color: #fafafa;
+	border: 1px solid #eeeeee;
+	border-radius: 4px;
+	padding: 24px 28px;
+	margin-top: 16px;
+}
+
+.initiatives-block__heading {
+	font-size: 13px;
+	font-weight: 700;
+	color: #444444;
+	letter-spacing: 0.08em;
+	margin: 0 0 16px;
+}
+
+.initiatives-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.initiative-item {
+	border-left: 2px solid #dc2626;
+	padding-left: 14px;
+}
+
+.initiative-item__label {
+	font-size: 15px;
+	font-weight: 600;
+	color: #111111;
+	margin: 0 0 4px;
+}
+
+.initiative-item__text {
+	font-size: 14px;
+	color: #555555;
+	line-height: 1.8;
+	margin: 0;
+}
+
+/* --- フッター --- */
+.policy-footer {
+	margin-top: 48px;
+	padding-top: 32px;
+	border-top: 1px solid #eeeeee;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	gap: 24px;
+}
+
+.policy-enacted {
+	font-size: 14px;
+	color: #666666;
+	margin: 0;
+}
+
+.policy-companies {
+	font-size: 13.5px;
+	color: #444444;
+}
+
+.policy-companies__title {
+	font-weight: 600;
+	color: #111111;
+	margin: 0 0 8px;
+}
+
+.policy-companies p {
+	margin: 0;
+	line-height: 1.8;
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+	.sp-only {
+		display: inline;
+	}
+
+	.policy-container {
+		padding: 40px 20px 0;
+	}
+
+	.policy-hero {
+		padding: 56px 0 48px;
+	}
+
+	.policy-article {
+		padding: 32px 20px;
+	}
+
+	.policy-intro {
+		padding: 20px 18px;
+		margin-bottom: 36px;
+	}
+
+	.policy-card__header {
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.policy-card__title {
+		font-size: 18px;
+	}
+
+	.initiatives-block {
+		padding: 20px 16px;
+	}
+
+	.policy-footer {
+		flex-direction: column;
+		gap: 20px;
+	}
+}
+</style>

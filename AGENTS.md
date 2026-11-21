@@ -60,6 +60,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
   10. *見出しなき箱・カードブロックの連続スタック禁止（トピック境界と順序付けの厳格化）*: 見出しや適切な文脈（リード文）を挟まずに、異なるスタイルや目的のカードグループ（箱）を2段連続で直結して並べることは厳禁。話題の切り替わりには必ず小見出し（H3等）と導入文を設け、思考の区切りを明確にすること。また、時系列や手順ではない並列要素に無意味にステップ番号（`step`）を付与せず、並列要素は統一したボックス型（`box`）で整理すること。
   11. *コンバージョン導線のCTAブロック化と記事末尾の集約原則*: 「○○について相談する」「商談予約をする」等のアクション導線や重要リンクは、本文中の生テキストやインラインリンクで放置せず、必ず正規のCTAブロック（`cta`）としてボタン化すること。記事末尾の注釈・免責事項はバラバラに放置せず単一の `notes` ブロックに美しく集約し、ハードコードされた関連記事や手動リンク群は削除してCMSの正規導線・CTAに統一すること。
   12. *臨機応変なタイトル中央揃えと全体の重量・統一感バランス原則*: ページ内のセクションにおいて、左右対称に広がるグリッドカード群、統計表、アコーディオン、全幅テーブルなどのように「全体または一部が中央・左右均等に寄るレイアウト」が存在する場合、教条的に左揃えに固執せず、臨機応変にセクションタイトル・サブタイトルを中央揃え（センター配置）にすること。左右分割の非対称ブロック（代表メッセージ等）は自然な左揃えを維持しつつ、左右対称ブロックは中央揃えにするなど、ページ全体としての重量バランス（視覚的重心）、統一感ある美しさを最優先に判断すること。
+  13. *注記・補足の縦線（左ボーダー）および安易な箱化・背景色変更の禁止（脱AI装飾原則）*: 注釈（※印など）、補足、リード文等の横・左側に配置する縦線（`border-left`）や、安易に背景色を変えたボックス（箱囲み・枠線付きカード化）はいかにもAI特有の安っぽい装飾であるため、公開Webサイト（フロントページ）ではユーザーから明示的な指示がない限り絶対に使用してはならない（管理画面／Admin UIは実用性の観点から問題なし）。注記は背景色変更や縦線（左ボーダー）をつけず、文字サイズやテキストカラーの明度差のみでシンプルかつ品格ある自然なテキストとして表現すること。
 - **Workflows (Skills)**: 開発開始時は `dev-setup`、作業終了・引き継ぎ時は `handover-wrapup`、SEO/AI検索診断時は `seo-geo-audit` スキルを実行すること（詳細は `.agents/skills/` を参照）。
 - **Deploy rule**: Cloudflareへのデプロイ・本番アップロード（`wrangler deploy`）は、ユーザーから明示的に指示があった場合のみ実行すること。ユーザーの指示がない限り勝手に本番へアップロードせず、ローカル環境（`http://localhost:4321`）での確認にとどめること。
 - **Admin UI direct access rule**: ユーザーから「管理画面」や「Admin」についての指示や質問があった際は、通常のログイン画面（`/_emdash/admin`）ではなく、必ず認証バイパス用の直接アクセスリンク [http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin](http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin) を提示・案内すること。
@@ -74,7 +75,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 - **Article Slug Naming Rule (記事スラッグ命名規則・公開年月プレフィックス原則)**: 記事（マガジン `magazine`、お知らせ `posts`、キャンペーン `campaigns` 等）のスラッグ（URL識別子）を新規作成・命名する際は、必ず公開年月（`YYYYMM` 4桁年+2桁月）を先頭に付与し、アンダースコアに続けて英小文字・ハイフンで簡潔に記述すること（例: `202611_xxxxxxx`）。日（DAY `DD`）までは含めず、公開月（`YYYYMM`）で統一すること。また、全ブランド対象記事（特定単一ブランドに属さない記事）にはブランド分類として「`ALL BRANDS`」を割り当てること。
 - **Constructive Pushback & Advisory Partnership Rule (プロフェッショナル助言・安全ブレーキ原則)**: ユーザーからの指示・希望を単に盲目的に実装するのではなく、プロフェッショナルな視点で一度立ち止まり、技術的・運用上・デザイン上のデメリットやリスク（CMS管理画面の手動編集との衝突、モバイル/タブレット表示の破綻、過度な共通化によるコード肥大化、ブランド品格・一貫性の毀損、表示速度/SEO低下など）が生じる恐れがある場合は、必ず作業を進める前に「リスクの理由」と「本来の目的を安全に達成できる代替案」を率直に提示し、ユーザーに確認・相談した上で進めること。
 - **Question-First Response Rule (質問優先・作業前回答原則)**: ユーザーから「なぜ〜か」「どうして」「おしえて」「どういうこと」などの質問・理由の確認・疑問を投げかけられた際は、先回りして勝手にコード編集や修正作業を行ってはならない。まずは純粋な質問への理由・背景・現状の分析・選択肢をテキストで回答し、ユーザーの理解・確認および次の方針指示を待ってから作業に移ること。
-- **Typography & Font rule (欧文・和文フォント設計原則)**: 欧文は Helvetica Neue / Helvetica（ヘルベチカ）を基調として最優先適用。和文（日本語）はシステムフォントスタック（Mac/iOS:「ヒラギノ角ゴ ProN」、Windows:「游ゴシック」、Android:「Noto Sans JP」/システムゴシック）を採用し、Webフォント遅延・レイアウトシフト（CLS）ゼロの最速高精細描画を担保すること。コード・メタラベルには JetBrains Mono を適用する。
+- **Typography & Font rule (欧文・和文フォント設計原則・等幅フォント完全排除)**: 欧文は全見出し・英数字・メタラベルを含め Helvetica Neue / Helvetica（ヘルベチカ）を一貫して最優先適用。和文（日本語）はシステムフォントスタック（Mac/iOS:「ヒラギノ角ゴ ProN」、Windows:「游ゴシック」、Android:「Noto Sans JP」/システムゴシック）を採用し、Webフォント遅延・レイアウトシフト（CLS）ゼロの最速高精細描画を担保すること。JetBrains Mono などの等幅フォント（Monospace）はサイト全体から完全排除し、一切使用してはならない。
 - **Magazine Article Title & Layout Rules (マガジン記事タイトル・アイキャッチ・構成原則)**:
   1. *タイトルの適正長（PCで2行目安）*: 記事タイトルは冗長な修飾語を詰め込まず、PC表示時に美しく2行以内に収まる文字量（目安40〜48文字前後）を厳格に順守すること。長すぎるタイトルは厳禁。
   2. *アイキャッチ写真の余白とモデル選定（空間美と最新モデル優先）*: アイキャッチ画像は車体が枠いっぱいに詰まったトリミングや余白のない写真は厳禁とし、美しい背景・周囲の呼吸感（余白）が確保された魅力的な公式写真・広角構図を採用すること。また比較・新型予告記事では、必ず「新しいモデル（次期型・新型コンセプト等）」の写真をアイキャッチに据えること。
@@ -84,7 +85,7 @@ This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json`
 
 ## This Template
 
-A blog with posts, pages, categories, tags, full-text search, and RSS. Designed for personal writing, technical writing, indie newsletters, and anything where the writing is the product. Neutral editorial aesthetic: a framed layout with hairline rails, white cards on an off-white canvas, Helvetica / Helvetica Neue with JetBrains Mono labels, and real article structure with bylines and reading time.
+A blog with posts, pages, categories, tags, full-text search, and RSS. Designed for personal writing, technical writing, indie newsletters, and anything where the writing is the product. Neutral editorial aesthetic: a framed layout with hairline rails, white cards on an off-white canvas, Helvetica / Helvetica Neue typography, and real article structure with bylines and reading time.
 
 ## Pages
 
@@ -114,7 +115,7 @@ The palette is neutral: an off-white canvas (`--color-bg`), white surfaces (`--c
 
 Every page sits in a frame: two hairline rails run the full height of the page, and each full-width section (`.band`) is ruled off with a hairline that meets the rails at a small crosshair. Cards are white with a 1px ring and a soft shadow, and their images are inset so the corners stay concentric (`--radius-xl` card = `--radius-lg` image + `--card-padding`).
 
-Type is **Helvetica** / **Helvetica Neue** on `--font-body` for everything, with weight and size carrying the hierarchy. **JetBrains Mono** on `--font-mono` sets code and the small uppercase labels (`.eyebrow`) used for section names and meta. Page titles use `--font-size-display` with tight tracking; the home intro pairs the site title with the tagline as a muted second line.
+Type is **Helvetica** / **Helvetica Neue** on `--font-body` for everything, with weight and size carrying the hierarchy. Small uppercase labels (`.eyebrow`) used for section names and meta also use Helvetica / Helvetica Neue. Page titles use `--font-size-display` with tight tracking; the home intro pairs the site title with the tagline as a muted second line.
 
 The article layout is the standout feature: a meta rail (authors, date, reading time), a 680px body column, and a rail with the table of contents and sidebar widgets. Below 1100px it collapses to one column, the table of contents is hidden, and the widgets move under the article. Don't flatten it on desktop -- the layout signals "this is something to read".
 

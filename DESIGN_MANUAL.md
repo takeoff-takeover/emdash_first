@@ -62,12 +62,12 @@
 
 ### ② タイポグラフィ（Typography）
 
-- **本文・見出しフォント**: `Inter`, sans-serif (`--font-body` / `--font-heading`)
-- **コード・メタラベル**: `JetBrains Mono`, monospace (`--font-mono`)
+- **本文・見出しフォント**: `Helvetica Neue`, Helvetica, sans-serif (`--font-body` / `--font-heading`)
+- **メタラベル・諸元**: `Helvetica Neue`, Helvetica, sans-serif（等幅フォントは完全排除）
 
 | トークン名 | rem | px換算 | 主な適用箇所 |
 | :--- | :--- | :--- | :--- |
-| `--font-size-label` | `0.75rem` | 12px | モノスペース小ラベル、タグ |
+| `--font-size-label` | `0.75rem` | 12px | 小ラベル、タグ、メタデータ |
 | `--font-size-xs` | `0.8125rem`| 13px | 注記、テーブル内セル、サブテキスト |
 | `--font-size-sm` | `0.875rem` | 14px | 補足説明、メタ情報、ボタンテキスト |
 | `--font-size-base` | `1.0rem` | 16px | **本文（標準サイズ）** |

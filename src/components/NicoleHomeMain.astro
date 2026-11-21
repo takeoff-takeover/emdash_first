@@ -4,7 +4,7 @@
 
 import fs from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import { getEmDashCollection, getEmDashEntry } from "emdash";
+import { getEmDashCollection, getEmDashEntry, getTermsForEntries } from "emdash";
 import { isNoticeArticle, isESGArticle } from "../lib/magazinePolicy";
 
 // 閲覧数の表示フラグ（移行データなしのためデフォルト非表示）
@@ -65,16 +65,45 @@ function buildYouTubeEmbedUrl(videoId: string, start?: number | null, end?: numb
 	return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 }
 
+// メディアURL解決ヘルパー（EmDash R2/ローカルストレージ key, オブジェクト, JSON文字列, 外部URLのすべてに対応）
+function resolveMediaUrl(img: unknown, fallback: string = ""): string {
+	if (!img) return fallback;
+	let target: any = img;
+	if (typeof target === "string") {
+		const trimmed = target.trim();
+		if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+			try {
+				target = JSON.parse(trimmed);
+			} catch {
+				return trimmed;
+			}
+		} else {
+			return trimmed || fallback;
+		}
+	}
+	if (typeof target === "object" && target !== null) {
+		if (typeof target.src === "string" && target.src.trim()) {
+			return target.src.trim();
+		}
+		const storageKey = target.meta?.storageKey || target.storageKey || target.id;
+		if (storageKey) {
+			return `/_emdash/api/media/file/${storageKey}`;
+		}
+	}
+	return fallback;
+}
+
 const DEFAULT_VIDEO_ID = "1Z0CddMzQBM";
-const DEFAULT_POSTER_IMAGE = "/uploads/hero-poster.jpg";
 const DEFAULT_MP4_VIDEO = "/uploads/hero.mp4";
 
 let homeHeroConfig = {
 	enabled: true,
-	mp4Url: DEFAULT_MP4_VIDEO as string | null,
-	embedUrl: buildYouTubeEmbedUrl(DEFAULT_VIDEO_ID),
+	mp4Url: null as string | null,
+	embedUrl: buildYouTubeEmbedUrl(DEFAULT_VIDEO_ID) as string | null,
 	brightness: "0.85",
-	posterImage: DEFAULT_POSTER_IMAGE as string | null,
+	posterImage: null as string | null,
+	startSec: null as number | null,
+	endSec: null as number | null,
 };
 
 let homepageData: any = null;
@@ -103,27 +132,43 @@ try {
 			? true
 			: Boolean(homepageData.hero_video_enabled === 1 || homepageData.hero_video_enabled === true || homepageData.hero_video_enabled === "1");
 		
-		const videoId = extractYouTubeVideoId(homepageData.hero_video_url) || DEFAULT_VIDEO_ID;
+		const rawYtUrl = homepageData.hero_video_url && String(homepageData.hero_video_url).trim();
+		const rawMp4 = homepageData.hero_video_mp4 && String(homepageData.hero_video_mp4).trim();
+
+		const videoId = extractYouTubeVideoId(rawYtUrl);
 		const startSec = homepageData.hero_video_start ? Number(homepageData.hero_video_start) : null;
 		const endSec = homepageData.hero_video_end ? Number(homepageData.hero_video_end) : null;
 		const brightness = homepageData.hero_video_brightness || "0.85";
 		
 		let posterSrc: string | null = null;
 		if (homepageData.hero_poster_image) {
-			posterSrc = typeof homepageData.hero_poster_image === "string" 
-				? homepageData.hero_poster_image 
-				: (homepageData.hero_poster_image.src || null);
+			const resolved = resolveMediaUrl(homepageData.hero_poster_image);
+			if (resolved) posterSrc = resolved;
 		}
 
-		// MP4動画（設定時またはデフォルト動画ファイルが存在する場合に優先し、ノイズゼロで0秒即時再生）
-		const mp4Src = (homepageData.hero_video_mp4 && String(homepageData.hero_video_mp4).trim()) || DEFAULT_MP4_VIDEO;
+		// 動画ソース判定：
+		// 1. MP4が明示的に設定されていればMP4を使用
+		// 2. MP4がなくYouTubeが設定されていればYouTubeを使用
+		// 3. どちらも未設定ならデフォルト動画（MP4）にフォールバック
+		let activeMp4: string | null = null;
+		let activeEmbed: string | null = null;
+
+		if (rawMp4) {
+			activeMp4 = rawMp4;
+		} else if (videoId) {
+			activeEmbed = buildYouTubeEmbedUrl(videoId, startSec, endSec);
+		} else {
+			activeMp4 = DEFAULT_MP4_VIDEO;
+		}
 
 		homeHeroConfig = {
 			enabled: isEnabled,
-			mp4Url: mp4Src || null,
-			embedUrl: buildYouTubeEmbedUrl(videoId, startSec, endSec),
+			mp4Url: activeMp4,
+			embedUrl: activeEmbed,
 			brightness: String(brightness),
-			posterImage: posterSrc || DEFAULT_POSTER_IMAGE,
+			posterImage: posterSrc || null,
+			startSec,
+			endSec,
 		};
 	}
 } catch (e) {
@@ -213,23 +258,21 @@ if (SHOW_ARTICLE_VIEWS) {
 	} catch (e) {}
 }
 
-// 記事トピック判定ヘルパー（マガジン一覧と統一）
-function determineArticleTopic(p: any): string {
+// 記事カテゴリー判定ヘルパー（マガジンの正規カテゴリー: Cars / People / ESG / Buyer's Guide）
+function determineArticleCategory(p: any): string {
 	const slug = (p.id || p.slug || "").toLowerCase();
 	const title = (p.data?.title || p.title || "").toLowerCase();
-	if (slug.includes("campaign") || slug.includes("fair") || title.includes("フェア") || title.includes("キャンペーン")) {
-		return "Campaign";
-	}
-	if (title.includes("試乗") || title.includes("インプレッション") || slug.includes("drive") || slug.includes("impression")) {
-		return "First Drive";
-	}
-	if (title.includes("体験") || title.includes("整備") || title.includes("メカニック") || title.includes("人") || title.includes("スタッフ") || title.includes("インタビュー")) {
-		return "People";
-	}
-	if (title.includes("ガイド") || title.includes("選び") || title.includes("購入") || title.includes("比較")) {
+
+	if (slug.includes("guide") || slug.includes("buyer") || title.includes("ガイド") || title.includes("選び") || title.includes("購入") || title.includes("比較")) {
 		return "Buyer's Guide";
 	}
-	return "Cars & Stories";
+	if (isESGArticle(p) || slug.includes("clean") || title.includes("美化活動") || title.includes("クリーンアップ") || title.includes("esg") || title.includes("sdgs")) {
+		return "ESG";
+	}
+	if (title.includes("体験") || title.includes("整備") || title.includes("メカニック") || title.includes("人") || title.includes("スタッフ") || title.includes("インタビュー") || title.includes("職人")) {
+		return "People";
+	}
+	return "Cars";
 }
 
 // CMS（magazineコレクション および postsコレクション）から最新記事を取得（エラー時は安全にフォールバック）
@@ -262,8 +305,7 @@ const fallbackInsights = [
 		slug: "2027_new_bmw_ix4_neue_klasse",
 		title: "【公式発表】新型BMW iX4登場。次世代EV専用『ノイエ・クラッセ』SACが切り拓く航続828kmの新時代",
 		brand: "BMW",
-		category: "BMW",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.10.28",
 		views: "1,248 views",
 		image: "/uploads/ix4/key-visual.jpg",
@@ -275,8 +317,7 @@ const fallbackInsights = [
 		slug: "2027_new_bmw_3series_neue_klasse",
 		title: "【公式発表】新型BMW 3シリーズ登場。完全電動『BMW i3』と直6搭載『M350 xDrive』が切り拓く新時代",
 		brand: "BMW",
-		category: "BMW",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.10.22",
 		views: "1,102 views",
 		image: "https://mediapool.bmwgroup.com/cache/P9/202609/P90657627/P90657627-the-new-bmw-3-series-exterior-2249px.jpg",
@@ -288,8 +329,7 @@ const fallbackInsights = [
 		slug: "202610_mini_united-japan-2026",
 		title: "「BIG LOVE」があふれた一日。みんなで彩ったMINIと、大盛況のガチャ抽選会",
 		brand: "MINI",
-		category: "MINI",
-		topic: "People",
+		category: "People",
 		date: "2026.10.15",
 		views: "986 views",
 		image: "/uploads/2026/10/DSC6593-1-scaled.jpg",
@@ -301,8 +341,7 @@ const fallbackInsights = [
 		slug: "202608_ferrari_luce",
 		title: "フェラーリ初のフル電動モデル「LUCE（ルーチェ）」日本上陸",
 		brand: "Ferrari",
-		category: "Ferrari",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.08.17",
 		views: "894 views",
 		image: "/uploads/2026/08/DSC4983-3.jpg",
@@ -314,8 +353,7 @@ const fallbackInsights = [
 		slug: "202608_bmw_kids_mechanic",
 		title: "お給料も自分で稼ぐ。小学生が体験したBMWメカニックの特別な1日",
 		brand: "BMW",
-		category: "BMW",
-		topic: "People",
+		category: "People",
 		date: "2026.08.20",
 		views: "1,420 views",
 		image: "/uploads/2026/08/DSC5134.jpg",
@@ -327,8 +365,7 @@ const fallbackInsights = [
 		slug: "20260714_mini_jcw_track_style_edition",
 		title: "【各25台限定】日本未発売仕様を纏ったエレクトリック・モンスター。「MINI JCW Track Style Edition」登場",
 		brand: "MINI",
-		category: "MINI",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.07.14",
 		views: "776 views",
 		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
@@ -340,8 +377,7 @@ const fallbackInsights = [
 		slug: "20260707_ferrari_challenge_invitation",
 		title: "跳ね馬の本能を呼び覚ます。フェラーリ・チャレンジへの招待",
 		brand: "Ferrari",
-		category: "Ferrari",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.07.07",
 		views: "652 views",
 		image: "/uploads/2026/07/DSC7756.jpg",
@@ -353,8 +389,7 @@ const fallbackInsights = [
 		slug: "202607_new_bmw_x5",
 		title: "新たなデザイン言語と5つの動力。第5世代、New BMW X5 誕生",
 		brand: "BMW",
-		category: "BMW",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.07.01",
 		views: "1,038 views",
 		image: "/uploads/2026/07/DSC6630.jpg",
@@ -366,8 +401,7 @@ const fallbackInsights = [
 		slug: "alpina-heritage-story",
 		title: "アルピナとともに歩んだ半世紀。ニコル・オートモビルズが受け継ぐクラフトマンシップの真価",
 		brand: "ALPINA",
-		category: "ALPINA",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.05.15",
 		views: "2,190 views",
 		image: "/uploads/2026/07/DSC7756.jpg",
@@ -379,8 +413,7 @@ const fallbackInsights = [
 		slug: "rolls-royce-bespoke-world",
 		title: "唯一無二を仕立てる。ロールス・ロイス・ビスポークの世界と横浜ショールームの誇り",
 		brand: "Rolls-Royce",
-		category: "Rolls-Royce",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.04.28",
 		views: "1,560 views",
 		image: "/uploads/2026/01/大田支店.jpg",
@@ -392,8 +425,7 @@ const fallbackInsights = [
 		slug: "202606_bmw_m2_cup",
 		title: "富士スピードウェイを駆ける。BMW M2 CS Racingの圧倒的ポテンシャル",
 		brand: "BMW",
-		category: "BMW",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.06.24",
 		views: "920 views",
 		image: "/uploads/2026/02/DSC3504.jpg",
@@ -405,8 +437,7 @@ const fallbackInsights = [
 		slug: "202606_rolls_royce_spectre_journey",
 		title: "静寂を走るラグジュアリー。スペクターで巡る湘南・西湘の海岸線",
 		brand: "Rolls-Royce",
-		category: "Rolls-Royce",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.06.12",
 		views: "1,140 views",
 		image: "/uploads/2026/01/大田支店.jpg",
@@ -418,8 +449,7 @@ const fallbackInsights = [
 		slug: "202605_ferrari_roma_spider",
 		title: "『ラ・ヌオーヴァ・ドルチェ・ヴィータ』。ローマ・スパイダーと過ごす心地よい週末",
 		brand: "Ferrari",
-		category: "Ferrari",
-		topic: "Cars & Stories",
+		category: "Cars",
 		date: "2026.05.30",
 		views: "870 views",
 		image: "/uploads/2026/07/DSC7756.jpg",
@@ -431,43 +461,15 @@ const fallbackInsights = [
 		slug: "202605_mini_aceman_first_drive",
 		title: "都市の冒険者へ。新型オールエレクトリック・クロスオーバー『MINI Aceman』試乗インプレッション",
 		brand: "MINI",
-		category: "MINI",
-		topic: "First Drive",
+		category: "Cars",
 		date: "2026.05.20",
 		views: "1,310 views",
 		image: "/uploads/2026/07/minijcwtrack-scaled.jpg",
 		lead: "クーパーとカントリーマンの美点を融合した新世代EV。俊敏なハンドリングと遊び心あふれる室内空間を徹底解剖。",
-		url: "/mini"
+		url: "/magazine/202605_mini_aceman_first_drive/"
 	}
 ];
 
-// アイキャッチ画像のURL解決ヘルパー（EmDash R2ストレージ key, オブジェクト, JSON文字列, 外部URLのすべてに対応）
-function resolveMediaUrl(img: unknown, fallback: string = ""): string {
-	if (!img) return fallback;
-	let target: any = img;
-	if (typeof target === "string") {
-		const trimmed = target.trim();
-		if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-			try {
-				target = JSON.parse(trimmed);
-			} catch {
-				return trimmed;
-			}
-		} else {
-			return trimmed || fallback;
-		}
-	}
-	if (typeof target === "object" && target !== null) {
-		if (typeof target.src === "string" && target.src.trim()) {
-			return target.src.trim();
-		}
-		const storageKey = target.meta?.storageKey || target.storageKey || target.id;
-		if (storageKey) {
-			return `/_emdash/api/media/file/${storageKey}`;
-		}
-	}
-	return fallback;
-}
 
 // 両コレクションを結合して正規化・フィルタリング
 const rawCmsEntries = [...cmsMagazines, ...cmsPosts];
@@ -488,6 +490,25 @@ for (const entry of validCmsEntries) {
 	if (!key || seenIds.has(key)) continue;
 	seenIds.add(key);
 	uniqueCmsArticles.push(entry);
+}
+
+// データベースから正規のブランドおよびカテゴリーを一括取得
+let brandTermsByEntry = new Map<string, any[]>();
+let categoryTermsByEntry = new Map<string, any[]>();
+try {
+	const allEntryIds = uniqueCmsArticles.map((p: any) => p.data?.id || p.id).filter(Boolean);
+	if (allEntryIds.length > 0) {
+		const [bTermsMag, cTermsMag, bTermsPosts, cTermsPosts] = await Promise.all([
+			getTermsForEntries("magazine" as any, allEntryIds, "brand").catch(() => new Map()),
+			getTermsForEntries("magazine" as any, allEntryIds, "category").catch(() => new Map()),
+			getTermsForEntries("posts" as any, allEntryIds, "brand").catch(() => new Map()),
+			getTermsForEntries("posts" as any, allEntryIds, "category").catch(() => new Map()),
+		]);
+		brandTermsByEntry = new Map([...bTermsPosts, ...bTermsMag]);
+		categoryTermsByEntry = new Map([...cTermsPosts, ...cTermsMag]);
+	}
+} catch (e) {
+	console.warn("Could not fetch taxonomy terms for home insights:", e);
 }
 
 // 本文からリード文（2〜3行の冒頭テキスト）を自動抽出するヘルパー
@@ -522,15 +543,33 @@ const formattedCmsArticles = uniqueCmsArticles.map((p: any) => {
 		? new Date(rawDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, '.')
 		: "2026.11.06";
 
+	const entryDbId = p.data?.id || p.id;
+	const assignedCategories = (categoryTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+	const assignedBrands = (brandTermsByEntry.get(entryDbId) || []).map((term: any) => term.label).filter(Boolean);
+
+	// 正規カテゴリー（Cars, People, ESG, Buyer's Guide）
+	let category = "Cars";
+	if (isESGArticle(p)) {
+		category = "ESG";
+	} else if (assignedCategories.length > 0) {
+		category = assignedCategories[0];
+	} else {
+		category = determineArticleCategory(p);
+	}
+
+	// 正規ブランド（BMW, MINI, Rolls-Royce, Ferrari, ALPINA, ALL BRANDS）
 	const t = (p.data?.title || "").toLowerCase();
 	const s = (p.id || "").toLowerCase();
 	let brand = "NICOLE";
 	if (
+		assignedBrands.includes("ALL BRANDS") || assignedBrands.length >= 3 ||
 		t.includes("下取り") || t.includes("買取") || s.includes("resale") || s.includes("trade-in") ||
 		s.includes("all-brands") || t.includes("全ブランド") ||
 		(t.includes("bmw") && (t.includes("mini") || t.includes("ferrari") || t.includes("rolls")))
 	) {
 		brand = "ALL BRANDS";
+	} else if (assignedBrands.length > 0) {
+		brand = assignedBrands[0];
 	} else if (t.includes("alpina") || s.includes("alpina")) brand = "ALPINA";
 	else if (t.includes("mini") || s.includes("mini")) brand = "MINI";
 	else if (t.includes("ferrari") || s.includes("ferrari")) brand = "Ferrari";
@@ -544,7 +583,7 @@ const formattedCmsArticles = uniqueCmsArticles.map((p: any) => {
 		viewsCount = 750 + (Math.abs(h) % 450);
 	}
 	const isCampaign = s.includes("mini-new-generation-debut-fair") || 
-		p.data?.category === "Campaign" || 
+		category === "Campaign" || 
 		(Array.isArray(p.data?.tags) && p.data.tags.includes("campaign"));
 	const articleUrl = isCampaign ? `/campaigns/${p.id}` : `/magazine/${p.id}/`;
 
@@ -553,8 +592,7 @@ const formattedCmsArticles = uniqueCmsArticles.map((p: any) => {
 		slug: p.id,
 		title: p.data?.title || "Nicole Group Insights",
 		brand: brand,
-		category: brand,
-		topic: determineArticleTopic(p),
+		category: category,
 		date: pubDate,
 		publishedTimestamp: rawDate ? new Date(rawDate).getTime() : 0,
 		viewsCount,
@@ -697,6 +735,8 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 						title="Nicole Group Official Video"
 						class="cinematic-hero__video" 
 						style={`filter: brightness(${homeHeroConfig.brightness});`}
+						data-start={homeHeroConfig.startSec || 0}
+						data-end={homeHeroConfig.endSec || 0}
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						referrerpolicy="strict-origin-when-cross-origin"
 						tabindex="-1"
@@ -711,10 +751,10 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 				<h1 class="cinematic-hero__title-group" id="hero-title-group">
 					<span class="cinematic-hero__lead" aria-label="BEYOND EXPECTATIONS">
 						<span class="hero-line hero-line--1">
-							<span class="hero-line__inner hero-shimmer-text">BEYOND</span>
+							<span class="hero-line__inner">BEYOND</span>
 						</span>
 						<span class="hero-line hero-line--2">
-							<span class="hero-line__inner hero-shimmer-text">EXPECTATIONS</span>
+							<span class="hero-line__inner">EXPECTATIONS</span>
 						</span>
 					</span>
 					<span class="cinematic-hero__sub">
@@ -774,7 +814,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 									<div class="article-item__meta">
 										<time class="meta-date">{item.date}</time>
 										<span class="meta-divider">/</span>
-										<span class="meta-topic">{item.topic}</span>
+										<span class="meta-topic">{item.category}</span>
 									</div>
 
 									<h3 class="insight-featured-card__title">{item.title}</h3>
@@ -819,7 +859,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 									<div class="article-item__meta">
 										<time class="meta-date">{item.date}</time>
 										<span class="meta-divider">/</span>
-										<span class="meta-topic">{item.topic}</span>
+										<span class="meta-topic">{item.category}</span>
 									</div>
 
 									<h3 class="insight-sub-card__title">{item.title}</h3>
@@ -1168,24 +1208,21 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		}, { root: null, rootMargin: "160px 0px 40px 0px", threshold: 0.05 });
 		brandItems.forEach(el => brandObserver.observe(el));
 
-		// 2. ヒーロータイトルのシネマティック・スクロールパララックス＆マウスティルト
+		// 2. ヒーロータイトルのスクロールパララックス（縦軸の動きのみ・中央移動や横ブレなし）
 		const heroTitleGroup = document.getElementById('hero-title-group');
 		const heroSection = document.getElementById('hero-section');
 		if (heroTitleGroup && heroSection) {
 			let ticking = false;
-			let targetTiltX = 0, targetTiltY = 0;
-			let currentTiltX = 0, currentTiltY = 0;
 
 			const updateHeroMotion = () => {
 				const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 				const heroHeight = heroSection.offsetHeight;
 				if (scrollY <= heroHeight * 1.2) {
 					const progress = Math.min(1, Math.max(0, scrollY / (heroHeight * 0.85)));
-					const translateY = scrollY * 0.38; // 滑らかなパララックス
-					const scale = 1 - progress * 0.06; // 奥へ沈み込むスケール
+					const translateY = scrollY * 0.35; // 縦軸のみのナチュラルなパララックス
 					const opacity = Math.max(0, 1 - progress * 1.35); // 緩やかなフェードアウト
 					
-					heroTitleGroup.style.transform = `translate3d(${currentTiltX.toFixed(2)}px, ${(translateY + currentTiltY).toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+					heroTitleGroup.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
 					heroTitleGroup.style.opacity = opacity.toFixed(3);
 				}
 				ticking = false;
@@ -1197,28 +1234,79 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					ticking = true;
 				}
 			}, { passive: true });
+		}
 
-			// PC限定：マウス微細パララックス（奥行き感・ティルト）
-			if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-				window.addEventListener('mousemove', (e) => {
-					const { innerWidth, innerHeight } = window;
-					const x = (e.clientX / innerWidth - 0.5) * 2;
-					const y = (e.clientY / innerHeight - 0.5) * 2;
-					targetTiltX = -x * 7;
-					targetTiltY = -y * 5;
-				}, { passive: true });
+		// 3. YouTube ヒーロー動画の完全区間ループ制御（公式IFrame API・完全無料）
+		const ytIframe = document.getElementById('hero-youtube-iframe');
+		if (ytIframe) {
+			const startSec = Number(ytIframe.getAttribute('data-start')) || 0;
+			const endSec = Number(ytIframe.getAttribute('data-end')) || 0;
 
-				const animateTilt = () => {
-					currentTiltX += (targetTiltX - currentTiltX) * 0.05;
-					currentTiltY += (targetTiltY - currentTiltY) * 0.05;
-					updateHeroMotion();
-					requestAnimationFrame(animateTilt);
+			const setupPlayer = () => {
+				let loopCheckTimer = null;
+				new window['YT'].Player('hero-youtube-iframe', {
+					events: {
+						onReady: (e) => {
+							e.target.mute();
+							if (startSec > 0) {
+								e.target.seekTo(startSec, true);
+							}
+							e.target.playVideo();
+						},
+						onStateChange: (e) => {
+							const YTState = window['YT'].PlayerState;
+							if (e.data === YTState.PLAYING) {
+								const poster = document.querySelector('.cinematic-hero__poster');
+								if (poster) {
+									poster.style.transition = 'opacity 0.6s ease';
+									poster.style.opacity = '0';
+									setTimeout(() => { poster.style.display = 'none'; }, 600);
+								}
+								if (endSec > startSec) {
+									if (loopCheckTimer) clearInterval(loopCheckTimer);
+									loopCheckTimer = setInterval(() => {
+										try {
+											if (e.target && typeof e.target.getCurrentTime === 'function') {
+												const curr = e.target.getCurrentTime();
+												if (curr >= endSec) {
+													e.target.seekTo(startSec, true);
+												}
+											}
+										} catch (err) {
+											if (loopCheckTimer) clearInterval(loopCheckTimer);
+										}
+									}, 200);
+								}
+							} else if (e.data === YTState.ENDED) {
+								e.target.seekTo(startSec > 0 ? startSec : 0, true);
+								e.target.playVideo();
+							}
+						}
+					}
+				});
+			};
+
+			if (window['YT'] && window['YT'].Player) {
+				setupPlayer();
+			} else {
+				const tag = document.createElement('script');
+				tag.src = 'https://www.youtube.com/iframe_api';
+				const firstScriptTag = document.getElementsByTagName('script')[0];
+				if (firstScriptTag && firstScriptTag.parentNode) {
+					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+				} else {
+					document.head.appendChild(tag);
+				}
+
+				const prevCallback = window['onYouTubeIframeAPIReady'];
+				window['onYouTubeIframeAPIReady'] = () => {
+					if (typeof prevCallback === 'function') prevCallback();
+					setupPlayer();
 				};
-				requestAnimationFrame(animateTilt);
 			}
 		}
 
-		// 3. The latest Nicole Group Insights スライダー（ボタンなし・スムーズスクロール）
+		// 4. The latest Nicole Group Insights スライダー（ボタンなし・スムーズスクロール）
 		const slider = document.getElementById('insights-slider');
 		if (slider) {
 			// マウスホイールやタッチによる快適なネイティブスワイプスクロール
@@ -1290,6 +1378,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		width: 100%;
 		max-width: 100%;
 		height: 100%;
+		background-color: #000000;
 		overflow: hidden !important;
 		pointer-events: none;
 		z-index: 1;
@@ -1472,36 +1561,6 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		}
 	}
 
-	/* 光彩シマーアニメーション（車体に反射する光のようなシルバー・スウィープ） */
-	.hero-shimmer-text {
-		position: relative;
-		display: inline-block;
-		background: linear-gradient(
-			115deg,
-			#ffffff 0%,
-			#ffffff 36%,
-			#e4edfc 44%,
-			#ffffff 50%,
-			#dbeafe 56%,
-			#ffffff 64%,
-			#ffffff 100%
-		);
-		background-size: 260% 100%;
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		animation: heroSlideUp 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-		           heroShimmerSweep 3.6s cubic-bezier(0.4, 0, 0.2, 1) 1.4s infinite;
-	}
-
-	@keyframes heroShimmerSweep {
-		0% {
-			background-position: 100% 0%;
-		}
-		45%, 100% {
-			background-position: -120% 0%;
-		}
-	}
 
 	.hero-scroll-indicator {
 		position: absolute;

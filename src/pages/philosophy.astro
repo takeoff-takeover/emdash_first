@@ -1,177 +1,630 @@
 ---
 // src/pages/philosophy.astro
-// ニコル・グループ 公式固定ページ（WordPress/Elementor デザインレイアウト完全継承）
+// ニコル・グループ 企業理念（公式本番完全準拠・文字被り完全解消・公式アセット）
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
-const pageTitle = "企業理念 | Nicole Group 公式";
-const pageDescription = "ニコル・グループの理念、ミッション、ビジョン、バリューをご紹介します。";
+const pageTitle = "企業理念 - ニコル・グループ";
+const pageDescription = "ニコル・グループを形作っているもの。それは、単なる事業の集合体ではなく、共通の意志です。私たちが社会に対して約束する、3つの核心についてご説明します。";
 
-// Elementor 完全継承HTMLコンテンツ
-const elementorHtml = "<div data-elementor-type=\"wp-page\" data-elementor-id=\"433\" class=\"elementor elementor-433\" data-elementor-post-type=\"page\">\n\t\t\t\t<div class=\"elementor-element elementor-element-8e9842a e-flex e-con-boxed e-con e-parent\" data-id=\"8e9842a\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;background_background&quot;:&quot;classic&quot;}\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-65dd69e elementor-widget elementor-widget-heading\" data-id=\"65dd69e\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h1 class=\"elementor-heading-title elementor-size-default\">企業理念</h1>\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-50780bf e-flex e-con-boxed e-con e-parent\" data-id=\"50780bf\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-59e02ee elementor-widget elementor-widget-heading\" data-id=\"59e02ee\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h2 class=\"elementor-heading-title elementor-size-default\">ニコル・グループを形作っているもの。それは、単なる事業の集合体ではなく、共通の意志です。私たちが社会に対して約束する、3つの核心についてご説明します。</h2>\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-3b1fe38 e-flex e-con-boxed e-con e-parent\" data-id=\"3b1fe38\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t<div class=\"elementor-element elementor-element-2ed9811 e-con-full e-flex elementor-invisible e-con e-child\" data-id=\"2ed9811\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;motion_fx_motion_fx_scrolling&quot;:&quot;yes&quot;,&quot;animation&quot;:&quot;fadeIn&quot;,&quot;motion_fx_devices&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;]}\">\n\t\t\t\t<div class=\"elementor-element elementor-element-8c1ac04 elementor-widget elementor-widget-heading\" data-id=\"8c1ac04\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h2 class=\"elementor-heading-title elementor-size-default\">MISSION</h2>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-81f5a2d elementor-widget elementor-widget-text-editor\" data-id=\"81f5a2d\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-8c68192 e-con-full e-flex elementor-invisible e-con e-child\" data-id=\"8c68192\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;motion_fx_motion_fx_scrolling&quot;:&quot;yes&quot;,&quot;animation&quot;:&quot;fadeIn&quot;,&quot;animation_delay&quot;:100,&quot;motion_fx_devices&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;]}\">\n\t\t\t\t<div class=\"elementor-element elementor-element-fa1312b elementor-widget elementor-widget-heading\" data-id=\"fa1312b\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h2 class=\"elementor-heading-title elementor-size-default\">VISION</h2>\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-62f926c elementor-widget elementor-widget-text-editor\" data-id=\"62f926c\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>私達はエクセレンスの追求に情熱を持ち、最も信頼される高級自動車グループを目指します。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-dfad844 e-con-full e-flex elementor-invisible e-con e-child\" data-id=\"dfad844\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;background_background&quot;:&quot;classic&quot;,&quot;animation&quot;:&quot;fadeInUp&quot;,&quot;animation_delay&quot;:200}\">\n\t\t\t\t<div class=\"elementor-element elementor-element-798fec6 elementor-widget elementor-widget-heading\" data-id=\"798fec6\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h2 class=\"elementor-heading-title elementor-size-default\">VALUES</h2>\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-33ef6ff e-con-full e-flex e-con e-parent\" data-id=\"33ef6ff\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;background_background&quot;:&quot;classic&quot;,&quot;motion_fx_motion_fx_scrolling&quot;:&quot;yes&quot;,&quot;motion_fx_devices&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;]}\">\n\t\t<div class=\"elementor-element elementor-element-e087a61 e-grid e-con-boxed e-con e-child\" data-id=\"e087a61\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-d57e753 elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"d57e753\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInLeft&quot;,&quot;_animation_delay&quot;:100}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\t責任\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達は最後まで仕事をやり遂げます。何事にも当事者意識を持ち、最大限の能力を発揮します。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-f02c532 elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"f02c532\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInRight&quot;,&quot;_animation_delay&quot;:100}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\t正しさ\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達は「正しい」ことを行います。常に正直であり続け、高い企業倫理とプロフェッショナリズムを実践します。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-e16454f elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"e16454f\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInLeft&quot;,&quot;_animation_delay&quot;:200}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\t変革\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達は変化を恐れません。新しいアイデアを追求し、社員やお客様により高い価値を提供します。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-5e9c2d8 elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"5e9c2d8\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInRight&quot;,&quot;_animation_delay&quot;:200}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\t尊重\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達はお互いの個性と意見を受け入れます。感謝と謙虚さを胸に、私達を取り巻く環境に思いやりを持って接します。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-03d31ca elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"03d31ca\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInLeft&quot;,&quot;_animation_delay&quot;:300}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\tコミュニケーション\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達は結束します。透明性の高い効果的な双方向コミュニケーションを通じ、ワンチームとして取り組みます。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-ec882a5 elementor-invisible elementor-widget elementor-widget-icon-box\" data-id=\"ec882a5\" data-element_type=\"widget\" data-e-type=\"widget\" data-settings=\"{&quot;_animation&quot;:&quot;fadeInRight&quot;,&quot;_animation_delay&quot;:300}\" data-widget_type=\"icon-box.default\">\n\t\t\t\t\t\t\t<div class=\"elementor-icon-box-wrapper\">\n\n\t\t\t\n\t\t\t\t\t\t<div class=\"elementor-icon-box-content\">\n\n\t\t\t\t\t\t\t\t\t<h3 class=\"elementor-icon-box-title\">\n\t\t\t\t\t\t<span  >\n\t\t\t\t\t\t\t成長\t\t\t\t\t\t</span>\n\t\t\t\t\t</h3>\n\t\t\t\t\n\t\t\t\t\t\t\t\t\t<p class=\"elementor-icon-box-description\">\n\t\t\t\t\t\t私達は目標を達成します。過去の成功にとらわれず、新しい機会に投資し続け、社員と事業を更なる高みへ導きます。\t\t\t\t\t</p>\n\t\t\t\t\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-3b4a995 e-flex e-con-boxed e-con e-parent\" data-id=\"3b4a995\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-a2206bd elementor-widget elementor-widget-text-editor\" data-id=\"a2206bd\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p class=\"fs-6 pt-2 text-black text-start text-md-start\" style=\"margin-bottom: 1rem; font-size: 16px; --bs-text-opacity: 1; font-family: 'Helvetica Neue', Helvetica, Arial, 'Noto Sans JP', 'SF Pro JP', 'SF Pro Display', 'SF Pro Icons', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', メイリオ, Meiryo, 'ＭＳ Ｐゴシック', 'sans-serif'; font-style: normal; font-weight: 400; padding-top: 0.5rem !important;\">ここに掲げた核心は、決して私たちだけの理想ではありません。お客様一人ひとりの期待に応え、社会に貢献し続けるための、真摯な約束です。この共通の意志が、皆様との対話を通じてより強固なものとなり、豊かで鮮やかな未来を形作っていく。私たちはそう信じています。ニコル・グループは、これからも皆様と共に、価値ある時間と感動を分かち合える存在であり続けます。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\n\t\n\t\n</div><!-- .entry-content .clear -->";
+const valuesList = [
+	{
+		title: "責任",
+		desc: "私達は最後まで仕事をやり遂げます。何事にも当事者意識を持ち、最大限の能力を発揮します。"
+	},
+	{
+		title: "正しさ",
+		desc: "私達は「正しい」ことを行います。常に正直であり続け、高い企業倫理とプロフェッショナリズムを実践します。"
+	},
+	{
+		title: "変革",
+		desc: "私達は変化を恐れません。新しいアイデアを追求し、社員やお客様により高い価値を提供します。"
+	},
+	{
+		title: "尊重",
+		desc: "私達はお互いの個性と意見を受け入れます。感謝と謙虚さを胸に、私達を取り巻く環境に思いやりを持って接します。"
+	},
+	{
+		title: "コミュニケーション",
+		desc: "私達は結束します。透明性の高い効果的な双方向コミュニケーションを通じ、ワンチームとして取り組みます。"
+	},
+	{
+		title: "成長",
+		desc: "私達は目標を達成します。過去の成功にとらわれず、新しい機会に投資し続け、社員と事業を更なる高みへ導きます。"
+	}
+];
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-  <slot name="head" slot="head">
-	<link rel="stylesheet" href="/wp-content/themes/astra/assets/css/minified/main.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/reviews-feed/vendor/smashballoon/framework/Packages/Blocks/css/sb-elementor.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/astra-addon/astra-addon-6ad82db3390588-53003025.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/frontend.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-image.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-spacer.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeIn.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-grow.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-mega-menu.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-pop.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInRight.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-breadcrumbs.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-divider.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-8.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-heading.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/modules/motion-fx.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInUp.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInLeft.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-box.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-433.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-6801.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-12887.css" />
-    <style is:global>
-      /* Elementor 余白・レイアウト完全適合スタイル */
-      .elementor {
-        box-sizing: border-box;
-      }
-      .entry-content {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      .elementor img {
-        height: auto;
-        max-width: 100%;
-      }
-      /* コンテナ幅・表示崩れ防止 */
-      .elementor-element {
-        --flex-direction: initial;
-        --flex-wrap: initial;
-        --justify-content: initial;
-        --align-items: initial;
-      }
+	<main class="philosophy-page">
+		<!-- 1. ヒーローセクション（公式背景写真：AdobeStock_838697355 ＋ パララックス） -->
+		<header class="ph-hero">
+			<div class="ph-hero__media" aria-hidden="true">
+				<img 
+					src="/uploads/2026/02/AdobeStock_838697355-scaled.jpeg" 
+					alt="" 
+					class="ph-hero__img" 
+					loading="eager" 
+					decoding="async" 
+				/>
+				<div class="ph-hero__overlay"></div>
+			</div>
 
-      /* ============================================================== */
-      /* グローバルヘッダーの左右端（max-width: 1440px / padding: 0 40px）に揃えるスタイル */
-      /* ============================================================== */
+			<div class="ph-container-max ph-hero__inner">
+				<nav class="ph-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="ph-breadcrumbs__list">
+						<li class="ph-breadcrumbs__item"><a href="/" class="ph-breadcrumbs__link">ホーム</a></li>
+						<li class="ph-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="ph-breadcrumbs__item"><a href="/corporate" class="ph-breadcrumbs__link">会社概要</a></li>
+						<li class="ph-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="ph-breadcrumbs__item" aria-current="page">企業理念</li>
+					</ol>
+				</nav>
 
-      /* ① 企業理念 ヒーローバナー */
-      .elementor-433 .elementor-element.elementor-element-8e9842a {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner {
-        max-width: 1440px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
+				<h1 class="ph-hero__title js-reveal">企業理念</h1>
+			</div>
+		</header>
 
-      /* ② リード文コンテナ (中央配置・テキスト完全センタリング) */
-      .elementor-433 .elementor-element.elementor-element-50780bf {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-        text-align: center !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-50780bf > .e-con-inner {
-        max-width: 820px !important;
-        margin: 0 auto !important;
-        padding-left: 24px !important;
-        padding-right: 24px !important;
-        box-sizing: border-box !important;
-        text-align: center !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-59e02ee,
-      .elementor-433 .elementor-element.elementor-element-59e02ee .elementor-heading-title {
-        text-align: center !important;
-      }
+		<!-- 2. リード文セクション（センター配置・幅狭め 820px） -->
+		<section class="ph-lead-section js-reveal">
+			<div class="ph-container-narrow">
+				<h2 class="ph-lead__text">
+					ニコル・グループを形作っているもの。<br class="pc-only" />
+					それは、単なる事業の集合体ではなく、共通の意志です。<br class="pc-only" />
+					私たちが社会に対して約束する、3つの核心についてご説明します。
+				</h2>
+			</div>
+		</section>
 
-      /* ③ 3つの核心（MISSION / VISION / VALUES図）コンテナ */
-      .elementor-433 .elementor-element.elementor-element-3b1fe38 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner {
-        max-width: 1440px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
+		<!-- 3. 3つの核心（MISSION / VISION / VALUES 図：完全独立レイアウト・文字被り完全排除） -->
+		<section class="ph-mvv-section js-reveal">
+			<div class="ph-container-max">
+				<!-- 上段：MISSION & VISION（2列均等配置） -->
+				<div class="ph-mv-row">
+					<div class="ph-mv-col js-reveal" style="--reveal-delay: 100ms;">
+						<h2 class="ph-mv-title">MISSION</h2>
+						<p class="ph-mv-text">
+							私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。
+						</p>
+					</div>
 
-      /* ④ VALUES 6大項目グリッドセクション (各項目が間延びせず引き締まるよう1040px幅に調整) */
-      .elementor-433 .elementor-element.elementor-element-33ef6ff {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-e087a61 {
-        width: 100% !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
-        max-width: 1040px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
+					<div class="ph-mv-col js-reveal" style="--reveal-delay: 200ms;">
+						<h2 class="ph-mv-title">VISION</h2>
+						<p class="ph-mv-text">
+							私達はエクセレンスの追求に情熱を持ち、最も信頼される高級自動車グループを目指します。
+						</p>
+					</div>
+				</div>
 
-      /* 見出しの改行最適化（単語分断・孤立文字防止） */
-      .elementor-433 .elementor-heading-title,
-      .elementor-433 h1, .elementor-433 h2, .elementor-433 h3, .elementor-433 h4 {
-        text-wrap: balance !important;
-        word-break: auto-phrase !important;
-        overflow-wrap: break-word !important;
-      }
+				<!-- 中段：VALUES ダイアグラム（円の切れ目にVALUESが収まる構造） -->
+				<div class="ph-diagram-container js-reveal" style="--reveal-delay: 300ms;">
+					<div class="ph-diagram-stage">
+						<img 
+							src="/uploads/2026/01/MVV-dark.svg?v=20261121b" 
+							alt="NICOLE GROUP VALUES 円弧ダイアグラム" 
+							class="ph-diagram-img" 
+							loading="lazy" 
+							decoding="async" 
+						/>
+						<h2 class="ph-diagram-title">VALUES</h2>
+					</div>
+				</div>
+			</div>
+		</section>
 
-      /* ⑤ 結びのメッセージ文コンテナ (読みやすい800px幅で中央配置) */
-      .elementor-433 .elementor-element.elementor-element-3b4a995 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-      }
-      .elementor-433 .elementor-element.elementor-element-3b4a995 > .e-con-inner {
-        max-width: 800px !important;
-        margin: 0 auto !important;
-        padding-left: 24px !important;
-        padding-right: 24px !important;
-        box-sizing: border-box !important;
-      }
+		<!-- 4. VALUES 6大項目セクション（公式背景画像：7color_bg-1.webp 固定パララックス・脱カード化） -->
+		<section class="ph-values-section js-reveal">
+			<div class="ph-values-bg" aria-hidden="true">
+				<img 
+					src="/uploads/2026/01/7color_bg-1.webp" 
+					alt="" 
+					class="ph-values-bg__img" 
+					loading="lazy" 
+					decoding="async" 
+				/>
+				<div class="ph-values-bg__overlay"></div>
+			</div>
 
-      /* レスポンシブ対応 (グローバルヘッダーと同一のパディング推移) */
-      @media (max-width: 1024px) {
-        .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner,
-        .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner,
-        .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-      }
+			<div class="ph-container-max ph-values-inner">
+				<div class="ph-values-grid">
+					{valuesList.map((val, idx) => (
+						<article class="ph-value-item js-reveal" style={`--reveal-delay: ${idx * 60}ms;`}>
+							<h3 class="ph-value-item__title">{val.title}</h3>
+							<p class="ph-value-item__desc">{val.desc}</p>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
 
-      @media (max-width: 480px) {
-        .elementor-433 .elementor-element.elementor-element-8e9842a > .e-con-inner,
-        .elementor-433 .elementor-element.elementor-element-3b1fe38 > .e-con-inner,
-        .elementor-433 .elementor-element.elementor-element-e087a61 > .e-con-inner {
-          padding-left: 16px !important;
-          padding-right: 16px !important;
-        }
-      }
-    </style>
-  </slot>
-
-  <div class="elementor-page-wrapper">
-    <div class="entry-content" set:html={elementorHtml} />
-  </div>
+		<!-- 5. 結びのメッセージセクション（センター配置・幅狭め 800px） -->
+		<section class="ph-closing-section js-reveal">
+			<div class="ph-container-narrow">
+				<p class="ph-closing__text">
+					ここに掲げた核心は、決して私たちだけの理想ではありません。お客様一人ひとりの期待に応え、社会に貢献し続けるための、真摯な約束です。この共通の意志が、皆様との対話を通じてより強固なものとなり、豊かで鮮やかな未来を形作っていく。私たちはそう信じています。ニコル・グループは、これからも皆様と共に、価値ある時間と感動を分かち合える存在であり続けます。
+				</p>
+			</div>
+		</section>
+	</main>
 </NicoleLayout>
+
+<script is:inline>
+	// スクロール連動リビール ＆ ヒーロー/背景パララックス
+	document.addEventListener('DOMContentLoaded', () => {
+		// 1. Intersection Observer for Reveal
+		const revealElements = document.querySelectorAll('.js-reveal');
+		if ('IntersectionObserver' in window) {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-visible');
+						observer.unobserve(entry.target);
+					}
+				});
+			}, {
+				rootMargin: '0px 0px -6% 0px',
+				threshold: 0.1
+			});
+			revealElements.forEach((el) => observer.observe(el));
+		} else {
+			revealElements.forEach((el) => el.classList.add('is-visible'));
+		}
+
+		// 2. Parallax (Reduced Motion Respect)
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (!prefersReducedMotion && window.innerWidth > 768) {
+			const heroImg = document.querySelector('.ph-hero__img');
+			const valuesImg = document.querySelector('.ph-values-bg__img');
+
+			let ticking = false;
+			window.addEventListener('scroll', () => {
+				if (!ticking) {
+					window.requestAnimationFrame(() => {
+						const scrollY = window.pageYOffset;
+						if (heroImg && scrollY < 900) {
+							heroImg.style.transform = `scale(1.05) translateY(${scrollY * 0.2}px)`;
+						}
+						if (valuesImg) {
+							const rect = valuesImg.parentElement.getBoundingClientRect();
+							if (rect.top < window.innerHeight && rect.bottom > 0) {
+								const offset = (window.innerHeight - rect.top) * 0.08;
+								valuesImg.style.transform = `scale(1.06) translateY(${offset - 25}px)`;
+							}
+						}
+						ticking = false;
+					});
+					ticking = true;
+				}
+			}, { passive: true });
+		}
+	});
+</script>
+
+<style>
+	/* ============================================================== */
+	/* 0. 基本変数・レイアウト共通設計（左右最大幅 1440px / センター幅狭め） */
+	/* ============================================================== */
+	.philosophy-page {
+		background-color: #040507;
+		color: #ffffff;
+		overflow-x: clip;
+		position: relative;
+	}
+
+	.ph-container-max {
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 40px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.ph-container-narrow {
+		max-width: 820px;
+		margin: 0 auto;
+		padding: 0 24px;
+		width: 100%;
+		box-sizing: border-box;
+		text-align: center;
+	}
+
+	.pc-only {
+		display: block;
+	}
+
+	/* ============================================================== */
+	/* 1. HERO（公式背景写真 ＋ パララックス ＋ 左右最大幅揃え） */
+	/* ============================================================== */
+	.ph-hero {
+		position: relative;
+		min-height: clamp(380px, 48vh, 520px);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding-bottom: clamp(48px, 6vw, 72px);
+		overflow: hidden;
+		background-color: #000000;
+	}
+
+	.ph-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.ph-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 40%;
+		transform: scale(1.05);
+		transition: transform 0.1s linear;
+		will-change: transform;
+	}
+
+	.ph-hero__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(4, 5, 7, 0.4) 0%,
+			rgba(4, 5, 7, 0.25) 50%,
+			rgba(4, 5, 7, 0.85) 85%,
+			#040507 100%
+		);
+		z-index: 2;
+	}
+
+	.ph-hero__inner {
+		position: relative;
+		z-index: 3;
+	}
+
+	/* パンくずリスト */
+	.ph-breadcrumbs {
+		margin-bottom: 20px;
+	}
+
+	.ph-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.ph-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.75);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.ph-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.ph-breadcrumbs__separator {
+		opacity: 0.4;
+	}
+
+	.ph-hero__title {
+		font-size: clamp(32px, 4.2vw, 54px);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin: 0;
+		color: #ffffff;
+		line-height: 1.25;
+		text-wrap: balance !important;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* ============================================================== */
+	/* 2. リード文セクション（センター幅狭め・品格ある語りかけ） */
+	/* ============================================================== */
+	.ph-lead-section {
+		padding: clamp(72px, 8.5vw, 120px) 0 clamp(60px, 7vw, 100px);
+	}
+
+	.ph-lead__text {
+		font-size: clamp(16px, 1.8vw, 20px);
+		font-weight: 500;
+		line-height: 1.95;
+		letter-spacing: 0.02em;
+		color: #ffffff;
+		margin: 0;
+		text-wrap: balance !important;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* ============================================================== */
+	/* 3. 3つの核心（MISSION / VISION / VALUES：ひとかたまりとして上部から離し、センター揃え・大きな文字） */
+	/* ============================================================== */
+	.ph-mvv-section {
+		/* 上部リード文からしっかり離して「ひとつの塊」として配置 */
+		padding: clamp(90px, 11vw, 160px) 0 clamp(90px, 10vw, 150px);
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	/* 上段：MISSION & VISION 2カラム（配置は今のまま、センター揃え） */
+	.ph-mv-row {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: clamp(48px, 6vw, 100px);
+		max-width: 1140px;
+		margin: 0 auto clamp(72px, 9vw, 120px);
+		text-align: center;
+	}
+
+	.ph-mv-col {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	/* MISSION & VISION：大きな文字（VALUESと同一スケール） */
+	.ph-mv-title {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: clamp(38px, 4.8vw, 56px);
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		color: #ffffff;
+		margin: 0 0 clamp(16px, 2vw, 24px);
+		line-height: 1.1;
+		text-align: center;
+	}
+
+	.ph-mv-text {
+		font-size: clamp(15.5px, 1.25vw, 18px);
+		line-height: 1.95;
+		color: rgba(255, 255, 255, 0.88);
+		margin: 0 auto;
+		max-width: 480px;
+		text-align: center;
+		text-wrap: balance !important;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* 中段：VALUES 円弧ダイアグラム（円の切れている箇所にVALUESが収まる絶対配置） */
+	.ph-diagram-container {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.ph-diagram-stage {
+		position: relative;
+		width: 100%;
+		max-width: 720px;
+		margin: 0 auto;
+	}
+
+	.ph-diagram-img {
+		width: 100%;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+		/* わずかなドロップシャドウで奥行きを演出 */
+		filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.5));
+	}
+
+	/* VALUES：オプティカル（視覚的重心）を意識し、円弧の開口部の真ん中に完璧に落ち着かせる */
+	.ph-diagram-title {
+		position: absolute;
+		bottom: 2%;
+		left: 50%;
+		transform: translateX(-50%);
+		margin: 0;
+		width: auto;
+		white-space: nowrap;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: clamp(38px, 4.8vw, 56px);
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		color: #ffffff;
+		line-height: 1;
+		text-align: center;
+		pointer-events: none;
+	}
+
+	/* ============================================================== */
+	/* 4. VALUES 6大項目セクション（7color_bg-1.webp 背景固定パララックス・脱カード化） */
+	/* ============================================================== */
+	.ph-values-section {
+		position: relative;
+		padding: clamp(80px, 10vw, 140px) 0;
+		overflow: hidden;
+		background-color: #0b0d14;
+	}
+
+	.ph-values-bg {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.ph-values-bg__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		transform: scale(1.06);
+		transition: transform 0.1s linear;
+		will-change: transform;
+	}
+
+	.ph-values-bg__overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(4, 5, 7, 0.72);
+		backdrop-filter: blur(2px);
+		z-index: 2;
+	}
+
+	.ph-values-inner {
+		position: relative;
+		z-index: 3;
+	}
+
+	/* 配置は今の2カラムのまま維持 */
+	.ph-values-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: clamp(40px, 5vw, 68px) clamp(44px, 5.5vw, 84px);
+		max-width: 1060px;
+		margin: 0 auto;
+	}
+
+	/* 文字はすべて中央揃え（配置は2カラムのまま） */
+	.ph-value-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		background: transparent;
+		border: none;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	.ph-value-item__title {
+		font-size: clamp(20px, 2.2vw, 24px);
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 14px;
+		letter-spacing: 0.06em;
+		line-height: 1.35;
+		text-align: center;
+	}
+
+	.ph-value-item__desc {
+		font-size: clamp(14.5px, 1.1vw, 16px);
+		line-height: 1.95;
+		color: rgba(255, 255, 255, 0.88);
+		margin: 0 auto;
+		max-width: 440px;
+		text-align: center;
+		text-wrap: balance !important;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* ============================================================== */
+	/* 5. 結びのメッセージセクション（センター配置・幅狭め 800px） */
+	/* ============================================================== */
+	.ph-closing-section {
+		padding: clamp(80px, 10vw, 130px) 0 clamp(90px, 11vw, 150px);
+	}
+
+	.ph-closing__text {
+		font-size: clamp(14.5px, 1.1vw, 16px);
+		line-height: 2.1;
+		color: rgba(255, 255, 255, 0.88);
+		margin: 0;
+		text-align: justify;
+		text-justify: inter-ideograph;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* ============================================================== */
+	/* 6. スクロールリビールアニメーション */
+	/* ============================================================== */
+	.js-reveal {
+		opacity: 0;
+		transform: translateY(24px);
+		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+		transition-delay: var(--reveal-delay, 0ms);
+		will-change: opacity, transform;
+	}
+
+	.js-reveal.is-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* ============================================================== */
+	/* 7. レスポンシブ設計（タブレット・モバイル最適化） */
+	/* ============================================================== */
+	@media (max-width: 1024px) {
+		.ph-container-max {
+			padding: 0 24px;
+		}
+
+		.ph-mv-row {
+			gap: 36px;
+			margin-bottom: 48px;
+		}
+
+		.ph-values-grid {
+			gap: 24px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.pc-only {
+			display: none;
+		}
+
+		.ph-container-max {
+			padding: 0 20px;
+		}
+
+		.ph-hero {
+			min-height: 320px;
+			padding-bottom: 36px;
+		}
+
+		.ph-lead-section {
+			padding: 48px 0 40px;
+		}
+
+		.ph-mvv-section {
+			padding: 20px 0 60px;
+		}
+
+		.ph-mv-row {
+			grid-template-columns: 1fr;
+			gap: 36px;
+			margin-bottom: 40px;
+		}
+
+		.ph-mv-title {
+			margin-bottom: 12px;
+		}
+
+		.ph-diagram-stage {
+			max-width: 100%;
+		}
+
+		.ph-values-section {
+			padding: 60px 0;
+		}
+
+		.ph-values-grid {
+			grid-template-columns: 1fr;
+			gap: 36px;
+		}
+
+		.ph-value-item {
+			padding: 0;
+		}
+
+		.ph-closing-section {
+			padding: 60px 0 80px;
+		}
+
+		.ph-closing__text {
+			text-align: left;
+		}
+	}
+</style>

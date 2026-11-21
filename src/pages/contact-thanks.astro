@@ -1,63 +1,213 @@
 ---
 // src/pages/contact-thanks.astro
-// ニコル・グループ 公式固定ページ（WordPress/Elementor デザインレイアウト完全継承）
+// ニコル・グループ お問い合わせ完了（完全モダン・脱Elementor）
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お問い合わせ完了 | Nicole Group 公式";
 const pageDescription = "お問い合わせを受け付けいたしました。担当者より順次ご連絡差し上げます。";
-
-// Elementor 完全継承HTMLコンテンツ
-const elementorHtml = "<div data-elementor-type=\"wp-page\" data-elementor-id=\"9558\" class=\"elementor elementor-9558\" data-elementor-post-type=\"page\">\n\t\t\t\t<div class=\"elementor-element elementor-element-7bbf745 e-flex e-con-boxed e-con e-parent\" data-id=\"7bbf745\" data-element_type=\"container\" data-e-type=\"container\" data-settings=\"{&quot;background_background&quot;:&quot;classic&quot;}\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-da3615b elementor-widget elementor-widget-heading\" data-id=\"da3615b\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"heading.default\">\n\t\t\t\t\t<h2 class=\"elementor-heading-title elementor-size-default\">お問い合わせ</h2>\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-cb5b594 e-flex e-con-boxed e-con e-parent\" data-id=\"cb5b594\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t<div class=\"elementor-element elementor-element-a82bba9 elementor-widget elementor-widget-text-editor\" data-id=\"a82bba9\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>送信が完了しました</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-2955d7e elementor-widget__width-inherit elementor-widget elementor-widget-text-editor\" data-id=\"2955d7e\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>内容を確認のうえ、担当よりご連絡いたします。</p><p>通常1〜3営業日以内にご返信いたします。<br data-start=\"1076\" data-end=\"1079\" />確認メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t<div class=\"elementor-element elementor-element-1e723b7 elementor-widget elementor-widget-text-editor\" data-id=\"1e723b7\" data-element_type=\"widget\" data-e-type=\"widget\" data-widget_type=\"text-editor.default\">\n\t\t\t\t\t\t\t\t\t<p>※お問い合わせ内容によっては、ご回答までにお時間をいただく場合がございます。あらかじめご了承ください。また内容により、担当者よりお電話でご連絡させていただく場合がございます。</p><p>※お車の不調・故障・修理など、サービス・メンテナンスに関するご相談は、お近くのNicole Groupの各ショールームまたはサービス拠点へ直接ご連絡いただきますようお願いいたします。インターネットからのお問い合わせでは対応できない場合がございます。</p><p>※営業・ご提案などの内容につきましては、返信を差し控えさせていただく場合がございます。</p>\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t<div class=\"elementor-element elementor-element-9518fb9 e-flex e-con-boxed e-con e-parent\" data-id=\"9518fb9\" data-element_type=\"container\" data-e-type=\"container\">\n\t\t\t\t\t<div class=\"e-con-inner\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>";
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-  <slot name="head" slot="head">
-	<link rel="stylesheet" href="/wp-content/themes/astra/assets/css/minified/main.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/reviews-feed/vendor/smashballoon/framework/Packages/Blocks/css/sb-elementor.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/astra-addon/astra-addon-6ad82db3390588-53003025.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/frontend.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-image.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-spacer.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/fadeIn.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-grow.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-mega-menu.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-breadcrumbs.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-divider.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-shrink.min.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-box.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-8.css" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-heading.min.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-9558.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-6801.css" />
-	<link rel="stylesheet" href="/wp-content/uploads/elementor/css/post-4102.css" />
-    <style is:global>
-      /* Elementor 余白・レイアウト完全適合スタイル */
-      .elementor {
-        box-sizing: border-box;
-      }
-      .entry-content {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      .elementor img {
-        height: auto;
-        max-width: 100%;
-      }
-      /* コンテナ幅・表示崩れ防止 */
-      .elementor-element {
-        --flex-direction: initial;
-        --flex-wrap: initial;
-        --justify-content: initial;
-        --align-items: initial;
-      }
-    </style>
-  </slot>
+	<main class="thanks-page">
+		<!-- ヒーローヘッダー -->
+		<header class="thanks-hero">
+			<div class="thanks-hero__inner">
+				<p class="thanks-hero__sub">THANK YOU</p>
+				<h1 class="thanks-hero__title">お問い合わせ完了</h1>
+			</div>
+		</header>
 
-  <div class="elementor-page-wrapper">
-    <div class="entry-content" set:html={elementorHtml} />
-  </div>
+		<div class="thanks-container">
+			<div class="thanks-card">
+				<div class="thanks-icon-wrap">
+					<svg class="thanks-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+				</div>
+
+				<h2 class="thanks-heading">送信が完了いたしました</h2>
+				<p class="thanks-lead">
+					この度はお問い合わせいただき、誠にありがとうございます。<br />
+					内容を確認の上、担当者より順次ご連絡を差し上げます。
+				</p>
+
+				<div class="thanks-info-box">
+					<p>通常1〜3営業日以内にご返信いたします。</p>
+					<p class="thanks-note">
+						※確認メールが届かない場合は、迷惑メールフォルダ等もあわせてご確認ください。<br />
+						※お問い合わせ内容によっては、お電話にてご連絡させていただく場合がございます。
+					</p>
+				</div>
+
+				<div class="thanks-action">
+					<a href="/" class="thanks-btn">トップページへ戻る</a>
+				</div>
+			</div>
+		</div>
+	</main>
 </NicoleLayout>
+
+<style>
+/* ============================================================== */
+/* お問い合わせ完了ページ：完全モダン＆セマンティックデザイン */
+/* ============================================================== */
+.thanks-page {
+	width: 100%;
+	background-color: #fcfcfc;
+	color: #111111;
+	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+	line-height: 1.8;
+	padding-bottom: 96px;
+}
+
+.thanks-container {
+	width: 100%;
+	max-width: 760px;
+	margin: 0 auto;
+	padding: 64px 40px 0;
+	box-sizing: border-box;
+}
+
+/* --- ヒーローヘッダー --- */
+.thanks-hero {
+	width: 100%;
+	background-color: #000000;
+	color: #ffffff;
+	padding: 88px 0 72px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	text-align: center;
+}
+
+.thanks-hero__inner {
+	width: 100%;
+	max-width: 1440px;
+	margin: 0 auto;
+	padding: 0 40px;
+	box-sizing: border-box;
+}
+
+.thanks-hero__sub {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	letter-spacing: 0.28em;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0 0 16px;
+	text-transform: uppercase;
+}
+
+.thanks-hero__title {
+	font-size: clamp(30px, 4vw, 42px);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	margin: 0;
+	color: #ffffff;
+	line-height: 1.3;
+}
+
+/* --- 完了カード --- */
+.thanks-card {
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
+	padding: 56px 48px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+	text-align: center;
+}
+
+.thanks-icon-wrap {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background-color: #f0fdf4;
+	color: #16a34a;
+	margin-bottom: 24px;
+}
+
+.thanks-check-icon {
+	width: 32px;
+	height: 32px;
+}
+
+.thanks-heading {
+	font-size: clamp(22px, 2.5vw, 26px);
+	font-weight: 600;
+	color: #111111;
+	margin: 0 0 16px;
+	letter-spacing: 0.03em;
+}
+
+.thanks-lead {
+	font-size: 15px;
+	line-height: 1.85;
+	color: #444444;
+	margin: 0 0 32px;
+}
+
+.thanks-info-box {
+	background-color: #fafafa;
+	border: 1px solid #eeeeee;
+	border-radius: 4px;
+	padding: 24px;
+	margin-bottom: 40px;
+	text-align: left;
+}
+
+.thanks-info-box p {
+	font-size: 14.5px;
+	color: #333333;
+	margin: 0 0 8px;
+}
+
+.thanks-note {
+	font-size: 13px !important;
+	color: #777777 !important;
+	line-height: 1.7;
+	margin: 0 !important;
+}
+
+.thanks-action {
+	margin-top: 16px;
+}
+
+.thanks-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 14px 36px;
+	background-color: #000000;
+	color: #ffffff;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-decoration: none;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.thanks-btn:hover {
+	background-color: #222222;
+	transform: translateY(-1px);
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+	.thanks-container {
+		padding: 40px 20px 0;
+	}
+
+	.thanks-hero {
+		padding: 56px 0 48px;
+	}
+
+	.thanks-card {
+		padding: 36px 20px;
+	}
+
+	.thanks-info-box {
+		padding: 20px 16px;
+	}
+}
+</style>

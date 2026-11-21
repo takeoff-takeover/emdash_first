@@ -1,0 +1,316 @@
+---
+// 開発環境（import.meta.env.DEV）でのみ有効化
+const isDev = import.meta.env.DEV;
+---
+
+{isDev && (
+	<div id="dev-mobile-root" style="display: none;">
+		<!-- フローティングトグルボタン -->
+		<div id="dev-mobile-trigger-btn" title="スマホ表示プレビュー切替">
+			<span class="icon">📱</span>
+			<span class="label">スマホ表示</span>
+		</div>
+
+		<!-- スマホプレビューオーバーレイ -->
+		<div id="dev-mobile-overlay" class="hidden">
+			<div class="dev-preview-header">
+				<div class="dev-preview-info">
+					<span class="status-dot"></span>
+					<span class="dev-title">DEVICE PREVIEW</span>
+					<div class="device-presets">
+						<button type="button" class="preset-btn active" data-width="390" data-height="844">iPhone (390px)</button>
+						<button type="button" class="preset-btn" data-width="430" data-height="932">Max (430px)</button>
+						<button type="button" class="preset-btn" data-width="768" data-height="1024">iPad (768px)</button>
+					</div>
+				</div>
+				<div class="dev-preview-actions">
+					<button type="button" id="dev-mobile-reload-btn" title="再読み込み">↻ 更新</button>
+					<button type="button" id="dev-mobile-close-btn" title="閉じる (Esc)">✕ PC表示に戻す</button>
+				</div>
+			</div>
+
+			<div class="dev-preview-body">
+				<div id="dev-device-frame" class="device-frame" style="width: 390px; height: 844px;">
+					<div class="device-notch"></div>
+					<iframe id="dev-preview-iframe" src="about:blank"></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		/* フローティングトグルボタン */
+		#dev-mobile-trigger-btn {
+			position: fixed;
+			bottom: 24px;
+			right: 24px;
+			z-index: 999999;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 16px;
+			background: #111111;
+			color: #ffffff;
+			border: 1px solid #333333;
+			border-radius: 9999px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+			cursor: pointer;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			font-size: 13px;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+			user-select: none;
+		}
+
+		#dev-mobile-trigger-btn:hover {
+			background: #e10600;
+			border-color: #e10600;
+			transform: translateY(-2px);
+			box-shadow: 0 6px 24px rgba(225, 6, 0, 0.35);
+		}
+
+		#dev-mobile-trigger-btn .icon {
+			font-size: 16px;
+			line-height: 1;
+		}
+
+		/* オーバーレイ全画面 */
+		#dev-mobile-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: rgba(10, 10, 12, 0.94);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			z-index: 1000000;
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+		}
+
+		#dev-mobile-overlay.hidden {
+			display: none !important;
+		}
+
+		/* ツールバー */
+		.dev-preview-header {
+			height: 48px;
+			flex-shrink: 0;
+			background: #16161a;
+			border-bottom: 1px solid #2a2a32;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 20px;
+			color: #f0f0f0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		}
+
+		.dev-preview-info {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #10b981;
+			box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+		}
+
+		.dev-title {
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			color: #888899;
+		}
+
+		.device-presets {
+			display: flex;
+			gap: 4px;
+			margin-left: 12px;
+			background: #0d0d10;
+			padding: 2px;
+			border-radius: 6px;
+			border: 1px solid #262630;
+		}
+
+		.preset-btn {
+			background: transparent;
+			border: none;
+			color: #888899;
+			padding: 4px 10px;
+			font-size: 12px;
+			font-weight: 500;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.15s;
+		}
+
+		.preset-btn:hover {
+			color: #ffffff;
+		}
+
+		.preset-btn.active {
+			background: #2b2b36;
+			color: #ffffff;
+			font-weight: 600;
+		}
+
+		.dev-preview-actions {
+			display: flex;
+			gap: 8px;
+		}
+
+		#dev-mobile-reload-btn, #dev-mobile-close-btn {
+			background: #24242e;
+			color: #ffffff;
+			border: 1px solid #363644;
+			border-radius: 6px;
+			padding: 6px 14px;
+			font-size: 12px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.15s;
+		}
+
+		#dev-mobile-reload-btn:hover {
+			background: #333342;
+		}
+
+		#dev-mobile-close-btn {
+			background: #e10600;
+			border-color: #e10600;
+		}
+
+		#dev-mobile-close-btn:hover {
+			background: #ff1a14;
+			border-color: #ff1a14;
+		}
+
+		/* プレビューエリア */
+		.dev-preview-body {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+			overflow: auto;
+		}
+
+		/* デバイス外枠 */
+		.device-frame {
+			position: relative;
+			background: #000000;
+			border-radius: 42px;
+			box-shadow: 0 0 0 10px #1e1e24, 0 0 0 12px #363640, 0 25px 60px rgba(0, 0, 0, 0.8);
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			transition: width 0.25s ease, height 0.25s ease;
+			max-height: calc(100vh - 88px);
+		}
+
+		.device-notch {
+			position: absolute;
+			top: 8px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 100px;
+			height: 22px;
+			background: #000000;
+			border-radius: 12px;
+			z-index: 10;
+			pointer-events: none;
+		}
+
+		#dev-preview-iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+			background: #ffffff;
+			display: block;
+		}
+	</style>
+
+	<script is:inline>
+		(function() {
+			// iframe内部ではトグルやオーバーレイを表示しない
+			if (window.self !== window.top || window.location.search.includes('_in_preview=1')) {
+				return;
+			}
+
+			const root = document.getElementById('dev-mobile-root');
+			if (!root) return;
+			root.style.display = 'block';
+
+			const triggerBtn = document.getElementById('dev-mobile-trigger-btn');
+			const overlay = document.getElementById('dev-mobile-overlay');
+			const closeBtn = document.getElementById('dev-mobile-close-btn');
+			const reloadBtn = document.getElementById('dev-mobile-reload-btn');
+			const iframe = document.getElementById('dev-preview-iframe');
+			const frame = document.getElementById('dev-device-frame');
+			const presetBtns = document.querySelectorAll('.preset-btn');
+
+			function openPreview() {
+				// 現在のURL（パスとクエリ）をiframeに読み込む
+				const currentUrl = new URL(window.location.href);
+				currentUrl.searchParams.set('_in_preview', '1');
+				if (iframe.src === 'about:blank' || iframe.getAttribute('data-loaded-for') !== window.location.pathname) {
+					iframe.src = currentUrl.toString();
+					iframe.setAttribute('data-loaded-for', window.location.pathname);
+				}
+				overlay.classList.remove('hidden');
+				sessionStorage.setItem('dev_mobile_preview_open', 'true');
+			}
+
+			function closePreview() {
+				overlay.classList.add('hidden');
+				sessionStorage.setItem('dev_mobile_preview_open', 'false');
+			}
+
+			triggerBtn.addEventListener('click', openPreview);
+			closeBtn.addEventListener('click', closePreview);
+
+			reloadBtn.addEventListener('click', () => {
+				if (iframe && iframe.contentWindow) {
+					iframe.contentWindow.location.reload();
+				}
+			});
+
+			// ESCキーで閉じる
+			window.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+					closePreview();
+				}
+			});
+
+			// プリセット切替
+			presetBtns.forEach(btn => {
+				btn.addEventListener('click', () => {
+					presetBtns.forEach(b => b.classList.remove('active'));
+					btn.classList.add('active');
+					const w = btn.getAttribute('data-width');
+					const h = btn.getAttribute('data-height');
+					frame.style.width = w + 'px';
+					frame.style.height = h + 'px';
+					if (w === '768') {
+						frame.style.borderRadius = '24px';
+					} else {
+						frame.style.borderRadius = '42px';
+					}
+				});
+			});
+
+			// 前回の開閉状態を復元
+			if (sessionStorage.getItem('dev_mobile_preview_open') === 'true') {
+				openPreview();
+			}
+		})();
+	</script>
+)}

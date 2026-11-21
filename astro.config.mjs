@@ -29,13 +29,6 @@ export default defineConfig({
 			weights: [400, 500, 600, 700],
 			fallbacks: ["sans-serif"],
 		},
-		{
-			provider: fontProviders.google(),
-			name: "JetBrains Mono",
-			cssVariable: "--font-mono",
-			weights: [400, 500],
-			fallbacks: ["monospace"],
-		},
 	],
 	devToolbar: { enabled: false },
 	server: { host: true, port: 4321 },

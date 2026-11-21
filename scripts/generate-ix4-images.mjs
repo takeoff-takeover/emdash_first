@@ -10,7 +10,7 @@ function createMonochromeSvg(title, subtitle, badgeNumber, totalCount, details =
   const detailItems = details.map((d, i) => `
     <g transform="translate(80, ${520 + i * 36})">
       <rect x="0" y="0" width="6" height="6" fill="#A0A0AA" rx="1"/>
-      <text x="20" y="7" fill="#D4D4D8" font-family="'JetBrains Mono', 'Inter', monospace" font-size="13" font-weight="500" letter-spacing="1.5">${d}</text>
+      <text x="20" y="7" fill="#D4D4D8" font-family="'Helvetica Neue', Helvetica, 'Inter', monospace" font-size="13" font-weight="500" letter-spacing="1.5">${d}</text>
     </g>
   `).join('');
 
@@ -46,7 +46,7 @@ function createMonochromeSvg(title, subtitle, badgeNumber, totalCount, details =
 
   <!-- Counter Indicator (Top Right) - Minimal format -->
   <g transform="translate(1440, 70)">
-    <text x="0" y="0" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="600" letter-spacing="2">${badgeNumber} / ${totalCount}</text>
+    <text x="0" y="0" fill="#71717A" font-family="'Helvetica Neue', Helvetica, monospace" font-size="14" font-weight="600" letter-spacing="2">${badgeNumber} / ${totalCount}</text>
   </g>
 
   <!-- Technical Wireframe Silhouette Graphic -->
@@ -81,7 +81,7 @@ function createMonochromeSvg(title, subtitle, badgeNumber, totalCount, details =
 
   <!-- Footer Branding (Minimal Monotone) -->
   <g transform="translate(80, 835)">
-    <text x="0" y="0" fill="#52525B" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500" letter-spacing="2">BMW GROUP PRESSCLUB OFFICIAL RELEASE // NEUE KLASSE ARCHITECTURE</text>
+    <text x="0" y="0" fill="#52525B" font-family="'Helvetica Neue', Helvetica, monospace" font-size="11" font-weight="500" letter-spacing="2">BMW GROUP PRESSCLUB OFFICIAL RELEASE // NEUE KLASSE ARCHITECTURE</text>
   </g>
 </svg>`;
 }

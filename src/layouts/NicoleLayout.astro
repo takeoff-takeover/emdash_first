@@ -22,6 +22,7 @@ const {
 } = Astro.props;
 
 import { getSiteUrl } from "../utils/siteUrl";
+import DevMobilePreview from "../components/dev/DevMobilePreview.astro";
 
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
 
@@ -119,28 +120,6 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
 
-	<!-- WordPress & Astra & Elementor Core Styles (Self-hosted) -->
-	<link rel="stylesheet" href="/wp-content/themes/astra/assets/css/minified/main.min.css?ver=4.14.1" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=4.3.5" />
-	<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=4.3.5" />
-
-	{!isHome && (
-		<>
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-mega-menu.min.css?ver=4.3.2" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=4.3.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-loop-common.min.css?ver=4.3.2" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-loop-carousel.min.css?ver=4.3.2" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-loop-grid.min.css?ver=4.3.2" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=4.3.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-spacer.min.css?ver=4.3.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=4.3.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor/assets/css/widget-divider.min.css?ver=4.3.5" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-breadcrumbs.min.css?ver=4.3.2" />
-			<link rel="stylesheet" href="/wp-content/plugins/elementor-pro/assets/css/widget-post-info.min.css?ver=4.3.2" />
-		</>
-	)}
-
 	<!-- Extracted Site Styles (Kit-8, Header 6801, Home 2030, Footer 12887, etc.) -->
 	<link rel="stylesheet" href="/css/nicole-core.css" />
 
@@ -150,7 +129,7 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 			background-color: #000000 !important;
 		}
 
-		/* Astraテーマの不要なマージン・パディングを完全リセット（ヘッダーとヒーローの隙間・横余白の排除） */
+		/* メインレイアウトの不要なマージン・パディングを完全リセット（ヘッダーとコンテンツの隙間・横余白の排除） */
 		#content, .site-content, .ast-container, #primary, .content-area {
 			margin: 0 !important;
 			padding: 0 !important;
@@ -181,8 +160,6 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 
 		/* 2. 全体的な見出し・本文の不自然な改行・単語分断・孤立文字防止（デザイン原則順守） */
 		h1, h2, h3, h4, h5, h6,
-		.elementor-heading-title,
-		.elementor-icon-box-title,
 		.nicole-banner-heading,
 		.bmw-insights-title,
 		.nicole-group-title,
@@ -214,9 +191,6 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<!-- AI検索 / LLM Knowledge Discovery (AIO / GEO 最適化) -->
 	<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Knowledge Base" />
 
-	{!isHome && (
-		<script is:inline defer src="/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"></script>
-	)}
 	<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
 	{jsonLd && (
@@ -225,7 +199,7 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 	<slot name="head" />
 </head>
 
-<body class={`nicole-brand ast-desktop elementor-default elementor-kit-8 ast-page-builder-template ${isHome ? 'home page' : 'page'} ${isMagazine ? 'is-magazine-page' : ''}`}>
+<body class={`nicole-brand ${isHome ? 'home page' : 'page'} ${isMagazine ? 'is-magazine-page' : ''}`}>
 	<div class="hfeed site" id="page">
 		<NicoleHeader />
 		{isMagazine && <NicoleConnectSubnav currentSlug={currentSlug} />}
@@ -241,94 +215,6 @@ import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
 		<NicoleFooter />
 	</div>
 
-	<!-- Interactive Behavior Scripts (Legacy Elementor Pages fallback) -->
-	{!isHome && (
-		<script is:inline>
-			document.addEventListener('DOMContentLoaded', function() {
-				// 1. Lazyload backgrounds observer
-				const lazyloadBackgrounds = document.querySelectorAll('.e-con.e-parent');
-				if (lazyloadBackgrounds.length > 0) {
-					lazyloadBackgrounds.forEach((bg) => {
-						bg.classList.add('e-lazyloaded');
-					});
-				}
-
-				// 2. Swiper Carousel Initialization (Only if Elementor loop carousels exist)
-				try {
-					if (typeof Swiper !== 'undefined') {
-						if (document.querySelector('.elementor-element-a045b7c .elementor-loop-container')) {
-							new Swiper('.elementor-element-a045b7c .elementor-loop-container', {
-								slidesPerView: 1,
-								loop: true,
-								speed: 600,
-								autoplay: { delay: 4000, disableOnInteraction: false },
-								pagination: { el: '.elementor-element-a045b7c .swiper-pagination', clickable: true },
-							});
-						}
-
-						if (document.querySelector('.elementor-element-2a171cc .elementor-loop-container')) {
-							new Swiper('.elementor-element-2a171cc .elementor-loop-container', {
-								slidesPerView: 1,
-								spaceBetween: 20,
-								loop: true,
-								speed: 500,
-								autoplay: { delay: 3500, disableOnInteraction: false },
-								pagination: { el: '.elementor-element-2a171cc .swiper-pagination', clickable: true },
-								breakpoints: {
-									768: { slidesPerView: 2, spaceBetween: 20 },
-									1025: { slidesPerView: 3, spaceBetween: 20 }
-								}
-							});
-						}
-					}
-				} catch (e) {}
-
-				// 3. Mega Menu Hover / Click Handling
-				const menuItems = document.querySelectorAll('.e-n-menu-item');
-				if (menuItems.length > 0) {
-					menuItems.forEach((item) => {
-						const title = item.querySelector('.e-n-menu-title');
-						const content = item.querySelector('.e-n-menu-content');
-						if (title && content) {
-							title.addEventListener('click', () => {
-								const isOpen = item.classList.contains('e-active');
-								menuItems.forEach(mi => mi.classList.remove('e-active'));
-								if (!isOpen) {
-									item.classList.add('e-active');
-									content.style.display = 'block';
-								} else {
-									content.style.display = 'none';
-								}
-							});
-
-							if (window.innerWidth > 1024) {
-								item.addEventListener('mouseenter', () => { content.style.display = 'block'; });
-								item.addEventListener('mouseleave', () => { content.style.display = 'none'; });
-							}
-						}
-					});
-
-					document.addEventListener('click', (e) => {
-						if (!e.target.closest('.e-n-menu')) {
-							document.querySelectorAll('.e-n-menu-content').forEach(c => c.style.display = 'none');
-							menuItems.forEach(mi => mi.classList.remove('e-active'));
-						}
-					});
-				}
-
-				// 4. Mobile Menu Toggle
-				const menuToggle = document.querySelector('.e-n-menu-toggle');
-				const menuWrapper = document.querySelector('.e-n-menu-wrapper');
-				if (menuToggle && menuWrapper) {
-					menuToggle.addEventListener('click', () => {
-						menuWrapper.classList.toggle('e-active');
-						const isExpanded = menuWrapper.classList.contains('e-active');
-						menuToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
-						menuWrapper.style.display = isExpanded ? 'block' : 'none';
-					});
-				}
-			});
-		</script>
-	)}
+	<DevMobilePreview />
 </body>
 </html>

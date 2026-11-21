@@ -1,12 +1,10 @@
 ---
 // src/pages/pages/[slug].astro
-// ニコル・グループ 固定ページ動的ルーティング＆事業会社Elementorデザイン完全継承
+// ニコル・グループ 固定ページ動的ルーティング（CMS 'pages' コレクション連携）
 import { decodeSlug, getEmDashEntry } from "emdash";
 import NicoleLayout from "../../layouts/NicoleLayout.astro";
 import RichPortableText from "../../components/blocks/RichPortableText.astro";
 import "../../styles/prose.css";
-import fs from "node:fs";
-import path from "node:path";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -20,8 +18,8 @@ const redirectMap: Record<string, string> = {
 	"ホーム": "/",
 	corporate: "/corporate",
 	philosophy: "/philosophy",
-	bmw: "/bmw",
-	mini: "/mini",
+	bmw: "https://nicole.bmw.jp/",
+	mini: "https://www.mini-yokohama.com/",
 	locations: "/locations",
 	esg_sdgs: "/esg_sdgs",
 	privacystatement: "/privacystatement",
@@ -40,111 +38,29 @@ if (redirectMap[slug]) {
 	return Astro.redirect(target, 301);
 }
 
-// 2. 5大事業会社のElementorデータロード
-const companyFileMap: Record<string, string> = {
-	"nicole-cars": "NicoleCarsElementor",
-	"nicole-automobiles": "NicoleAutomobilesElementor",
-	"nicole-motorcars": "NicoleMotorcarsElementor",
-	"nicole-competizione": "NicoleCompetizioneElementor",
-	"nicole-racing-japan": "NicoleRacingJapanElementor"
-};
-
-let pageData: { title: string; description: string; cssFiles: string[]; html: string } | null = null;
-
-if (companyFileMap[slug]) {
-	const baseName = companyFileMap[slug];
-	const dir = path.resolve("./src/components/companies");
-	const jsonPath = path.join(dir, `${baseName}.json`);
-	const htmlPath = path.join(dir, `${baseName}.html`);
-	
-	if (fs.existsSync(jsonPath) && fs.existsSync(htmlPath)) {
-		const meta = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-		const html = fs.readFileSync(htmlPath, "utf-8");
-		pageData = {
-			title: meta.title,
-			description: meta.description,
-			cssFiles: meta.cssFiles || [],
-			html
-		};
-	}
-}
-
-// 3. CMSの「固定ページ（pages）」コレクションから取得
+// 2. CMSの「固定ページ（pages）」コレクションから取得
 let cmsPage: any = null;
 let cacheHint: any = null;
 
-if (!pageData) {
-	try {
-		const res = await getEmDashEntry("pages" as any, slug);
-		if (res?.entry) {
-			cmsPage = res.entry.data;
-			cacheHint = res.cacheHint;
-		}
-	} catch (e) {
-		console.error(`[pages] Error fetching entry for slug: ${slug}`, e);
+try {
+	const res = await getEmDashEntry("pages" as any, slug);
+	if (res?.entry) {
+		cmsPage = res.entry.data;
+		cacheHint = res.cacheHint;
 	}
-
-	if (Astro.cache?.enabled && cacheHint) {
-		Astro.cache.set(cacheHint);
-	}
+} catch (e) {
+	console.error(`[pages] Error fetching entry for slug: ${slug}`, e);
 }
 
-if (!pageData && !cmsPage) {
+if (Astro.cache?.enabled && cacheHint) {
+	Astro.cache.set(cacheHint);
+}
+
+if (!cmsPage) {
 	return Astro.rewrite("/404");
 }
 ---
 
-{pageData ? (
-<NicoleLayout title={pageData.title} description={pageData.description}>
-  <slot name="head" slot="head">
-    {pageData.cssFiles.map((css: string) => (
-      <link rel="stylesheet" href={css} />
-    ))}
-    <style is:global>
-      .elementor {
-        box-sizing: border-box;
-      }
-      .entry-content {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      .elementor img {
-        height: auto;
-        max-width: 100%;
-      }
-
-      /* グローバルヘッダーの左右端（max-width: 1440px / padding: 0 40px）に揃えるスタイル */
-      .elementor .e-con-boxed > .e-con-inner {
-        max-width: 1440px !important;
-        margin: 0 auto !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        box-sizing: border-box !important;
-      }
-
-      @media (max-width: 1024px) {
-        .elementor .e-con-boxed > .e-con-inner {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .elementor .e-con-boxed > .e-con-inner {
-          padding-left: 16px !important;
-          padding-right: 16px !important;
-        }
-      }
-    </style>
-  </slot>
-
-  <div class="elementor-page-wrapper">
-    <div class="entry-content" set:html={pageData.html} />
-  </div>
-</NicoleLayout>
-) : (
 <NicoleLayout title={cmsPage.title} description={cmsPage.excerpt || cmsPage.title}>
   <div class="cms-page-wrapper">
     <!-- パンくずリスト -->
@@ -176,7 +92,7 @@ if (!pageData && !cmsPage) {
 
   <style>
     .cms-page-wrapper {
-      background: var(--color-bg, #0a0a0c);
+      background: var(--color-bg, #000000);
       color: var(--color-text, #ffffff);
       min-height: 80vh;
       padding-bottom: clamp(60px, 8vw, 120px);
@@ -286,4 +202,3 @@ if (!pageData && !cmsPage) {
     }
   </style>
 </NicoleLayout>
-)}
