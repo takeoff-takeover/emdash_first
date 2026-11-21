@@ -146,6 +146,22 @@ const welfareFeatures = [
 	"退職金制度"
 ];
 
+// よくあるご質問（FAQデータ）
+const faqList = [
+	{
+		q: "神奈川県でBMW、MINI、フェラーリ、ロールス・ロイスを取り扱っている正規ディーラーグループですか？",
+		a: "はい。ニコル・グループは1977年の設立以来、神奈川県（横浜・川崎エリア等）および東京都内にて、BMW、MINI、ロールス・ロイス、フェラーリの正規ディーラーとして新車・認定中古車の販売およびアフターサービスを行っております。"
+	},
+	{
+		q: "購入後の車検や定期点検、修理・整備も相談できますか？",
+		a: "はい、各ブランドの正規サービス工場にて車検・定期点検・修理・メンテナンスを承っております。他店でご購入されたお車や、旧アルピナ車の点検整備・純正パーツのご相談も各正規窓口にて対応可能です。"
+	},
+	{
+		q: "各ブランドのショールームやサービス拠点はどこにありますか？",
+		a: "横浜・川崎エリアをはじめとする神奈川県内および東京都内にショールームとサービスセンターを展開しております。各拠点の所在地や営業時間、ご予約窓口は事業拠点・ショールーム一覧よりご確認いただけます。"
+	}
+];
+
 // Schema.org 構造化データ（JSON-LD）
 const jsonLd = {
 	"@context": "https://schema.org",
@@ -202,6 +218,18 @@ const jsonLd = {
 				{ "@type": "Organization", "name": "Nicole MotorCars合同会社" },
 				{ "@type": "Organization", "name": "Nicole Competizione合同会社" }
 			]
+		},
+		{
+			"@type": "FAQPage",
+			"@id": "https://www.nicole.co.jp/corporate/#faq",
+			"mainEntity": faqList.map((item) => ({
+				"@type": "Question",
+				"name": item.q,
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": item.a
+				}
+			}))
 		}
 	]
 };
@@ -267,6 +295,7 @@ const jsonLd = {
 						<li><a href="#corporatedata" class="corp-subnav__pill">企業データ</a></li>
 						<li><a href="#awards" class="corp-subnav__pill">受賞歴</a></li>
 						<li><a href="#culture" class="corp-subnav__pill">職場環境・福利厚生</a></li>
+						<li><a href="#faq" class="corp-subnav__pill">よくあるご質問</a></li>
 						<li><a href="#profile" class="corp-subnav__pill">会社基本データ</a></li>
 					</ul>
 				</nav>
@@ -274,7 +303,7 @@ const jsonLd = {
 		</header>
 
 		<!-- 2. 代表メッセージ -->
-		<section id="message" class="corp-section corp-section--bordered">
+		<section id="message" class="corp-section">
 			<div class="corp-container">
 				<div class="corp-message-grid">
 					<!-- 左列: 代表ポートレート写真（スマホ時はコンパクト表示） -->
@@ -328,7 +357,7 @@ const jsonLd = {
 		</section>
 
 		<!-- 3. ブランドムービー / 企業紹介 -->
-		<section id="movie" class="corp-section corp-section--bordered">
+		<section id="movie" class="corp-section corp-section--alt">
 			<div class="corp-container">
 				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">ブランドムービー</h2>
@@ -350,9 +379,9 @@ const jsonLd = {
 		</section>
 
 		<!-- 4. 5つの事業会社（会社名ロゴのみ掲載） -->
-		<section id="structure" class="corp-section corp-section--bordered">
+		<section id="structure" class="corp-section">
 			<div class="corp-container">
-				<header class="corp-section-header">
+				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">ニコル・グループを構成する5つの事業会社</h2>
 					<p class="corp-section-subtitle">専門性と誇りを持った5つの事業会社が連携し、世界最高峰のブランド体験をお客様にお届けします。</p>
 				</header>
@@ -387,9 +416,9 @@ const jsonLd = {
 		</section>
 
 		<!-- 5. 企業データ（丸アイコン拡大・3,300台・22拠点） -->
-		<section id="corporatedata" class="corp-section corp-section--bordered">
+		<section id="corporatedata" class="corp-section corp-section--alt">
 			<div class="corp-container">
-				<header class="corp-section-header">
+				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">企業データ</h2>
 					<p class="corp-section-subtitle">半世紀近くにわたり築き上げてきた信頼と実績を数字でご紹介します。</p>
 				</header>
@@ -413,9 +442,9 @@ const jsonLd = {
 		</section>
 
 		<!-- 6. 受賞歴（アイコン拡大・3列レイアウト） -->
-		<section id="awards" class="corp-section corp-section--bordered">
+		<section id="awards" class="corp-section">
 			<div class="corp-container">
-				<header class="corp-section-header">
+				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">受賞歴</h2>
 					<p class="corp-section-subtitle">
 						<span class="heading-phrase">世界基準のサービス品質と顧客満足度に対して</span><span class="heading-phrase">贈られた数々の栄誉。</span>
@@ -438,9 +467,9 @@ const jsonLd = {
 		</section>
 
 		<!-- 7. 職場環境 & 福利厚生 -->
-		<section id="culture" class="corp-section corp-section--bordered">
+		<section id="culture" class="corp-section corp-section--alt">
 			<div class="corp-container">
-				<header class="corp-section-header">
+				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">職場環境と福利厚生</h2>
 					<p class="corp-section-subtitle">社員一人ひとりが情熱を持って挑戦し、長期的に成長できる環境と制度を整えています。</p>
 				</header>
@@ -491,10 +520,55 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 8. 会社基本データ（テーブル崩れ完全修正・クリーン定義リスト型セマンティックテーブル） -->
-		<section id="profile" class="corp-section">
+		<!-- 8. よくあるご質問（FAQ） -->
+		<section id="faq" class="corp-section">
 			<div class="corp-container">
-				<header class="corp-section-header">
+				<header class="corp-section-header corp-section-header--center">
+					<h2 class="corp-section-title">よくあるご質問</h2>
+					<p class="corp-section-subtitle">正規ディーラー事業、お取り扱いブランド、アフターサービスに関する主なご質問にお答えします。</p>
+				</header>
+
+				<div class="corp-faq-accordion-list">
+					{faqList.map((item, idx) => (
+						<details class="corp-faq-accordion-item">
+							<summary class="corp-faq-accordion-summary">
+								<div class="corp-faq-q-line">
+									<span class="corp-faq-q-badge" aria-hidden="true">Q{idx + 1}.</span>
+									<h3 class="corp-faq-q-text">{item.q}</h3>
+								</div>
+								<span class="corp-faq-toggle-icon" aria-hidden="true">
+									<svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<line x1="12" y1="5" x2="12" y2="19"></line>
+										<line x1="5" y1="12" x2="19" y2="12"></line>
+									</svg>
+									<svg class="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<line x1="5" y1="12" x2="19" y2="12"></line>
+									</svg>
+								</span>
+							</summary>
+
+							<div class="corp-faq-accordion-body">
+								<div class="corp-faq-a-line">
+									<span class="corp-faq-a-badge" aria-hidden="true">A{idx + 1}.</span>
+									<div class="corp-faq-a-content">
+										{idx === 2 ? (
+											<p>横浜・川崎エリアをはじめとする神奈川県内および東京都内にショールームとサービスセンターを展開しております。各拠点の所在地や営業時間、ご予約窓口は<a href="/locations" class="corp-faq-link">事業拠点・ショールーム一覧</a>よりご確認いただけます。</p>
+										) : (
+											<p>{item.a}</p>
+										)}
+									</div>
+								</div>
+							</div>
+						</details>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- 9. 会社基本データ（テーブル崩れ完全修正・クリーン定義リスト型セマンティックテーブル） -->
+		<section id="profile" class="corp-section corp-section--alt">
+			<div class="corp-container">
+				<header class="corp-section-header corp-section-header--center">
 					<h2 class="corp-section-title">会社基本データ</h2>
 					<p class="corp-section-subtitle">ニコル・グループの企業概要データです。</p>
 				</header>
@@ -647,21 +721,35 @@ const jsonLd = {
 	}
 
 	/* ============================================================== */
-	/* 共通セクション設定（見出し・セクション間の余白リズム） */
+	/* 共通セクション設定（ブロック境界・余白リズム） */
 	/* ============================================================== */
 	.corp-section {
 		padding: var(--spacing-24) 0;
 		position: relative;
-	}
-
-	.corp-section--bordered {
-		border-bottom: 1px solid var(--color-border);
+		background-color: #040507;
 	}
 
 	@media (max-width: 768px) {
 		.corp-section {
 			padding: var(--spacing-16) 0;
 		}
+	}
+
+	/* オルタネート背景（ブロック境界を視覚化する洗練されたダークチャコール帯） */
+	.corp-section--alt {
+		background-color: #0b0d14;
+		background-image: 
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%),
+			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.035) 0%, transparent 75%);
+		border-top: 1px solid rgba(255, 255, 255, 0.09);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+		box-shadow: 
+			inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+			inset 0 -1px 0 0 rgba(0, 0, 0, 0.5);
+	}
+
+	.corp-section--bordered {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	.corp-section-header {
@@ -678,6 +766,10 @@ const jsonLd = {
 		text-align: center;
 	}
 
+	.corp-section-header--center .corp-section-title {
+		text-align: center !important;
+	}
+
 	.corp-section-title {
 		font-size: clamp(26px, 3.2vw, 38px) !important;
 		font-weight: 700 !important;
@@ -686,6 +778,8 @@ const jsonLd = {
 		line-height: var(--leading-tight) !important;
 		margin: 0 0 var(--spacing-3) 0 !important;
 		text-wrap: balance !important;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
 		clear: both !important;
 	}
 
@@ -1722,5 +1816,214 @@ const jsonLd = {
 
 	.corp-inline-link-sep {
 		color: rgba(255, 255, 255, 0.25);
+	}
+
+	/* ============================================================== */
+	/* 8. よくあるご質問（FAQ：マガジン同等のミニマル・ヘアライン型アコーディオン） */
+	/* ============================================================== */
+	.corp-faq-accordion-list {
+		max-width: 960px;
+		margin: 0 auto;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.corp-faq-accordion-item {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		background: transparent;
+		transition: background-color 0.2s ease;
+	}
+
+	.corp-faq-accordion-item:last-child {
+		border-bottom: none;
+	}
+
+	.corp-faq-accordion-item:hover {
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.corp-faq-accordion-summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.5rem 0.5rem;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		gap: 1.25rem;
+	}
+
+	.corp-faq-accordion-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.corp-faq-q-line {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.corp-faq-q-badge {
+		font-family: var(--font-mono, "JetBrains Mono", monospace);
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #ffffff;
+		flex-shrink: 0;
+		letter-spacing: 0.05em;
+	}
+
+	.corp-faq-q-text {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #ffffff;
+		line-height: 1.6;
+		margin: 0;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* 開閉アイコン（ミニマルな＋ / −） */
+	.corp-faq-toggle-icon {
+		position: relative;
+		width: 22px;
+		height: 22px;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #9ca3af;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.corp-faq-accordion-item:hover .corp-faq-toggle-icon {
+		color: #ffffff;
+	}
+
+	.corp-faq-toggle-icon svg {
+		position: absolute;
+		width: 18px;
+		height: 18px;
+		transition: opacity 0.2s ease, transform 0.2s ease;
+	}
+
+	.corp-faq-toggle-icon .icon-plus {
+		opacity: 1;
+		transform: rotate(0deg);
+	}
+
+	.corp-faq-toggle-icon .icon-minus {
+		opacity: 0;
+		transform: rotate(-90deg);
+	}
+
+	.corp-faq-accordion-item[open] .icon-plus {
+		opacity: 0;
+		transform: rotate(90deg);
+	}
+
+	.corp-faq-accordion-item[open] .icon-minus {
+		opacity: 1;
+		transform: rotate(0deg);
+	}
+
+	.corp-faq-accordion-item[open] .corp-faq-toggle-icon {
+		color: #ffffff;
+	}
+
+	/* アコーディオン本文（回答A） */
+	.corp-faq-accordion-body {
+		padding: 0 0.5rem 1.75rem 0.5rem;
+		animation: corpFaqSlideDown 0.25s ease-out;
+	}
+
+	@keyframes corpFaqSlideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.corp-faq-a-line {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+	}
+
+	.corp-faq-a-badge {
+		font-family: var(--font-mono, "JetBrains Mono", monospace);
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #71717a;
+		flex-shrink: 0;
+		letter-spacing: 0.05em;
+	}
+
+	.corp-faq-a-content {
+		flex: 1;
+		font-size: 0.98rem;
+		line-height: 1.85;
+		color: #d4d4d8;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.corp-faq-a-content p {
+		margin: 0;
+	}
+
+	.corp-faq-link {
+		color: #ffffff;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 4px;
+		text-decoration-color: rgba(255, 255, 255, 0.4);
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
+	}
+
+	.corp-faq-link:hover {
+		color: #ff3333;
+		text-decoration-color: #ff3333;
+	}
+
+	@media (max-width: 640px) {
+		.corp-faq-accordion-summary {
+			padding: 1.25rem 0.25rem;
+			gap: 0.75rem;
+		}
+
+		.corp-faq-q-line {
+			gap: 0.65rem;
+		}
+
+		.corp-faq-q-badge {
+			font-size: 1rem;
+		}
+
+		.corp-faq-q-text {
+			font-size: 0.96rem;
+		}
+
+		.corp-faq-accordion-body {
+			padding: 0 0.25rem 1.35rem 0.25rem;
+		}
+
+		.corp-faq-a-line {
+			gap: 0.65rem;
+		}
+
+		.corp-faq-a-badge {
+			font-size: 1rem;
+		}
+
+		.corp-faq-a-content {
+			font-size: 0.9rem;
+			line-height: 1.75;
+		}
 	}
 </style>
