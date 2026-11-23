@@ -1,0 +1,53 @@
+================================================================================
+引き継ぎサマリー（PC移行版）: 2026-11-23
+================================================================================
+
+1. 今回のセッションで完了したこと
+   - PC移行準備およびリポジトリ最新同期
+     * 最新のローカルD1データベースを seed/backup.sqlite へ完全バックアップ完了。
+     * 前回コミット（フッターの余白・アライメント最適化、固定ページ調整）および今回のDBバックアップをGitHubリモート（mainブランチ）へ確実にプッシュ。
+     * AGENTS.md と CLAUDE.md の完全同期（乖離ゼロ）を確認。
+
+2. 現在のステータス & 引き継ぎ事項
+   - 全体ステータス: 良好・クリーン。
+   - GitHubリポジトリ: https://github.com/takeoff-takeover/emdash_first.git
+   - Cloudflare Workersへの本番デプロイは未実施（ローカル検証済み、Deploy rule準拠）。
+   - 注意点:
+     * .env ファイルはセキュリティ上GitHubに含まれていません。
+       新PCへ移行する際は、本サマリー末尾またはチャット履歴に記載の .env の内容を新PC側で再現してください。
+
+3. 新しいPCでの環境構築・再開手順
+   ----------------------------------------------------------------------------
+   【Step 1】作業用ディレクトリでリポジトリをクローン
+     cd ~/dev
+     git clone https://github.com/takeoff-takeover/emdash_first.git my-emdash-site
+     cd my-emdash-site
+
+   【Step 2】プロジェクト直下に .env ファイルを作成
+     以下の内容をプロジェクト直下の .env に保存します：
+     --------------------------------------------------
+     EMDASH_ENCRYPTION_KEY=emdash_enc_v1_S3w_iE-tZ3hg9LQ8bOPAk53mVcsWShscJwDIvvVDaJU
+     EMDASH_TOKEN=ec_pat_cLzqhyseKpglYt1-CmmcdNw_e6fYG1Cv72R18htUSDk
+     EMDASH_URL=https://my-emdash-site.kaz130.workers.dev
+
+     # Google Maps / Places API Key
+     GOOGLE_PLACES_API_KEY=AIzaSyCvALF5WExyVD0qx-LX8MV3xoyPYoKRX74
+     --------------------------------------------------
+
+   【Step 3】依存パッケージのインストール
+     npm install
+
+   【Step 4】ローカルデータベース（D1）の復元
+     npm run db:restore --force
+
+   【Step 5】開発サーバーの起動
+     npm run dev
+     * サイト: http://localhost:4321
+     * 管理画面（認証バイパス直通）:
+       http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin
+
+   ★ AIエージェント（Antigravity / Claude Code / Cursor等）を使用する場合：
+     Step 1〜Step 2（クローンと .env 作成）を行った後、プロジェクトフォルダを開いて
+     AIに「開発準備して」と指示するだけで、Step 3〜Step 5（パッケージ確認・DB復元・サーバー起動）を
+     dev-setup スキルにより全自動で実行します。
+================================================================================
