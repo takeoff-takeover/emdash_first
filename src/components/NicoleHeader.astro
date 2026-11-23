@@ -601,7 +601,7 @@ const corporateLinks = [
 		margin-bottom: -2.5px;
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.24);
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		font-family: 'Inter', -apple-system, sans-serif;
 		font-size: 12px;
 		font-weight: 600;
@@ -639,7 +639,7 @@ const corporateLinks = [
 		backdrop-filter: blur(24px);
 		-webkit-backdrop-filter: blur(24px);
 		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 16px;
+		border-radius: var(--radius-card, 4px);
 		padding: 32px;
 		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
 		opacity: 0;
@@ -733,7 +733,7 @@ const corporateLinks = [
 	.brand-dropdown-card {
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		padding: 14px 12px 12px;
 		text-decoration: none;
 		display: flex;
@@ -851,7 +851,7 @@ const corporateLinks = [
 		padding: 12px 14px;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		text-decoration: none;
 		transition: all 0.3s ease;
 	}
@@ -1047,7 +1047,7 @@ const corporateLinks = [
 		color: rgba(255, 255, 255, 0.8);
 		text-decoration: none;
 		font-size: 14px;
-		border-radius: 6px;
+		border-radius: var(--radius-card, 4px);
 		transition: background 0.2s ease, color 0.2s ease;
 	}
 
@@ -1157,7 +1157,7 @@ const corporateLinks = [
 		text-align: center;
 		padding: 15px;
 		background: #ffffff;
-		border-radius: 8px;
+		border-radius: var(--radius-action, 9999px);
 		color: #000000;
 		font-weight: 700;
 		font-size: 14px;

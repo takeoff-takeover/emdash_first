@@ -69,7 +69,7 @@ if (campaignsList.length === 0) {
 			period_text: "2026年11月7日(土) 〜 11月23日(月・祝)",
 			period_start: "2026-11-07",
 			period_end: "2026-11-23",
-			featured_image: "/uploads/2026/02/MINI-新百合ヶ丘.jpg",
+			featured_image: "/uploads/2026/02/MINI-横浜都筑.jpg",
 			excerpt: "新世代MINIファミリーが一堂に集結。個性あふれるデザインとゴーカート・フィーリングを各ショールームでご体感ください。",
 			target_locations: "MINI 港北 / MINI 都筑 / MINI 新百合ヶ丘",
 			cta_label: "詳細を見る",
@@ -114,7 +114,7 @@ if (campaignsList.length === 0) {
 			period_text: "2026年11月15日(日) 〜 12月20日(日)",
 			period_start: "2026-11-15",
 			period_end: "2026-12-20",
-			featured_image: "/uploads/2026/02/0H9A1397.jpg",
+			featured_image: "/uploads/wp/2026/08/24_0206_nicol_kohoku_33477_re_web-1024x683.jpg",
 			excerpt: "フェラーリ正規ファクトリーによる冬期特別点検プログラム。最新専用テスター診断とエキスパートメカニックによる30項目徹底チェックを実施。",
 			target_locations: "Nicole Competizione サービスセンター（横浜川向）",
 			cta_label: "詳細を見る",
@@ -481,7 +481,7 @@ const BRAND_LOGOS: Record<string, string> = {
 		font-size: 12px;
 		font-weight: 600;
 		padding: 6px 16px;
-		border-radius: 2px;
+		border-radius: var(--radius-action, 9999px);
 		cursor: pointer;
 		transition: all 0.2s ease;
 	}
@@ -582,7 +582,7 @@ const BRAND_LOGOS: Record<string, string> = {
 		font-weight: 700;
 		letter-spacing: 0.05em;
 		padding: 3px 8px;
-		border-radius: 2px;
+		border-radius: var(--radius-meta, 0);
 		text-transform: uppercase;
 	}
 	.cmp-badge--brand {
@@ -686,7 +686,7 @@ const BRAND_LOGOS: Record<string, string> = {
 		padding: 8px 20px;
 		font-size: 12px;
 		font-weight: 600;
-		border-radius: 2px;
+		border-radius: var(--radius-action, 9999px);
 		cursor: pointer;
 		transition: all 0.2s ease;
 	}
@@ -734,7 +734,7 @@ const BRAND_LOGOS: Record<string, string> = {
 		font-weight: 600;
 		letter-spacing: 0.05em;
 		text-decoration: none;
-		border-radius: 2px;
+		border-radius: var(--radius-action, 9999px);
 		transition: all 0.2s ease;
 	}
 	.cmp-btn-cta--primary {

@@ -50,8 +50,8 @@ export const GET: APIRoute = async ({ url, locals }) => {
 		}
 
 		// 単一記事の閲覧数取得
-		if (!slug) {
-			return new Response(JSON.stringify({ ok: false, error: "slug is required" }), {
+		if (!slug || !/^[a-zA-Z0-9_-]{1,120}$/.test(slug)) {
+			return new Response(JSON.stringify({ ok: false, error: "invalid slug" }), {
 				status: 400,
 				headers: { "Content-Type": "application/json" }
 			});
@@ -88,11 +88,14 @@ export const GET: APIRoute = async ({ url, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
 	try {
 		const body = (await request.json().catch(() => ({}))) as Record<string, any>;
-		const slug = body?.slug;
-		const collection = body?.collection || "magazine";
+		const slug = typeof body?.slug === "string" ? body.slug.trim() : "";
+		const allowedCollections = new Set(["magazine", "posts", "campaigns", "locations"]);
+		const collection = typeof body?.collection === "string" && allowedCollections.has(body.collection)
+			? body.collection
+			: "magazine";
 
-		if (!slug) {
-			return new Response(JSON.stringify({ ok: false, error: "slug is required" }), {
+		if (!slug || !/^[a-zA-Z0-9_-]{1,120}$/.test(slug)) {
+			return new Response(JSON.stringify({ ok: false, error: "invalid slug" }), {
 				status: 400,
 				headers: { "Content-Type": "application/json" }
 			});

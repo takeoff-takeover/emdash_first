@@ -102,7 +102,7 @@ const fitMode = data.media_fit || "cover"; // "cover" (統一枠・余白なし)
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		background: var(--cms-card-bg, rgba(255, 255, 255, 0.04));
 		border: 1px solid var(--cms-card-border, rgba(255, 255, 255, 0.1));
-		border-radius: 14px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		width: 100%;
 		box-sizing: border-box;
@@ -206,7 +206,7 @@ const fitMode = data.media_fit || "cover"; // "cover" (統一枠・余白なし)
 		text-decoration: none !important;
 		padding: 0.65rem 1.25rem;
 		border: 1px solid var(--cms-card-border, rgba(128, 128, 128, 0.35));
-		border-radius: 6px;
+		border-radius: var(--radius-action, 9999px);
 		transition: background 0.15s ease, border-color 0.15s ease;
 	}
 	.cms-split-card__btn:hover {

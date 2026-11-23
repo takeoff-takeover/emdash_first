@@ -1,0 +1,149 @@
+/* ==============================================================
+   Nicole Motion & Smooth Scroll Architecture
+   Nicole Editorial Motion System:
+   - Lenis silky-smooth inertial scrolling
+   - Master easing: cubic-bezier(0.42, 0, 0, 1)
+   - Scroll-driven progressive reveal & staggered waves
+   - Luxury curtain parallax for hero
+   ============================================================== */
+
+/* -------------------------------------------------------------
+   1. Lenis Smooth Scroll Foundation
+   ------------------------------------------------------------- */
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+	overflow: hidden;
+}
+
+/* スクロール中のホバー誤爆・再描画チラつき防止 */
+html.lenis-scrolling a:not(.no-hover-disable),
+html.lenis-scrolling button:not(.no-hover-disable),
+html.lenis-scrolling img:not(.no-hover-disable),
+html.lenis-scrolling .article-item,
+html.lenis-scrolling .insight-featured-card,
+html.lenis-scrolling .insight-sub-card {
+	pointer-events: none !important;
+}
+
+/* -------------------------------------------------------------
+   2. Master Reveal Primitives
+   ------------------------------------------------------------- */
+.motion-reveal {
+	opacity: 0;
+	transform: translate3d(0, 36px, 0);
+	transition:
+		opacity 0.85s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1)),
+		transform 0.85s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1));
+	will-change: opacity, transform;
+}
+
+.motion-reveal.is-inview {
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+
+/* バリエーション：微弱スケールアップ浮上（カード・画像用） */
+.motion-reveal--scale {
+	opacity: 0;
+	transform: translate3d(0, 32px, 0) scale(0.97);
+	transition:
+		opacity 0.9s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1)),
+		transform 0.9s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1));
+	will-change: opacity, transform;
+}
+
+.motion-reveal--scale.is-inview {
+	opacity: 1;
+	transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* バリエーション：タイポグラフィ・テキストスライド（見出し・リード用） */
+.motion-reveal--slide-left {
+	opacity: 0;
+	transform: translate3d(-30px, 0, 0);
+	transition:
+		opacity 0.85s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1)),
+		transform 0.85s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1));
+}
+
+.motion-reveal--slide-left.is-inview {
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+
+/* -------------------------------------------------------------
+   3. Staggered Wave (左から右へ波打つように揃うグリッド)
+   ------------------------------------------------------------- */
+.motion-stagger > *:nth-child(1) { transition-delay: 0ms; }
+.motion-stagger > *:nth-child(2) { transition-delay: 90ms; }
+.motion-stagger > *:nth-child(3) { transition-delay: 180ms; }
+.motion-stagger > *:nth-child(4) { transition-delay: 270ms; }
+.motion-stagger > *:nth-child(5) { transition-delay: 360ms; }
+.motion-stagger > *:nth-child(6) { transition-delay: 450ms; }
+
+/* スタッガー波形（高さオフセット差からの同期収束） */
+.motion-stagger-wave > * {
+	opacity: 0;
+	transition:
+		opacity 0.95s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1)),
+		transform 0.95s var(--ease-editorial, cubic-bezier(0.42, 0, 0, 1));
+	will-change: opacity, transform;
+}
+.motion-stagger-wave > *:nth-child(3n + 1) { transform: translate3d(0, 35px, 0); }
+.motion-stagger-wave > *:nth-child(3n + 2) { transform: translate3d(0, 60px, 0); transition-delay: 60ms; }
+.motion-stagger-wave > *:nth-child(3n + 3) { transform: translate3d(0, 85px, 0); transition-delay: 120ms; }
+
+.motion-stagger-wave.is-inview > * {
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+
+/* -------------------------------------------------------------
+   4. Curtain Parallax Effect (TOPヒーロー・カーテン効果)
+   ------------------------------------------------------------- */
+.motion-curtain-hero {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	will-change: transform;
+}
+
+/* 覆い被さるメインコンテンツ（手前にせり上がるカーテン） */
+.motion-curtain-sheet {
+	position: relative;
+	z-index: 20;
+	background: #040507;
+	box-shadow: 0 -30px 80px rgba(0, 0, 0, 0.95);
+	/* 境界に上品な極細ハイライト線 */
+	border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* -------------------------------------------------------------
+   5. Reduced Motion Support (アクセシビリティ配慮)
+   ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	.motion-reveal,
+	.motion-reveal--scale,
+	.motion-reveal--slide-left,
+	.motion-stagger-wave > * {
+		opacity: 1 !important;
+		transform: none !important;
+		transition: none !important;
+	}
+	.motion-curtain-hero {
+		position: static !important;
+		transform: none !important;
+	}
+}

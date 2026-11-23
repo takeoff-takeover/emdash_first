@@ -53,6 +53,7 @@ function buildYouTubeEmbedUrl(videoId: string, start?: number | null, end?: numb
 		iv_load_policy: "3",
 		modestbranding: "1",
 		enablejsapi: "1",
+		wmode: "transparent",
 	});
 
 	if (typeof start === "number" && !isNaN(start) && start > 0) {
@@ -202,7 +203,7 @@ const bannerPhilosophy = {
 };
 
 const bannerEsg = {
-	image: resolveImageSrc(homepageData?.banner_esg_image) || "/uploads/2026/02/AdobeStock_1808926524-scaled.webp",
+	image: resolveImageSrc(homepageData?.banner_esg_image) || "/uploads/2026/02/nicole-esg-banner.webp",
 	title: homepageData?.banner_esg_title || "ESG / SDGs活動",
 	desc: homepageData?.banner_esg_desc || "私たちは、長年培った経験と信頼を基盤に、ESG / SDGsの観点から持続可能な社会の実現に取り組んでいます。ステークホルダーの皆さまと共に、次世代に誇れる未来を築くことを使命としています。",
 	btnLabel: homepageData?.banner_esg_btn_label !== undefined ? homepageData.banner_esg_btn_label : "活動内容を詳しく",
@@ -392,7 +393,7 @@ const fallbackInsights = [
 		category: "Cars",
 		date: "2026.07.01",
 		views: "1,038 views",
-		image: "/uploads/2026/07/DSC6630.jpg",
+		image: "/uploads/2026/07/P90645946_highRes_bmw-ix5-60-xdrive-06-scaled-e1783070586231.jpg",
 		lead: "プレミアムSUVのパイオニアが劇的な進化。新世代オペレーティングシステムと極上の快適性。",
 		url: "/magazine/202607_new_bmw_x5/"
 	},
@@ -416,7 +417,7 @@ const fallbackInsights = [
 		category: "Cars",
 		date: "2026.04.28",
 		views: "1,560 views",
-		image: "/uploads/2026/01/大田支店.jpg",
+		image: "/uploads/2026/08/Rolls-Royce-Cullinan-Series-II-Captain-Finished-in-Monteverde-Image-9-2025-scaled-e1787725475530.jpg",
 		lead: "4万4000色以上のパレットと無限の素材。オーナーの夢を形にするロールス・ロイスの最高峰クラフト。",
 		url: "/corporate/nicole-motorcars"
 	},
@@ -440,7 +441,7 @@ const fallbackInsights = [
 		category: "Cars",
 		date: "2026.06.12",
 		views: "1,140 views",
-		image: "/uploads/2026/01/大田支店.jpg",
+		image: "/uploads/2026/02/rr_20261008.jpg",
 		lead: "完全電動ウルトラ・ラグジュアリー・クーペが魅せる、異次元の浮遊感と洗練されたビスポーク・インテリア。",
 		url: "/corporate/nicole-motorcars"
 	},
@@ -778,25 +779,25 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	<!-- 2. 特集マガジン：The latest from Nicole Connect.（抜粋） -->
 	<!-- ============================================================== -->
 	<section class="bmw-insights-section" id="magazine-section" aria-label="The latest from Nicole Connect">
-		<div class="editorial-container">
-			<div class="bmw-insights-header">
-				<div class="bmw-insights-header__title-group editorial-reveal">
-					<h2 class="bmw-insights-title">
-						<span class="bmw-insights-title__text">The latest from Nicole Connect.</span>
-						<span class="bmw-insights-title__line" aria-hidden="true"></span>
-					</h2>
-					<p class="bmw-insights-subtitle">
-						<span class="phrase">公式Webマガジン『Nicole Connect』の最新エピソードより抜粋。</span><span class="phrase">試乗インプレッションから職人のクラフトマンシップまで。</span>
-					</p>
+			<div class="editorial-container">
+				<div class="bmw-insights-header">
+					<div class="bmw-insights-header__title-group motion-reveal--slide-left">
+						<h2 class="bmw-insights-title">
+							<span class="bmw-insights-title__text">The latest from Nicole Connect.</span>
+							<span class="bmw-insights-title__line" aria-hidden="true"></span>
+						</h2>
+						<p class="bmw-insights-subtitle">
+							<span class="phrase">公式Webマガジン『Nicole Connect』の最新エピソードより抜粋。</span><span class="phrase">試乗インプレッションから職人のクラフトマンシップまで。</span>
+						</p>
+					</div>
 				</div>
-			</div>
 
-			<!-- グリッドコンテナ：上段2件（大）＋下段3件（小） -->
-			<div class="insights-grid-wrapper">
-				<!-- 上段：大きく2つ並べる -->
-				<div class="insights-featured-grid">
-					{featuredInsights.map((item, idx) => (
-						<article class="insight-featured-card editorial-reveal" data-delay={idx * 120}>
+				<!-- グリッドコンテナ：上段2件（大）＋下段3件（小） -->
+				<div class="insights-grid-wrapper">
+					<!-- 上段：大きく2つ並べる（スタッガー波形） -->
+					<div class="insights-featured-grid motion-stagger-wave">
+						{featuredInsights.map((item, idx) => (
+							<article class="insight-featured-card motion-reveal--scale" data-delay={idx * 120}>
 							<a href={item.url} class="insight-featured-card__link">
 								<div class="insight-featured-card__media">
 									<img 
@@ -838,10 +839,10 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 					))}
 				</div>
 
-				<!-- 下段：小さく3つ並べる -->
-				<div class="insights-sub-grid">
+				<!-- 下段：小さく3つ並べる（スタッガー波形） -->
+				<div class="insights-sub-grid motion-stagger-wave">
 					{subInsights.map((item, idx) => (
-						<article class="insight-sub-card editorial-reveal" data-delay={200 + idx * 80}>
+						<article class="insight-sub-card motion-reveal--scale" data-delay={200 + idx * 80}>
 							<a href={item.url} class="insight-sub-card__link">
 								<div class="insight-sub-card__media">
 									<img 
@@ -1411,7 +1412,6 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		transform: translate(-50%, -50%) scale(1.3);
 		transform-origin: center center;
 		border: none;
-		filter: brightness(0.85);
 		pointer-events: none !important;
 		user-select: none;
 		z-index: 1;
@@ -1714,7 +1714,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		text-decoration: none;
 		letter-spacing: 0.04em;
 		padding: 12px 22px;
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		transition: all 0.3s ease;
@@ -1776,7 +1776,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		position: relative;
 		background: #090b0e;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 14px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 		display: flex;
@@ -1878,7 +1878,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		position: relative;
 		background: #090b0e;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 		display: flex;
@@ -1976,7 +1976,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		padding: 3px 10px;
 		background: rgba(7, 8, 10, 0.85);
 		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
+		border-radius: var(--radius-meta, 0);
 		font-size: 10.5px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
@@ -2060,7 +2060,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		justify-content: center;
 		text-align: center;
 		padding: 16px 44px;
-		border-radius: 40px;
+		border-radius: var(--radius-action, 9999px);
 		font-family: var(--font-body);
 		font-size: var(--font-size-sm);
 		font-weight: 600;
@@ -2381,7 +2381,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		letter-spacing: 0.1em;
 		padding: 3px 8px;
 		background: rgba(255, 255, 255, 0.1);
-		border-radius: 4px;
+		border-radius: var(--radius-meta, 0);
 		color: #ffffff;
 	}
 
@@ -2468,7 +2468,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		font-weight: 500;
 		letter-spacing: 0.08em;
 		text-decoration: none;
-		border-radius: 2px;
+		border-radius: var(--radius-action, 9999px);
 		transition: all 0.25s ease;
 	}
 
@@ -2574,7 +2574,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		font-family: var(--font-helvetica);
 		font-size: 15px;
 		font-weight: 500;
-		border-radius: 40px;
+		border-radius: var(--radius-action, 9999px);
 		padding: 16px 44px;
 		text-decoration: none;
 		box-shadow: none !important;
@@ -2592,7 +2592,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 	.nicole-banner-btn-wrap .btn-nicole-outline {
 		display: inline-block;
 		border: 1px solid var(--color-brand);
-		border-radius: 40px;
+		border-radius: var(--radius-action, 9999px);
 		padding: 16px 44px;
 		font-family: var(--font-helvetica);
 		font-size: 15px;
@@ -2633,7 +2633,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		font-family: var(--font-helvetica);
 		font-size: 15px;
 		font-weight: 600;
-		border-radius: 40px;
+		border-radius: var(--radius-action, 9999px);
 		padding: 16px 44px;
 		text-decoration: none;
 		border: 1px solid #FFFFFF;
@@ -2920,7 +2920,7 @@ const newsList = liveNewsList.length > 0 ? liveNewsList : fallbackNewsList;
 		font-family: var(--font-helvetica);
 		font-size: 15px;
 		font-weight: 500;
-		border-radius: 40px;
+		border-radius: var(--radius-action, 9999px);
 		padding: 16px 48px;
 		text-decoration: none;
 		border: 1px solid rgba(255, 255, 255, 0.3);

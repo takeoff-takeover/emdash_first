@@ -16,9 +16,10 @@
 - ホーム: /
 - Webマガジン (Nicole Connect): /magazine/
   - 下取り・買取・委託販売完全ガイド: /magazine/bmw-mini-rolls-royce-ferrari-resale-guide
-  - 新型BMW iX4 詳細解説: /magazine/bmw-ix4-debut
-  - ニコル・レーシング・ジャパン歴史とDNA: /magazine/nicole-racing-dna
-  - アルピナの哲学とクラフトマンシップ: /magazine/alpina-philosophy
+  - 新型BMW iX4 詳細解説: /magazine/2027_new_bmw_ix4_neue_klasse
+  - Nicole Competizione 2025年度フェラーリ「サービス部門世界一」受賞: /magazine/202611_ferrari_world-award-2025
+  - BMW ALPINA ナルド300km/h超高速テスト・新章: /magazine/bmw-alpina-nardo-high-speed-testing
+  - 次期型BMW X5と現行G05比較ガイド: /magazine/202611_bmw-x5-next-gen-comparison
 - 拠点・サービスセンター一覧 (Locations): /locations
 - 企業情報 (Corporate): /corporate
 - お問い合わせ・オンライン査定相談 (Contact): /contact

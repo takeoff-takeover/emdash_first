@@ -15,7 +15,7 @@
 /* ==============================================================
    見出し・タイトルの自然な文節改行（言葉の途中での不自然な改行・ぶつ切りを完全防止）
    ============================================================== */
-.is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6),
+.is-magazine-page :is(.nicole-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6),
 .is-magazine-page .article-main-title,
 .is-magazine-page .article-rich-text :is(h1, h2, h3, h4, h5, h6),
 .cms-table-title,
@@ -32,6 +32,14 @@
 
 .title-phrase {
 	display: inline-block !important;
+}
+
+/* スマホ幅では長いカタカナ語連続時の不自然な右側余白を防ぐため、本文見出しは自然なフル幅折り返し（禁則処理は維持） */
+@media (max-width: 768px) {
+	.is-magazine-page .article-rich-text :is(h2, h3, h4, h5, h6) {
+		word-break: normal !important;
+		line-break: strict !important;
+	}
 }
 
 /* ==============================================================
@@ -76,7 +84,7 @@
    ============================================================== */
 
 /* 1. 見出し・タイトル（純白 #ffffff で引き締める） */
-.is-magazine-page :is(.apple-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
+.is-magazine-page :is(.nicole-magazine-main, .modern-article-page) :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
 .is-magazine-page .article-main-title,
 .is-magazine-page .article-rich-text :is(h1, h2, h3, h4, h5, h6):not(.is-dark-text, .is-dark-text *),
 .is-magazine-page .cms-col-card__title,

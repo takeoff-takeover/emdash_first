@@ -29,13 +29,13 @@ interface Props {
 
 const { node } = Astro.props;
 
-const label = (node.label || node.button_label || node.title || node.text || "詳細はこちら").trim();
-const url = (node.url || node.href || node.button_url || "https://www.nicole.co.jp/contact/?form_type=inquiry").trim();
-const leadText = (node.lead_text || "").trim();
+const label = (node.label || node.button_label || node.buttonText || node.title || node.text || "詳細はこちら").trim();
+const url = (node.url || node.href || node.button_url || node.buttonUrl || "https://www.nicole.co.jp/contact/?form_type=inquiry").trim();
+const leadText = (node.lead_text || (node.buttonText && node.text ? node.text : "") || "").trim();
 const subtitle = (node.subtitle || "").trim();
 
 const align = node.align || "center";
-const styleType = node.style || "secondary";
+const styleType = node.style || node.theme || "secondary";
 const customColor = (node.custom_color || "").trim();
 const shape = node.shape || "pill";
 const showArrow = node.has_arrow !== "false" && node.has_arrow !== false;
@@ -170,21 +170,22 @@ if (styleType === "custom" && customColor) {
 		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 		box-sizing: border-box;
 		position: relative;
+		border-radius: var(--radius-action, 9999px);
 	}
 
 	.cms-cta-btn--full {
 		width: 100% !important;
 	}
 
-	/* 形状 */
+	/* 形状 (ルール14: アクション要素はPill丸型に統一) */
 	.cms-cta-shape--pill {
-		border-radius: 9999px;
+		border-radius: var(--radius-action, 9999px);
 	}
 	.cms-cta-shape--rounded {
-		border-radius: 8px;
+		border-radius: var(--radius-action, 9999px);
 	}
 	.cms-cta-shape--square {
-		border-radius: 0;
+		border-radius: var(--radius-action, 9999px);
 	}
 
 	/* スタイル1：アクセントレッド / ブランド（ネオン発光感を完全排除し、落ち着いた高級マット陰影に - パターンA） */

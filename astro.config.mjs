@@ -1,7 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
-import { defineConfig, fontProviders } from "astro/config";
+import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { editorialToolsPlugin } from "./src/plugins/editorial-tools/index";
 
@@ -20,15 +20,6 @@ export default defineConfig({
 			storage: r2({ binding: "MEDIA" }),
 			plugins: [editorialToolsPlugin()],
 		}),
-	],
-	fonts: [
-		{
-			provider: fontProviders.google(),
-			name: "Inter",
-			cssVariable: "--font-body",
-			weights: [400, 500, 600, 700],
-			fallbacks: ["sans-serif"],
-		},
 	],
 	devToolbar: { enabled: false },
 	server: { host: true, port: 4321 },

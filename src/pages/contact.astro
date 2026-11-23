@@ -1,403 +1,1158 @@
 ---
 // src/pages/contact.astro
-// ニコル・グループ お問い合わせフォーム（完全モダン・脱Elementor）
+// ニコル・グループ お問い合わせフォーム
+// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
+// formrun API連携対応ネイティブHTMLフォーム
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お問い合わせ | Nicole Group 公式";
 const pageDescription = "ニコル・グループへのお問い合わせ・ご相談窓口。試乗・商談・点検整備など各ショールームへのお問い合わせはこちらから。";
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "ContactPage",
+			"@id": "https://www.nicole.co.jp/contact/#webpage",
+			"url": "https://www.nicole.co.jp/contact",
+			"name": pageTitle,
+			"description": pageDescription,
+			"breadcrumb": {
+				"@id": "https://www.nicole.co.jp/contact/#breadcrumb"
+			}
+		},
+		{
+			"@type": "BreadcrumbList",
+			"@id": "https://www.nicole.co.jp/contact/#breadcrumb",
+			"itemListElement": [
+				{
+					"@type": "ListItem",
+					"position": 1,
+					"name": "HOME",
+					"item": "https://www.nicole.co.jp/"
+				},
+				{
+					"@type": "ListItem",
+					"position": 2,
+					"name": "お問い合わせ",
+					"item": "https://www.nicole.co.jp/contact"
+				}
+			]
+		}
+	]
+};
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-	<main class="contact-page">
-		<!-- ヒーローヘッダー -->
-		<header class="contact-hero">
-			<div class="contact-hero__inner">
-				<p class="contact-hero__sub">CONTACT</p>
-				<h1 class="contact-hero__title" id="contact-heading">お問い合わせ</h1>
+	<Fragment slot="head">
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		<style is:global>
+			body:has(.contact-dark-main),
+			body:has(.contact-dark-main) #page,
+			body:has(.contact-dark-main) #content,
+			body:has(.contact-dark-main) .site-content,
+			body:has(.contact-dark-main) #primary,
+			body:has(.contact-dark-main) .content-area,
+			body:has(.contact-dark-main) .ast-container {
+				background-color: #040507 !important;
+				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
+			}
+		</style>
+	</Fragment>
+
+	<main class="contact-dark-main">
+		<!-- 1. ヒーローヘッダー（会社案内準拠・写真背景＋ダークグラデーション） -->
+		<header class="corp-hero">
+			<div class="corp-hero__media">
+				<img
+					src="/uploads/2026/02/DSC3504.jpg"
+					alt="ニコル・グループ お問い合わせ"
+					class="corp-hero__img"
+					loading="eager"
+					decoding="async"
+				/>
+				<div class="corp-hero__gradient"></div>
+				<div class="corp-hero__side-vignette"></div>
+			</div>
+
+			<div class="corp-container corp-hero__inner">
+				<nav class="corp-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="corp-breadcrumbs__list">
+						<li class="corp-breadcrumbs__item"><a href="/" class="corp-breadcrumbs__link">HOME</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item" aria-current="page" id="contact-breadcrumb-current">お問い合わせ</li>
+					</ol>
+				</nav>
+
+				<h1 class="corp-hero__title" id="contact-heading">お問い合わせ</h1>
+				<p class="corp-hero__subtitle">
+					<span class="corp-hero__phrase">試乗・商談のご予約、車両に関するご質問、</span><span class="corp-hero__phrase">ニコル・グループ各ブランドへのお問い合わせを承っております。</span>
+				</p>
 			</div>
 		</header>
 
-		<div class="contact-container">
-			<div class="contact-content-card">
-				<!-- 注意事項・ご案内 -->
+		<!-- 2. ご案内・注意事項セクション（#040507 ベース） -->
+		<section class="corp-section corp-section--compact">
+			<div class="corp-container">
 				<div class="contact-notes">
 					<p class="contact-notes__lead">
-						以下のフォームをご入力の上、プライバシー・ポリシーをご一読いただき、ご了承いただける場合には「同意する」を選択して次へお進みください。
+						以下のフォームをご入力の上、プライバシー・ポリシーをご一読いただき、ご了承いただける場合には「同意する」を選択して送信してください。
 					</p>
 					<ul class="contact-notes__list">
 						<li>お問い合わせ内容によっては、ご回答までにお時間をいただく場合がございます。あらかじめご了承ください。また内容により、担当者よりお電話でご連絡させていただく場合がございます。</li>
-						<li>お車の不調・故障・修理など、サービス・メンテナンスに関するご相談は、お近くのNicole Groupの各ショールームまたはサービス拠点へ直接ご連絡いただきますようお願いいたします。インターネットからのお問い合わせでは対応できない場合がございます。</li>
+						<li>お車の不調・故障・修理など、サービス・メンテナンスに関するご相談は、お近くのニコル・グループの各ショールームまたはサービス拠点（<a href="/locations" class="contact-inline-link">事業拠点・ショールーム一覧</a>）へ直接ご連絡いただきますようお願いいたします。インターネットからのお問い合わせでは対応できない場合がございます。</li>
 						<li>営業・ご提案などの内容につきましては、返信を差し控えさせていただく場合がございます。</li>
 					</ul>
 				</div>
-
-				<!-- formrun 埋め込みエリア -->
-				<div id="formrun-wrapper" class="formrun-wrapper">
-					<div
-						id="formrun-embed"
-						class="formrun-embed"
-						data-formrun-redirect="true"
-						aria-label="お問い合わせフォーム"
-					></div>
-				</div>
 			</div>
-		</div>
+		</section>
+
+		<!-- 3. お問い合わせフォーム本体（チャコールグレー帯・1440pxワイド1カラム） -->
+		<section id="contact-form-section" class="corp-section corp-section--alt">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">お問い合わせフォーム</h2>
+					<p class="corp-section-subtitle">
+						「必須」と記載された項目は必ずご入力ください。
+					</p>
+				</header>
+
+				<form
+					id="nicole-contact-form"
+					class="contact-form-panel"
+					method="post"
+					action="/api/contact"
+					novalidate
+				>
+					<!-- 自社API ＆ 将来のformrun自動転送用メタフィールド -->
+					<input type="hidden" name="brand_slug" id="field-brand-slug" value="nicole" />
+					<input type="hidden" name="form_type" id="field-form-type" value="inquiry" />
+					<input type="hidden" name="source_url" id="field-source-url" value="" />
+					<!-- スパム対策ハニーポット（人間には非表示） -->
+					<div class="form-hp-field" aria-hidden="true">
+						<label for="field-company-website">Website</label>
+						<input type="text" id="field-company-website" name="company_website" tabindex="-1" autocomplete="off" />
+					</div>
+
+					<!-- ご用件（種別） -->
+					<fieldset class="form-group form-fieldset">
+						<legend class="form-label">
+							<span>お問い合わせ種別</span>
+							<span class="form-badge form-badge--required">必須</span>
+						</legend>
+						<div class="form-radio-grid">
+							<label class="form-radio-option">
+								<input type="radio" name="inquiry_type" value="お問い合わせ" checked required />
+								<span>一般的なお問い合わせ</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="inquiry_type" value="来場・試乗予約" />
+								<span>来場・試乗予約</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="inquiry_type" value="カタログ・資料請求" />
+								<span>カタログ・資料請求</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="inquiry_type" value="認定中古車のご相談" />
+								<span>認定中古車のご相談</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="inquiry_type" value="その他" />
+								<span>その他</span>
+							</label>
+						</div>
+					</fieldset>
+
+					<!-- 対象ブランド・ご検討モデル（PC 2列 / SP 1列） -->
+					<div class="form-row-2col">
+						<div class="form-group">
+							<label for="field-brand" class="form-label">
+								<span>対象ブランド</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<div class="form-select-wrap">
+								<select id="field-brand" name="_field_19" class="form-control form-select" required>
+									<option value="Nicole Group">Nicole Group（総合窓口）</option>
+									<option value="BMW">BMW</option>
+									<option value="MINI">MINI</option>
+									<option value="Rolls-Royce">Rolls-Royce</option>
+									<option value="ALPINA">ALPINA</option>
+									<option value="Ferrari">Ferrari</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="field-series" class="form-label">
+								<span>ご検討中のモデル・車種</span>
+								<span class="form-badge form-badge--optional">任意</span>
+							</label>
+							<input
+								type="text"
+								id="field-series"
+								name="series"
+								class="form-control"
+								placeholder="例：BMW 3シリーズ、MINI Cooper、296 GTB など"
+							/>
+						</div>
+					</div>
+
+					<!-- お名前（姓・名） -->
+					<div class="form-row-2col">
+						<div class="form-group">
+							<label for="field-last-name" class="form-label">
+								<span>お名前（姓）</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="text"
+								id="field-last-name"
+								name="last_name"
+								class="form-control"
+								autocomplete="family-name"
+								placeholder="例：山田"
+								required
+							/>
+						</div>
+
+						<div class="form-group">
+							<label for="field-first-name" class="form-label">
+								<span>お名前（名）</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="text"
+								id="field-first-name"
+								name="first_name"
+								class="form-control"
+								autocomplete="given-name"
+								placeholder="例：太郎"
+								required
+							/>
+						</div>
+					</div>
+
+					<!-- フリガナ（セイ・メイ） -->
+					<div class="form-row-2col">
+						<div class="form-group">
+							<label for="field-last-kana" class="form-label">
+								<span>フリガナ（セイ）</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="text"
+								id="field-last-kana"
+								name="last_kana"
+								class="form-control"
+								placeholder="例：ヤマダ"
+								required
+							/>
+						</div>
+
+						<div class="form-group">
+							<label for="field-first-kana" class="form-label">
+								<span>フリガナ（メイ）</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="text"
+								id="field-first-kana"
+								name="first_kana"
+								class="form-control"
+								placeholder="例：タロウ"
+								required
+							/>
+						</div>
+					</div>
+
+					<!-- メールアドレス・電話番号 -->
+					<div class="form-row-2col">
+						<div class="form-group">
+							<label for="field-email" class="form-label">
+								<span>メールアドレス</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="email"
+								id="field-email"
+								name="email"
+								class="form-control"
+								autocomplete="email"
+								placeholder="例：example@nicole.co.jp"
+								required
+							/>
+						</div>
+
+						<div class="form-group">
+							<label for="field-tel" class="form-label">
+								<span>電話番号</span>
+								<span class="form-badge form-badge--required">必須</span>
+							</label>
+							<input
+								type="tel"
+								id="field-tel"
+								name="tel"
+								class="form-control"
+								autocomplete="tel"
+								placeholder="例：044-511-9859"
+								required
+							/>
+						</div>
+					</div>
+
+					<!-- ご希望の連絡方法 -->
+					<fieldset class="form-group form-fieldset">
+						<legend class="form-label">
+							<span>ご希望の連絡方法</span>
+							<span class="form-badge form-badge--optional">任意</span>
+						</legend>
+						<div class="form-radio-inline">
+							<label class="form-radio-option">
+								<input type="radio" name="preferred_contact" value="どちらでも可" checked />
+								<span>どちらでも可</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="preferred_contact" value="メール" />
+								<span>メール</span>
+							</label>
+							<label class="form-radio-option">
+								<input type="radio" name="preferred_contact" value="お電話" />
+								<span>お電話</span>
+							</label>
+						</div>
+					</fieldset>
+
+					<!-- お問い合わせ内容 -->
+					<div class="form-group">
+						<label for="field-message" class="form-label">
+							<span>お問い合わせ内容・ご要望</span>
+							<span class="form-badge form-badge--required">必須</span>
+						</label>
+						<textarea
+							id="field-message"
+							name="message"
+							class="form-control form-textarea"
+							rows="6"
+							placeholder="ご希望の試乗日時、ご質問内容などをご記入ください。"
+							required
+						></textarea>
+					</div>
+
+					<!-- プライバシー・ポリシー同意 -->
+					<div class="form-consent-box">
+						<label class="form-checkbox-label">
+							<input type="checkbox" id="field-privacy" name="privacy_agreed" value="同意する" required />
+							<span>
+								<a href="/privacystatement" target="_blank" rel="noopener noreferrer" class="contact-inline-link">プライバシー・ポリシー</a>を確認し、個人情報の取り扱いに同意する
+							</span>
+						</label>
+					</div>
+
+					<!-- バリデーションエラーメッセージ -->
+					<div id="form-error-banner" class="form-error-banner" role="alert" hidden></div>
+
+					<!-- 送信ボタン -->
+					<div class="form-submit-wrap">
+						<button type="submit" id="form-submit-btn" class="form-submit-btn">
+							<span>入力内容を送信する</span>
+							<svg class="form-submit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+								<path d="M5 12h14M13 5l7 7-7 7"></path>
+							</svg>
+						</button>
+					</div>
+				</form>
+			</div>
+		</section>
 	</main>
 </NicoleLayout>
 
 <style>
-/* ============================================================== */
-/* お問い合わせページ：完全モダン＆セマンティックデザイン */
-/* ============================================================== */
-.contact-page {
-	width: 100%;
-	background-color: #fcfcfc;
-	color: #111111;
-	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-	line-height: 1.8;
-	padding-bottom: 96px;
-}
+	/* ============================================================== */
+	/* お問い合わせページ：黒ベース＆チャコールグレー帯・1440pxワイド */
+	/* ============================================================== */
+	.contact-dark-main {
+		--spacing-4: 1rem;
+		--spacing-6: 1.5rem;
+		--spacing-8: 2rem;
+		--spacing-10: 2.5rem;
+		--spacing-12: 3rem;
+		--spacing-16: 4rem;
+		--spacing-20: 5rem;
 
-.contact-container {
-	width: 100%;
-	max-width: 960px;
-	margin: 0 auto;
-	padding: 64px 40px 0;
-	box-sizing: border-box;
-}
+		--color-bg: #040507;
+		--color-border: rgba(255, 255, 255, 0.1);
+		--color-text: #ffffff;
+		--color-text-secondary: rgba(255, 255, 255, 0.74);
+		--color-accent: #E60012;
 
-/* --- ヒーローヘッダー --- */
-.contact-hero {
-	width: 100%;
-	background-color: #000000;
-	color: #ffffff;
-	padding: 88px 0 72px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	text-align: center;
-}
-
-.contact-hero__inner {
-	width: 100%;
-	max-width: 1440px;
-	margin: 0 auto;
-	padding: 0 40px;
-	box-sizing: border-box;
-}
-
-.contact-hero__sub {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	letter-spacing: 0.28em;
-	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 16px;
-	text-transform: uppercase;
-}
-
-.contact-hero__title {
-	font-size: clamp(30px, 4vw, 42px);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	margin: 0;
-	color: #ffffff;
-	line-height: 1.3;
-}
-
-/* --- メインカード --- */
-.contact-content-card {
-	background-color: #ffffff;
-	border: 1px solid #e5e5e5;
-	border-radius: 4px;
-	padding: 48px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-
-/* --- 注意事項 --- */
-.contact-notes {
-	background-color: #f9f9f9;
-	border-left: 3px solid #dc2626;
-	padding: 24px 28px;
-	margin-bottom: 48px;
-	border-radius: 0 4px 4px 0;
-}
-
-.contact-notes__lead {
-	font-size: 15px;
-	font-weight: 600;
-	color: #111111;
-	margin: 0 0 16px;
-	line-height: 1.7;
-}
-
-.contact-notes__list {
-	padding-left: 20px;
-	margin: 0;
-	font-size: 13.5px;
-	color: #555555;
-	line-height: 1.8;
-}
-
-.contact-notes__list li {
-	margin-bottom: 8px;
-}
-
-.contact-notes__list li:last-child {
-	margin-bottom: 0;
-}
-
-/* --- formrun 埋め込み --- */
-.formrun-wrapper {
-	position: relative;
-	width: 100%;
-	scroll-margin-top: 120px;
-}
-
-.formrun-embed {
-	width: 100%;
-	min-height: 700px;
-}
-
-:global(#formrun-embed iframe) {
-	display: block;
-	width: 100% !important;
-	max-width: 100% !important;
-	border: 0 !important;
-}
-
-/* --- レスポンシブ対応 --- */
-@media (max-width: 768px) {
-	.contact-container {
-		padding: 40px 20px 0;
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+		min-height: 100vh;
+		position: relative;
+		overflow-x: hidden;
+		line-height: 1.8;
 	}
 
-	.contact-hero {
-		padding: 56px 0 48px;
+	.corp-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 var(--spacing-10);
+		box-sizing: border-box;
 	}
 
-	.contact-content-card {
-		padding: 32px 20px;
+	@media (max-width: 1024px) {
+		.corp-container {
+			padding: 0 var(--spacing-6);
+		}
 	}
 
+	@media (max-width: 480px) {
+		.corp-container {
+			padding: 0 var(--spacing-4);
+		}
+	}
+
+	/* --- ヒーローヘッダー（corporate.astro 準拠） --- */
+	.corp-hero {
+		position: relative;
+		min-height: 440px;
+		display: flex;
+		align-items: flex-end;
+		padding: 130px 0 56px 0;
+		border-bottom: 1px solid var(--color-border);
+		overflow: hidden;
+		background: #000000;
+	}
+
+	@media (max-width: 768px) {
+		.corp-hero {
+			min-height: 340px;
+			padding: 100px 0 36px 0;
+		}
+	}
+
+	.corp-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.corp-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 36%;
+		filter: brightness(0.62) contrast(1.06);
+		transform: scale(1.02);
+	}
+
+	.corp-hero__gradient {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(4, 5, 7, 0.86) 0%,
+			rgba(4, 5, 7, 0.42) 40%,
+			rgba(4, 5, 7, 0.85) 80%,
+			#040507 100%
+		);
+	}
+
+	.corp-hero__side-vignette {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			rgba(4, 5, 7, 0.82) 0%,
+			rgba(4, 5, 7, 0.28) 55%,
+			rgba(4, 5, 7, 0.62) 100%
+		);
+	}
+
+	.corp-hero__inner {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+	}
+
+	.corp-breadcrumbs {
+		margin-bottom: 20px;
+	}
+
+	.corp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.corp-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.72);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.corp-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.corp-breadcrumbs__separator {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	.corp-hero__title {
+		font-size: clamp(30px, 4.2vw, 52px);
+		font-weight: 800;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		margin: 0 0 14px 0;
+		line-height: 1.18;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.corp-hero__subtitle {
+		font-size: clamp(14.5px, 1.35vw, 16.5px);
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.86);
+		max-width: 900px;
+		margin: 0;
+		text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase;
+	}
+
+	.corp-hero__phrase {
+		display: inline-block;
+	}
+
+	@media (max-width: 640px) {
+		.corp-hero__phrase {
+			display: inline;
+		}
+	}
+
+	/* --- セクション設定 --- */
+	.corp-section {
+		padding: var(--spacing-20) 0;
+		position: relative;
+		background-color: #040507;
+	}
+
+	.corp-section--compact {
+		padding: var(--spacing-12) 0;
+	}
+
+	.corp-section--alt {
+		background-color: #0e1118;
+		background-image:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
+			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow:
+			inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+			inset 0 -1px 0 0 rgba(0, 0, 0, 0.45);
+	}
+
+	@media (max-width: 768px) {
+		.corp-section {
+			padding: var(--spacing-12) 0;
+		}
+		.corp-section--compact {
+			padding: var(--spacing-8) 0;
+		}
+	}
+
+	.corp-section-header {
+		margin-bottom: 32px;
+	}
+
+	.corp-section-title {
+		font-size: clamp(22px, 2.8vw, 32px);
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		line-height: 1.3;
+		margin: 0 0 8px 0;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.corp-section-subtitle {
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.62);
+		margin: 0;
+	}
+
+	/* --- 注意事項エリア（箱なし・明度差と余白のみで表現） --- */
 	.contact-notes {
-		padding: 20px 18px;
-		margin-bottom: 36px;
+		width: 100%;
 	}
 
-	.formrun-wrapper {
-		scroll-margin-top: 24px;
+	.contact-notes__lead {
+		font-size: 15.5px;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.92);
+		margin: 0 0 16px;
+		line-height: 1.85;
 	}
 
-	.formrun-embed {
-		min-height: 600px;
+	.contact-notes__list {
+		padding-left: 20px;
+		margin: 0;
+		font-size: 13.5px;
+		color: rgba(255, 255, 255, 0.6);
+		line-height: 1.85;
 	}
-}
+
+	.contact-notes__list li {
+		margin-bottom: 6px;
+	}
+
+	.contact-notes__list li:last-child {
+		margin-bottom: 0;
+	}
+
+	.contact-inline-link {
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		text-decoration-color: rgba(255, 255, 255, 0.45);
+		transition: text-decoration-color 0.2s ease;
+	}
+
+	.contact-inline-link:hover {
+		text-decoration-color: #ffffff;
+	}
+
+	/* --- ネイティブフォーム（外枠箱なし・セクション面に直接配置） --- */
+	.contact-form-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 36px;
+		padding-top: 36px;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.form-hp-field {
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.form-fieldset {
+		display: block;
+		border: 0;
+		padding: 0;
+		margin: 0;
+		min-width: 0;
+	}
+
+	.form-row-2col {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 28px;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.form-fieldset.form-group {
+		display: block;
+		gap: 0;
+	}
+
+	.form-label {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 14px;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.92);
+		letter-spacing: 0.02em;
+		line-height: 1.4;
+		margin: 0;
+		padding: 0;
+	}
+
+	legend.form-label {
+		width: 100%;
+		margin: 0 0 14px 0 !important;
+		padding: 0 !important;
+	}
+
+	/* 静的メタバッジ：角丸なし（完全スクエア） */
+	.form-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2px 8px;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		border-radius: var(--radius-meta, 0);
+		line-height: 1.4;
+	}
+
+	.form-badge--required {
+		background-color: rgba(230, 0, 18, 0.18);
+		border: 1px solid rgba(230, 0, 18, 0.55);
+		color: #ff6b76;
+	}
+
+	.form-badge--optional {
+		background-color: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		color: rgba(255, 255, 255, 0.62);
+	}
+
+	/* 入力フィールド：マイクロ角丸 4px・AstraグローバルCSS干渉を完全遮断 */
+	.form-control {
+		display: block;
+		width: 100%;
+		height: 52px !important;
+		min-height: 52px !important;
+		padding: 0 16px !important;
+		margin: 0 !important;
+		background-color: rgba(4, 5, 7, 0.72) !important;
+		border: 1px solid rgba(255, 255, 255, 0.18) !important;
+		border-radius: var(--radius-card, 4px) !important;
+		color: #ffffff !important;
+		font-size: 15px !important;
+		font-family: inherit !important;
+		line-height: normal !important;
+		box-sizing: border-box !important;
+		box-shadow: none !important;
+		transition: border-color 0.2s ease, background-color 0.2s ease;
+	}
+
+	.form-control::placeholder {
+		color: rgba(255, 255, 255, 0.36);
+	}
+
+	.form-control:hover {
+		border-color: rgba(255, 255, 255, 0.34) !important;
+	}
+
+	.form-control:focus {
+		outline: none !important;
+		border-color: #ffffff !important;
+		background-color: rgba(4, 5, 7, 0.92) !important;
+	}
+
+	.form-control.is-invalid {
+		border-color: #E60012 !important;
+	}
+
+	.form-textarea {
+		height: auto !important;
+		min-height: 168px !important;
+		padding: 16px !important;
+		resize: vertical;
+		line-height: 1.75 !important;
+	}
+
+	/* セレクトボックス（文字切れ防止：height固定＋上下padding 0） */
+	.form-select-wrap {
+		position: relative;
+		width: 100%;
+	}
+
+	.form-select-wrap::after {
+		content: "";
+		position: absolute;
+		right: 18px;
+		top: 50%;
+		width: 8px;
+		height: 8px;
+		border-right: 1.5px solid rgba(255, 255, 255, 0.7);
+		border-bottom: 1.5px solid rgba(255, 255, 255, 0.7);
+		transform: translateY(-65%) rotate(45deg);
+		pointer-events: none;
+	}
+
+	.form-select {
+		-webkit-appearance: none !important;
+		appearance: none !important;
+		padding: 0 44px 0 16px !important;
+		cursor: pointer;
+	}
+
+	.form-select option {
+		background-color: #0e1118;
+		color: #ffffff;
+	}
+
+	/* ラジオ選択オプション（ゆとりあるサイズ・間隔に統一） */
+	.form-radio-grid,
+	.form-radio-inline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.form-radio-option {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 48px;
+		padding: 12px 22px;
+		background-color: rgba(4, 5, 7, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: var(--radius-card, 4px);
+		color: rgba(255, 255, 255, 0.86);
+		font-size: 14.5px;
+		line-height: 1.4;
+		box-sizing: border-box;
+		cursor: pointer;
+		transition: border-color 0.2s ease, background-color 0.2s ease;
+	}
+
+	.form-radio-option:hover {
+		border-color: rgba(255, 255, 255, 0.34);
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+
+	.form-radio-option:has(input:checked) {
+		border-color: #ffffff;
+		background-color: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+	}
+
+	.form-radio-option input[type="radio"] {
+		accent-color: #ffffff;
+		width: 16px;
+		height: 16px;
+		margin: 0 !important;
+		flex-shrink: 0;
+		cursor: pointer;
+	}
+
+	/* プライバシー同意チェックボックス（箱なし・上ボーダー区切りのみ） */
+	.form-consent-box {
+		padding-top: 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.form-checkbox-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 12px;
+		font-size: 14.5px;
+		color: rgba(255, 255, 255, 0.88);
+		cursor: pointer;
+	}
+
+	.form-checkbox-label input[type="checkbox"] {
+		accent-color: #E60012;
+		width: 18px;
+		height: 18px;
+		margin: 0;
+		flex-shrink: 0;
+		cursor: pointer;
+	}
+
+	/* エラーバナー */
+	.form-error-banner {
+		padding: 14px 18px;
+		background-color: rgba(230, 0, 18, 0.12);
+		border: 1px solid rgba(230, 0, 18, 0.5);
+		border-radius: var(--radius-card, 4px);
+		color: #ffd0d4;
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	/* 送信ボタン（最重要CTA：アクセントレッド・丸型ピル・グロー影なし） */
+	.form-submit-wrap {
+		display: flex;
+		justify-content: flex-start;
+		padding-top: 8px;
+	}
+
+	.form-submit-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		min-width: 280px;
+		padding: 16px 40px;
+		background-color: #E60012;
+		border: 1px solid #E60012;
+		border-radius: var(--radius-action, 9999px);
+		color: #ffffff;
+		font-size: 15px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.form-submit-btn:hover {
+		background-color: #c4000f;
+		border-color: #c4000f;
+		transform: translateY(-1px);
+	}
+
+	.form-submit-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.form-submit-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* --- レスポンシブ --- */
+	@media (max-width: 768px) {
+		.contact-form-panel {
+			gap: 24px;
+			padding-top: 24px;
+		}
+
+		.form-row-2col {
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
+
+		.form-submit-btn {
+			width: 100%;
+			min-width: 0;
+		}
+	}
 </style>
 
-<!-- formrun 動的埋め込みスクリプト -->
+<!-- URLパラメータ引き継ぎ ＆ 自社API（/api/contact）送信スクリプト -->
 <script is:inline>
 (function () {
-  'use strict';
+	'use strict';
 
-  const params = new URLSearchParams(window.location.search);
-  const DEFAULT_BRAND = 'nicole';
-  const SCROLL_OFFSET_PC = 120;
-  const SCROLL_OFFSET_SP = 24;
-  const OBSERVER_ARM_DELAY = 2500;
-  const HEIGHT_CHANGE_THRESHOLD = 200;
-  const SCROLL_DELAY = 180;
+	const params = new URLSearchParams(window.location.search);
+	const DEFAULT_BRAND = 'nicole';
 
-  // タイトル更新（form_type連動）
-  function updateHeading() {
-    const formType = params.get('form_type');
-    const headingMap = {
-      inquiry: 'お問い合わせ',
-      visit_testdrive: '来場・試乗予約'
-    };
-    const headingEl = document.getElementById('contact-heading');
-    if (headingEl && headingMap[formType]) {
-      headingEl.textContent = headingMap[formType];
-    }
-  }
+	const BRAND_LABEL_TO_SLUG = {
+		'BMW': 'bmw',
+		'MINI': 'mini',
+		'Rolls-Royce': 'rolls-royce',
+		'ALPINA': 'alpina',
+		'Ferrari': 'ferrari',
+		'Nicole Group': 'nicole'
+	};
 
-  function detectBrandFromPath(pathname) {
-    const path = String(pathname || '').toLowerCase();
-    if (path.startsWith('/bmw/')) return 'bmw';
-    if (path.startsWith('/mini/')) return 'mini';
-    if (path.startsWith('/rolls-royce/')) return 'rolls-royce';
-    if (path.startsWith('/alpina/')) return 'alpina';
-    if (path.startsWith('/ferrari/')) return 'ferrari';
-    return DEFAULT_BRAND;
-  }
+	function detectBrandFromPath(pathname) {
+		const path = String(pathname || '').toLowerCase();
+		if (path.startsWith('/bmw/')) return 'bmw';
+		if (path.startsWith('/mini/')) return 'mini';
+		if (path.startsWith('/rolls-royce/')) return 'rolls-royce';
+		if (path.startsWith('/alpina/')) return 'alpina';
+		if (path.startsWith('/ferrari/')) return 'ferrari';
+		return DEFAULT_BRAND;
+	}
 
-  function normalizeTitle(title) {
-    if (!title) return '';
-    let t = String(title).trim();
-    t = t.replace(/\u3000/g, ' ');
-    t = t.replace(/\s+/g, ' ').trim();
-    t = t.replace(/\s*-\s*TEST\s*$/i, '');
-    t = t.split(' - ')[0].trim();
-    t = t.replace(/\s*[｜|]\s*Nicole.*$/i, '').trim();
-    t = t.replace(/^BMW\s+/i, '');
-    return t;
-  }
+	function normalizeTitle(title) {
+		if (!title) return '';
+		let t = String(title).trim();
+		t = t.replace(/\u3000/g, ' ');
+		t = t.replace(/\s+/g, ' ').trim();
+		t = t.replace(/\s*-\s*TEST\s*$/i, '');
+		t = t.split(' - ')[0].trim();
+		t = t.replace(/\s*[｜|]\s*Nicole.*$/i, '').trim();
+		t = t.replace(/^BMW\s+/i, '');
+		return t;
+	}
 
-  let brandSlug = String(params.get('brand') || '').toLowerCase();
-  if (!brandSlug) {
-    brandSlug = String(sessionStorage.getItem('ng_brand') || '').toLowerCase();
-  }
-  if (!brandSlug) {
-    try {
-      const referrerPath = document.referrer ? new URL(document.referrer).pathname : '';
-      brandSlug = detectBrandFromPath(referrerPath);
-    } catch (error) {
-      brandSlug = DEFAULT_BRAND;
-    }
-  }
-  if (!brandSlug || brandSlug === 'group') brandSlug = DEFAULT_BRAND;
+	function initFormContext() {
+		// 1. form_type 連動（見出し・種別ラジオ自動選択）
+		const formType = params.get('form_type') || 'inquiry';
+		const headingMap = {
+			inquiry: 'お問い合わせ',
+			visit_testdrive: '来場・試乗予約'
+		};
+		const headingEl = document.getElementById('contact-heading');
+		const breadcrumbEl = document.getElementById('contact-breadcrumb-current');
+		if (headingEl && headingMap[formType]) {
+			headingEl.textContent = headingMap[formType];
+		}
+		if (breadcrumbEl && headingMap[formType]) {
+			breadcrumbEl.textContent = headingMap[formType];
+		}
 
-  const allowedBrands = ['bmw', 'mini', 'rolls-royce', 'alpina', 'ferrari', 'nicole'];
-  if (!allowedBrands.includes(brandSlug)) brandSlug = DEFAULT_BRAND;
+		const formTypeInput = document.getElementById('field-form-type');
+		if (formTypeInput) formTypeInput.value = formType;
 
-  const brandMap = {
-    'bmw': 'BMW',
-    'mini': 'MINI',
-    'rolls-royce': 'Rolls-Royce',
-    'alpina': 'ALPINA',
-    'ferrari': 'Ferrari',
-    'nicole': 'Nicole Group'
-  };
-  const brand = brandMap[brandSlug] || brandMap[DEFAULT_BRAND];
+		if (formType === 'visit_testdrive') {
+			const visitRadio = document.querySelector('input[name="inquiry_type"][value="来場・試乗予約"]');
+			if (visitRadio) visitRadio.checked = true;
+		}
 
-  const formTitleRaw = params.get('form_title') || sessionStorage.getItem('ng_form_title') || '';
-  const seriesValue = normalizeTitle(formTitleRaw);
+		// 2. ブランド自動判別・初期選択
+		let brandSlug = String(params.get('brand') || '').toLowerCase();
+		if (!brandSlug) {
+			brandSlug = String(sessionStorage.getItem('ng_brand') || '').toLowerCase();
+		}
+		if (!brandSlug) {
+			try {
+				const referrerPath = document.referrer ? new URL(document.referrer).pathname : '';
+				brandSlug = detectBrandFromPath(referrerPath);
+			} catch {
+				brandSlug = DEFAULT_BRAND;
+			}
+		}
+		const allowedBrands = ['bmw', 'mini', 'rolls-royce', 'alpina', 'ferrari', 'nicole'];
+		if (!allowedBrands.includes(brandSlug)) brandSlug = DEFAULT_BRAND;
 
-  const formIdMap = {
-    'bmw': '@nicole-group-contact-bmw',
-    'mini': '@nicole-group-contact-mini',
-    'rolls-royce': '@nicole-group-contact-rollsroyce',
-    'alpina': '@nicole-group-contact-alpina',
-    'ferrari': '@nicole-group-contact-ferrari',
-    'nicole': '@nicole-group-contact'
-  };
+		const brandMap = {
+			bmw: 'BMW',
+			mini: 'MINI',
+			'rolls-royce': 'Rolls-Royce',
+			alpina: 'ALPINA',
+			ferrari: 'Ferrari',
+			nicole: 'Nicole Group'
+		};
 
-  const seriesFieldMap = {
-    'bmw': '_field_20',
-    'mini': '_field_21',
-    'rolls-royce': '_field_19',
-    'alpina': '_field_19',
-    'ferrari': '_field_23',
-    'nicole': '_field_19'
-  };
+		const brandSlugInput = document.getElementById('field-brand-slug');
+		if (brandSlugInput) brandSlugInput.value = brandSlug;
 
-  const formId = formIdMap[brandSlug] || formIdMap[DEFAULT_BRAND];
-  const seriesFieldKey = seriesFieldMap[brandSlug] || seriesFieldMap[DEFAULT_BRAND];
+		const brandSelect = document.getElementById('field-brand');
+		if (brandSelect && brandMap[brandSlug]) {
+			brandSelect.value = brandMap[brandSlug];
+		}
+		if (brandSelect && brandSlugInput) {
+			brandSelect.addEventListener('change', function () {
+				brandSlugInput.value = BRAND_LABEL_TO_SLUG[brandSelect.value] || DEFAULT_BRAND;
+			});
+		}
 
-  const formParams = new URLSearchParams();
-  formParams.set('_field_19', brand);
-  if (seriesValue && seriesFieldKey) {
-    formParams.set(seriesFieldKey, seriesValue);
-  }
+		// 3. 検討モデル（form_title）自動プリセット
+		const formTitleRaw = params.get('form_title') || sessionStorage.getItem('ng_form_title') || '';
+		const seriesValue = normalizeTitle(formTitleRaw);
+		const seriesInput = document.getElementById('field-series');
+		if (seriesInput && seriesValue) {
+			seriesInput.value = seriesValue;
+		}
 
-  const queryString = formParams.toString().replace(/\+/g, '%20');
-  const formrunFormValue = formId + (queryString ? '?' + queryString : '');
+		// 4. 遷移元URL記録
+		const sourceUrlInput = document.getElementById('field-source-url');
+		if (sourceUrlInput) {
+			sourceUrlInput.value = document.referrer || window.location.href;
+		}
 
-  const embedElement = document.getElementById('formrun-embed');
-  if (embedElement) {
-    embedElement.setAttribute('data-formrun-form', formrunFormValue);
-    embedElement.setAttribute('data-formrun-redirect', 'true');
-  }
+		// 5. バリデーション ＆ 自社API（/api/contact）送信ハンドリング
+		const form = document.getElementById('nicole-contact-form');
+		const errorBanner = document.getElementById('form-error-banner');
+		const submitBtn = document.getElementById('form-submit-btn');
+		const submitBtnLabel = submitBtn ? submitBtn.querySelector('span') : null;
 
-  function getScrollOffset() {
-    return window.matchMedia('(max-width: 767px)').matches ? SCROLL_OFFSET_SP : SCROLL_OFFSET_PC;
-  }
+		if (!form) return;
 
-  function scrollToFormTop() {
-    const wrapper = document.getElementById('formrun-wrapper');
-    if (!wrapper) return;
-    const targetPosition = window.scrollY + wrapper.getBoundingClientRect().top - getScrollOffset();
-    window.scrollTo({
-      top: Math.max(targetPosition, 0),
-      behavior: 'smooth'
-    });
-  }
+		form.addEventListener('submit', async function (event) {
+			event.preventDefault();
 
-  let scrollTimer = null;
-  function scheduleScrollToFormTop() {
-    if (scrollTimer) window.clearTimeout(scrollTimer);
-    scrollTimer = window.setTimeout(function () {
-      scrollToFormTop();
-      scrollTimer = null;
-    }, SCROLL_DELAY);
-  }
+			// 既存エラーリセット
+			form.querySelectorAll('.is-invalid').forEach(function (el) {
+				el.classList.remove('is-invalid');
+			});
+			if (errorBanner) {
+				errorBanner.hidden = true;
+				errorBanner.textContent = '';
+			}
 
-  let observerArmed = false;
-  let lastIframeHeight = 0;
+			const errors = [];
+			const requiredFields = form.querySelectorAll('[required]');
+			let firstInvalid = null;
 
-  window.setTimeout(function () {
-    observerArmed = true;
-  }, OBSERVER_ARM_DELAY);
+			requiredFields.forEach(function (field) {
+				if (field.type === 'checkbox') {
+					if (!field.checked) {
+						errors.push('プライバシー・ポリシーへの同意が必要です。');
+						if (!firstInvalid) firstInvalid = field;
+					}
+				} else if (field.type === 'email') {
+					const val = field.value.trim();
+					if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+						field.classList.add('is-invalid');
+						errors.push('正しいメールアドレスをご入力ください。');
+						if (!firstInvalid) firstInvalid = field;
+					}
+				} else if (!field.value.trim()) {
+					field.classList.add('is-invalid');
+					if (!firstInvalid) firstInvalid = field;
+				}
+			});
 
-  function getIframeHeight(iframe) {
-    if (!iframe) return 0;
-    const rectHeight = iframe.getBoundingClientRect().height;
-    const attributeHeight = parseFloat(iframe.getAttribute('height') || '0');
-    const styleHeight = parseFloat(iframe.style.height || '0');
-    return Math.max(rectHeight || 0, attributeHeight || 0, styleHeight || 0);
-  }
+			if (firstInvalid) {
+				if (errorBanner) {
+					errorBanner.textContent = errors.length
+						? errors[0]
+						: '必須項目をご入力の上、送信してください。';
+					errorBanner.hidden = false;
+				}
+				firstInvalid.focus();
+				return;
+			}
 
-  function handleIframeHeightChange(iframe) {
-    const currentHeight = getIframeHeight(iframe);
-    if (!currentHeight) return;
-    if (!lastIframeHeight) {
-      lastIframeHeight = currentHeight;
-      return;
-    }
-    const heightDifference = Math.abs(currentHeight - lastIframeHeight);
-    lastIframeHeight = currentHeight;
+			if (submitBtn) submitBtn.disabled = true;
+			if (submitBtnLabel) submitBtnLabel.textContent = '送信しています...';
 
-    if (!observerArmed || heightDifference < HEIGHT_CHANGE_THRESHOLD) return;
-    scheduleScrollToFormTop();
-  }
+			try {
+				const formData = new FormData(form);
+				const response = await fetch('/api/contact', {
+					method: 'POST',
+					body: formData,
+					headers: { Accept: 'application/json' }
+				});
+				const result = await response.json().catch(function () { return {}; });
 
-  if (embedElement) {
-    const iframeCreationObserver = new MutationObserver(function () {
-      const iframe = embedElement.querySelector('iframe');
-      if (!iframe) return;
-      if (iframe.getAttribute('data-nicole-formrun-observer') === 'true') return;
-      iframe.setAttribute('data-nicole-formrun-observer', 'true');
-      lastIframeHeight = getIframeHeight(iframe);
+				if (!response.ok || !result.ok) {
+					throw new Error(result.error || '送信中にエラーが発生しました。');
+				}
 
-      const iframeAttributeObserver = new MutationObserver(function () {
-        handleIframeHeightChange(iframe);
-      });
-      iframeAttributeObserver.observe(iframe, {
-        attributes: true,
-        attributeFilter: ['style', 'height']
-      });
+				const refQuery = result.referenceId
+					? '?ref=' + encodeURIComponent(result.referenceId)
+					: '';
+				window.location.href = '/contact-thanks' + refQuery;
+			} catch (err) {
+				if (errorBanner) {
+					errorBanner.textContent =
+						(err && err.message) ||
+						'送信中にエラーが発生しました。時間をおいて再度お試しいただくか、お電話にてお問い合わせください。';
+					errorBanner.hidden = false;
+				}
+				if (submitBtn) submitBtn.disabled = false;
+				if (submitBtnLabel) submitBtnLabel.textContent = '入力内容を送信する';
+			}
+		});
+	}
 
-      if ('ResizeObserver' in window) {
-        const iframeResizeObserver = new ResizeObserver(function () {
-          handleIframeHeightChange(iframe);
-        });
-        iframeResizeObserver.observe(iframe);
-      }
-      iframeCreationObserver.disconnect();
-    });
-
-    iframeCreationObserver.observe(embedElement, {
-      childList: true,
-      subtree: true
-    });
-  }
-
-  // formrun SDK読み込み
-  const scriptUrl = 'https://sdk.form.run/js/v2/embed.js';
-  if (!document.querySelector('script[src="' + scriptUrl + '"]')) {
-    const script = document.createElement('script');
-    script.src = scriptUrl;
-    script.async = true;
-    document.body.appendChild(script);
-  }
-
-  document.addEventListener('DOMContentLoaded', updateHeading);
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initFormContext);
+	} else {
+		initFormContext();
+	}
 })();
 </script>

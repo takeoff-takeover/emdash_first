@@ -1573,6 +1573,209 @@
   "content": {
     "magazine": [
       {
+        "id": "01M6WORLD1FERRARINICOLE202611",
+        "slug": "202611_ferrari_world-award-2025",
+        "status": "published",
+        "author_id": "system",
+        "primary_byline_id": null,
+        "created_at": "2026-11-20T19:32:15.000Z",
+        "updated_at": "2026-11-20T19:32:15.000Z",
+        "published_at": "2026-11-20T19:32:15.000Z",
+        "version": 1,
+        "locale": "ja",
+        "translation_group": "01M6WORLD1FERRARINICOLE202611",
+        "title": "世界が認めた跳ね馬の頂点へ。Nicole Competizione、2025年度「サービス部門 世界一」の栄冠に輝く",
+        "featured_image": {
+          "src": "/uploads/2026/11/nczworld1-scaled.png",
+          "alt": "世界が認めた跳ね馬の頂点へ。Nicole Competizione、2025年度「サービス部門 世界一」の栄冠に輝く"
+        },
+        "content": [
+          {
+            "_type": "block",
+            "_key": "b-intro-1",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-intro-1",
+                "text": "日本一の、その先へ ────── "
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-intro-2",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-intro-2",
+                "text": "Nicole Competizioneは、フェラーリ正規ディーラーのアフターセールス（サービス）部門において世界の頂点に輝きました。2026年11月19日、Ferrari S.p.A. 主催の年次総会「Ferrari Dealer Annual Meeting」において、2025年度のサービス部門最高賞「Global Top Service Dealer Award 2025」を受賞。世界60以上の市場で展開されるフェラーリ正規ディーラーネットワークの中で、サービス部門世界一の栄冠を獲得いたしました。"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-intro-3",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-intro-3",
+                "text": "日頃より支えてくださるすべてのお客様に、心より感謝申し上げます。"
+              }
+            ]
+          },
+          {
+            "_type": "customImage",
+            "_key": "b-img-1",
+            "image": {
+              "src": "/uploads/2026/11/large_preview-.jpg",
+              "alt": "Nicole Competizione 代表取締役社長 ミヒャエル・ヴィット、ゼネラルマネージャー 北川 隆三"
+            },
+            "caption": "写真右から：Nicole Competizione 代表取締役社長 ミヒャエル・ヴィット、ゼネラルマネージャー 北川 隆三"
+          },
+          {
+            "_type": "block",
+            "_key": "b-h2-1",
+            "style": "h2",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-h2-1",
+                "text": "世界最高峰のディーラーネットワークを牽引する評価基準"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-1",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-1",
+                "text": "「Global Top Service Dealer Award」は、世界中のフェラーリ正規ディーラーを対象に、年間を通じたサービスクオリティを多角的に審査・選出する最も権威ある賞です。高度な整備技術はもちろん、パーツ供給の正確性、整備入庫時の迅速な対応、専用テスターを用いた厳格な車両診断、そして何よりオーナー様からの高い顧客満足度に至るまで、あらゆる領域の総合的なパフォーマンスが厳格に評価されます。"
+              }
+            ]
+          },
+          {
+            "_type": "customImage",
+            "_key": "b-img-2",
+            "image": {
+              "src": "/uploads/2026/02/Z7A8366_re_web.avif",
+              "alt": "Nicole Competizione 港北サービスセンター"
+            },
+            "caption": "世界最高水準の整備技術を誇るNicole Competizione 港北サービスセンター"
+          },
+          {
+            "_type": "block",
+            "_key": "b-h2-2",
+            "style": "h2",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-h2-2",
+                "text": "「ONE Nicole」で築いた、世界最高水準の安心と信頼"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-2",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-2",
+                "text": "今回の受賞は、港北サービスセンターのサービスチームを中心に、日々オーナー様と一台一台のお車に真摯に向き合ってきた積み重ねが国際水準で認められた証です。"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-3",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-3",
+                "text": "フェラーリという至高のブランドを所有する喜びを支えるのは、確かな技術力と、細部まで行き届くホスピタリティに他なりません。その根底にあるのは、ニコル・グループが大切にしてきた「ONE Nicole」の精神です。サービス、セールス、そしてブランド体験を支えるすべての部門が垣根を越えて一丸となり、オーナー様との深い信頼関係を築いてきたからこそ、この到達点へとたどり着くことができました。"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-4",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-4",
+                "text": "世界一という称号を新たな基準とし、これからも謙虚に、目の前のお客様のためにできることを一つずつ積み重ねながら、跳ね馬がもたらす唯一無二の感動を最高のコンディションとともにお届けしてまいります。"
+              }
+            ]
+          },
+          {
+            "_type": "customImage",
+            "_key": "b-img-3",
+            "image": {
+              "src": "/uploads/2026/11/DSC7864.png",
+              "alt": "Nicole Competizione ショールーム"
+            },
+            "caption": "Nicole Competizione 横浜ショールーム"
+          },
+          {
+            "_type": "block",
+            "_key": "b-h2-3",
+            "style": "h2",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-h2-3",
+                "text": "世界が認めた空間とホスピタリティを、ぜひショールーム、サービスセンターで"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-5",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-5",
+                "text": "Nicole Competizioneでは、世界最高水準と認められた港北サービスセンターでのメンテナンス・整備のご相談をはじめ、最新モデルの展示や厳格な基準をクリアしたフェラーリ認定中古車（Ferrari Approved）のご案内まで、オーナー様一人ひとりのフェラーリライフをトータルでサポートしております。"
+              }
+            ]
+          },
+          {
+            "_type": "block",
+            "_key": "b-p-6",
+            "style": "normal",
+            "children": [
+              {
+                "_type": "span",
+                "_key": "s-p-6",
+                "text": "世界の頂点に立った技術力と空間、そしてフェラーリが放つ圧倒的な情熱を、ぜひ実際のショールームおよびサービスセンターにてご体感ください。スタッフ一同、皆様のご来場を心よりお待ち申し上げております。"
+              }
+            ]
+          },
+          {
+            "_type": "cta",
+            "_key": "b-cta-1",
+            "heading": "世界一のクオリティを、あなたのお手元に",
+            "text": "Nicole Competizioneでの点検・整備、モデル試乗、認定中古車のご相談を承ります。",
+            "buttonText": "試乗・商談予約をする",
+            "buttonUrl": "/contact/?form_type=inquiry",
+            "theme": "primary",
+            "card_style": "box"
+          }
+        ],
+        "excerpt": "Nicole Competizioneは、フェラーリ正規ディーラーのアフターセールス（サービス）部門において世界の頂点に輝きました。2026年11月19日、Ferrari S.p.A. 主催の年次総会「Ferrari Dealer Annual Meeting」において、2025年度のサービス部門最高賞「Global Top Service Dealer Award 2025」を受賞。世界60以上の市場で展開される正規ディーラーネットワークの中で、世界一の栄冠を獲得いたしました。",
+        "layout": "standard"
+      },
+      {
         "id": "01M619G5BE3SNREQGM1BTP6F9W",
         "slug": "202606_tamagawa_clean",
         "status": "published",
@@ -3753,7 +3956,7 @@
         },
         "data": {
           "title": "サマーコンファレンス2026で最新ラグジュアリーカーを展示",
-          "excerpt": "2026年7月18日（土）、日本青年会議 [&hellip;]",
+          "excerpt": "2026年7月18日（土）、日本青年会議所主催のイベント「サマーコンファレンス2026 ～家族で学ぶ、みらいのわたし～」が、みなとみらい地区のパシフィコ横浜・臨港パークにて開催されました。",
           "content": [
             {
               "_type": "block",
@@ -3792,6 +3995,10 @@
           },
           "related_location": "",
           "layout": "2col"
+        },
+        "featured_image": {
+          "src": "/uploads/2026/07/20260718_4-scaled.jpg",
+          "alt": "サマーコンファレンス2026で最新ラグジュアリーカーを展示"
         }
       },
       {
@@ -4089,7 +4296,7 @@
         },
         "data": {
           "title": "【2026最新】新型BMW 7シリーズ徹底解説！比較と失敗しない選び方",
-          "excerpt": "BMWのフラッグシップセダン「7シリーズ [&hellip;]",
+          "excerpt": "BMWのフラッグシップセダン「7シリーズ」が、かつてない大規模なモデルチェンジ（G70 LCI）を果たしました。次世代EV世代「ノイエ・クラッセ」の最先端テクノロジーを取り入れ、デザイン・パワートレイン・デジタル技術のすべてが刷新されています。",
           "content": [
             {
               "_type": "block",
@@ -5626,6 +5833,10 @@
           },
           "related_location": "",
           "layout": "2col"
+        },
+        "featured_image": {
+          "src": "/uploads/2026/10/169P90638677_highRes_bmw-740-xdrive-04-20-scaled-e1791451337890.jpg",
+          "alt": "【2026最新】新型BMW 7シリーズ徹底解説！比較と失敗しない選び方"
         }
       },
       {
@@ -5643,7 +5854,7 @@
         },
         "data": {
           "title": "i7・740徹底比較！新型7シリーズ後悔しない選び方",
-          "excerpt": "新型BMW 7シリーズ（G70 LCI： [&hellip;]",
+          "excerpt": "新型BMW 7シリーズ（G70 LCI：ビッグマイナーチェンジモデル）の最大の魅力は、完全電動モデル（BEV）と、ガソリン（ICE：内燃機関）という2つのパワーユニットを自由にお選びいただける点にあります。",
           "content": [
             {
               "_type": "block",
@@ -7257,7 +7468,7 @@
         },
         "data": {
           "title": "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃",
-          "excerpt": "新型BMW 7シリーズ（G70 LCI） [&hellip;]",
+          "excerpt": "新型BMW 7シリーズ（G70 LCI）は、デザインや走りの進化にとどまらず、インテリアのデジタル体験においても自動車業界の常識を覆す進化を果たしました。世界初の14.6インチ助手席画面やパノラミックビジョンを徹底解説。",
           "content": [
             {
               "_type": "block",
@@ -8020,6 +8231,10 @@
           },
           "related_location": "",
           "layout": "2col"
+        },
+        "featured_image": {
+          "src": "/uploads/2026/10/P90638737_lowRes_the-display-and-oper-1.jpg",
+          "alt": "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃"
         }
       },
       {
@@ -71766,6 +71981,10 @@
             "alt": "ブッフローエが日本に託した、最後の傑作"
           },
           "layout": "2col"
+        },
+        "featured_image": {
+          "src": "/uploads/2026/03/DSC8995-2.jpg",
+          "alt": "ブッフローエが日本に託した、最後の傑作"
         }
       },
       {
@@ -86208,6 +86427,10 @@
           ],
           "excerpt": "BMWのフラッグシップセダン「7シリーズ [&hellip;]",
           "related_location": ""
+        },
+        "featured_image": {
+          "src": "/uploads/2026/10/169P90638677_highRes_bmw-740-xdrive-04-20-scaled-e1791451337890.jpg",
+          "alt": "【2026最新】新型BMW 7シリーズ徹底解説！比較と失敗しない選び方"
         }
       },
       {
@@ -88670,6 +88893,10 @@
           ],
           "excerpt": "新型BMW 7シリーズ（G70 LCI） [&hellip;]",
           "related_location": ""
+        },
+        "featured_image": {
+          "src": "/uploads/2026/10/P90638737_lowRes_the-display-and-oper-1.jpg",
+          "alt": "世界初の助手席画面も！新型BMW 7シリーズ先進装備の衝撃"
         }
       },
       {
@@ -88716,6 +88943,10 @@
           ],
           "excerpt": "2026年7月18日（土）、日本青年会議 [&hellip;]",
           "related_location": ""
+        },
+        "featured_image": {
+          "src": "/uploads/2026/07/20260718_4-scaled.jpg",
+          "alt": "サマーコンファレンス2026で最新ラグジュアリーカーを展示"
         }
       },
       {
@@ -90294,6 +90525,10 @@
             "src": "/images/placeholder-replace.jpg",
             "alt": "当グループのInstagram・Facebookで最新情報配信中｜LINEアカウント閉鎖のお知らせ（アイキャッチ写真未設定）"
           }
+        },
+        "featured_image": {
+          "src": "/uploads/2026/02/AdobeStock_838697355-scaled.jpeg",
+          "alt": "当グループのInstagram・Facebookで最新情報配信中｜LINEアカウント閉鎖のお知らせ"
         }
       },
       {
@@ -90924,6 +91159,10 @@
           ],
           "excerpt": "2026年9月1日より、道路交通法施行令 [&hellip;]",
           "related_location": ""
+        },
+        "featured_image": {
+          "src": "/uploads/2026/09/32286261_m.jpg",
+          "alt": "生活道路等の法定速度が30km/hに｜2026年9月道路交通法改正のお知らせ"
         }
       },
       {
@@ -91152,6 +91391,10 @@
           ],
           "excerpt": "当グループで取り扱う認定中古車の在庫は、 [&hellip;]",
           "related_location": ""
+        },
+        "featured_image": {
+          "src": "/uploads/2026/10/AdobeStock_442021317-scaled.jpeg",
+          "alt": "認定中古車検索ページおよび関連Webマガジンのご案内"
         }
       },
       {
@@ -92409,5 +92652,21 @@
         }
       }
     ]
-  }
+  },
+  "content_taxonomies": [
+    {
+      "collection": "magazine",
+      "entry_id": "01M6WORLD1FERRARINICOLE202611",
+      "taxonomy_id": "term_brand_ferrari",
+      "published_at": "2026-11-20T19:32:15.000Z",
+      "created_at": "2026-11-20T19:32:15.000Z"
+    },
+    {
+      "collection": "magazine",
+      "entry_id": "01M6WORLD1FERRARINICOLE202611",
+      "taxonomy_id": "term_mag_people",
+      "published_at": "2026-11-20T19:32:15.000Z",
+      "created_at": "2026-11-20T19:32:15.000Z"
+    }
+  ]
 }

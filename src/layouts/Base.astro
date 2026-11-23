@@ -8,11 +8,11 @@ import {
 } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
-import { Font } from "astro:assets";
 import { getSiteLocale } from "../utils/locale";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
 import "../styles/tokens.css";
 import "../styles/theme.css";
+import "../styles/entrance-motion.css";
 
 interface Props {
 	title: string;
@@ -127,7 +127,6 @@ const year = new Date().getFullYear();
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="robots" content="noindex, nofollow, noarchive" />
 		<meta name="googlebot" content="noindex, nofollow, noarchive" />
-		<Font cssVariable="--font-body" preload />
 		<title>{fullTitle}</title>
 		<EmDashHead page={pageCtx} />
 		<link
@@ -1077,7 +1076,7 @@ const year = new Date().getFullYear();
 				flex-shrink: 0;
 				width: 1.75rem;
 				height: 1.75rem;
-				border-radius: var(--radius);
+				border-radius: var(--radius-card, 4px);
 				background: var(--color-brand);
 				color: var(--color-on-brand);
 				font-size: var(--font-size-sm);
@@ -1227,7 +1226,7 @@ const year = new Date().getFullYear();
 				margin-top: 0;
 				padding: 6px;
 				border: 0;
-				border-radius: 14px;
+				border-radius: var(--radius-card, 4px);
 				background: var(--color-surface);
 				box-shadow: var(--shadow-lg);
 				max-height: min(420px, 70vh);
@@ -1248,7 +1247,7 @@ const year = new Date().getFullYear();
 				gap: 2px;
 				padding: 10px 12px;
 				border: 0;
-				border-radius: var(--radius);
+				border-radius: var(--radius-card, 4px);
 				color: var(--color-text);
 				text-decoration: none;
 			}
@@ -1289,7 +1288,7 @@ const year = new Date().getFullYear();
 
 			.site-search :global(.emdash-live-search-result-snippet mark) {
 				padding: 0 2px;
-				border-radius: 3px;
+				border-radius: 0;
 				background: var(--color-fill-strong);
 				color: var(--color-text);
 			}
@@ -1507,6 +1506,8 @@ const year = new Date().getFullYear();
 				searchInput.focus();
 			});
 		</script>
+		<script is:inline src="/scripts/lenis.min.js"></script>
+		<script is:inline src="/scripts/entrance-motion-init.js"></script>
 		<EmDashBodyEnd page={pageCtx} />
 	</body>
 </html>

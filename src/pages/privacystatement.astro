@@ -1,646 +1,932 @@
 ---
 // src/pages/privacystatement.astro
-// ニコル・グループ プライバシー・ポリシー（完全モダン・脱Elementor）
+// ニコル・グループ プライバシー・ポリシー
+// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "プライバシー・ポリシー | Nicole Group 公式";
 const pageDescription = "ニコル・グループの個人情報保護方針、お客様情報の取り扱い方針について定めたプライバシーステートメントです。";
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "WebPage",
+			"@id": "https://www.nicole.co.jp/privacystatement/#webpage",
+			"url": "https://www.nicole.co.jp/privacystatement",
+			"name": pageTitle,
+			"description": pageDescription,
+			"breadcrumb": {
+				"@id": "https://www.nicole.co.jp/privacystatement/#breadcrumb"
+			}
+		},
+		{
+			"@type": "BreadcrumbList",
+			"@id": "https://www.nicole.co.jp/privacystatement/#breadcrumb",
+			"itemListElement": [
+				{
+					"@type": "ListItem",
+					"position": 1,
+					"name": "HOME",
+					"item": "https://www.nicole.co.jp/"
+				},
+				{
+					"@type": "ListItem",
+					"position": 2,
+					"name": "プライバシー・ポリシー",
+					"item": "https://www.nicole.co.jp/privacystatement"
+				}
+			]
+		}
+	]
+};
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-	<main class="legal-page">
-		<!-- ヒーローヘッダー -->
-		<header class="legal-hero">
-			<div class="legal-hero__inner">
-				<p class="legal-hero__sub">PRIVACY POLICY</p>
-				<h1 class="legal-hero__title">プライバシー・ポリシー</h1>
+	<Fragment slot="head">
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		<style is:global>
+			body:has(.legal-dark-main),
+			body:has(.legal-dark-main) #page,
+			body:has(.legal-dark-main) #content,
+			body:has(.legal-dark-main) .site-content,
+			body:has(.legal-dark-main) #primary,
+			body:has(.legal-dark-main) .content-area,
+			body:has(.legal-dark-main) .ast-container {
+				background-color: #040507 !important;
+				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
+			}
+		</style>
+	</Fragment>
+
+	<main class="legal-dark-main">
+		<!-- 1. ヒーローヘッダー（会社案内準拠・写真背景＋ダークグラデーション） -->
+		<header class="corp-hero">
+			<div class="corp-hero__media">
+				<img
+					src="/uploads/2026/02/DSC3504.jpg"
+					alt="ニコル・グループ プライバシー・ポリシー"
+					class="corp-hero__img"
+					loading="eager"
+					decoding="async"
+				/>
+				<div class="corp-hero__gradient"></div>
+				<div class="corp-hero__side-vignette"></div>
+			</div>
+
+			<div class="corp-container corp-hero__inner">
+				<nav class="corp-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="corp-breadcrumbs__list">
+						<li class="corp-breadcrumbs__item"><a href="/" class="corp-breadcrumbs__link">HOME</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item" aria-current="page">プライバシー・ポリシー</li>
+					</ol>
+				</nav>
+
+				<h1 class="corp-hero__title">プライバシー・ポリシー</h1>
+				<p class="corp-hero__subtitle">
+					<span class="corp-hero__phrase">ニコル・グループにおける個人情報保護方針および、</span><span class="corp-hero__phrase">当社グループウェブサイトにおける個人関連情報の取扱いについて定めています。</span>
+				</p>
+
+				<!-- ページ内クイックナビゲーション -->
+				<nav class="corp-subnav" aria-label="ページ内目次">
+					<ul class="corp-subnav__list">
+						<li><a href="#privacy-statement" class="corp-subnav__pill">プライバシー・ステートメント</a></li>
+						<li><a href="#privacy-contact" class="corp-subnav__pill">お問い合わせ・開示請求窓口</a></li>
+						<li><a href="#website-policy" class="corp-subnav__pill">ウェブサイトにおける個人関連情報の取扱い</a></li>
+						<li><a href="#legal-companies" class="corp-subnav__pill">対象会社</a></li>
+					</ul>
+				</nav>
 			</div>
 		</header>
 
-		<div class="legal-container">
-			<!-- 第1部：プライバシー・ステートメント -->
-			<article class="legal-article">
-				<div class="legal-intro-box">
-					<p>
-						Nicole Group（ニコル・グループ）は創業以来、Excellenceを企業理念として常にクォリティの高い製品とサービスをお届けすることを目指して参りました。
-					</p>
-					<p>
-						この理念のもとニコル・グループ5社の主幹的役割を担うニコル・レーシング・ジャパン合同会社の他、ニコル・オートモビルズ合同会社、ニコル・カーズ合同会社、Nicole MotorCars合同会社、Nicole Competizione合同会社、（以下、総称して「当社グループ」といいます）は、お客様第一主義を掲げ、高品質な製品にふさわしい卓越したサービスをご提供しております。
-					</p>
-					<p>
-						このポリシーは、お客様個人情報の取得や取扱い方法及び保護においても一貫しており、当社グループ全体で真摯に取り組んで参ります。
-					</p>
-					<p>
-						ここに当社グループとしてのプライバシー・ステートメントを公表し、お客様の信頼とご理解を頂く為、以下の原則に基づき、お客様個人情報の適正な取扱いに努めます。
-					</p>
-				</div>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">1. 法令遵守</h2>
-					<p>
-						当社グループは、個人情報の保護に関する法律及びその他の法令の規範を遵守の上、お客様の個人情報を適正に取扱います。
-					</p>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">2. お客様個人情報の利用目的について</h2>
-					<p>
-						当社グループでは、お預かりしたお客様個人情報、および保有しているお客様個人データ（以下総称して「お客様個人情報」といいます）を以下の目的に利用いたします。
-					</p>
-					<ol class="legal-list">
-						<li>定期点検、車検および保険満期のご案内などを提供するための、郵便、電話、電子メール、面談などの方法によるお知らせ</li>
-						<li>当社グループにおいて取り扱う商品、サービスなど、または各種イベント、キャンペーンなどの開催についての、郵便、電話、電子メール、面談などの方法によるご案内</li>
-						<li>商品開発あるいはお客様満足度向上策検討のための、郵便、電話、電子メール、面談などの方法によるアンケート調査の実施</li>
-						<li>資料請求、試乗申し込み、懸賞応募などに対応したサービスのご提供</li>
-						<li>与信・審査およびご契約期間中の信用調査・管理</li>
-						<li>市場調査および流通分析、統計</li>
-						<li>
-							当社グループが代理店として委託を受け損害保険契約を締結する損害保険会社各社に対し、同各社がお客様に保険商品の案内および提供を行うため<br />
-							<strong>＜損害保険会社＞</strong><br />
-							・三井住友海上火災保険株式会社<br />
-							・損害保険ジャパン株式会社
-						</li>
-						<li>項番4．に定めるお客様情報及びお客様車両サービス情報の共同利用による、お客様車両に対する的確なサービスの提供、査定、代替時等、的確なアドバイス、当社グループにおいて取扱う商品のご案内等</li>
-						<li>緊急時の路上サービスの提供（項番4．に定めるメーカーが提供するエマージェンシー・サービスの提供を含む）</li>
-						<li>その他当社グループの行う販売業務、サービス業務遂行のための利用</li>
-						<li>法令または裁判所の命令もしくは権限ある行政機関の命令や決定により開示を求められた場合</li>
-						<li>
-							当社が取り扱う損害保険およびこれらに付帯・関連するサービスのご提供<br />
-							【当社取扱保険会社】<br />
-							■ 三井住友海上火災保険株式会社（<a href="https://www.ms-ins.com" target="_blank" rel="noopener noreferrer">https://www.ms-ins.com</a>）<br />
-							■ 損害保険ジャパン株式会社（<a href="https://www.sompo-japan.co.jp" target="_blank" rel="noopener noreferrer">https://www.sompo-japan.co.jp</a>）
-						</li>
-					</ol>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">3. お客様個人情報の第三者提供について</h2>
-					<p>
-						当社グループは、お客様個人情報を、以下の例外を除き、お客様の同意なく第三者に提供いたしません。また、当社グループがお客様個人情報の取扱いを含む業務を委託する場合、その業務委託の目的の範囲内でお客様個人情報を当該委託先に預託いたします。
-					</p>
-					<ol class="legal-list">
-						<li>法令に基づく場合</li>
-						<li>人の生命、身体又は財産の保護のために必要がある場合であって、本人の同意を得ることが困難であるとき</li>
-						<li>公衆衛生の向上又は児童の健全な育成の推進のために特に必要がある場合であって、本人の同意を得ることが困難であるとき</li>
-						<li>国の機関若しくは地方公共団体又はその委託を受けた者が法令の定める事務を遂行することに対して協力する必要がある場合であって、本人の同意を得ることにより当該事務の遂行に支障を及ぼすおそれがあるとき</li>
-					</ol>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">4. お客様個人情報及びお客様車両サービス情報の共同利用について</h2>
-					<p>
-						当社グループは、お客様個人情報を、以下の例外を除き、お客様の同意なく第三者に提供いたしません。また、当社グループがお客様個人情報の取扱いを含む業務を委託する場合、その業務委託の目的の範囲内でお客様個人情報を当該委託先に預託いたします。
-					</p>
-					<ol class="legal-list">
-						<li>共同利用するお客様個人情報の項目及び範囲</li>
-						<li>共同利用者によるお客様個人情報の利用目的</li>
-						<li>共同利用するお客様個人情報の管理についての責任を有する者</li>
-					</ol>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">5. お客様個人情報の適正な管理</h2>
-					<p>
-						当社グループは、お客様個人情報を適切に管理すると共に、不正アクセス、お客様個人情報の紛失、破壊、改ざん、及び漏えいを防止する為の組織体制を整備し、システム面等の安全管理措置を実行します。業務委託先についても、同様の方針でお客様個人情報を厳正に管理して参ります。
-					</p>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">6. お預かりしているお客様個人情報の取扱いに関して</h2>
-					<p>
-						当社グループは、グループの主幹的役割を担うニコル・レーシング・ジャパン合同会社の管理のもと、保有しているお客様個人情報に関しては、お客様の事前同意がない限り、項番2．に記載した目的以外には利用しません。
-					</p>
-					<p>
-						なお、お客様がご本人様の個人情報の開示、訂正等を希望される場合は、別途定める手続きにてご請求頂き、当社グループは合理的な範囲で速やかに応じます。お客様個人情報の開示・消去は、当社グループが定める書面で、また訂正・変更・利用停止は、問い合わせ窓口に電話で請求頂き、お客様ご本人である確認をとらせて頂いた上で、万が一不正確、または誤りであることが明らかになった場合は、速やかに消去・訂正・変更等に応じます。
-					</p>
-					<p>
-						開示請求書等当社グループの定める書面の入手方法につきましては、項番7．に記載のお客様個人情報の取扱いに関する窓口までお問い合わせください。開示のご回答には、個人情報開示請求書に記載の所定の手数料（郵送費、消費税込）を申し受けますのでご了承ください。
-					</p>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">7. お客様個人情報の取扱いに関する窓口、保有個人データ開示請求書等の送付先</h2>
-					<div class="legal-contact-card">
-						<p class="legal-contact-card__address">
-							〒212-0005 神奈川県川崎市幸区戸手2-5-7<br />
-							<strong>ニコル・レーシング・ジャパン合同会社</strong><br />
-							お客様相談室（お客様個人情報に関するお問い合わせ窓口）<br />
-							TEL：044-511-9859
-						</p>
-						<div class="legal-pdf-box">
-							<a href="/uploads/2026/05/privacy.pdf" target="_blank" rel="noopener noreferrer" class="legal-pdf-link">
-								<svg class="legal-pdf-icon" viewBox="0 0 384 512" fill="currentColor">
-									<path d="M181.9 256.1c-5-16-4.9-46.9-2-46.9 8.4 0 7.6 36.9 2 46.9zm-1.7 47.2c-7.7 20.2-17.3 43.3-28.4 62.7 18.3-7 39-17.2 62.9-21.9-12.7-9.6-24.9-23.4-34.5-40.8zM86.1 428.1c0 .8 13.2-5.4 34.9-40.2-6.7 6.3-29.1 24.5-34.9 40.2zM248 160h136v328c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V24C0 10.7 10.7 0 24 0h200v136c0 13.2 10.8 24 24 24zm-8 171.8c-20-12.2-33.3-29-42.7-53.8 4.5-18.5 11.6-46.6 6.2-64.2-4.7-29.4-42.4-26.5-47.8-6.8-5 18.3-.4 44.1 8.1 77-11.6 27.6-28.7 64.6-40.8 85.8-.1 0-.1.1-.2.1-27.1 13.9-73.6 44.5-54.5 68 5.6 6.9 16 10 21.5 10 17.9 0 35.7-18 61.1-61.8 25.8-8.5 54.1-19.1 79-23.2 21.7 11.8 47.1 19.5 64 19.5 29.2 0 31.2-32 19.7-43.4-13.9-13.6-54.3-9.7-73.6-7.2zM377 105L279 7c-4.5-4.5-10.6-7-17-7h-6v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-74.1 255.3c4.1-2.7-2.5-11.9-42.8-9 37.1 15.8 42.8 9 42.8 9z"></path>
-								</svg>
-								<span>PDF個人情報開示請求書（304KB）</span>
-							</a>
-						</div>
-					</div>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">8. 教育</h2>
-					<p>
-						お客様個人情報の保護に関する教育を全役職員に対して継続的に行います。
-					</p>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">9. プライバシー・ステートメントの変更</h2>
-					<p>
-						当社グループは、法令の変更ないしお客様のご要望等に対応するために、このプライバシー・ステートメントを変更することがあります。<br />
-						変更のご案内については、当社グループウェブサイト等によって公表しますので、定期的にご確認いただきますようお願いいたします。
-					</p>
-				</section>
-
-				<section class="legal-section">
-					<h2 class="legal-section__heading">10. お客様のご質問</h2>
-					<p>
-						当社グループにおけるプライバシーの保護に関するご質問がありましたら、項番7．のお客様相談室（お客様個人情報の取り扱いに関する窓口）までお問い合わせください。
-					</p>
-				</section>
-
-				<footer class="legal-revision">
-					<p>制定日：2009年9月22日<br />改定日：2017年5月30日<br />改定日：2022年4月1日</p>
-					<p class="legal-signer">ニコル・レーシング・ジャパン合同会社<br />職務執行社長　ミヒャエル・ヴィット</p>
-				</footer>
-			</article>
-
-			<!-- 区切り線 -->
-			<div class="legal-divider" role="separator"></div>
-
-			<!-- 第2部：ウェブサイトにおける個人関連情報の取扱い -->
-			<article class="legal-article">
-				<header class="legal-sub-header">
-					<span class="legal-sub-label">WEBSITE POLICY</span>
-					<h2 class="legal-sub-title">当社グループウェブサイトにおける個人関連情報の取扱いについて</h2>
+		<!-- 2. 第1部：プライバシー・ステートメント（#040507 ベース） -->
+		<section id="privacy-statement" class="corp-section">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">プライバシー・ステートメント</h2>
 				</header>
 
-				<div class="legal-intro-box">
-					<p>当社グループは、当社グループが運営する以下のウェブサイトを総称して以下、「本ウェブサイト」といいます。</p>
-					<ul class="legal-sites-list">
-						<li>nicole.co.jp</li>
-						<li>nicole.jp</li>
-						<li>nicole-automobiles.com</li>
-						<li>nicole-automobiles.shop</li>
-						<li>nicole.bmw.jp</li>
-						<li>mini-yokohama.com</li>
-						<li>kohoku.mini.jp</li>
-						<li>yokohama-tsuzuki.mini.jp</li>
-						<li>shin-yurigaoka.mini.jp</li>
-						<li>rolls-roycemotorcars.com/yokohama/ja_JP/showroom.html</li>
-						<li>yokohama.ferraridealers.com/ja-JP</li>
-					</ul>
-					<p>
-						上記の本ウェブサイトでお客様個人情報を取得する場合の目的については、上記プライバシー・ステートメントの項番2．「お客様個人情報の利用目的について」をご参照ください。<br />
-						また、お客様の個人関連情報の取扱いについては以下をご確認ください。
-					</p>
-				</div>
-
-				<section class="legal-section">
-					<h3 class="legal-section__heading">1. クッキー（Cookie）について</h3>
-					<div class="legal-sub-block">
-						<h4 class="legal-sub-heading">（1）クッキー（Cookie）について</h4>
+				<article class="legal-article">
+					<div class="legal-intro-box">
 						<p>
-							本ウェブサイトでは、クッキーと呼ばれる技術を利用しています。クッキーとは、ウェブサーバがお客様のブラウザに送信する小規模なデータのことで、ハードディスクに保存されコンピュータの識別に利用されます。<br />
-							クッキーは、お客様が再び本ウェブサイトをご利用になる際に、本ウェブサイトのコンテンツをより便利に利用していただく為のもので、お客様のプライバシーを侵害したり、お客様のコンピュータへ悪影響を及ぼしたりすることはありません。<br />
-							ウェブブラウザの多くはクッキーを受け取ったことを認識し、ユーザーがクッキーの使用を許可するか禁止するかを設定できるようになっています。クッキーでは、お客様ご自身が本ウェブサイトで能動的に個人情報を入力しない限り、特定の個人を識別することは出来ません。<br />
-							現在使用しているブラウザがこの機能を持っているかどうか不明な場合は、ソフトウェア製造元または、インターネット・サービス・プロバイダーにお問い合わせください。
+							Nicole Group（ニコル・グループ）は創業以来、Excellenceを企業理念として常にクォリティの高い製品とサービスをお届けすることを目指して参りました。
+						</p>
+						<p>
+							この理念のもとニコル・グループ5社の主幹的役割を担うニコル・レーシング・ジャパン合同会社の他、ニコル・オートモビルズ合同会社、ニコル・カーズ合同会社、Nicole MotorCars合同会社、Nicole Competizione合同会社、（以下、総称して「当社グループ」といいます）は、お客様第一主義を掲げ、高品質な製品にふさわしい卓越したサービスをご提供しております。
+						</p>
+						<p>
+							このポリシーは、お客様個人情報の取得や取扱い方法及び保護においても一貫しており、当社グループ全体で真摯に取り組んで参ります。
+						</p>
+						<p>
+							ここに当社グループとしてのプライバシー・ステートメントを公表し、お客様の信頼とご理解を頂く為、以下の原則に基づき、お客様個人情報の適正な取扱いに努めます。
 						</p>
 					</div>
-					<div class="legal-sub-block">
-						<h4 class="legal-sub-heading">（2）クッキーの使用目的</h4>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">1. 法令遵守</h3>
+						<p>
+							当社グループは、個人情報の保護に関する法律及びその他の法令の規範を遵守の上、お客様の個人情報を適正に取扱います。
+						</p>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">2. お客様個人情報の利用目的について</h3>
+						<p>
+							当社グループでは、お預かりしたお客様個人情報、および保有しているお客様個人データ（以下総称して「お客様個人情報」といいます）を以下の目的に利用いたします。
+						</p>
 						<ol class="legal-list">
-							<li>本ウェブサイトのサービスを改善するため</li>
-							<li>本ウェブサイトの利用者数やトラフィックを統計調査するため（統計調査情報にはお客様を特定する個人情報は含まれておりません）</li>
-							<li>本ウェブサービスのサービスを改善するため</li>
+							<li>定期点検、車検および保険満期のご案内などを提供するための、郵便、電話、電子メール、面談などの方法によるお知らせ</li>
+							<li>当社グループにおいて取り扱う商品、サービスなど、または各種イベント、キャンペーンなどの開催についての、郵便、電話、電子メール、面談などの方法によるご案内</li>
+							<li>商品開発あるいはお客様満足度向上策検討のための、郵便、電話、電子メール、面談などの方法によるアンケート調査の実施</li>
+							<li>資料請求、試乗申し込み、懸賞応募などに対応したサービスのご提供</li>
+							<li>与信・審査およびご契約期間中の信用調査・管理</li>
+							<li>市場調査および流通分析、統計</li>
+							<li>
+								当社グループが代理店として委託を受け損害保険契約を締結する損害保険会社各社に対し、同各社がお客様に保険商品の案内および提供を行うため<br />
+								<strong>＜損害保険会社＞</strong><br />
+								・三井住友海上火災保険株式会社<br />
+								・損害保険ジャパン株式会社
+							</li>
+							<li>項番4．に定めるお客様情報及びお客様車両サービス情報の共同利用による、お客様車両に対する的確なサービスの提供、査定、代替時等、的確なアドバイス、当社グループにおいて取扱う商品のご案内等</li>
+							<li>緊急時の路上サービスの提供（項番4．に定めるメーカーが提供するエマージェンシー・サービスの提供を含む）</li>
+							<li>その他当社グループの行う販売業務、サービス業務遂行のための利用</li>
+							<li>法令または裁判所の命令もしくは権限ある行政機関の命令や決定により開示を求められた場合</li>
+							<li>
+								当社が取り扱う損害保険およびこれらに付帯・関連するサービスのご提供<br />
+								【当社取扱保険会社】<br />
+								■ 三井住友海上火災保険株式会社（<a href="https://www.ms-ins.com" target="_blank" rel="noopener noreferrer">https://www.ms-ins.com</a>）<br />
+								■ 損害保険ジャパン株式会社（<a href="https://www.sompo-japan.co.jp" target="_blank" rel="noopener noreferrer">https://www.sompo-japan.co.jp</a>）
+							</li>
 						</ol>
-					</div>
-				</section>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">2. アクセスログについて</h3>
-					<div class="legal-sub-block">
-						<h4 class="legal-sub-heading">（1）アクセスログについて</h4>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">3. お客様個人情報の第三者提供について</h3>
 						<p>
-							本ウェブサイトでは、アクセスされた方の情報をアクセスログとして記録しています。ただし、お客様が利用されているインターネット・サービス・プロバイダーのドメイン名、IPアドレス、使用ブラウザの名称とバージョン、使用OSの種類、ウェブサイトの閲覧履歴等であり、個人を特定できる情報を含むものではありません。
+							当社グループは、お客様個人情報を、以下の例外を除き、お客様の同意なく第三者に提供いたしません。また、当社グループがお客様個人情報の取扱いを含む業務を委託する場合、その業務委託の目的の範囲内でお客様個人情報を当該委託先に預託いたします。
+						</p>
+						<ol class="legal-list">
+							<li>法令に基づく場合</li>
+							<li>人の生命、身体又は財産の保護のために必要がある場合であって、本人の同意を得ることが困難であるとき</li>
+							<li>公衆衛生の向上又は児童の健全な育成の推進のために特に必要がある場合であって、本人の同意を得ることが困難であるとき</li>
+							<li>国の機関若しくは地方公共団体又はその委託を受けた者が法令の定める事務を遂行することに対して協力する必要がある場合であって、本人の同意を得ることにより当該事務の遂行に支障を及ぼすおそれがあるとき</li>
+						</ol>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">4. お客様個人情報及びお客様車両サービス情報の共同利用について</h3>
+						<p>
+							当社グループは、お客様個人情報を、以下の例外を除き、お客様の同意なく第三者に提供いたしません。また、当社グループがお客様個人情報の取扱いを含む業務を委託する場合、その業務委託の目的の範囲内でお客様個人情報を当該委託先に預託いたします。
+						</p>
+						<ol class="legal-list">
+							<li>共同利用するお客様個人情報の項目及び範囲</li>
+							<li>共同利用者によるお客様個人情報の利用目的</li>
+							<li>共同利用するお客様個人情報の管理についての責任を有する者</li>
+						</ol>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">5. お客様個人情報の適正な管理</h3>
+						<p>
+							当社グループは、お客様個人情報を適切に管理すると共に、不正アクセス、お客様個人情報の紛失、破壊、改ざん、及び漏えいを防止する為の組織体制を整備し、システム面等の安全管理措置を実行します。業務委託先についても、同様の方針でお客様個人情報を厳正に管理して参ります。
+						</p>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">6. お預かりしているお客様個人情報の取扱いに関して</h3>
+						<p>
+							当社グループは、グループの主幹的役割を担うニコル・レーシング・ジャパン合同会社の管理のもと、保有しているお客様個人情報に関しては、お客様の事前同意がない限り、項番2．に記載した目的以外には利用しません。
+						</p>
+						<p>
+							なお、お客様がご本人様の個人情報の開示、訂正等を希望される場合は、別途定める手続きにてご請求頂き、当社グループは合理的な範囲で速やかに応じます。お客様個人情報の開示・消去は、当社グループが定める書面で、また訂正・変更・利用停止は、問い合わせ窓口に電話で請求頂き、お客様ご本人である確認をとらせて頂いた上で、万が一不正確、または誤りであることが明らかになった場合は、速やかに消去・訂正・変更等に応じます。
+						</p>
+						<p>
+							開示請求書等当社グループの定める書面の入手方法につきましては、項番7．に記載のお客様個人情報の取扱いに関する窓口までお問い合わせください。開示のご回答には、個人情報開示請求書に記載の所定の手数料（郵送費、消費税込）を申し受けますのでご了承ください。
+						</p>
+					</section>
+
+					<section id="privacy-contact" class="legal-section">
+						<h3 class="legal-section__heading">7. お客様個人情報の取扱いに関する窓口、保有個人データ開示請求書等の送付先</h3>
+						<div class="legal-contact-card">
+							<p class="legal-contact-card__address">
+								〒212-0005 神奈川県川崎市幸区戸手2-5-7<br />
+								<strong>ニコル・レーシング・ジャパン合同会社</strong><br />
+								お客様相談室（お客様個人情報に関するお問い合わせ窓口）<br />
+								TEL：044-511-9859
+							</p>
+							<div class="legal-pdf-box">
+								<a href="/uploads/2026/05/privacy.pdf" target="_blank" rel="noopener noreferrer" class="legal-pdf-link">
+									<svg class="legal-pdf-icon" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">
+										<path d="M181.9 256.1c-5-16-4.9-46.9-2-46.9 8.4 0 7.6 36.9 2 46.9zm-1.7 47.2c-7.7 20.2-17.3 43.3-28.4 62.7 18.3-7 39-17.2 62.9-21.9-12.7-9.6-24.9-23.4-34.5-40.8zM86.1 428.1c0 .8 13.2-5.4 34.9-40.2-6.7 6.3-29.1 24.5-34.9 40.2zM248 160h136v328c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V24C0 10.7 10.7 0 24 0h200v136c0 13.2 10.8 24 24 24zm-8 171.8c-20-12.2-33.3-29-42.7-53.8 4.5-18.5 11.6-46.6 6.2-64.2-4.7-29.4-42.4-26.5-47.8-6.8-5 18.3-.4 44.1 8.1 77-11.6 27.6-28.7 64.6-40.8 85.8-.1 0-.1.1-.2.1-27.1 13.9-73.6 44.5-54.5 68 5.6 6.9 16 10 21.5 10 17.9 0 35.7-18 61.1-61.8 25.8-8.5 54.1-19.1 79-23.2 21.7 11.8 47.1 19.5 64 19.5 29.2 0 31.2-32 19.7-43.4-13.9-13.6-54.3-9.7-73.6-7.2zM377 105L279 7c-4.5-4.5-10.6-7-17-7h-6v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-74.1 255.3c4.1-2.7-2.5-11.9-42.8-9 37.1 15.8 42.8 9 42.8 9z"></path>
+									</svg>
+									<span>PDF個人情報開示請求書（304KB）</span>
+								</a>
+							</div>
+						</div>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">8. 教育</h3>
+						<p>
+							お客様個人情報の保護に関する教育を全役職員に対して継続的に行います。
+						</p>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">9. プライバシー・ステートメントの変更</h3>
+						<p>
+							当社グループは、法令の変更ないしお客様のご要望等に対応するために、このプライバシー・ステートメントを変更することがあります。<br />
+							変更のご案内については、当社グループウェブサイト等によって公表しますので、定期的にご確認いただきますようお願いいたします。
+						</p>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">10. お客様のご質問</h3>
+						<p>
+							当社グループにおけるプライバシーの保護に関するご質問がありましたら、項番7．のお客様相談室（お客様個人情報の取り扱いに関する窓口）までお問い合わせください。
+						</p>
+					</section>
+
+					<footer class="legal-revision">
+						<p>制定日：2009年9月22日<br />改定日：2017年5月30日<br />改定日：2022年4月1日</p>
+						<p class="legal-signer">ニコル・レーシング・ジャパン合同会社<br />職務執行社長　ミヒャエル・ヴィット</p>
+					</footer>
+				</article>
+			</div>
+		</section>
+
+		<!-- 3. 第2部：ウェブサイトにおける個人関連情報の取扱い（チャコールグレー帯） -->
+		<section id="website-policy" class="corp-section corp-section--alt">
+			<div class="corp-container">
+				<header class="corp-section-header">
+					<h2 class="corp-section-title">当社グループウェブサイトにおける個人関連情報の取扱いについて</h2>
+				</header>
+
+				<article class="legal-article">
+					<div class="legal-intro-box">
+						<p>当社グループは、当社グループが運営する以下のウェブサイトを総称して以下、「本ウェブサイト」といいます。</p>
+						<ul class="legal-sites-list">
+							<li>nicole.co.jp</li>
+							<li>nicole.jp</li>
+							<li>nicole-automobiles.com</li>
+							<li>nicole-automobiles.shop</li>
+							<li>nicole.bmw.jp</li>
+							<li>mini-yokohama.com</li>
+							<li>kohoku.mini.jp</li>
+							<li>yokohama-tsuzuki.mini.jp</li>
+							<li>shin-yurigaoka.mini.jp</li>
+							<li>rolls-roycemotorcars.com/yokohama/ja_JP/showroom.html</li>
+							<li>yokohama.ferraridealers.com/ja-JP</li>
+						</ul>
+						<p>
+							上記の本ウェブサイトでお客様個人情報を取得する場合の目的については、上記プライバシー・ステートメントの項番2．「お客様個人情報の利用目的について」をご参照ください。<br />
+							また、お客様の個人関連情報の取扱いについては以下をご確認ください。
 						</p>
 					</div>
-					<div class="legal-sub-block">
-						<h4 class="legal-sub-heading">（2）アクセスログの利用目的</h4>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">1. クッキー（Cookie）について</h3>
+						<div class="legal-sub-block">
+							<h4 class="legal-sub-heading">（1）クッキー（Cookie）について</h4>
+							<p>
+								本ウェブサイトでは、クッキーと呼ばれる技術を利用しています。クッキーとは、ウェブサーバがお客様のブラウザに送信する小規模なデータのことで、ハードディスクに保存されコンピュータの識別に利用されます。<br />
+								クッキーは、お客様が再び本ウェブサイトをご利用になる際に、本ウェブサイトのコンテンツをより便利に利用していただく為のもので、お客様のプライバシーを侵害したり、お客様のコンピュータへ悪影響を及ぼしたりすることはありません。<br />
+								ウェブブラウザの多くはクッキーを受け取ったことを認識し、ユーザーがクッキーの使用を許可するか禁止するかを設定できるようになっています。クッキーでは、お客様ご自身が本ウェブサイトで能動的に個人情報を入力しない限り、特定の個人を識別することは出来ません。<br />
+								現在使用しているブラウザがこの機能を持っているかどうか不明な場合は、ソフトウェア製造元または、インターネット・サービス・プロバイダーにお問い合わせください。
+							</p>
+						</div>
+						<div class="legal-sub-block">
+							<h4 class="legal-sub-heading">（2）クッキーの使用目的</h4>
+							<ol class="legal-list">
+								<li>本ウェブサイトのサービスを改善するため</li>
+								<li>本ウェブサイトの利用者数やトラフィックを統計調査するため（統計調査情報にはお客様を特定する個人情報は含まれておりません）</li>
+								<li>本ウェブサービスのサービスを改善するため</li>
+							</ol>
+						</div>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">2. アクセスログについて</h3>
+						<div class="legal-sub-block">
+							<h4 class="legal-sub-heading">（1）アクセスログについて</h4>
+							<p>
+								本ウェブサイトでは、アクセスされた方の情報をアクセスログとして記録しています。ただし、お客様が利用されているインターネット・サービス・プロバイダーのドメイン名、IPアドレス、使用ブラウザの名称とバージョン、使用OSの種類、ウェブサイトの閲覧履歴等であり、個人を特定できる情報を含むものではありません。
+							</p>
+						</div>
+						<div class="legal-sub-block">
+							<h4 class="legal-sub-heading">（2）アクセスログの利用目的</h4>
+							<p>
+								ウェブサイトの利用状況を統計的に計測し、今後の利便性の向上を図る為に使用します。
+							</p>
+						</div>
+						<div class="legal-sub-block">
+							<h4 class="legal-sub-heading">（3）アクセスログのオプトアウト</h4>
+							<p>
+								本ウェブサイトでは、Google Analytics を利用し訪問履歴を記録・分析しますが、個人を識別する情報は含まれません。分析された情報は Google 社のプライバシーポリシーに従い取り扱われます。
+							</p>
+							<p>
+								オプトアウトをご希望の場合は、以下のブラウザアドオンをインストールすることで、トラッキングを拒否できます。<br />
+								<a href="https://tools.google.com/dlpage/gaoptout?hl=jp" target="_blank" rel="noopener noreferrer">https://tools.google.com/dlpage/gaoptout?hl=jp</a>
+							</p>
+						</div>
+					</section>
+
+					<section class="legal-section">
+						<h3 class="legal-section__heading">3. 推奨OS及びウェブブラウザについて</h3>
 						<p>
-							ウェブサイトの利用状況を統計的に計測し、今後の利便性の向上を図る為に使用します。
-						</p>
-					</div>
-					<div class="legal-sub-block">
-						<h4 class="legal-sub-heading">（3）アクセスログのオプトアウト</h4>
-						<p>
-							本ウェブサイトでは、Google Analytics を利用し訪問履歴を記録・分析しますが、個人を識別する情報は含まれません。分析された情報は Google 社のプライバシーポリシーに従い取り扱われます。
+							本ウェブサイトは一般的な環境での閲覧を前提にデザインされています。推奨環境以外で発生した不具合については責任を負いかねます。
 						</p>
 						<p>
-							オプトアウトをご希望の場合は、以下のブラウザアドオンをインストールすることで、トラッキングを拒否できます。<br />
-							<a href="https://tools.google.com/dlpage/gaoptout?hl=jp" target="_blank" rel="noopener noreferrer">https://tools.google.com/dlpage/gaoptout?hl=jp</a>
+							【推奨OS】<br />
+							Windows 10 / 11、macOS 最新バージョン<br /><br />
+							【推奨ブラウザ】<br />
+							Google Chrome（最新版）、Microsoft Edge（最新版）、Safari（最新版）
 						</p>
-					</div>
-				</section>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">3. 推奨OS及びウェブブラウザについて</h3>
-					<p>
-						本ウェブサイトは一般的な環境での閲覧を前提にデザインされています。推奨環境以外で発生した不具合については責任を負いかねます。
-					</p>
-					<p>
-						【推奨OS】<br />
-						Windows 10 / 11、macOS 最新バージョン<br /><br />
-						【推奨ブラウザ】<br />
-						Google Chrome（最新版）、Microsoft Edge（最新版）、Safari（最新版）
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">4. プラグイン、ヘルパーアプリケーションについて</h3>
+						<p>
+							本ウェブサイトでは各種ドキュメント（PDF等）の閲覧プラグインを利用しています。ご使用の際には最新のリーダーアプリケーションをご利用ください。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">4. プラグイン、ヘルパーアプリケーションについて</h3>
-					<p>
-						本ウェブサイトでは各種ドキュメント（PDF等）の閲覧プラグインを利用しています。ご使用の際には最新のリーダーアプリケーションをご利用ください。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">5. ご利用上のお願い</h3>
+						<p>
+							本ウェブサイトでは、JavaScriptおよびスタイルシートを使用しています。ご覧になる際にはブラウザ設定で、JavaScriptおよびスタイルシートを有効にしてください。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">5. ご利用上のお願い</h3>
-					<p>
-						本ウェブサイトでは、JavaScriptおよびスタイルシートを使用しています。ご覧になる際にはブラウザ設定で、JavaScriptおよびスタイルシートを有効にしてください。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">6. 本ウェブサイト上の情報のご利用制限について</h3>
+						<p>
+							本ウェブサイトに掲載される情報は、各国の著作権法、各種条約及びその他の法律で保護されています。私的使用その他法律によって明示的に認められる範囲を超えて、これらの情報を使用（複製、改変、アップロード、掲示、送信、頒布、ライセンス、販売、出版等を含む）することは、事前に当社グループの文書による許諾がないかぎり、禁止します。
+						</p>
+						<p>
+							本ウェブサイトから提供されるソフトウエアは、当該ソフトウエアに関する権利者の著作物です。それぞれのソフトウエアの提供に際して権利者から提示されるソフトウエア使用許諾契約書の規定及び著作権法、各種条約その他の法律に従ってご使用下さい。
+						</p>
+						<p>
+							本ウェブサイトのうち「alpina.co.jp」上で使用される商標またはその他の商品名は独国アルピナ社及び当社・オートモビルズ合同会社の商標又は登録商標です。その他の製品及び会社名は、各社の商号、登録商標又は商標です。
+						</p>
+						<p>
+							本ウェブサイトのうち「alpina.co.jp」上に掲載されている製品、サービス、技術に関するアルピナ・ロゴやマークなどは当社・グループに商標権または使用権が帰属しています。これらを無断で使用して、アルピナの製品・サービスと関係があるかのような誤解を招く恐れのあるサイトを作成するなどの行為を禁止しております。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">6. 本ウェブサイト上の情報のご利用制限について</h3>
-					<p>
-						本ウェブサイトに掲載される情報は、各国の著作権法、各種条約及びその他の法律で保護されています。私的使用その他法律によって明示的に認められる範囲を超えて、これらの情報を使用（複製、改変、アップロード、掲示、送信、頒布、ライセンス、販売、出版等を含む）することは、事前に当社グループの文書による許諾がないかぎり、禁止します。
-					</p>
-					<p>
-						本ウェブサイトから提供されるソフトウエアは、当該ソフトウエアに関する権利者の著作物です。それぞれのソフトウエアの提供に際して権利者から提示されるソフトウエア使用許諾契約書の規定及び著作権法、各種条約その他の法律に従ってご使用下さい。
-					</p>
-					<p>
-						本ウェブサイトのうち「alpina.co.jp」上で使用される商標またはその他の商品名は独国アルピナ社及び当社・オートモビルズ合同会社の商標又は登録商標です。その他の製品及び会社名は、各社の商号、登録商標又は商標です。
-					</p>
-					<p>
-						本ウェブサイトのうち「alpina.co.jp」上に掲載されている製品、サービス、技術に関するアルピナ・ロゴやマークなどは当社・グループに商標権または使用権が帰属しています。これらを無断で使用して、アルピナの製品・サービスと関係があるかのような誤解を招く恐れのあるサイトを作成するなどの行為を禁止しております。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">7. 禁止事項について</h3>
+						<p>本ウェブサイトのご利用に際し、次の行為をしてはならないものとします。</p>
+						<ol class="legal-list">
+							<li>第三者もしくは当社グループの財産もしくはプライバシー等を侵害する行為、または侵害する恐れのある行為</li>
+							<li>第三者もしくは当社グループに、不利益もしくは損害を与える行為、またはその恐れのある行為</li>
+							<li>公序良俗に反する行為、またはその恐れのある行為</li>
+							<li>犯罪行為もしくは犯罪行為に結びつく行為、またはその恐れのある行為</li>
+							<li>他人の電子メールアドレスを登録する等、虚偽の申告、届出を行なう行為</li>
+							<li>営業活動もしくは営利を目的とする行為、またはその準備を目的とする行為</li>
+							<li>第三者もしくは当社グループの名誉もしくは信用を毀損する行為</li>
+							<li>コンピュータウィルス等有害なプログラムを使用もしくは提供する行為、またはその恐れのある行為</li>
+							<li>その他、法律、法令もしくは条例に違反する行為、またはその恐れのある行為</li>
+							<li>その他、当社グループが不適切と判断する行為</li>
+						</ol>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">7. 禁止事項について</h3>
-					<p>本ウェブサイトのご利用に際し、次の行為をしてはならないものとします。</p>
-					<ol class="legal-list">
-						<li>第三者もしくは当社グループの財産もしくはプライバシー等を侵害する行為、または侵害する恐れのある行為</li>
-						<li>第三者もしくは当社グループに、不利益もしくは損害を与える行為、またはその恐れのある行為</li>
-						<li>公序良俗に反する行為、またはその恐れのある行為</li>
-						<li>犯罪行為もしくは犯罪行為に結びつく行為、またはその恐れのある行為</li>
-						<li>他人の電子メールアドレスを登録する等、虚偽の申告、届出を行なう行為</li>
-						<li>営業活動もしくは営利を目的とする行為、またはその準備を目的とする行為</li>
-						<li>第三者もしくは当社グループの名誉もしくは信用を毀損する行為</li>
-						<li>コンピュータウィルス等有害なプログラムを使用もしくは提供する行為、またはその恐れのある行為</li>
-						<li>その他、法律、法令もしくは条例に違反する行為、またはその恐れのある行為</li>
-						<li>その他、当社グループが不適切と判断する行為</li>
-					</ol>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">8. リンクサイトについて</h3>
+						<p>
+							本ウェブサイトから、もしくはこのウェブサイトへリンクを張っている当社グループ以外の第三者のウエブサイト（以下「リンクサイト」といいます）の内容は、それぞれ各社の責任で管理されるものであり、当社グループの管理下にあるものではありません。リンクサイトは、それぞれのリンクサイトの掲げる使用条件に従ってご利用下さい。<br />
+							当社グループはリンクサイトの内容について、また、それらをご利用になったことにより生じたいかなる損害についても責任を負いません。
+						</p>
+						<p>
+							尚、本ウェブサイトへのリンクという事実は、当社グループが同リンクサイトの利用や、リンクサイトに掲載されている商品、サービス、会社等を推奨することを意味するものではなく、また、当社グループとリンクサイトとの間に提携などの特別な関係があるということを意味するものではありません。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">8. リンクサイトについて</h3>
-					<p>
-						本ウェブサイトから、もしくはこのウェブサイトへリンクを張っている当社グループ以外の第三者のウエブサイト（以下「リンクサイト」といいます）の内容は、それぞれ各社の責任で管理されるものであり、当社グループの管理下にあるものではありません。リンクサイトは、それぞれのリンクサイトの掲げる使用条件に従ってご利用下さい。<br />
-						当社グループはリンクサイトの内容について、また、それらをご利用になったことにより生じたいかなる損害についても責任を負いません。
-					</p>
-					<p>
-						尚、本ウェブサイトへのリンクという事実は、当社グループが同リンクサイトの利用や、リンクサイトに掲載されている商品、サービス、会社等を推奨することを意味するものではなく、また、当社グループとリンクサイトとの間に提携などの特別な関係があるということを意味するものではありません。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">9. 免責事項</h3>
+						<p>
+							当社グループは、本ウェブサイトに情報を掲載する際には、あらゆる面から細心の注意を払っております。<br />
+							しかしながら、当社グループはこれらの情報の内容が正確であるかどうか、有用なものであるかどうか、確実なものであるかどうか、ご使用になる皆様の目的に合ったものかどうか、安全なものであるかどうか（機能が中断しないこと、エラーが発生しないこと、欠点を修正すること、本ウェブサイト及びサーバーにコンピュータウィルスその他の有害物がないこと、等）等につきましては、一切保証致しません。<br />
+							また、当社グループは皆様がこれらの情報を使用されたこと、もしくはご使用になれなかったこと、また、本ウェブサイトをご利用になったことにより生じるいかなる損害についても責任を負うものではありません。<br />
+							当社グループは予告なしにウェブサイト上の情報を変更することがあります。また、ウェブサイトの運営を中断又は中止させて頂くことがあります。あらかじめご了承下さい。尚、当社グループは理由の如何に関わらず、情報の変更及びこのウェブサイトの運用の中断または中止によって生じるいかなる損害についても責任を負うものではありません。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">9. 免責事項</h3>
-					<p>
-						当社グループは、本ウェブサイトに情報を掲載する際には、あらゆる面から細心の注意を払っております。<br />
-						しかしながら、当社グループはこれらの情報の内容が正確であるかどうか、有用なものであるかどうか、確実なものであるかどうか、ご使用になる皆様の目的に合ったものかどうか、安全なものであるかどうか（機能が中断しないこと、エラーが発生しないこと、欠点を修正すること、本ウェブサイト及びサーバーにコンピュータウィルスその他の有害物がないこと、等）等につきましては、一切保証致しません。<br />
-						また、当社グループは皆様がこれらの情報を使用されたこと、もしくはご使用になれなかったこと、また、本ウェブサイトをご利用になったことにより生じるいかなる損害についても責任を負うものではありません。<br />
-						当社グループは予告なしにウェブサイト上の情報を変更することがあります。また、ウェブサイトの運営を中断又は中止させて頂くことがあります。あらかじめご了承下さい。尚、当社グループは理由の如何に関わらず、情報の変更及びこのウェブサイトの運用の中断または中止によって生じるいかなる損害についても責任を負うものではありません。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">10. 準拠法及び管轄裁判所</h3>
+						<p>
+							本ウェブサイトの利用並びに本ご利用条件の解釈及び適用は、他に別段の定めのない限り、日本国法に準拠するものとします。また、本ウェブサイトの利用に関わる全ての紛争については、他に別段の定めのない限り、東京地方裁判所を第一審の専属管轄裁判所とするものとします。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">10. 準拠法及び管轄裁判所</h3>
-					<p>
-						本ウェブサイトの利用並びに本ご利用条件の解釈及び適用は、他に別段の定めのない限り、日本国法に準拠するものとします。また、本ウェブサイトの利用に関わる全ての紛争については、他に別段の定めのない限り、東京地方裁判所を第一審の専属管轄裁判所とするものとします。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">11. プライバシー・ステートメントの変更</h3>
+						<p>
+							当社グループは、法令の変更ないしお客様のご要望等に対応する為に、このプライバシー・ステートメントを変更することがあります。変更のご案内については、当社グループウェブサイト等によって公表しますので、定期的にご確認いただきますようお願いいたします。
+						</p>
+					</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">11. プライバシー・ステートメントの変更</h3>
-					<p>
-						当社グループは、法令の変更ないしお客様のご要望等に対応する為に、このプライバシー・ステートメントを変更することがあります。変更のご案内については、当社グループウェブサイト等によって公表しますので、定期的にご確認いただきますようお願いいたします。
-					</p>
-				</section>
+					<section class="legal-section">
+						<h3 class="legal-section__heading">12. お客様のご質問</h3>
+						<p>
+							当社グループにおけるプライバシーの保護に関するご質問がありましたら、上記項番7．のお客様相談室までお問い合わせください。
+						</p>
+					</section>
+				</article>
+			</div>
+		</section>
 
-				<section class="legal-section">
-					<h3 class="legal-section__heading">12. お客様のご質問</h3>
-					<p>
-						当社グループにおけるプライバシーの保護に関するご質問がありましたら、上記項番7．のお客様相談室までお問い合わせください。
-					</p>
-				</section>
-
+		<!-- 4. 対象グループ会社（#040507 ベース） -->
+		<section id="legal-companies" class="corp-section">
+			<div class="corp-container">
 				<footer class="legal-companies">
 					<p class="legal-companies__title">&lt; Nicole Group of Companies &gt;</p>
-					<p>
-						ニコル・レーシング・ジャパン合同会社<br />
-						ニコル・オートモビルズ合同会社<br />
-						ニコル・カーズ合同会社<br />
-						Nicole MotorCars合同会社<br />
-						Nicole Competizione合同会社
-					</p>
+					<ul class="legal-companies__list">
+						<li>ニコル・レーシング・ジャパン合同会社</li>
+						<li>ニコル・オートモビルズ合同会社</li>
+						<li>ニコル・カーズ合同会社</li>
+						<li>Nicole MotorCars合同会社</li>
+						<li>Nicole Competizione合同会社</li>
+					</ul>
 				</footer>
-			</article>
-		</div>
+			</div>
+		</section>
 	</main>
 </NicoleLayout>
 
 <style>
-/* ============================================================== */
-/* プライバシー・ポリシーページ：完全モダン＆セマンティックデザイン */
-/* ============================================================== */
-.legal-page {
-	width: 100%;
-	background-color: #fcfcfc;
-	color: #111111;
-	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-	line-height: 1.85;
-	padding-bottom: 96px;
-}
+	/* ============================================================== */
+	/* プライバシー・ポリシー：黒ベース＆チャコールグレー帯・1440pxワイド */
+	/* ============================================================== */
+	.legal-dark-main {
+		--spacing-4: 1rem;
+		--spacing-6: 1.5rem;
+		--spacing-8: 2rem;
+		--spacing-10: 2.5rem;
+		--spacing-12: 3rem;
+		--spacing-16: 4rem;
+		--spacing-20: 5rem;
 
-.legal-container {
-	width: 100%;
-	max-width: 920px;
-	margin: 0 auto;
-	padding: 64px 40px 0;
-	box-sizing: border-box;
-}
+		--color-bg: #040507;
+		--color-border: rgba(255, 255, 255, 0.09);
+		--color-text: #ffffff;
+		--color-text-secondary: rgba(255, 255, 255, 0.78);
+		--color-muted: rgba(255, 255, 255, 0.5);
 
-/* --- ヒーローヘッダー --- */
-.legal-hero {
-	width: 100%;
-	background-color: #000000;
-	color: #ffffff;
-	padding: 88px 0 72px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	text-align: center;
-}
-
-.legal-hero__inner {
-	width: 100%;
-	max-width: 1440px;
-	margin: 0 auto;
-	padding: 0 40px;
-	box-sizing: border-box;
-}
-
-.legal-hero__sub {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	letter-spacing: 0.28em;
-	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 16px;
-	text-transform: uppercase;
-}
-
-.legal-hero__title {
-	font-size: clamp(30px, 4vw, 42px);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	margin: 0;
-	color: #ffffff;
-	line-height: 1.3;
-}
-
-/* --- 記事ブロック --- */
-.legal-article {
-	background-color: #ffffff;
-	border: 1px solid #e5e5e5;
-	border-radius: 4px;
-	padding: 48px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-
-.legal-intro-box {
-	background-color: #f9f9f9;
-	border-left: 3px solid #000000;
-	padding: 24px 28px;
-	margin-bottom: 40px;
-	border-radius: 0 4px 4px 0;
-}
-
-.legal-intro-box p {
-	font-size: 15px;
-	line-height: 1.9;
-	color: #333333;
-	margin: 0 0 16px;
-}
-
-.legal-intro-box p:last-child {
-	margin-bottom: 0;
-}
-
-.legal-section {
-	margin-bottom: 40px;
-}
-
-.legal-section:last-of-type {
-	margin-bottom: 32px;
-}
-
-.legal-section__heading {
-	font-size: 18px;
-	font-weight: 600;
-	color: #000000;
-	margin: 0 0 16px;
-	padding-bottom: 8px;
-	border-bottom: 1px solid #eeeeee;
-	letter-spacing: 0.02em;
-}
-
-.legal-section p {
-	font-size: 15px;
-	color: #333333;
-	margin: 0 0 16px;
-}
-
-.legal-section p:last-child {
-	margin-bottom: 0;
-}
-
-.legal-list {
-	padding-left: 24px;
-	margin: 16px 0;
-	color: #333333;
-	font-size: 14.5px;
-}
-
-.legal-list li {
-	margin-bottom: 12px;
-	line-height: 1.8;
-}
-
-.legal-contact-card {
-	background-color: #fcfcfc;
-	border: 1px solid #e8e8e8;
-	padding: 24px;
-	border-radius: 4px;
-	margin-top: 16px;
-}
-
-.legal-contact-card__address {
-	font-size: 14.5px;
-	line-height: 1.8;
-	color: #222222;
-	margin: 0 0 20px !important;
-}
-
-.legal-pdf-box {
-	margin-top: 16px;
-}
-
-.legal-pdf-link {
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	background-color: #000000;
-	color: #ffffff;
-	padding: 10px 20px;
-	border-radius: 4px;
-	font-size: 13px;
-	font-weight: 500;
-	text-decoration: none;
-	transition: background-color 0.2s ease;
-}
-
-.legal-pdf-link:hover {
-	background-color: #333333;
-}
-
-.legal-pdf-icon {
-	width: 14px;
-	height: 14px;
-}
-
-.legal-revision {
-	margin-top: 48px;
-	padding-top: 24px;
-	border-top: 1px solid #eeeeee;
-	font-size: 13.5px;
-	color: #666666;
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
-	flex-wrap: wrap;
-	gap: 16px;
-}
-
-.legal-signer {
-	font-weight: 500;
-	color: #222222;
-	text-align: right;
-}
-
-/* --- 区切り線 --- */
-.legal-divider {
-	width: 100%;
-	height: 1px;
-	background-color: #e5e5e5;
-	margin: 56px 0;
-}
-
-/* --- サブセクション --- */
-.legal-sub-header {
-	margin-bottom: 32px;
-}
-
-.legal-sub-label {
-	display: inline-block;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: 0.16em;
-	color: #dc2626;
-	margin-bottom: 6px;
-	text-transform: uppercase;
-}
-
-.legal-sub-title {
-	font-size: clamp(20px, 2.4vw, 26px);
-	font-weight: 600;
-	color: #000000;
-	margin: 0;
-	line-height: 1.4;
-}
-
-.legal-sites-list {
-	padding-left: 20px;
-	margin: 12px 0 16px;
-	color: #444444;
-	font-size: 14px;
-	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", monospace;
-}
-
-.legal-sites-list li {
-	margin-bottom: 4px;
-}
-
-.legal-sub-block {
-	margin-bottom: 24px;
-}
-
-.legal-sub-heading {
-	font-size: 16px;
-	font-weight: 600;
-	color: #222222;
-	margin: 0 0 10px;
-}
-
-.legal-companies {
-	margin-top: 48px;
-	padding-top: 24px;
-	border-top: 1px solid #eeeeee;
-	font-size: 13.5px;
-	color: #444444;
-}
-
-.legal-companies__title {
-	font-weight: 600;
-	color: #111111;
-	margin-bottom: 8px;
-}
-
-/* --- レスポンシブ対応 --- */
-@media (max-width: 768px) {
-	.legal-container {
-		padding: 40px 20px 0;
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+		min-height: 100vh;
+		position: relative;
+		overflow-x: hidden;
+		line-height: 1.85;
 	}
 
-	.legal-hero {
-		padding: 56px 0 48px;
+	.corp-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 var(--spacing-10);
+		box-sizing: border-box;
 	}
 
+	@media (max-width: 1024px) {
+		.corp-container {
+			padding: 0 var(--spacing-6);
+		}
+	}
+
+	@media (max-width: 480px) {
+		.corp-container {
+			padding: 0 var(--spacing-4);
+		}
+	}
+
+	/* --- ヒーローヘッダー（corporate.astro 準拠） --- */
+	.corp-hero {
+		position: relative;
+		min-height: 460px;
+		display: flex;
+		align-items: flex-end;
+		padding: 130px 0 60px 0;
+		border-bottom: 1px solid var(--color-border);
+		overflow: hidden;
+		background: #000000;
+	}
+
+	@media (max-width: 768px) {
+		.corp-hero {
+			min-height: 360px;
+			padding: 100px 0 40px 0;
+		}
+	}
+
+	.corp-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.corp-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 36%;
+		filter: brightness(0.62) contrast(1.06);
+		transform: scale(1.02);
+	}
+
+	.corp-hero__gradient {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(4, 5, 7, 0.86) 0%,
+			rgba(4, 5, 7, 0.42) 40%,
+			rgba(4, 5, 7, 0.85) 80%,
+			#040507 100%
+		);
+	}
+
+	.corp-hero__side-vignette {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			rgba(4, 5, 7, 0.82) 0%,
+			rgba(4, 5, 7, 0.28) 55%,
+			rgba(4, 5, 7, 0.62) 100%
+		);
+	}
+
+	.corp-hero__inner {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+	}
+
+	.corp-breadcrumbs {
+		margin-bottom: 20px;
+	}
+
+	.corp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.corp-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.72);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.corp-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.corp-breadcrumbs__separator {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	.corp-hero__title {
+		font-size: clamp(30px, 4.2vw, 52px);
+		font-weight: 800;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		margin: 0 0 16px 0;
+		line-height: 1.18;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.corp-hero__subtitle {
+		font-size: clamp(14.5px, 1.35vw, 16.5px);
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.86);
+		max-width: 920px;
+		margin: 0 0 28px 0;
+		text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase;
+	}
+
+	.corp-hero__phrase {
+		display: inline-block;
+	}
+
+	@media (max-width: 640px) {
+		.corp-hero__phrase {
+			display: inline;
+		}
+	}
+
+	/* --- クイックナビゲーション（ピル型） --- */
+	.corp-subnav {
+		margin-top: 8px;
+	}
+
+	.corp-subnav__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.corp-subnav__pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 8px 18px;
+		border-radius: var(--radius-action, 9999px);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		color: rgba(255, 255, 255, 0.88);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+	}
+
+	.corp-subnav__pill:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(255, 255, 255, 0.35);
+		color: #ffffff;
+	}
+
+	/* --- 共通セクション --- */
+	.corp-section {
+		padding: var(--spacing-20) 0;
+		position: relative;
+		background-color: #040507;
+		scroll-margin-top: 88px;
+	}
+
+	.corp-section--alt {
+		background-color: #0e1118;
+		background-image:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
+			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow:
+			inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+			inset 0 -1px 0 0 rgba(0, 0, 0, 0.45);
+	}
+
+	@media (max-width: 768px) {
+		.corp-section {
+			padding: var(--spacing-12) 0;
+		}
+	}
+
+	.corp-section-header {
+		margin-bottom: 32px;
+	}
+
+	.corp-section-title {
+		font-size: clamp(22px, 2.8vw, 32px);
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: -0.01em;
+		line-height: 1.3;
+		margin: 0;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* --- 法務本文（外枠箱なし・セクション面に直接配置） --- */
 	.legal-article {
-		padding: 32px 20px;
+		padding: 0;
 	}
 
 	.legal-intro-box {
-		padding: 20px 18px;
+		padding-bottom: 36px;
+		margin-bottom: 44px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
+	.legal-intro-box p {
+		font-size: 15px;
+		line-height: 1.9;
+		color: rgba(255, 255, 255, 0.84);
+		margin: 0 0 16px;
+	}
+
+	.legal-intro-box p:last-child {
+		margin-bottom: 0;
+	}
+
+	.legal-section {
+		margin-bottom: 48px;
+		scroll-margin-top: 100px;
+	}
+
+	.legal-section:last-of-type {
+		margin-bottom: 0;
+	}
+
+	.legal-section__heading {
+		font-size: clamp(17px, 1.7vw, 21px);
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 18px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+		letter-spacing: 0.01em;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.legal-section p {
+		font-size: 15px;
+		color: rgba(255, 255, 255, 0.8);
+		margin: 0 0 16px;
+	}
+
+	.legal-section p:last-child {
+		margin-bottom: 0;
+	}
+
+	.legal-section a {
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		text-decoration-color: rgba(255, 255, 255, 0.4);
+		transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
+	}
+
+	.legal-section a:hover {
+		text-decoration-color: #ffffff;
+		opacity: 0.9;
+	}
+
+	.legal-list {
+		padding-left: 24px;
+		margin: 16px 0;
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 14.5px;
+	}
+
+	.legal-list li {
+		margin-bottom: 12px;
+		line-height: 1.85;
+	}
+
+	.legal-list strong {
+		color: #ffffff;
+	}
+
+	/* --- お問い合わせ・開示請求窓口（多重箱なし・すっきりした単一構成） --- */
+	.legal-contact-card {
+		padding: 20px 0 4px;
+		margin-top: 8px;
+	}
+
+	.legal-contact-card__address {
+		font-size: 15px;
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.88) !important;
+		margin: 0 0 22px !important;
+	}
+
+	.legal-contact-card__address strong {
+		color: #ffffff;
+	}
+
+	.legal-pdf-box {
+		margin-top: 16px;
+	}
+
+	.legal-pdf-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		background-color: #ffffff;
+		color: #040507 !important;
+		padding: 12px 26px;
+		border-radius: var(--radius-action, 9999px);
+		font-size: 13.5px;
+		font-weight: 600;
+		text-decoration: none !important;
+		transition: background-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.legal-pdf-link:hover {
+		background-color: rgba(255, 255, 255, 0.88);
+		transform: translateY(-1px);
+	}
+
+	.legal-pdf-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* --- 制定日・署名 --- */
 	.legal-revision {
-		flex-direction: column;
-		align-items: flex-start;
+		margin-top: 48px;
+		padding-top: 28px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.62);
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+
+	.legal-revision p {
+		margin: 0;
 	}
 
 	.legal-signer {
-		text-align: left;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.9);
+		text-align: right;
 	}
-}
+
+	/* --- ウェブサイト一覧・サブブロック --- */
+	.legal-sites-list {
+		padding-left: 20px;
+		margin: 14px 0 18px;
+		color: rgba(255, 255, 255, 0.78);
+		font-size: 14px;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		letter-spacing: 0.02em;
+	}
+
+	.legal-sites-list li {
+		margin-bottom: 4px;
+	}
+
+	.legal-sub-block {
+		margin-bottom: 24px;
+	}
+
+	.legal-sub-block:last-child {
+		margin-bottom: 0;
+	}
+
+	.legal-sub-heading {
+		font-size: 15.5px;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.94);
+		margin: 0 0 10px;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* --- 対象会社 --- */
+	.legal-companies__title {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 13px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 14px;
+	}
+
+	.legal-companies__list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		font-size: 14.5px;
+		color: rgba(255, 255, 255, 0.84);
+		line-height: 1.75;
+	}
+
+	/* --- レスポンシブ --- */
+	@media (max-width: 768px) {
+		.legal-intro-box {
+			padding-bottom: 24px;
+			margin-bottom: 32px;
+		}
+
+		.legal-revision {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.legal-signer {
+			text-align: left;
+		}
+	}
 </style>

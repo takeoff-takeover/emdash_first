@@ -1,6 +1,7 @@
 ---
 // src/pages/customer-policy.astro
-// ニコル・グループ お客さま本位の業務運営方針（FD宣言）（完全モダン・脱Elementor）
+// ニコル・グループ お客さま本位の業務運営方針（FD宣言）
+// 会社案内（corporate.astro）準拠：黒ベース（#040507）・1440pxワイド1カラム構成
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お客さま本位の業務運営方針（FD宣言） | Nicole Group 公式";
@@ -8,12 +9,16 @@ const pageDescription = "ニコル・グループ各社が定める「お客さ�
 
 const policies = [
 	{
+		id: "policy-01",
 		num: "01",
+		shortLabel: "方針 1",
 		title: "方針1. お客様本位の業務運営の徹底について",
 		desc: "私たちは、経営理念と本方針に基づき、全社員がお客様本位で行動していく企業風土を醸成します。また、本方針の定期的な見直しは、社会情勢や経営環境の変化を踏まえ行います。"
 	},
 	{
+		id: "policy-02",
 		num: "02",
+		shortLabel: "方針 2",
 		title: "方針2. お客様の最善の利益の追求について",
 		desc: "お客様の立場に立ち、最適な提案と安心を提供するため、以下の取り組みを実践します。",
 		initiatives: [
@@ -32,7 +37,9 @@ const policies = [
 		]
 	},
 	{
+		id: "policy-03",
 		num: "03",
+		shortLabel: "方針 3",
 		title: "方針3. ガバナンス体制整備について",
 		desc: "高い企業倫理と専門性を維持し、健全な業務運営を推進します。",
 		initiatives: [
@@ -47,7 +54,9 @@ const policies = [
 		]
 	},
 	{
+		id: "policy-04",
 		num: "04",
+		shortLabel: "方針 4",
 		title: "方針4. 実現化するためのKPIについて",
 		desc: "本方針の定着とさらなる品質向上のため、以下のKPIを設定・検証します。",
 		initiatives: [
@@ -62,31 +71,123 @@ const policies = [
 		]
 	}
 ];
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "WebPage",
+			"@id": "https://www.nicole.co.jp/customer-policy/#webpage",
+			"url": "https://www.nicole.co.jp/customer-policy",
+			"name": pageTitle,
+			"description": pageDescription,
+			"breadcrumb": {
+				"@id": "https://www.nicole.co.jp/customer-policy/#breadcrumb"
+			}
+		},
+		{
+			"@type": "BreadcrumbList",
+			"@id": "https://www.nicole.co.jp/customer-policy/#breadcrumb",
+			"itemListElement": [
+				{
+					"@type": "ListItem",
+					"position": 1,
+					"name": "HOME",
+					"item": "https://www.nicole.co.jp/"
+				},
+				{
+					"@type": "ListItem",
+					"position": 2,
+					"name": "会社概要",
+					"item": "https://www.nicole.co.jp/corporate"
+				},
+				{
+					"@type": "ListItem",
+					"position": 3,
+					"name": "お客さま本位の業務運営方針（FD宣言）",
+					"item": "https://www.nicole.co.jp/customer-policy"
+				}
+			]
+		}
+	]
+};
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-	<main class="policy-page">
-		<!-- ヒーローヘッダー -->
-		<header class="policy-hero">
-			<div class="policy-hero__inner">
-				<p class="policy-hero__sub">FIDUCIARY DUTY</p>
-				<h1 class="policy-hero__title">お客さま本位の業務運営方針<br class="sp-only" />（FD宣言）</h1>
+	<Fragment slot="head">
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		<style is:global>
+			body:has(.policy-dark-main),
+			body:has(.policy-dark-main) #page,
+			body:has(.policy-dark-main) #content,
+			body:has(.policy-dark-main) .site-content,
+			body:has(.policy-dark-main) #primary,
+			body:has(.policy-dark-main) .content-area,
+			body:has(.policy-dark-main) .ast-container {
+				background-color: #040507 !important;
+				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
+			}
+		</style>
+	</Fragment>
+
+	<main class="policy-dark-main">
+		<!-- 1. ヒーローヘッダー（会社案内準拠・写真背景＋ダークグラデーション） -->
+		<header class="corp-hero">
+			<div class="corp-hero__media">
+				<img
+					src="/uploads/2026/02/DSC3504.jpg"
+					alt="ニコル・グループ お客さま本位の業務運営方針（FD宣言）"
+					class="corp-hero__img"
+					loading="eager"
+					decoding="async"
+				/>
+				<div class="corp-hero__gradient"></div>
+				<div class="corp-hero__side-vignette"></div>
+			</div>
+
+			<div class="corp-container corp-hero__inner">
+				<nav class="corp-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="corp-breadcrumbs__list">
+						<li class="corp-breadcrumbs__item"><a href="/" class="corp-breadcrumbs__link">HOME</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item"><a href="/corporate" class="corp-breadcrumbs__link">会社概要</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item" aria-current="page">お客さま本位の業務運営方針（FD宣言）</li>
+					</ol>
+				</nav>
+
+				<h1 class="corp-hero__title">
+					<span class="title-phrase">お客さま本位の業務運営方針</span><span class="title-phrase">（FD宣言）</span>
+				</h1>
+				<p class="corp-hero__subtitle">
+					<span class="corp-hero__phrase">私たち、Nicole Groupは、</span><span class="corp-hero__phrase">経営理念に「私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。」を掲げ、</span><br class="corp-hero__br" /><span class="corp-hero__phrase">お客様本位の業務運営方針を策定・公表・実践してまいります。</span>
+				</p>
+
+				<!-- ページ内クイックナビゲーション -->
+				<nav class="corp-subnav" aria-label="ページ内目次">
+					<ul class="corp-subnav__list">
+						{policies.map((p) => (
+							<li>
+								<a href={`#${p.id}`} class="corp-subnav__pill">{p.shortLabel}</a>
+							</li>
+						))}
+						<li><a href="#policy-companies" class="corp-subnav__pill">対象会社・制定日</a></li>
+					</ul>
+				</nav>
 			</div>
 		</header>
 
-		<div class="policy-container">
-			<article class="policy-article">
-				<!-- リード文 -->
-				<div class="policy-intro">
-					<p>
-						私たち、Nicole Groupは、経営理念に<strong>「私達は共に働く仲間・お客様・パートナーの期待を超える喜びをお届けします。」</strong>を掲げ、お客様本位の業務運営方針を策定・公表・実践してまいります。
-					</p>
-				</div>
-
-				<!-- 各方針ブロック -->
+		<!-- 2. 各方針 ＆ 制定情報（チャコールグレー一色・1440px ワイド 1カラム） -->
+		<section class="corp-section corp-section--charcoal">
+			<div class="corp-container">
 				<div class="policy-list">
 					{policies.map((p) => (
-						<section class="policy-card">
+						<article id={p.id} class="policy-card">
 							<div class="policy-card__header">
 								<span class="policy-card__num">{p.num}</span>
 								<h2 class="policy-card__title">{p.title}</h2>
@@ -95,7 +196,7 @@ const policies = [
 
 							{p.initiatives && (
 								<div class="initiatives-block">
-									<h3 class="initiatives-block__heading">【具体的取組内容】</h3>
+									<h3 class="initiatives-block__heading">具体的取組内容</h3>
 									<div class="initiatives-list">
 										{p.initiatives.map((init) => (
 											<div class="initiative-item">
@@ -106,275 +207,434 @@ const policies = [
 									</div>
 								</div>
 							)}
-						</section>
+						</article>
 					))}
 				</div>
 
-				<!-- 結び・制定情報 -->
-				<footer class="policy-footer">
-					<p class="policy-enacted">制定日：2025年5月</p>
+				<!-- 制定日・対象会社 -->
+				<footer id="policy-companies" class="policy-footer">
+					<div class="policy-footer__meta">
+						<p class="policy-footer__label">制定情報</p>
+						<p class="policy-enacted">制定日：2025年5月</p>
+					</div>
 					<div class="policy-companies">
 						<p class="policy-companies__title">&lt; Nicole Group of Companies &gt;</p>
-						<p>
-							ニコル・レーシング・ジャパン合同会社<br />
-							ニコル・オートモビルズ合同会社<br />
-							ニコル・カーズ合同会社<br />
-							Nicole MotorCars合同会社<br />
-							Nicole Competizione合同会社
-						</p>
+						<ul class="policy-companies__list">
+							<li>ニコル・レーシング・ジャパン合同会社</li>
+							<li>ニコル・オートモビルズ合同会社</li>
+							<li>ニコル・カーズ合同会社</li>
+							<li>Nicole MotorCars合同会社</li>
+							<li>Nicole Competizione合同会社</li>
+						</ul>
 					</div>
 				</footer>
-			</article>
-		</div>
+			</div>
+		</section>
 	</main>
 </NicoleLayout>
 
 <style>
-/* ============================================================== */
-/* お客さま本位の業務運営方針（FD宣言）：完全モダン＆セマンティックデザイン */
-/* ============================================================== */
-.policy-page {
-	width: 100%;
-	background-color: #fcfcfc;
-	color: #111111;
-	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-	line-height: 1.85;
-	padding-bottom: 96px;
-}
+	/* ============================================================== */
+	/* お客さま本位の業務運営方針（FD宣言）：黒ベース・1440pxワイド構成 */
+	/* ============================================================== */
+	.policy-dark-main {
+		--spacing-4: 1rem;
+		--spacing-6: 1.5rem;
+		--spacing-8: 2rem;
+		--spacing-10: 2.5rem;
+		--spacing-12: 3rem;
+		--spacing-16: 4rem;
+		--spacing-20: 5rem;
+		--spacing-24: 6rem;
 
-.policy-container {
-	width: 100%;
-	max-width: 920px;
-	margin: 0 auto;
-	padding: 64px 40px 0;
-	box-sizing: border-box;
-}
+		--color-bg: #040507;
+		--color-surface: rgba(255, 255, 255, 0.03);
+		--color-border: rgba(255, 255, 255, 0.09);
+		--color-text: #ffffff;
+		--color-text-secondary: rgba(255, 255, 255, 0.72);
+		--color-muted: rgba(255, 255, 255, 0.48);
+		--color-accent: #E60012;
 
-.sp-only {
-	display: none;
-}
-
-/* --- ヒーローヘッダー --- */
-.policy-hero {
-	width: 100%;
-	background-color: #000000;
-	color: #ffffff;
-	padding: 88px 0 72px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	text-align: center;
-}
-
-.policy-hero__inner {
-	width: 100%;
-	max-width: 1440px;
-	margin: 0 auto;
-	padding: 0 40px;
-	box-sizing: border-box;
-}
-
-.policy-hero__sub {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	letter-spacing: 0.28em;
-	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 16px;
-	text-transform: uppercase;
-}
-
-.policy-hero__title {
-	font-size: clamp(26px, 3.6vw, 40px);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	margin: 0;
-	color: #ffffff;
-	line-height: 1.35;
-}
-
-/* --- メインコンテンツ --- */
-.policy-article {
-	background-color: #ffffff;
-	border: 1px solid #e5e5e5;
-	border-radius: 4px;
-	padding: 48px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-
-.policy-intro {
-	background-color: #f9f9f9;
-	border-left: 3px solid #000000;
-	padding: 24px 28px;
-	margin-bottom: 48px;
-	border-radius: 0 4px 4px 0;
-}
-
-.policy-intro p {
-	font-size: 16px;
-	line-height: 1.9;
-	color: #222222;
-	margin: 0;
-}
-
-.policy-list {
-	display: flex;
-	flex-direction: column;
-	gap: 40px;
-}
-
-.policy-card {
-	padding-bottom: 40px;
-	border-bottom: 1px solid #eeeeee;
-}
-
-.policy-card:last-child {
-	border-bottom: none;
-	padding-bottom: 0;
-}
-
-.policy-card__header {
-	display: flex;
-	align-items: baseline;
-	gap: 12px;
-	margin-bottom: 16px;
-}
-
-.policy-card__num {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	font-weight: 700;
-	color: #dc2626;
-	letter-spacing: 0.1em;
-}
-
-.policy-card__title {
-	font-size: 20px;
-	font-weight: 600;
-	color: #000000;
-	margin: 0;
-	letter-spacing: 0.02em;
-}
-
-.policy-card__desc {
-	font-size: 15px;
-	line-height: 1.85;
-	color: #333333;
-	margin: 0 0 20px;
-}
-
-/* --- 具体的取組ブロック --- */
-.initiatives-block {
-	background-color: #fafafa;
-	border: 1px solid #eeeeee;
-	border-radius: 4px;
-	padding: 24px 28px;
-	margin-top: 16px;
-}
-
-.initiatives-block__heading {
-	font-size: 13px;
-	font-weight: 700;
-	color: #444444;
-	letter-spacing: 0.08em;
-	margin: 0 0 16px;
-}
-
-.initiatives-list {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-}
-
-.initiative-item {
-	border-left: 2px solid #dc2626;
-	padding-left: 14px;
-}
-
-.initiative-item__label {
-	font-size: 15px;
-	font-weight: 600;
-	color: #111111;
-	margin: 0 0 4px;
-}
-
-.initiative-item__text {
-	font-size: 14px;
-	color: #555555;
-	line-height: 1.8;
-	margin: 0;
-}
-
-/* --- フッター --- */
-.policy-footer {
-	margin-top: 48px;
-	padding-top: 32px;
-	border-top: 1px solid #eeeeee;
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	flex-wrap: wrap;
-	gap: 24px;
-}
-
-.policy-enacted {
-	font-size: 14px;
-	color: #666666;
-	margin: 0;
-}
-
-.policy-companies {
-	font-size: 13.5px;
-	color: #444444;
-}
-
-.policy-companies__title {
-	font-weight: 600;
-	color: #111111;
-	margin: 0 0 8px;
-}
-
-.policy-companies p {
-	margin: 0;
-	line-height: 1.8;
-}
-
-/* --- レスポンシブ対応 --- */
-@media (max-width: 768px) {
-	.sp-only {
-		display: inline;
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+		min-height: 100vh;
+		position: relative;
+		overflow-x: hidden;
+		line-height: 1.85;
 	}
 
-	.policy-container {
-		padding: 40px 20px 0;
+	.corp-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 var(--spacing-10);
+		box-sizing: border-box;
 	}
 
-	.policy-hero {
-		padding: 56px 0 48px;
+	@media (max-width: 1024px) {
+		.corp-container {
+			padding: 0 var(--spacing-6);
+		}
 	}
 
-	.policy-article {
-		padding: 32px 20px;
+	@media (max-width: 480px) {
+		.corp-container {
+			padding: 0 var(--spacing-4);
+		}
 	}
 
-	.policy-intro {
-		padding: 20px 18px;
-		margin-bottom: 36px;
+	/* --- ヒーローヘッダー（corporate.astro 準拠） --- */
+	.corp-hero {
+		position: relative;
+		min-height: 480px;
+		display: flex;
+		align-items: flex-end;
+		padding: 130px 0 60px 0;
+		border-bottom: 1px solid var(--color-border);
+		overflow: hidden;
+		background: #000000;
+	}
+
+	@media (max-width: 768px) {
+		.corp-hero {
+			min-height: 380px;
+			padding: 100px 0 40px 0;
+		}
+	}
+
+	.corp-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.corp-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 36%;
+		filter: brightness(0.62) contrast(1.06);
+		transform: scale(1.02);
+	}
+
+	.corp-hero__gradient {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(4, 5, 7, 0.86) 0%,
+			rgba(4, 5, 7, 0.42) 40%,
+			rgba(14, 17, 24, 0.86) 82%,
+			#0e1118 100%
+		);
+	}
+
+	.corp-hero__side-vignette {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			rgba(4, 5, 7, 0.82) 0%,
+			rgba(4, 5, 7, 0.28) 55%,
+			rgba(4, 5, 7, 0.62) 100%
+		);
+	}
+
+	.corp-hero__inner {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+	}
+
+	.corp-breadcrumbs {
+		margin-bottom: 20px;
+	}
+
+	.corp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.corp-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.72);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.corp-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.corp-breadcrumbs__separator {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	.corp-hero__title {
+		font-size: clamp(28px, 4vw, 50px);
+		font-weight: 800;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		margin: 0 0 18px 0;
+		line-height: 1.2;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.title-phrase {
+		display: inline-block;
+	}
+
+	.corp-hero__subtitle {
+		font-size: clamp(14.5px, 1.35vw, 16.5px);
+		line-height: 1.85;
+		color: rgba(255, 255, 255, 0.86);
+		max-width: 960px;
+		margin: 0 0 28px 0;
+		text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase;
+	}
+
+	.corp-hero__phrase {
+		display: inline-block;
+	}
+
+	@media (max-width: 640px) {
+		.corp-hero__br {
+			display: none;
+		}
+		.corp-hero__phrase {
+			display: inline;
+		}
+	}
+
+	/* --- クイックナビゲーション（ピル型） --- */
+	.corp-subnav {
+		margin-top: 8px;
+	}
+
+	.corp-subnav__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.corp-subnav__pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 8px 18px;
+		border-radius: var(--radius-action, 9999px);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		color: rgba(255, 255, 255, 0.88);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+	}
+
+	.corp-subnav__pill:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(255, 255, 255, 0.35);
+		color: #ffffff;
+	}
+
+	/* --- 共通セクション（チャコールグレー一色） --- */
+	.corp-section {
+		padding: var(--spacing-20) 0;
+		position: relative;
+		background-color: #0e1118;
+	}
+
+	.corp-section--charcoal {
+		background-color: #0e1118;
+		background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 320px);
+	}
+
+	@media (max-width: 768px) {
+		.corp-section {
+			padding: var(--spacing-12) 0;
+		}
+	}
+
+	/* --- 方針ブロック（外枠箱なし・セクション面に直接配置） --- */
+	.policy-list {
+		display: flex;
+		flex-direction: column;
+		gap: 64px;
+	}
+
+	.policy-card {
+		padding: 0;
+		scroll-margin-top: 100px;
 	}
 
 	.policy-card__header {
-		flex-direction: column;
-		gap: 6px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 20px;
+		padding-bottom: 18px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.policy-card__num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 36px;
+		height: 28px;
+		padding: 0 10px;
+		background-color: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: var(--radius-meta, 0);
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 13px;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: 0.12em;
+		flex-shrink: 0;
 	}
 
 	.policy-card__title {
-		font-size: 18px;
+		font-size: clamp(20px, 2.2vw, 28px);
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0;
+		letter-spacing: -0.01em;
+		line-height: 1.35;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
 	}
 
+	.policy-card__desc {
+		font-size: 15.5px;
+		line-height: 1.9;
+		color: rgba(255, 255, 255, 0.86);
+		margin: 0;
+	}
+
+	/* --- 具体的取組内容（箱なし・余白と細い区切り線のみで整理） --- */
 	.initiatives-block {
-		padding: 20px 16px;
+		margin-top: 32px;
+		padding-top: 28px;
+		border-top: 1px solid rgba(255, 255, 255, 0.09);
 	}
 
-	.policy-footer {
-		flex-direction: column;
-		gap: 20px;
+	.initiatives-block__heading {
+		font-size: 13px;
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.52);
+		letter-spacing: 0.14em;
+		margin: 0 0 24px;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
 	}
-}
+
+	.initiatives-list {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.initiative-item {
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.initiative-item:last-child {
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+
+	.initiative-item__label {
+		font-size: 16px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 8px;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.initiative-item__text {
+		font-size: 14.5px;
+		color: rgba(255, 255, 255, 0.72);
+		line-height: 1.85;
+		margin: 0;
+	}
+
+	/* --- 制定情報・対象会社 --- */
+	.policy-footer {
+		margin-top: 72px;
+		padding-top: 48px;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		flex-wrap: wrap;
+		gap: 40px;
+		scroll-margin-top: 100px;
+	}
+
+	.policy-footer__label {
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgba(255, 255, 255, 0.48);
+		margin: 0 0 8px;
+	}
+
+	.policy-enacted {
+		font-size: 16px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0;
+	}
+
+	.policy-companies__title {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 13px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.65);
+		margin: 0 0 12px;
+	}
+
+	.policy-companies__list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		font-size: 14.5px;
+		color: rgba(255, 255, 255, 0.82);
+		line-height: 1.7;
+	}
+
+	/* --- レスポンシブ --- */
+	@media (max-width: 768px) {
+		.policy-card__header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 10px;
+		}
+
+		.policy-footer {
+			flex-direction: column;
+			gap: 28px;
+		}
+	}
 </style>

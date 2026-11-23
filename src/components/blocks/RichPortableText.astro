@@ -239,7 +239,7 @@ if (currentBand && currentBand.items.length > 0) {
 		margin-left: 0 !important;
 		margin-right: 0 !important;
 		padding: 2.75rem 2.25rem !important;
-		border-radius: 14px !important;
+		border-radius: var(--radius-card, 4px) !important;
 		overflow: hidden !important;
 	}
 	:global(.article-two-col-layout:not(.is-one-column)) .cms-bg-band__inner {
@@ -251,7 +251,7 @@ if (currentBand && currentBand.items.length > 0) {
 	@media (max-width: 768px) {
 		:global(.article-two-col-layout:not(.is-one-column)) .cms-bg-band {
 			padding: 2rem 1.25rem !important;
-			border-radius: 12px !important;
+			border-radius: var(--radius-card, 4px) !important;
 		}
 	}
 	/* 背景エリアが連続する時だけ、間の余白（黒い隙間）をなくして隙間なく接続する */

@@ -10,7 +10,7 @@
   --resale-text-lg: 1.25rem;
   --resale-number-size: 2rem;
   --resale-leading: 1.5;
-  --resale-radius: 0.75rem;
+  --resale-radius: var(--radius-card, 4px);
   --resale-ink: #ffffff;
   --resale-surface: #141418;
   --resale-border: #383842;

@@ -956,6 +956,21 @@ const articleContent = sanitizeContent(post.data.content);
 // 関連記事データ（作成日・公開日の新しい順に動的取得）
 
 
+// 現在の記事のブランド・カテゴリをCMSタクソノミーから取得（関連記事の優先順位抽出にも利用）
+const postDbId = (post?.data as any)?.id;
+let articleBrands: string[] = [];
+let articleCategories: string[] = [];
+let articleCategorySlugs: string[] = [];
+if (postDbId) {
+	const [curBrands, curCategories] = await Promise.all([
+		getTermsForEntries(contentCollection, [postDbId], "brand"),
+		getTermsForEntries(contentCollection, [postDbId], "category"),
+	]);
+	articleBrands = (curBrands.get(postDbId) || []).map((term: any) => term.label);
+	articleCategories = (curCategories.get(postDbId) || []).map((term: any) => term.label);
+	articleCategorySlugs = (curCategories.get(postDbId) || []).map((term: any) => (term.slug || term.label || "").toLowerCase());
+}
+
 // 右カラム（サイドバー）ニュース生成：EmDash公式APIから全公開記事を取得
 const storiesBySlug = new Map<string, any>();
 try {
@@ -969,17 +984,23 @@ try {
 			if (Astro.cache?.enabled) Astro.cache.set(result.cacheHint);
 			const entries = result.entries || [];
 			const ids = entries.map((entry: any) => entry.data.id);
-			const brands = ids.length ? await getTermsForEntries(collection, ids, "brand") : new Map();
+			const [brands, categories] = ids.length
+				? await Promise.all([
+					getTermsForEntries(collection, ids, "brand"),
+					getTermsForEntries(collection, ids, "category"),
+				])
+				: [new Map(), new Map()];
 			for (const entry of entries as any[]) {
 				if (entry.id === slug || isNoticeArticle(entry) || storiesBySlug.has(entry.id)) continue;
 				const assignedBrands = (brands.get(entry.data.id) || []).map((term: any) => term.label);
+				const assignedCategorySlugs = (categories.get(entry.data.id) || []).map((term: any) => (term.slug || term.label || "").toLowerCase());
 				// 移行記事などでブランド未登録の場合、タイトル・slugから補完
 				if (!assignedBrands.length) {
 					const t = (entry.data.title || "").toLowerCase();
 					const entrySlug = entry.id.toLowerCase();
 					if (t.includes("mini") || entrySlug.includes("mini")) assignedBrands.push("MINI");
 					else if (t.includes("bmw") || entrySlug.includes("bmw") || /7シリーズ|3シリーズ/.test(t)) assignedBrands.push("BMW");
-					else if (t.includes("ferrari") || entrySlug.includes("ferrari")) assignedBrands.push("Ferrari");
+					else if (t.includes("ferrari") || entrySlug.includes("ferrari") || t.includes("フェラーリ")) assignedBrands.push("Ferrari");
 					else if (t.includes("rolls") || entrySlug.includes("rolls") || t.includes("ロールス")) assignedBrands.push("Rolls-Royce");
 					else if (t.includes("alpina") || entrySlug.includes("alpina") || t.includes("アルピナ")) assignedBrands.push("ALPINA");
 					else if (entry.data.related_location) assignedBrands.push("BMW");
@@ -989,6 +1010,7 @@ try {
 					slug: entry.id,
 					title: entry.data.title,
 					brands: assignedBrands,
+					categorySlugs: assignedCategorySlugs,
 					brand: isESGArticle(entry) ? "ESG" : (assignedBrands.join(" / ") || "NEWS"),
 					isESG: isESGArticle(entry),
 					sortDate: new Date(rawDate).getTime() || 0,
@@ -1006,16 +1028,30 @@ try {
 
 const allStories = [...storiesBySlug.values()].sort((a, b) => b.sortDate - a.sortDate || a.slug.localeCompare(b.slug));
 
-// 現在の記事のブランド（MINI / BMW / Ferrari 等）に合わせて関連記事を最適抽出
-const articleTitleLower = (post.data.title || slug).toLowerCase();
-const detectedBrand = articleTitleLower.includes("mini") ? "MINI"
-	: (articleTitleLower.includes("ferrari") || articleTitleLower.includes("フェラーリ")) ? "Ferrari"
-	: (articleTitleLower.includes("rolls") || articleTitleLower.includes("ロールス")) ? "Rolls-Royce"
-	: (articleTitleLower.includes("alpina") || articleTitleLower.includes("アルピナ")) ? "ALPINA"
+// 現在の記事のブランド・カテゴリを特定（CMSタクソノミーを最優先し、未設定時のみタイトル・スラッグから補完）
+const articleKeyLower = `${post.data.title || ""} ${slug}`.toLowerCase();
+const fallbackBrand = articleKeyLower.includes("mini") ? "MINI"
+	: (articleKeyLower.includes("ferrari") || articleKeyLower.includes("フェラーリ") || articleKeyLower.includes("competizione")) ? "Ferrari"
+	: (articleKeyLower.includes("rolls") || articleKeyLower.includes("ロールス")) ? "Rolls-Royce"
+	: (articleKeyLower.includes("alpina") || articleKeyLower.includes("アルピナ")) ? "ALPINA"
 	: "BMW";
+const targetBrands = articleBrands.length > 0 ? articleBrands : [fallbackBrand];
+const detectedBrand = targetBrands[0];
+const isCurrentESG = articleCategorySlugs.includes("esg") || isESGArticle(post);
 
-const matchedRelated = allStories.filter(story => !story.isESG && story.brands.includes(detectedBrand)).slice(0, 5);
-const relatedStories = matchedRelated.length > 0 ? matchedRelated : allStories.filter(story => !story.isESG).slice(0, 5);
+// 関連記事を「1. 同ブランド＆同カテゴリ → 2. 同ブランド → 3. 同カテゴリ → 4. その他最新」の優先順で最大5件抽出
+const relatedCandidates = allStories.filter(story => isCurrentESG ? true : !story.isESG);
+const getRelatedTier = (story: any): number => {
+	const sameBrand = story.brands.some((b: string) => targetBrands.includes(b));
+	const sameCategory = articleCategorySlugs.length > 0 && story.categorySlugs.some((c: string) => articleCategorySlugs.includes(c));
+	if (sameBrand && sameCategory) return 1;
+	if (sameBrand) return 2;
+	if (sameCategory) return 3;
+	return 4;
+};
+const relatedStories = [...relatedCandidates]
+	.sort((a, b) => getRelatedTier(a) - getRelatedTier(b) || b.sortDate - a.sortDate || a.slug.localeCompare(b.slug))
+	.slice(0, 5);
 const latestStories = allStories.slice(0, 5);
 const relatedStoriesUrl = `/magazine/?brand=${encodeURIComponent(detectedBrand)}#magazine-archive`;
 
@@ -1184,17 +1220,7 @@ function getTitleSegments(rawTitle: string): { text: string; class: string }[] {
 const titleSegments = getTitleSegments(post.data.title);
 
 // 記事編集ページURL（EmDash Admin）
-const postDbId = (post?.data as any)?.id;
-let articleBrands: string[] = [];
-let articleCategories: string[] = [];
-if (postDbId) {
-	const [brands, categories] = await Promise.all([
-		getTermsForEntries(contentCollection, [postDbId], "brand"),
-		getTermsForEntries(contentCollection, [postDbId], "category"),
-	]);
-	articleBrands = (brands.get(postDbId) || []).map(term => term.label);
-	articleCategories = (categories.get(postDbId) || []).map(term => term.label);
-}
+// 記事のブランド・カテゴリは上部で取得済み（articleBrands / articleCategories）
 const articleDate = (post.data as any).publishedAt || (post.data as any).published_at;
 const formattedArticleDate = articleDate
 	? new Date(articleDate).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
@@ -1849,6 +1875,7 @@ if (Array.isArray(post.data?.content)) {
 		color: var(--magazine-text-title, #ffffff);
 		margin: 0 0 16px 0;
 		max-width: 1200px;
+		text-wrap: wrap;
 		word-break: auto-phrase !important;
 		line-break: strict !important;
 		overflow-wrap: break-word !important;
@@ -1891,7 +1918,7 @@ if (Array.isArray(post.data?.content)) {
 		font-size: 11px;
 		font-weight: 800;
 		letter-spacing: 0.12em;
-		border-radius: 999px;
+		border-radius: var(--radius-meta, 0);
 	}
 
 	.brand-dot {
@@ -1905,7 +1932,7 @@ if (Array.isArray(post.data?.content)) {
 		padding: 4px 12px;
 		background: rgba(255, 255, 255, 0.12);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
+		border-radius: var(--radius-meta, 0);
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.12em;
@@ -1953,7 +1980,7 @@ if (Array.isArray(post.data?.content)) {
 		padding: 4px 11px;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.16);
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		color: var(--magazine-text-secondary, #a1a1aa);
 		font-size: 11px;
 		font-weight: 600;
@@ -2041,6 +2068,11 @@ if (Array.isArray(post.data?.content)) {
 		max-width: 100%;
 		width: 100%;
 	}
+	.modern-article-page.is-one-column .article-rich-text,
+	.modern-article-page.is-one-column .article-rich-text.prose {
+		max-width: 100% !important;
+		width: 100%;
+	}
 
 	/* 1カラム時：文章テキスト・見出し・注釈・FAQも含め、下のカードや画像と揃えて左右いっぱいにダイナミック展開 */
 	.modern-article-page.is-one-column .article-rich-text > :global(p),
@@ -2099,7 +2131,7 @@ if (Array.isArray(post.data?.content)) {
 	.sidebar-block {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.09);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		padding: 22px 20px;
 		box-sizing: border-box;
 		position: relative;
@@ -2254,7 +2286,7 @@ if (Array.isArray(post.data?.content)) {
 		position: relative;
 		width: 78px;
 		height: 56px;
-		border-radius: 3px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		background: #111111;
 		flex-shrink: 0;
@@ -2282,7 +2314,7 @@ if (Array.isArray(post.data?.content)) {
 		font-weight: 700;
 		letter-spacing: 0.06em;
 		padding: 2px 5px;
-		border-radius: 2px;
+		border-radius: var(--radius-meta, 0);
 		backdrop-filter: blur(4px);
 	}
 
@@ -2292,11 +2324,11 @@ if (Array.isArray(post.data?.content)) {
 		left: 4px;
 		width: 18px;
 		height: 18px;
-		border-radius: 2px;
+		border-radius: var(--radius-meta, 0);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-family: var(--font-mono, monospace);
+		font-family: var(--font-body);
 		font-size: 10px;
 		font-weight: 700;
 		background: rgba(0, 0, 0, 0.75);
@@ -2415,6 +2447,18 @@ if (Array.isArray(post.data?.content)) {
 		}
 	}
 
+	.article-main-col {
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+	}
+
+	.article-main-col .article-rich-text,
+	.article-rich-text.prose {
+		max-width: 100% !important;
+		width: 100%;
+	}
+
 	.article-rich-text {
 		font-size: 17px;
 		line-height: 1.95;
@@ -2425,8 +2469,8 @@ if (Array.isArray(post.data?.content)) {
 	/* 見出し（ゴールド縦線と下地なし・クリーンタイポグラフィ・文節改行保護・セクションブロック間余白）
 	   ※本文直下のセクション見出し（「30秒でわかること」等）のみを対象とし、カードやコンポーネント内には波及させない */
 	.article-rich-text > :global(h2) {
-		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-		font-size: clamp(24px, 2.4vw, 30px);
+		font-family: var(--font-body);
+		font-size: clamp(20px, 2.4vw, 30px);
 		font-weight: 700;
 		color: var(--magazine-text-title, #ffffff);
 		/* セクションブロック間のゆったりしたスペース */
@@ -2435,28 +2479,31 @@ if (Array.isArray(post.data?.content)) {
 		border: none;
 		background: none;
 		line-height: 1.35;
+		text-wrap: wrap;
 		word-break: auto-phrase !important;
 		line-break: strict !important;
 		overflow-wrap: break-word !important;
 	}
 
 	.article-rich-text > :global(h3) {
-		font-size: 20px;
+		font-size: clamp(17.5px, 1.6vw, 20px);
 		font-weight: 700;
 		color: var(--magazine-text-title, #ffffff);
 		margin: clamp(56px, 6vw, 76px) 0 22px 0 !important;
 		line-height: 1.4;
+		text-wrap: wrap;
 		word-break: auto-phrase !important;
 		line-break: strict !important;
 		overflow-wrap: break-word !important;
 	}
 
 	.article-rich-text > :global(h4) {
-		font-size: 17px;
+		font-size: clamp(16px, 1.3vw, 17px);
 		font-weight: 700;
 		color: var(--magazine-text-title, #ffffff);
 		margin: clamp(40px, 4.5vw, 54px) 0 16px 0 !important;
 		line-height: 1.45;
+		text-wrap: wrap;
 		word-break: auto-phrase !important;
 		line-break: strict !important;
 		overflow-wrap: break-word !important;
@@ -2498,7 +2545,7 @@ if (Array.isArray(post.data?.content)) {
 
 	.article-rich-text :global(img) {
 		width: 100%;
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		margin: 36px 0;
 		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
 	}
@@ -2519,12 +2566,12 @@ if (Array.isArray(post.data?.content)) {
 
 	.article-rich-text :global(blockquote) {
 		margin: 36px 0;
-		padding: 20px 24px;
-		background: rgba(255, 255, 255, 0.03);
-		border-left: 3px solid rgba(255, 255, 255, 0.3);
-		border-radius: 0 8px 8px 0;
-		font-style: italic;
-		color: var(--magazine-text-body, #d1d1d6);
+		padding: 16px 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.14);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+		background: transparent;
+		font-style: normal;
+		color: var(--magazine-text-sub, #a1a1aa);
 	}
 
 	.article-rich-text :global(a:not([class*="btn"], [class*="cta"], [class*="chip"])) {
@@ -2581,7 +2628,7 @@ if (Array.isArray(post.data?.content)) {
 	.slider-viewport {
 		position: relative;
 		overflow: hidden;
-		border-radius: 10px;
+		border-radius: var(--radius-card, 4px);
 		background: #000;
 	}
 
@@ -2617,7 +2664,7 @@ if (Array.isArray(post.data?.content)) {
 		background: rgba(0, 0, 0, 0.8);
 		border: 1px solid rgba(255, 255, 255, 0.25);
 		border-radius: 0;
-		font-family: var(--font-mono, monospace);
+		font-family: var(--font-body);
 		font-size: 11px;
 		font-weight: 600;
 		color: var(--magazine-text-color);
@@ -2825,7 +2872,7 @@ if (Array.isArray(post.data?.content)) {
 		padding: 12px 20px;
 		background: #0d0f13;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 6px;
+		border-radius: var(--radius-card, 4px);
 		transition: background 0.2s ease, border-color 0.2s ease;
 		box-sizing: border-box;
 		width: 100%;
@@ -3186,7 +3233,7 @@ if (Array.isArray(post.data?.content)) {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		color: var(--magazine-text-color);
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 13px;
 		font-weight: 600;
 		letter-spacing: 0.06em;
@@ -3217,7 +3264,7 @@ if (Array.isArray(post.data?.content)) {
 		padding: 11px 22px;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.18);
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		color: var(--magazine-text-color);
 		font-size: 13px;
 		font-weight: 600;
@@ -3299,7 +3346,7 @@ if (Array.isArray(post.data?.content)) {
 	.rec-card {
 		background: #090b0e;
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 	}
@@ -3343,7 +3390,7 @@ if (Array.isArray(post.data?.content)) {
 		padding: 3px 9px;
 		background: rgba(4, 5, 7, 0.85);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 999px;
+		border-radius: var(--radius-meta, 0);
 		font-size: 10px;
 		font-weight: 700;
 		color: var(--magazine-text-color);
@@ -3426,9 +3473,16 @@ if (Array.isArray(post.data?.content)) {
 		}
 
 		.article-main-title {
-			font-size: clamp(21px, 5.5vw, 28px);
+			font-size: clamp(23px, 5.8vw, 28px);
 			line-height: 1.44;
 			margin: 14px 0 16px 0;
+		}
+
+		.article-rich-text > :global(h2),
+		.article-rich-text > :global(h3),
+		.article-rich-text > :global(h4) {
+			word-break: normal !important;
+			line-break: strict !important;
 		}
 
 		.article-lead-text {

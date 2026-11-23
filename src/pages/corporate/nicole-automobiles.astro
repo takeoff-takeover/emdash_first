@@ -42,13 +42,13 @@ const pageDescription = companyEntry?.hero_phrase
 	: "BMW ALPINAの日本総輸入元として46年の歴史を紡いできたニコル・オートモビルズ合同会社の企業情報です。2026年以降も在庫車・認定中古車および正規アフターサービスを提供。ニコル世田谷ショールーム、ニコル青山ショールームの拠点情報をご案内します。";
 
 // ヒーロー
-const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/02/DSC8585-scaled.avif";
+const heroImageSrc = companyEntry?.hero_image?.src || "/uploads/2026/02/青山ショールーム202603.jpg";
 const heroPhrase = companyEntry?.hero_phrase || "独国アルピナ社（BMW ALPINA）日本総代理店として46年。8,000台を超える特別な名車を日本のお客様へお届けしてまいりました。2026年以降も在庫車・認定中古車の販売と正規アフターサービスを通じて、孤高のクラフトマンシップと唯一無二の走りの世界をお支えします。";
 
 // 会社紹介
 const aboutTitle = companyEntry?.about_title || "46年の歴史が紡ぐ、<br />孤高のクラフトマンシップと信頼。";
 const aboutLead = companyEntry?.about_lead || "日本総代理店として8,000台におよぶ名車を日本のお客様にお届けしてきた誇り";
-const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/2026/02/DSC2802-scaled.avif";
+const aboutImageSrc = companyEntry?.about_image?.src || "/uploads/2026/02/世田谷ショールーム2026.jpg";
 const aboutImageCaption = companyEntry?.about_image_caption || "BMW ALPINA クラフトマンシップ";
 const aboutText = companyEntry?.about_text || "ニコル・オートモビルズ合同会社は、独国アルピナ社（BMW ALPINA）の日本総代理店として、1982年の会社設立以来、46年の長きにわたり8,000台におよぶ名車を日本の選ばれたお客様にお届けしてまいりました。\n\n2025年12月31日のアルピナ社によるBMW社への商標譲渡完了を経て、2026年1月1日以降も、ニコル世田谷ショールーム、ニコル青山ショールーム、ならびに全国のBMW正規ディーラー・ネットワークを通じて、引き続き在庫車および認定中古車を中心とした販売と、純正部品の供給、熟練の専任メカニックによる高水準のアフターサービスを提供し続けています。\n\nクラフトマンシップへの深い敬意と情熱、そして半世紀近くにわたり培った専門知識をもとに、オーナーの皆様が愛車とともに過ごす豊かな時間を末永くお支えいたします。";
 
@@ -63,28 +63,28 @@ const highlight3Label = companyEntry?.highlight_3_label || "青山・世田谷�
 // ショールームフォトギャラリー写真（CMS 'companies' コレクションから動的生成）
 let showroomGallery = [
 	{
-		src: "/uploads/2026/02/DSC8585-scaled.avif",
+		src: "/uploads/2026/03/DSC8995-2.jpg",
 		alt: "BMW ALPINA ブルー & デコライン エクステリア",
 		num: "01",
 		title: "エクステリア・デザイン",
 		caption: "アルピナ ブルーと伝統のデコラインが放つ唯一無二のエクステリア"
 	},
 	{
-		src: "/uploads/2026/02/DSC2802-scaled.avif",
+		src: "/uploads/2026/03/ALPINA_CLASSIC_Newsletter_EOP_G2X_08.jpg",
 		alt: "BMW ALPINA ラヴァリナ・レザー インテリア",
 		num: "02",
 		title: "インテリア・クラフトマンシップ",
 		caption: "熟練職人の手縫いによる極上のラヴァリナ・レザーインテリア"
 	},
 	{
-		src: "/uploads/2026/02/DSC5967-scaled.avif",
-		alt: "BMW ALPINA クラシック・マルチスポークホイール",
+		src: "/uploads/2026/02/世田谷ショールーム2026.jpg",
+		alt: "ニコル世田谷ショールーム 展示スペース",
 		num: "03",
-		title: "クラシック・ホイール",
-		caption: "軽量性と美しさを極限まで追求した伝統のクラシックホイール"
+		title: "世田谷ショールーム",
+		caption: "洗練された空間で名車と向き合うニコル世田谷ショールーム"
 	},
 	{
-		src: "/uploads/2026/03/DSC3293-scaled.avif",
+		src: "/uploads/2026/02/青山ショールーム202603.jpg",
 		alt: "ニコル青山ショールーム 展示スペース",
 		num: "04",
 		title: "青山ショールーム",
@@ -287,7 +287,7 @@ try {
 				? new Date(publishedAt).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).replace(/-/g, ".")
 				: "2026.03.15";
 			
-			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/2026/02/DSC8585-scaled.avif";
+			let imgPath = entry.data?.featured_image?.src || entry.featured_image?.src || "/uploads/2026/03/DSC8995-2.jpg";
 			if (imgPath.includes("nicole.co.jp/wp/wp-content")) {
 				imgPath = imgPath.replace(/https?:\/\/[^\/]+\/wp\/wp-content/, "/uploads/wp");
 			}
@@ -317,7 +317,7 @@ if (relatedArticles.length === 0) {
 			category: "Cars",
 			brand: "ALPINA",
 			url: "/magazine/202603_bornandmadeinbuchloe/",
-			img: "/uploads/2026/02/DSC8585-scaled.avif"
+			img: "/uploads/2026/03/DSC8995-2.jpg"
 		},
 		{
 			title: "一時代の終幕、ミュンヘンのBMW工場からの旅立ち",
@@ -325,7 +325,7 @@ if (relatedArticles.length === 0) {
 			category: "Cars",
 			brand: "ALPINA",
 			url: "/magazine/202603_alpina-farewell-munich/",
-			img: "/uploads/2026/02/DSC2802-scaled.avif"
+			img: "/uploads/wp/2026/03/ALPINA_CLASSIC_Newsletter_EOP_G2X_08.jpg"
 		},
 		{
 			title: "愛車の輝きを10年守る。プロテクションフィルムの選び方と「メーカー直結施工」の真価",

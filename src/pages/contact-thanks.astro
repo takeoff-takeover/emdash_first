@@ -1,213 +1,399 @@
 ---
 // src/pages/contact-thanks.astro
-// ニコル・グループ お問い合わせ完了（完全モダン・脱Elementor）
+// ニコル・グループ お問い合わせ完了
+// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お問い合わせ完了 | Nicole Group 公式";
 const pageDescription = "お問い合わせを受け付けいたしました。担当者より順次ご連絡差し上げます。";
+
+const rawRef = Astro.url.searchParams.get("ref") || "";
+const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 ---
 
 <NicoleLayout title={pageTitle} description={pageDescription}>
-	<main class="thanks-page">
-		<!-- ヒーローヘッダー -->
-		<header class="thanks-hero">
-			<div class="thanks-hero__inner">
-				<p class="thanks-hero__sub">THANK YOU</p>
-				<h1 class="thanks-hero__title">お問い合わせ完了</h1>
+	<Fragment slot="head">
+		<style is:global>
+			body:has(.thanks-dark-main),
+			body:has(.thanks-dark-main) #page,
+			body:has(.thanks-dark-main) #content,
+			body:has(.thanks-dark-main) .site-content,
+			body:has(.thanks-dark-main) #primary,
+			body:has(.thanks-dark-main) .content-area,
+			body:has(.thanks-dark-main) .ast-container {
+				background-color: #040507 !important;
+				background-image: none !important;
+				padding: 0 !important;
+				margin: 0 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+				border: none !important;
+			}
+		</style>
+	</Fragment>
+
+	<main class="thanks-dark-main">
+		<!-- 1. ヒーローヘッダー（会社案内準拠・写真背景＋ダークグラデーション） -->
+		<header class="corp-hero">
+			<div class="corp-hero__media">
+				<img
+					src="/uploads/2026/02/DSC3504.jpg"
+					alt="ニコル・グループ お問い合わせ完了"
+					class="corp-hero__img"
+					loading="eager"
+					decoding="async"
+				/>
+				<div class="corp-hero__gradient"></div>
+				<div class="corp-hero__side-vignette"></div>
+			</div>
+
+			<div class="corp-container corp-hero__inner">
+				<nav class="corp-breadcrumbs" aria-label="パンくずリスト">
+					<ol class="corp-breadcrumbs__list">
+						<li class="corp-breadcrumbs__item"><a href="/" class="corp-breadcrumbs__link">HOME</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item"><a href="/contact" class="corp-breadcrumbs__link">お問い合わせ</a></li>
+						<li class="corp-breadcrumbs__separator" aria-hidden="true">/</li>
+						<li class="corp-breadcrumbs__item" aria-current="page">お問い合わせ完了</li>
+					</ol>
+				</nav>
+
+				<h1 class="corp-hero__title">お問い合わせ完了</h1>
 			</div>
 		</header>
 
-		<div class="thanks-container">
-			<div class="thanks-card">
-				<div class="thanks-icon-wrap">
-					<svg class="thanks-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
-				</div>
+		<!-- 2. 完了メッセージセクション（チャコールグレー帯・1440pxワイド1カラム） -->
+		<section class="corp-section corp-section--alt">
+			<div class="corp-container">
+				<div class="thanks-card">
+					<div class="thanks-icon-wrap" aria-hidden="true">
+						<svg class="thanks-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="20 6 9 17 4 12"></polyline>
+						</svg>
+					</div>
 
-				<h2 class="thanks-heading">送信が完了いたしました</h2>
-				<p class="thanks-lead">
-					この度はお問い合わせいただき、誠にありがとうございます。<br />
-					内容を確認の上、担当者より順次ご連絡を差し上げます。
-				</p>
-
-				<div class="thanks-info-box">
-					<p>通常1〜3営業日以内にご返信いたします。</p>
-					<p class="thanks-note">
-						※確認メールが届かない場合は、迷惑メールフォルダ等もあわせてご確認ください。<br />
-						※お問い合わせ内容によっては、お電話にてご連絡させていただく場合がございます。
+					<h2 class="thanks-heading">送信が完了いたしました</h2>
+					{referenceId && (
+						<p class="thanks-ref">受付番号：<span>{referenceId}</span></p>
+					)}
+					<p class="thanks-lead">
+						この度はお問い合わせいただき、誠にありがとうございます。<br />
+						内容を確認の上、担当者より順次ご連絡を差し上げます。
 					</p>
-				</div>
 
-				<div class="thanks-action">
-					<a href="/" class="thanks-btn">トップページへ戻る</a>
+					<div class="thanks-info-box">
+						<p class="thanks-info-main">通常1〜3営業日以内にご返信いたします。</p>
+						<p class="thanks-note">
+							※確認メールが届かない場合は、迷惑メールフォルダ等もあわせてご確認ください。<br />
+							※お問い合わせ内容によっては、お電話にてご連絡させていただく場合がございます。
+						</p>
+					</div>
+
+					<div class="thanks-action">
+						<a href="/" class="thanks-btn thanks-btn--primary">トップページへ戻る</a>
+						<a href="/locations" class="thanks-btn thanks-btn--secondary">事業拠点・ショールーム一覧</a>
+					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	</main>
 </NicoleLayout>
 
 <style>
-/* ============================================================== */
-/* お問い合わせ完了ページ：完全モダン＆セマンティックデザイン */
-/* ============================================================== */
-.thanks-page {
-	width: 100%;
-	background-color: #fcfcfc;
-	color: #111111;
-	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-	line-height: 1.8;
-	padding-bottom: 96px;
-}
+	/* ============================================================== */
+	/* お問い合わせ完了ページ：黒ベース＆チャコールグレー帯・1440pxワイド */
+	/* ============================================================== */
+	.thanks-dark-main {
+		--spacing-4: 1rem;
+		--spacing-6: 1.5rem;
+		--spacing-10: 2.5rem;
+		--spacing-12: 3rem;
+		--spacing-20: 5rem;
 
-.thanks-container {
-	width: 100%;
-	max-width: 760px;
-	margin: 0 auto;
-	padding: 64px 40px 0;
-	box-sizing: border-box;
-}
+		--color-bg: #040507;
+		--color-border: rgba(255, 255, 255, 0.1);
+		--color-text: #ffffff;
 
-/* --- ヒーローヘッダー --- */
-.thanks-hero {
-	width: 100%;
-	background-color: #000000;
-	color: #ffffff;
-	padding: 88px 0 72px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	text-align: center;
-}
-
-.thanks-hero__inner {
-	width: 100%;
-	max-width: 1440px;
-	margin: 0 auto;
-	padding: 0 40px;
-	box-sizing: border-box;
-}
-
-.thanks-hero__sub {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	letter-spacing: 0.28em;
-	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 16px;
-	text-transform: uppercase;
-}
-
-.thanks-hero__title {
-	font-size: clamp(30px, 4vw, 42px);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	margin: 0;
-	color: #ffffff;
-	line-height: 1.3;
-}
-
-/* --- 完了カード --- */
-.thanks-card {
-	background-color: #ffffff;
-	border: 1px solid #e5e5e5;
-	border-radius: 4px;
-	padding: 56px 48px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-	text-align: center;
-}
-
-.thanks-icon-wrap {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	background-color: #f0fdf4;
-	color: #16a34a;
-	margin-bottom: 24px;
-}
-
-.thanks-check-icon {
-	width: 32px;
-	height: 32px;
-}
-
-.thanks-heading {
-	font-size: clamp(22px, 2.5vw, 26px);
-	font-weight: 600;
-	color: #111111;
-	margin: 0 0 16px;
-	letter-spacing: 0.03em;
-}
-
-.thanks-lead {
-	font-size: 15px;
-	line-height: 1.85;
-	color: #444444;
-	margin: 0 0 32px;
-}
-
-.thanks-info-box {
-	background-color: #fafafa;
-	border: 1px solid #eeeeee;
-	border-radius: 4px;
-	padding: 24px;
-	margin-bottom: 40px;
-	text-align: left;
-}
-
-.thanks-info-box p {
-	font-size: 14.5px;
-	color: #333333;
-	margin: 0 0 8px;
-}
-
-.thanks-note {
-	font-size: 13px !important;
-	color: #777777 !important;
-	line-height: 1.7;
-	margin: 0 !important;
-}
-
-.thanks-action {
-	margin-top: 16px;
-}
-
-.thanks-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 14px 36px;
-	background-color: #000000;
-	color: #ffffff;
-	border-radius: 4px;
-	font-size: 14px;
-	font-weight: 500;
-	letter-spacing: 0.04em;
-	text-decoration: none;
-	transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.thanks-btn:hover {
-	background-color: #222222;
-	transform: translateY(-1px);
-}
-
-/* --- レスポンシブ対応 --- */
-@media (max-width: 768px) {
-	.thanks-container {
-		padding: 40px 20px 0;
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+		min-height: 100vh;
+		position: relative;
+		overflow-x: hidden;
+		line-height: 1.85;
 	}
 
-	.thanks-hero {
-		padding: 56px 0 48px;
+	.corp-container {
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 var(--spacing-10);
+		box-sizing: border-box;
 	}
 
+	@media (max-width: 1024px) {
+		.corp-container {
+			padding: 0 var(--spacing-6);
+		}
+	}
+
+	@media (max-width: 480px) {
+		.corp-container {
+			padding: 0 var(--spacing-4);
+		}
+	}
+
+	/* --- ヒーローヘッダー（corporate.astro 準拠） --- */
+	.corp-hero {
+		position: relative;
+		min-height: 380px;
+		display: flex;
+		align-items: flex-end;
+		padding: 130px 0 56px 0;
+		border-bottom: 1px solid var(--color-border);
+		overflow: hidden;
+		background: #000000;
+	}
+
+	@media (max-width: 768px) {
+		.corp-hero {
+			min-height: 300px;
+			padding: 100px 0 36px 0;
+		}
+	}
+
+	.corp-hero__media {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+	}
+
+	.corp-hero__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 36%;
+		filter: brightness(0.62) contrast(1.06);
+		transform: scale(1.02);
+	}
+
+	.corp-hero__gradient {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(4, 5, 7, 0.86) 0%,
+			rgba(4, 5, 7, 0.42) 40%,
+			rgba(4, 5, 7, 0.85) 80%,
+			#040507 100%
+		);
+	}
+
+	.corp-hero__side-vignette {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			rgba(4, 5, 7, 0.82) 0%,
+			rgba(4, 5, 7, 0.28) 55%,
+			rgba(4, 5, 7, 0.62) 100%
+		);
+	}
+
+	.corp-hero__inner {
+		position: relative;
+		z-index: 5;
+		width: 100%;
+	}
+
+	.corp-breadcrumbs {
+		margin-bottom: 20px;
+	}
+
+	.corp-breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 12px;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.corp-breadcrumbs__link {
+		color: rgba(255, 255, 255, 0.72);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.corp-breadcrumbs__link:hover {
+		color: #ffffff;
+	}
+
+	.corp-breadcrumbs__separator {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	.corp-hero__title {
+		font-size: clamp(30px, 4.2vw, 52px);
+		font-weight: 800;
+		color: #ffffff;
+		letter-spacing: -0.02em;
+		margin: 0;
+		line-height: 1.18;
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	/* --- セクション設定（チャコールグレー帯） --- */
+	.corp-section {
+		padding: var(--spacing-20) 0;
+		position: relative;
+		background-color: #040507;
+	}
+
+	.corp-section--alt {
+		background-color: #0e1118;
+		background-image:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
+			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	@media (max-width: 768px) {
+		.corp-section {
+			padding: var(--spacing-12) 0;
+		}
+	}
+
+	/* --- 完了メッセージ（箱入れ子なし・セクション面に直接配置） --- */
 	.thanks-card {
-		padding: 36px 20px;
+		padding: 16px 0;
+		text-align: left;
+	}
+
+	.thanks-icon-wrap {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background-color: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.22);
+		color: #ffffff;
+		margin-bottom: 24px;
+	}
+
+	.thanks-check-icon {
+		width: 26px;
+		height: 26px;
+	}
+
+	.thanks-heading {
+		font-size: clamp(22px, 2.8vw, 32px);
+		font-weight: 700;
+		color: #ffffff;
+		margin: 0 0 18px;
+		letter-spacing: 0.01em;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.thanks-ref {
+		font-family: "Helvetica Neue", Helvetica, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.65);
+		letter-spacing: 0.06em;
+		margin: 0 0 20px;
+	}
+
+	.thanks-ref span {
+		color: #ffffff;
+		font-weight: 600;
+	}
+
+	.thanks-lead {
+		font-size: 15.5px;
+		line-height: 1.9;
+		color: rgba(255, 255, 255, 0.84);
+		margin: 0 0 32px;
 	}
 
 	.thanks-info-box {
-		padding: 20px 16px;
+		margin: 0 0 40px;
+		padding-top: 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		text-align: left;
 	}
-}
+
+	.thanks-info-main {
+		font-size: 15px;
+		font-weight: 600;
+		color: #ffffff;
+		margin: 0 0 10px;
+	}
+
+	.thanks-note {
+		font-size: 13.5px;
+		color: rgba(255, 255, 255, 0.58);
+		line-height: 1.85;
+		margin: 0;
+	}
+
+	.thanks-action {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.thanks-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 14px 36px;
+		border-radius: var(--radius-action, 9999px);
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-decoration: none;
+		transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.thanks-btn--primary {
+		background-color: #ffffff;
+		border: 1px solid #ffffff;
+		color: #040507;
+	}
+
+	.thanks-btn--primary:hover {
+		background-color: rgba(255, 255, 255, 0.88);
+		transform: translateY(-1px);
+	}
+
+	.thanks-btn--secondary {
+		background-color: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		color: #ffffff;
+	}
+
+	.thanks-btn--secondary:hover {
+		background-color: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.45);
+		transform: translateY(-1px);
+	}
+
+	/* --- レスポンシブ --- */
+	@media (max-width: 768px) {
+		.thanks-btn {
+			width: 100%;
+		}
+	}
 </style>

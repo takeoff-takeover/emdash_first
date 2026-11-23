@@ -75,6 +75,15 @@ h1, h2, h3, h4, h5, h6,
 	display: inline-block !important;
 }
 
+/* スマホ幅（768px以下）の本文見出し（H2〜H4）はカタカナ長語連続時の過度な右側余白を防ぎ、禁則処理を保ちつつフル幅で自然に折り返す */
+@media (max-width: 768px) {
+	:is(.prose, .article-rich-text, .news-rich-text, .cms-page-body) :is(h2, h3, h4, h5, h6) {
+		word-break: normal !important;
+		line-break: strict !important;
+		text-wrap: wrap;
+	}
+}
+
 /* Adjust brand logo image in header */
 .brand__logo {
 	height: 36px;

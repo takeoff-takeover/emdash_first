@@ -1,6 +1,6 @@
 ---
 // src/pages/magazine/index.astro
-// Nicole Connect - Web Magazine（Apple風の巨大写真ヒーロー＆エディトリアル・マガジンカバー）
+// Nicole Connect - Web Magazine（巨大写真ヒーロー＆エディトリアル・マガジンカバー）
 import { getEmDashCollection, getTermsForEntries } from "emdash";
 import { env } from "cloudflare:workers";
 import { DatabaseSync } from "node:sqlite";
@@ -74,8 +74,10 @@ try {
 
 // 本文からリード文（2〜3行の冒頭テキスト）を自動抽出するヘルパー
 function extractLead(p: any): string {
-	if (p.data?.excerpt && p.data.excerpt.trim()) {
-		return p.data.excerpt.trim().replace(/\[&hellip;\]/g, '…').replace(/&hellip;/g, '…');
+	const rawExcerpt = p.data?.excerpt ? p.data.excerpt.trim().replace(/\[&hellip;\]/g, '…').replace(/&hellip;/g, '…') : '';
+	// 抜粋が35文字以上あり、かつ途切れ記号（…）で終わっていなければそのまま採用
+	if (rawExcerpt.length >= 35 && !rawExcerpt.endsWith('…')) {
+		return rawExcerpt;
 	}
 	const content = p.data?.content;
 	if (Array.isArray(content)) {
@@ -88,7 +90,7 @@ function extractLead(p: any): string {
 			}
 		}
 	}
-	return "";
+	return rawExcerpt || "";
 }
 
 // アイキャッチ画像のURL解決ヘルパー（EmDash R2ストレージ key, オブジェクト, JSON文字列, 外部URLのすべてに対応）
@@ -263,18 +265,26 @@ mainArticles.sort((a, b) => {
 // 一番目玉の記事（Cover Story）
 const coverArticle = mainArticles[0];
 
-// 特集ハイライト記事（最新記事 2枠）
-const highlightStories = mainArticles.filter(a => a.id !== coverArticle.id).slice(0, 2);
+// 特集ハイライト記事（シネマティック・カルーセル：最新5記事）
+const highlightStories = mainArticles.filter(a => a.id !== coverArticle.id).slice(0, 5);
+const storyCount = highlightStories.length;
+
+// 無限ループ用：前後に全ハイライト記事のクローンセットを配置した完全シームレス配列（計15枚）
+const loopSlides = storyCount > 0 ? [
+	...highlightStories.map((s, idx) => ({ ...s, isClone: true, realIndex: idx })),
+	...highlightStories.map((s, idx) => ({ ...s, isClone: false, realIndex: idx })),
+	...highlightStories.map((s, idx) => ({ ...s, isClone: true, realIndex: idx })),
+] : [];
 
 // 人気の記事ランキング（閲覧数の多い順、同数の場合は公開日時の新しい順に上位5件）
 const popularArticles = [...mainArticles]
 	.sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0) || (b.publishedAt || 0) - (a.publishedAt || 0))
 	.slice(0, 5);
 
-// トップ最新3記事のIDセット（Cover Story 1件 + LATEST STORIES 2件）
-const top3ArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.id)]);
-// 初期表示時のアーカイブ収録記事数（最新3記事を除いた件数）
-const initialArchiveCount = mainArticles.filter(a => !top3ArticleIds.has(a.id)).length;
+// カバー記事およびカルーセル掲載記事のIDセット
+const featuredArticleIds = new Set([coverArticle.id, ...highlightStories.map(s => s.id)]);
+// 初期表示時のアーカイブ収録記事数
+const initialArchiveCount = mainArticles.filter(a => !featuredArticleIds.has(a.id)).length;
 
 const brandsList = ["ALL", "BMW", "MINI", "Ferrari", "Rolls-Royce", "ALPINA", "ALL BRANDS"];
 const topicsList = ["ALL", "Cars", "People", "Buyer's Guide", "Campaign"];
@@ -285,34 +295,34 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 <NicoleLayout 
 	title="Nicole Connect - Web Magazine ｜ ニコル・グループ公式" 
-	description="Appleのような大迫力のビジュアルと洗練されたエディトリアルで綴るWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新モデル情報から特集記事まで。"
+	description="大迫力のビジュアルと洗練されたエディトリアルで綴るWebマガジン「Nicole Connect」。BMW、MINI、フェラーリ、ロールス・ロイス、アルピナの最新モデル情報から特集記事まで。"
 	isMagazine={true}
 >
-	<main class="apple-magazine-main">
+	<main class="nicole-magazine-main">
 		<!-- ============================================================== -->
-		<!-- 1. Apple風 特大マガジンカバー・HERO（画面全体に写真を大胆に使用） -->
+		<!-- 1. 特大マガジンカバー・HERO（画面全体に写真を大胆に使用） -->
 		<!-- ============================================================== -->
-		<section class="apple-hero" id="hero-cover">
+		<section class="magazine-hero" id="hero-cover">
 			<!-- 巨大背景画像コンテナ（スクロール視差パララックス対応） -->
-			<div class="apple-hero__media" id="apple-hero-media">
+			<div class="magazine-hero__media" id="magazine-hero-media">
 				<img 
 					src={coverArticle.image} 
 					alt={coverArticle.title} 
-					class="apple-hero__img" 
-					id="apple-hero-img"
+					class="magazine-hero__img" 
+					id="magazine-hero-img"
 					loading="eager"
 					onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';"
 				/>
 				<!-- 映画的なダークビネットとグラデーション -->
-				<div class="apple-hero__gradient"></div>
-				<div class="apple-hero__side-vignette"></div>
+				<div class="magazine-hero__gradient"></div>
+				<div class="magazine-hero__side-vignette"></div>
 			</div>
 
 
 
 			<!-- 表紙コンテンツ -->
-			<div class="apple-hero__content">
-				<div class="mag-container apple-hero__container">
+			<div class="magazine-hero__content">
+				<div class="mag-container magazine-hero__container">
 					<!-- 1. 左上固定：マガジンマストヘッド（どの記事でも固定） -->
 					<div class="hero-masthead">
 						<h1 class="hero-masthead__brand">Nicole<br />Connect</h1>
@@ -335,7 +345,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 						<!-- 左寄せのアクションボタン -->
 						<div class="hero-story-actions">
-							<a href={coverArticle.url} class="apple-cta-btn apple-cta-btn--secondary">
+							<a href={coverArticle.url} class="magazine-cta-btn magazine-cta-btn--secondary">
 								<span>記事を読む</span>
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 							</a>
@@ -345,51 +355,114 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			</div>
 
 			<!-- スクロール促進インジケーター -->
-			<a href="#table-of-contents" class="apple-hero__scroll-cue" aria-label="コンテンツへスクロール">
+			<a href="#table-of-contents" class="magazine-hero__scroll-cue" aria-label="コンテンツへスクロール">
 				<span class="scroll-cue-text">SCROLL TO READ</span>
 				<div class="scroll-cue-line"></div>
 			</a>
 		</section>
 
 		<!-- ============================================================== -->
-		<!-- 2. 最新記事ハイライト（LATEST STORIES） -->
+		<!-- 2. 最新記事ハイライト（LATEST STORIES - シネマティック・カルーセル） -->
 		<!-- ============================================================== -->
-		<section class="toc-section" id="table-of-contents">
+		<section class="toc-section latest-carousel-section" id="table-of-contents">
 			<div class="mag-container">
 				<div class="toc-header">
 					<h2 class="toc-heading">LATEST STORIES</h2>
-					<p class="toc-sub">Nicoleが厳選した最新の特集ストーリーをお届けします。</p>
+					<p class="toc-sub">ニコル・グループが厳選した最新の特集ストーリーをお届けします。</p>
+				</div>
+			</div>
+
+			<!-- 両端チラ見えフルブリード・カルーセル（左右から集まるモーション＆無限ループ対応） -->
+			<div class="latest-carousel" aria-roledescription="carousel" aria-label="Latest Stories Carousel" data-story-count={storyCount}>
+				<div class="latest-carousel__viewport">
+					<div class="latest-carousel__track">
+						{loopSlides.map((story, domIdx) => (
+							<div 
+								class={`latest-carousel__slide ${domIdx === storyCount ? 'is-active' : ''}`}
+								data-dom-index={domIdx}
+								data-real-index={story.realIndex}
+								data-is-clone={story.isClone ? "true" : "false"}
+								data-gather={domIdx < storyCount ? "prev" : domIdx === storyCount ? "active" : "next"}
+								role="group"
+								aria-roledescription="slide"
+								aria-label={`${story.realIndex + 1} / ${storyCount}`}
+							>
+								<div class="latest-card">
+									<a href={story.url} class="latest-card__media-link" tabindex="-1" aria-hidden="true">
+										<img 
+											src={story.image} 
+											alt={story.title} 
+											loading="eager" 
+											decoding="async"
+											class="latest-card__img" 
+											onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" 
+										/>
+										<div class="latest-card__overlay"></div>
+									</a>
+
+									<!-- 写真上部バッジ（ブランド名のみ） -->
+									<div class="latest-card__top-badge">
+										<span class="latest-card__brand-tag">{story.brand}</span>
+									</div>
+
+									<!-- テキストレイヤー（写真の下部に配置・下の記事と同様のメタ構成） -->
+									<div class="latest-card__content">
+										<div class="latest-card__meta">
+											<time class="meta-date">{story.date}</time>
+											<span class="meta-divider">/</span>
+											<span class="meta-topic">{story.topic}</span>
+										</div>
+
+										<h3 class="latest-card__headline">
+											<a href={story.url} class="latest-card__headline-link">
+												“{story.title}”
+											</a>
+										</h3>
+
+										{story.lead && (
+											<p class="latest-card__lead">
+												{story.lead}
+											</p>
+										)}
+
+										<div class="latest-card__cta-wrap">
+											<a href={story.url} class="latest-card__cta-btn">
+												<span>記事を読む</span>
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="latest-card__cta-arrow">
+													<path d="M5 12h14M12 5l7 7-7 7"/>
+												</svg>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
 				</div>
 
-				<div class="toc-grid">
-					{highlightStories.map((story) => (
-						<article class="toc-card">
-							<a href={story.url} class="toc-card__link">
-								<div class="toc-card__media">
-									<img src={story.image} alt={story.title} loading="lazy" class="toc-card__img" onerror="this.onerror=null;this.src='/images/placeholder-replace.jpg';" />
-									<div class="toc-card__overlay"></div>
-									<span class="toc-card__brand">{story.brand}</span>
-								</div>
-								<div class="toc-card__body">
-									<div class="toc-card__meta">
-										<span class="toc-meta-topic">{story.topic}</span>
-										<span class="toc-meta-sep">/</span>
-										<time class="toc-meta-date">{story.date}</time>
-										<span class="toc-meta-sep">/</span>
-										<span class="toc-meta-views" title="閲覧数">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toc-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-											<span>{story.views}</span>
-										</span>
-									</div>
-									<h3 class="toc-card__title">{story.title}</h3>
-									{story.lead && <p class="toc-card__lead">{story.lead}</p>}
-									<div class="toc-card__arrow">
-										<span>記事を読む</span>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-									</div>
-								</div>
-							</a>
-						</article>
+				<!-- 左右フロート円形矢印ナビゲーション（白丸ボタン＋黒矢印） -->
+				<button class="latest-carousel__arrow latest-carousel__arrow--prev" aria-label="前のスライドへ" type="button">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M15 18l-6-6 6-6"/>
+					</svg>
+				</button>
+				<button class="latest-carousel__arrow latest-carousel__arrow--next" aria-label="次のスライドへ" type="button">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M9 18l6-6-6-6"/>
+					</svg>
+				</button>
+
+				<!-- 下部中央インジケータードット -->
+				<div class="latest-carousel__dots" role="tablist" aria-label="スライド選択">
+					{highlightStories.map((_, idx) => (
+						<button 
+							class={`latest-carousel__dot ${idx === 0 ? 'is-active' : ''}`}
+							data-dot-index={idx}
+							aria-label={`スライド ${idx + 1}`}
+							role="tab"
+							aria-selected={idx === 0 ? "true" : "false"}
+							type="button"
+						></button>
 					))}
 				</div>
 			</div>
@@ -500,8 +573,8 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 					</div>
 				</div>
 
-				<!-- 記事グリッド（JSフィルタリング対象） -->
-				<div class="articles-grid" id="articles-grid">
+				<!-- 記事グリッド（JSフィルタリング対象・スタッガー波形） -->
+				<div class="articles-grid motion-stagger-wave" id="articles-grid">
 					{archiveArticles.map((art, idx) => {
 						const cycle = idx % 10;
 						let featuredClass = '';
@@ -510,9 +583,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 						return (
 							<article 
-								class={`article-item ${featuredClass}`} 
+								class={`article-item motion-reveal--scale ${featuredClass}`} 
 								data-id={art.id}
-								data-is-top3={top3ArticleIds.has(art.id) ? "true" : "false"}
+								data-is-top3={featuredArticleIds.has(art.id) ? "true" : "false"}
 								data-brand={art.brand} 
 								data-topic={art.topic}
 								data-title={art.title.toLowerCase()}
@@ -603,7 +676,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 										<time class="esg-card__date">{art.date}</time>
 										<span class="esg-meta-sep">/</span>
 										<span class="esg-meta-views" title="閲覧数">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toc-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-views-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 											<span>{art.views}</span>
 										</span>
 									</div>
@@ -627,13 +700,13 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	</main>
 </NicoleLayout>
 
-<!-- Apple風スクロールパララックス＆フィルタリング制御スクリプト -->
+<!-- スクロールパララックス＆フィルタリング制御スクリプト -->
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
 		// ==============================================================
-		// 1. Apple風 スクロールパララックス＆ズーム効果
+		// 1. スクロールパララックス＆ズーム効果
 		// ==============================================================
-		const heroImg = document.getElementById('apple-hero-img');
+		const heroImg = document.getElementById('magazine-hero-img');
 		const heroSection = document.getElementById('hero-cover');
 
 		if (heroImg && heroSection) {
@@ -945,14 +1018,316 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 				updateEsgDisplay();
 			});
 		}
+
+		// ==============================================================
+		// 4. LATEST STORIES カルーセル・スライダー制御（無限ループ ＆ 左右集約モーション）
+		// ==============================================================
+		const carouselSection = document.querySelector('.latest-carousel-section');
+		const carousel = document.querySelector('.latest-carousel');
+
+		if (carousel && carouselSection) {
+			const track = carousel.querySelector('.latest-carousel__track');
+			const slides = Array.from(carousel.querySelectorAll('.latest-carousel__slide'));
+			const dots = Array.from(carousel.querySelectorAll('.latest-carousel__dot'));
+			const prevBtn = carousel.querySelector('.latest-carousel__arrow--prev');
+			const nextBtn = carousel.querySelector('.latest-carousel__arrow--next');
+
+			const STORY_COUNT = parseInt(carousel.getAttribute('data-story-count') || '5', 10);
+			const CLONE_OFFSET = STORY_COUNT; // 前方に5枚の完全クローンセットがあるため、実体スライド0はインデックス5
+
+			if (track && slides.length > 0) {
+				let currentDomIndex = CLONE_OFFSET; // 初期位置: 実体スライド0 (DOM index 5)
+				let isAnimating = false;
+				let autoplayTimer = null;
+				let transitionCleanup = null;
+				const AUTOPLAY_INTERVAL = 5500;
+				const TRANSITION_DURATION = 650; // ms
+
+				// 全スライドの画像をプリデコード（GPUメモリにキャッシュを保持し、ループ時の描画遅延・空白を防止）
+				carousel.querySelectorAll('.latest-card__img').forEach(img => {
+					if (img.complete) {
+						if (img.decode) img.decode().catch(() => {});
+					} else {
+						img.addEventListener('load', () => {
+							if (img.decode) img.decode().catch(() => {});
+						}, { once: true });
+					}
+				});
+
+				// 各スライドに初期集約用の属性を付与
+				function setupGatheringAttributes(activeIdx) {
+					slides.forEach((slide, i) => {
+						if (i < activeIdx) {
+							slide.setAttribute('data-gather', 'prev');
+						} else if (i === activeIdx) {
+							slide.setAttribute('data-gather', 'active');
+						} else {
+							slide.setAttribute('data-gather', 'next');
+						}
+					});
+				}
+
+				// 位置計算と中央配置
+				function calculateTranslateX(index) {
+					const viewportWidth = carousel.clientWidth;
+					const targetSlide = slides[index];
+					if (!targetSlide) return 0;
+					const slideWidth = targetSlide.offsetWidth;
+					const slideOffsetLeft = targetSlide.offsetLeft;
+					return (viewportWidth / 2) - (slideOffsetLeft + slideWidth / 2);
+				}
+
+				function updateSlideClasses(activeDomIndex) {
+					const activeSlide = slides[activeDomIndex];
+					const realIndex = activeSlide ? parseInt(activeSlide.getAttribute('data-real-index') || '0', 10) : 0;
+
+					slides.forEach((slide, i) => {
+						const isActive = (i === activeDomIndex);
+						slide.classList.toggle('is-active', isActive);
+						slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+						if (i < activeDomIndex) {
+							slide.setAttribute('data-gather', 'prev');
+						} else if (i === activeDomIndex) {
+							slide.setAttribute('data-gather', 'active');
+						} else {
+							slide.setAttribute('data-gather', 'next');
+						}
+					});
+
+					dots.forEach((dot, i) => {
+						const isDotActive = (i === realIndex);
+						dot.classList.toggle('is-active', isDotActive);
+						dot.setAttribute('aria-selected', isDotActive ? 'true' : 'false');
+					});
+				}
+
+				function goToSlide(domIndex, smooth = true) {
+					if (transitionCleanup) {
+						transitionCleanup();
+					}
+
+					currentDomIndex = domIndex;
+					const targetX = calculateTranslateX(currentDomIndex);
+
+					if (smooth) {
+						isAnimating = true;
+						track.style.transition = 'transform 0.65s cubic-bezier(0.42, 0, 0, 1)';
+						track.style.transform = `translateX(${targetX}px)`;
+						updateSlideClasses(currentDomIndex);
+
+						let handled = false;
+						const onEnd = (e) => {
+							if (e && (e.target !== track || e.propertyName !== 'transform')) return;
+							if (handled) return;
+							handled = true;
+							cleanup();
+							checkInfiniteBoundary();
+							isAnimating = false;
+						};
+
+						const safetyTimer = setTimeout(() => {
+							onEnd();
+						}, TRANSITION_DURATION + 40);
+
+						function cleanup() {
+							track.removeEventListener('transitionend', onEnd);
+							clearTimeout(safetyTimer);
+							transitionCleanup = null;
+						}
+
+						track.addEventListener('transitionend', onEnd);
+						transitionCleanup = cleanup;
+					} else {
+						warpToSlide(currentDomIndex);
+					}
+				}
+
+				// 無限ループ境界の瞬間同期（アニメーション完全停止によりフラッシュ・カクツキをゼロに）
+				function checkInfiniteBoundary() {
+					let wrapIndex = -1;
+					// 最後のクローン領域へ進んだ場合（例: DOM index 7 = Clone 0）
+					if (currentDomIndex >= CLONE_OFFSET + STORY_COUNT) {
+						wrapIndex = currentDomIndex - STORY_COUNT; // 実体スライド0へ
+					}
+					// 最初のクローン領域へ戻った場合（例: DOM index 1 = Clone 4）
+					else if (currentDomIndex < CLONE_OFFSET) {
+						wrapIndex = currentDomIndex + STORY_COUNT; // 実体スライド4へ
+					}
+
+					if (wrapIndex !== -1) {
+						warpToSlide(wrapIndex);
+					}
+				}
+
+				// トランジションを完全に遮断し、見かけのブレなく実体スライドへ同期
+				function warpToSlide(newDomIndex) {
+					currentDomIndex = newDomIndex;
+					carousel.classList.add('is-instant-jump');
+					updateSlideClasses(currentDomIndex);
+					const targetX = calculateTranslateX(currentDomIndex);
+					track.style.transition = 'none';
+					track.style.transform = `translateX(${targetX}px)`;
+
+					// 同期リフローを実行してスタイルを即座に確定
+					void track.offsetWidth;
+
+					// 確定後、次フレームで安全にトランジション遮断を解除し、インラインtransitionをリセット
+					requestAnimationFrame(() => {
+						requestAnimationFrame(() => {
+							carousel.classList.remove('is-instant-jump');
+							track.style.transition = '';
+						});
+					});
+				}
+
+				function nextSlide() {
+					if (isAnimating) return;
+					goToSlide(currentDomIndex + 1, true);
+				}
+
+				function prevSlide() {
+					if (isAnimating) return;
+					goToSlide(currentDomIndex - 1, true);
+				}
+
+				function startAutoplay() {
+					stopAutoplay();
+					autoplayTimer = setInterval(() => {
+						nextSlide();
+					}, AUTOPLAY_INTERVAL);
+				}
+
+				function stopAutoplay() {
+					if (autoplayTimer) {
+						clearInterval(autoplayTimer);
+						autoplayTimer = null;
+					}
+				}
+
+				if (nextBtn) {
+					nextBtn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						nextSlide();
+						startAutoplay();
+					});
+				}
+
+				if (prevBtn) {
+					prevBtn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						prevSlide();
+						startAutoplay();
+					});
+				}
+
+				dots.forEach((dot, i) => {
+					dot.addEventListener('click', (e) => {
+						e.stopPropagation();
+						if (isAnimating) return;
+						goToSlide(i + CLONE_OFFSET, true);
+						startAutoplay();
+					});
+				});
+
+				// 両脇の見切れカードをクリックしたらそのカードへ移動
+				slides.forEach((slide, domIdx) => {
+					slide.addEventListener('click', (e) => {
+						if (domIdx !== currentDomIndex) {
+							e.preventDefault();
+							e.stopPropagation();
+							if (isAnimating) return;
+							goToSlide(domIdx, true);
+							startAutoplay();
+						}
+					});
+				});
+
+				carousel.addEventListener('mouseenter', stopAutoplay);
+				carousel.addEventListener('mouseleave', startAutoplay);
+
+				// タッチスワイプ
+				let startX = 0;
+				let isSwiping = false;
+
+				carousel.addEventListener('touchstart', (e) => {
+					stopAutoplay();
+					startX = e.touches[0].clientX;
+					isSwiping = true;
+				}, { passive: true });
+
+				carousel.addEventListener('touchend', (e) => {
+					if (!isSwiping) return;
+					isSwiping = false;
+					const endX = e.changedTouches[0].clientX;
+					const diff = endX - startX;
+					if (Math.abs(diff) > 40) {
+						if (diff > 0) {
+							prevSlide();
+						} else {
+							nextSlide();
+						}
+					}
+					startAutoplay();
+				}, { passive: true });
+
+				// リサイズ時の再計算
+				window.addEventListener('resize', () => {
+					warpToSlide(currentDomIndex);
+				}, { passive: true });
+
+				// ==============================================================
+				// 左右から中央に集まるスクロールエントランスモーション（Motion System）
+				// ==============================================================
+				function triggerGatherMotion() {
+					if (carousel.classList.contains('is-gathered')) return;
+					carousel.classList.add('is-gathered');
+					startAutoplay();
+					// エントランスモーション完了後に通常トランジション（0.65s）へ切り替え
+					setTimeout(() => {
+						carousel.classList.add('is-motion-done');
+					}, 1100);
+				}
+
+				// 初期位置セット（アニメーションなしで即座に実体スライド0を中央に配置）
+				setupGatheringAttributes(CLONE_OFFSET);
+				warpToSlide(CLONE_OFFSET);
+
+				// スクロール検知で「左右から中央に集まる」アニメーションを発火
+				// ファーストビュー（Hero）表示時は発火させず、ユーザーがLATEST STORIESにスクロール到達した瞬間に劇的に発火
+				if ('IntersectionObserver' in window) {
+					const gatherObserver = new IntersectionObserver((entries) => {
+						entries.forEach(entry => {
+							if (entry.isIntersecting) {
+								triggerGatherMotion();
+								gatherObserver.unobserve(entry.target);
+							}
+						});
+					}, { 
+						rootMargin: '0px 0px -100px 0px',
+						threshold: 0.15 
+					});
+					gatherObserver.observe(carousel);
+
+					// URLアンカー直接指定（#table-of-contents）またはすでにスクロールして画面内にしっかり入っている場合のみ発火
+					const isAnchorTarget = window.location.hash === '#table-of-contents';
+					const rect = carousel.getBoundingClientRect();
+					// 画面上部からしっかり見えている場合（Heroを通り過ぎてすでにカルーセルが表示領域にある場合）
+					if (isAnchorTarget || (rect.top > 0 && rect.top < window.innerHeight * 0.75)) {
+						setTimeout(triggerGatherMotion, 120);
+					}
+				} else {
+					triggerGatherMotion();
+				}
+			}
+		}
 	});
 </script>
 
 <style>
 	/* ============================================================== */
-	/* Nicole Connect - Apple風大判写真エディトリアルマガジン */
+	/* Nicole Connect - 大判写真エディトリアルマガジン */
 	/* ============================================================== */
-	.apple-magazine-main {
+	.nicole-magazine-main {
 		/* 4色のエディトリアル・タイポグラフィ体系（ダークテーマ） */
 		--mag-color-heading: #f2f3f6;     /* 1. 見出し・タイトル（白に近い上品なソフトホワイト） */
 		--mag-color-lead: #9ea3ae;        /* 2. リード文・本文（圧迫感を減らし読みやすいミディアムグレー） */
@@ -975,9 +1350,9 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* ============================================================== */
-	/* 1. Apple風 特大マガジンカバー・HERO */
+	/* 1. 特大マガジンカバー・HERO */
 	/* ============================================================== */
-	.apple-hero {
+	.magazine-hero {
 		position: relative;
 		min-height: 94vh;
 		display: flex;
@@ -989,7 +1364,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* 巨大背景画像コンテナ */
-	.apple-hero__media {
+	.magazine-hero__media {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -999,7 +1374,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		overflow: hidden;
 	}
 
-	.apple-hero__img {
+	.magazine-hero__img {
 		width: 100%;
 		height: 115%;
 		object-fit: cover;
@@ -1009,7 +1384,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		filter: brightness(0.85) contrast(1.08);
 	}
 
-	.apple-hero__gradient {
+	.magazine-hero__gradient {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -1024,7 +1399,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		);
 	}
 
-	.apple-hero__side-vignette {
+	.magazine-hero__side-vignette {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -1040,14 +1415,14 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 
 	/* 表紙コンテンツ */
-	.apple-hero__content {
+	.magazine-hero__content {
 		position: relative;
 		z-index: 5;
 		width: 100%;
 		padding: 50px 0 60px 0;
 	}
 
-	.apple-hero__container {
+	.magazine-hero__container {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -1094,7 +1469,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.hero-story-eyebrow {
 		display: inline-block;
-		font-family: var(--font-mono, monospace);
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.16em;
@@ -1136,12 +1511,12 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		gap: 16px;
 	}
 
-	.apple-cta-btn {
+	.magazine-cta-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 10px;
 		padding: 14px 30px;
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 14px;
 		font-weight: 700;
 		letter-spacing: 0.06em;
@@ -1149,29 +1524,29 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	.apple-cta-btn svg {
+	.magazine-cta-btn svg {
 		width: 16px;
 		height: 16px;
 		transition: transform 0.3s ease;
 	}
 
-	.apple-cta-btn--primary {
+	.magazine-cta-btn--primary {
 		background: #ffffff;
 		color: #040507;
 		box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
 	}
 
-	.apple-cta-btn--primary:hover {
+	.magazine-cta-btn--primary:hover {
 		background: #e4e4e7;
 		transform: translateY(-2px);
 		box-shadow: 0 8px 30px rgba(255, 255, 255, 0.4);
 	}
 
-	.apple-cta-btn--primary:hover svg {
+	.magazine-cta-btn--primary:hover svg {
 		transform: translateX(4px);
 	}
 
-	.apple-cta-btn--secondary {
+	.magazine-cta-btn--secondary {
 		background: rgba(255, 255, 255, 0.12);
 		color: var(--magazine-text-color);
 		border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1180,19 +1555,19 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 	}
 
-	.apple-cta-btn--secondary:hover {
+	.magazine-cta-btn--secondary:hover {
 		background: rgba(255, 255, 255, 0.22);
 		border-color: rgba(255, 255, 255, 0.6);
 		transform: translateY(-2px);
 		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
 	}
 
-	.apple-cta-btn--secondary:hover svg {
+	.magazine-cta-btn--secondary:hover svg {
 		transform: translateX(4px);
 	}
 
 	/* スクロールキュー */
-	.apple-hero__scroll-cue {
+	.magazine-hero__scroll-cue {
 		position: absolute;
 		bottom: 24px;
 		right: 48px;
@@ -1206,7 +1581,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		transition: color 0.3s ease;
 	}
 
-	.apple-hero__scroll-cue:hover {
+	.magazine-hero__scroll-cue:hover {
 		color: var(--magazine-text-color);
 	}
 
@@ -1232,16 +1607,17 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	/* ============================================================== */
-	/* 2. 本の見開き目次（TABLE OF CONTENTS） */
+	/* 2. フルブリード・カルーセル（LATEST STORIES） */
 	/* ============================================================== */
-	.toc-section {
-		padding: 90px 0 70px 0;
+	.latest-carousel-section {
+		padding: 90px 0 80px 0;
 		background: #06070a;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		overflow: hidden;
 	}
 
 	.toc-header {
-		margin-bottom: 44px;
+		margin-bottom: 36px;
 	}
 
 	.toc-badge {
@@ -1278,21 +1654,548 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		margin: 0;
 	}
 
-	.toc-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 32px;
+	/* カルーセル外枠（両サイドチラ見えフルブリードステージ） */
+	.latest-carousel {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+		padding: 16px 0 56px;
+	}
+
+	.latest-carousel__viewport {
+		width: 100%;
+		overflow: visible;
+	}
+
+	.latest-carousel__track {
+		display: flex;
+		gap: 16px;
+		width: max-content;
+		transition: transform 0.65s cubic-bezier(0.42, 0, 0, 1);
+		will-change: transform;
+	}
+
+	/* 無限ループ境界の瞬間同期（アニメーションを完全停止しフラッシュ・カクツキをゼロに） */
+	.latest-carousel.is-instant-jump,
+	.latest-carousel.is-instant-jump .latest-carousel__track,
+	.latest-carousel.is-instant-jump .latest-carousel__slide,
+	.latest-carousel.is-instant-jump .latest-card,
+	.latest-carousel.is-instant-jump .latest-card__content,
+	.latest-carousel.is-instant-jump .latest-card__top-badge,
+	.latest-carousel.is-instant-jump .latest-card__img {
+		transition: none !important;
+		animation: none !important;
+	}
+
+	.latest-carousel__slide {
+		width: clamp(740px, 78vw, 1120px);
+		flex-shrink: 0;
+		opacity: 0.42;
+		transform: scale(0.95);
+		transition: opacity 0.65s cubic-bezier(0.42, 0, 0, 1), transform 0.65s cubic-bezier(0.42, 0, 0, 1);
+		cursor: pointer;
+		will-change: transform, opacity;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+	}
+
+	.latest-carousel__slide.is-active {
+		opacity: 1;
+		transform: scale(1);
+		cursor: default;
+	}
+
+	/* -------------------------------------------------------------- */
+	/* 「左右から中央に集まる」エントランスモーション定義 */
+	/* -------------------------------------------------------------- */
+	/* 初期状態（未進入時）：左右のカードは外側に開いて離れており、中央は下から浮き上がる準備 */
+	.latest-carousel:not(.is-gathered) .latest-carousel__slide[data-gather="prev"] {
+		transform: scale(0.86) translateX(-110px);
+		opacity: 0;
+	}
+
+	.latest-carousel:not(.is-gathered) .latest-carousel__slide.is-active {
+		transform: scale(0.92) translateY(36px);
+		opacity: 0;
+	}
+
+	.latest-carousel:not(.is-gathered) .latest-carousel__slide[data-gather="next"] {
+		transform: scale(0.86) translateX(110px);
+		opacity: 0;
+	}
+
+	.latest-carousel:not(.is-gathered) .latest-card__content {
+		opacity: 0;
+		transform: translateY(28px);
+	}
+
+	.latest-carousel:not(.is-gathered) .latest-card__top-badge {
+		opacity: 0;
+		transform: translateY(-14px);
+	}
+
+	/* 集約発火時（is-gathered）：左右から中央へ吸い寄せられるように集まる */
+	.latest-carousel.is-gathered:not(.is-motion-done) .latest-carousel__slide {
+		transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.latest-carousel.is-gathered .latest-carousel__slide[data-gather="prev"],
+	.latest-carousel.is-gathered .latest-carousel__slide[data-gather="next"] {
+		transform: scale(0.95) translateX(0);
+		opacity: 0.42;
+	}
+
+	.latest-carousel.is-gathered .latest-carousel__slide.is-active {
+		transform: scale(1) translateY(0);
+		opacity: 1;
+	}
+
+	.latest-carousel.is-gathered:not(.is-motion-done) .latest-card__top-badge {
+		opacity: 1;
+		transform: translateY(0);
+		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+	}
+
+	.latest-carousel.is-gathered:not(.is-motion-done) .latest-card__content {
+		opacity: 1;
+		transform: translateY(0);
+		transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+	}
+
+	.latest-carousel.is-gathered.is-motion-done .latest-card__top-badge,
+	.latest-carousel.is-gathered.is-motion-done .latest-card__content {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	/* 矢印ボタンも左右の外側から所定位置にスライドイン */
+	.latest-carousel:not(.is-gathered) .latest-carousel__arrow--prev {
+		opacity: 0;
+		transform: translateY(-50%) translateX(-60px);
+		pointer-events: none;
+	}
+	.latest-carousel:not(.is-gathered) .latest-carousel__arrow--next {
+		opacity: 0;
+		transform: translateY(-50%) translateX(60px);
+		pointer-events: none;
+	}
+
+	.latest-carousel.is-gathered .latest-carousel__arrow--prev,
+	.latest-carousel.is-gathered .latest-carousel__arrow--next {
+		opacity: 1;
+		transform: translateY(-50%) translateX(0);
+		pointer-events: auto;
+		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+	}
+
+	/* カード本体（写真スライダー構造） */
+	.latest-card {
+		position: relative;
+		width: 100%;
+		height: 520px;
+		border-radius: var(--radius-card, 4px);
+		overflow: hidden;
+		background: #0a0c10;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+		transition: border-color 0.35s ease, box-shadow 0.35s ease;
+	}
+
+	.latest-carousel__slide.is-active .latest-card:hover {
+		border-color: rgba(255, 255, 255, 0.3);
+		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+	}
+
+	.latest-card__media-link {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+		text-decoration: none;
+	}
+
+	.latest-card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.latest-carousel__slide.is-active .latest-card:hover .latest-card__img {
+		transform: scale(1.03);
+	}
+
+	/* 左側からのシネマティック・グラデーション（文字可読性の完全保証） */
+	.latest-card__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(90deg, 
+			rgba(5, 7, 10, 0.94) 0%, 
+			rgba(5, 7, 10, 0.82) 38%, 
+			rgba(5, 7, 10, 0.35) 70%, 
+			transparent 100%
+		);
+		transition: background 0.35s ease;
+	}
+
+	/* 写真上部のバッジ表示（ブランド単独・ALL BRANDSの2行折れ防止） */
+	.latest-card__top-badge {
+		position: absolute;
+		top: clamp(28px, 3.2vw, 38px);
+		left: clamp(32px, 3.6vw, 44px);
+		z-index: 3;
+		display: flex;
+		align-items: center;
+		pointer-events: none;
+	}
+
+	.latest-card__brand-tag {
+		color: #ffffff;
+		background: rgba(7, 8, 10, 0.75);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		padding: 5px 14px;
+		border-radius: var(--radius-meta, 0);
+		border: 1px solid rgba(255, 255, 255, 0.22);
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		font-weight: 700;
+		text-transform: uppercase;
+		white-space: nowrap !important;
+		flex-shrink: 0;
+	}
+
+	/* コンテンツレイヤー（写真の下部に配置・PCにふさわしい上質でゆったりとした余白） */
+	.latest-card__content {
+		position: relative;
+		z-index: 2;
+		height: 100%;
+		padding: clamp(34px, 3.8vw, 48px);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		max-width: 680px;
+		box-sizing: border-box;
+		pointer-events: none;
+	}
+
+	.latest-card__meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 11.5px;
+		color: rgba(255, 255, 255, 0.7);
+		margin-bottom: 8px;
+		letter-spacing: 0.02em;
+	}
+
+	.latest-card__meta .meta-date {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 11.5px;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.65);
+		letter-spacing: 0.02em;
+	}
+
+	.latest-card__meta .meta-divider {
+		opacity: 0.4;
+		font-size: 10px;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.latest-card__meta .meta-topic {
+		color: rgba(255, 255, 255, 0.85);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+	}
+
+	.latest-carousel__slide.is-active .latest-card__content {
+		pointer-events: auto;
+	}
+
+	/* 大きく太い引用風見出し */
+	.latest-card__headline {
+		font-family: inherit;
+		font-size: clamp(22px, 3.2vw, 36px);
+		font-weight: 700;
+		color: #ffffff;
+		line-height: 1.28;
+		margin: 0 0 16px 0;
+		letter-spacing: -0.015em;
+		word-break: auto-phrase !important;
+		line-break: strict !important;
+	}
+
+	.latest-card__headline-link {
+		color: #ffffff;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	.latest-card__headline-link:hover {
+		color: #ffffff;
+	}
+
+	.latest-card__lead {
+		font-size: clamp(13px, 1.3vw, 15px);
+		line-height: 1.7;
+		color: rgba(255, 255, 255, 0.78);
+		margin: 0 0 28px 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.latest-card__cta-wrap {
+		margin-top: 4px;
+	}
+
+	/* 赤系サテンクリムゾンCTAボタン（公式仕様：モノトーン基調＋アクセントレッド） */
+	.latest-card__cta-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 13px 30px;
+		background: #b81424;
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: var(--radius-action, 9999px);
+		font-size: 14px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-decoration: none;
+		width: fit-content;
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+	}
+
+	.latest-card__cta-btn:hover {
+		background: #9f111f;
+		color: #ffffff;
+		border-color: rgba(255, 255, 255, 0.35);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 26px rgba(0, 0, 0, 0.6);
+	}
+
+	.latest-card__cta-btn:active {
+		transform: translateY(0);
+		background: #8b0f1b;
+	}
+
+	.latest-card__cta-arrow {
+		width: 16px;
+		height: 16px;
+		stroke: #ffffff;
+		transition: transform 0.25s ease;
+	}
+
+	.latest-card__cta-btn:hover .latest-card__cta-arrow {
+		transform: translateX(4px);
+	}
+
+	/* フロート円形矢印ナビゲーション（透過・ぼかしのラグジュアリー・フロストガラス仕様） */
+	.latest-carousel__arrow {
+		position: absolute;
+		top: calc(16px + 260px) !important; /* PCカード高さ520pxの上下完全中央 (padding-top 16px + 260px = 276px) */
+		transform: translateY(-50%) !important;
+		width: 48px !important;
+		height: 48px !important;
+		min-width: 48px !important;
+		max-width: 48px !important;
+		padding: 0 !important;
+		border-radius: 50% !important;
+		background: rgba(255, 255, 255, 0.16) !important;
+		backdrop-filter: blur(16px) saturate(160%) !important;
+		-webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+		border: 1px solid rgba(255, 255, 255, 0.32) !important;
+		color: #ffffff !important;
+		box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+		cursor: pointer;
+		display: flex !important;
+		align-items: center;
+		justify-content: center;
+		z-index: 20;
+		transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		box-sizing: border-box;
+	}
+
+	.latest-carousel__arrow svg {
+		width: 22px !important;
+		height: 22px !important;
+		display: block !important;
+		stroke: #ffffff !important;
+		color: #ffffff !important;
+		fill: none !important;
+		flex-shrink: 0;
+	}
+
+	.latest-carousel__arrow:hover {
+		transform: translateY(-50%) scale(1.08) !important;
+		background: rgba(255, 255, 255, 0.28) !important;
+		border-color: rgba(255, 255, 255, 0.6) !important;
+		box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+	}
+
+	.latest-carousel__arrow:active {
+		transform: translateY(-50%) scale(0.96) !important;
+		background: rgba(255, 255, 255, 0.2) !important;
+	}
+
+	.latest-carousel__arrow--prev {
+		left: clamp(28px, 3.5vw, 48px);
+	}
+
+	.latest-carousel__arrow--next {
+		right: clamp(28px, 3.5vw, 48px);
+	}
+
+	/* 下部中央インジケータードット */
+	.latest-carousel__dots {
+		position: absolute;
+		bottom: 20px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		z-index: 20;
+	}
+
+	.latest-carousel__dot {
+		appearance: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		height: 6px;
+		width: 6px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.4);
+		transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.latest-carousel__dot:hover {
+		background: rgba(255, 255, 255, 0.7);
+	}
+
+	.latest-carousel__dot.is-active {
+		width: 24px;
+		border-radius: 9999px;
+		background: #ffffff;
+	}
+
+	/* レスポンシブ最適化 */
+	@media (max-width: 1024px) {
+		.latest-carousel__track {
+			gap: 14px;
+		}
+		.latest-carousel__slide {
+			width: 84vw;
+		}
+		.latest-card {
+			height: 480px;
+		}
+		.latest-carousel__arrow {
+			top: calc(16px + 240px) !important; /* タブレットカード高さ480pxの上下完全中央 (padding-top 16px + 240px = 256px) */
+		}
+		.latest-carousel__arrow--prev {
+			left: 20px;
+		}
+		.latest-carousel__arrow--next {
+			right: 20px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.latest-carousel-section {
+			padding: 50px 0 40px 0;
+		}
+		.latest-carousel {
+			padding: 8px 0 52px; /* ドットとウインドウの余白を十分に確保 */
+		}
+		.latest-carousel__track {
+			gap: 12px;
+		}
+		.latest-carousel__slide {
+			width: 90vw;
+		}
+		.latest-card {
+			height: 440px;
+		}
+		.latest-card__overlay {
+			background: linear-gradient(180deg, 
+				rgba(5, 7, 10, 0.15) 0%, 
+				rgba(5, 7, 10, 0.35) 40%, 
+				rgba(5, 7, 10, 0.94) 80%
+			);
+		}
+		.latest-card__top-badge {
+			top: 22px;
+			left: 22px;
+		}
+		.latest-card__brand-tag {
+			padding: 4px 10px;
+			font-size: 10.5px;
+			white-space: nowrap !important;
+		}
+		/* 写真の中のパディングは下の記事（22px）と統一 */
+		.latest-card__content {
+			justify-content: flex-end;
+			padding: 22px !important;
+			max-width: 100%;
+		}
+		.latest-card__headline {
+			font-size: 18px;
+			line-height: 1.35;
+			margin-bottom: 12px;
+		}
+		/* スマホ時は中身テキスト（リード文）を非表示にして写真を美しく主役に */
+		.latest-card__lead {
+			display: none !important;
+		}
+		.latest-card__cta-wrap {
+			margin-top: 0;
+		}
+		.latest-card__cta-btn {
+			padding: 9px 20px;
+			font-size: 12.5px;
+		}
+		/* 左右移動丸ボタンはカードの上下完全中央配置（padding-top 8px + カード高さ440px / 2 = 228px） */
+		.latest-carousel__arrow {
+			width: 34px !important;
+			height: 34px !important;
+			min-width: 34px !important;
+			max-width: 34px !important;
+			top: calc(8px + 220px) !important;
+			transform: translateY(-50%) !important;
+		}
+		.latest-carousel__arrow svg {
+			width: 15px !important;
+			height: 15px !important;
+		}
+		.latest-carousel__arrow--prev {
+			left: 6px !important;
+		}
+		.latest-carousel__arrow--next {
+			right: 6px !important;
+		}
+		.latest-carousel__dots {
+			bottom: 18px; /* カード下部および次セクションとの十分な距離 */
+		}
 	}
 
 	/* ============================================================== */
-	/* スクロール連動ふわっと表示（Scroll Reveal）共通定義 */
+	/* スクロール連動エントランスモーション（Stagger Wave / 時間差リビール） */
 	/* ============================================================== */
-	.toc-card,
 	.popular-card,
 	.article-item,
 	.esg-card {
 		opacity: 0;
-		transform: translateY(28px);
+		transform: translateY(24px) scale(0.985);
 		transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), 
 		            transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), 
 		            border-color 0.35s ease, 
@@ -1300,196 +2203,77 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		will-change: opacity, transform;
 	}
 
-	.toc-card.is-revealed,
 	.popular-card.is-revealed,
 	.article-item.is-revealed,
 	.esg-card.is-revealed {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translateY(0) scale(1);
 	}
 
-	.toc-card.is-revealed:hover {
-		transform: translateY(-6px);
+	/* 1. 人気の記事（POPULAR STORIES）：左から順に1位〜5位へ波打つ時間差（0.08s刻み） */
+	.popular-grid .popular-card:nth-child(1) { transition-delay: 0s; }
+	.popular-grid .popular-card:nth-child(2) { transition-delay: 0.08s; }
+	.popular-grid .popular-card:nth-child(3) { transition-delay: 0.16s; }
+	.popular-grid .popular-card:nth-child(4) { transition-delay: 0.24s; }
+	.popular-grid .popular-card:nth-child(5) { transition-delay: 0.32s; }
+
+	/* 2. 全記事アーカイブ（ALL STORIES）：行ごとに左から右へ流れる時間差（3列/2列対応） */
+	@media (min-width: 1025px) {
+		.articles-grid .article-item:nth-child(3n + 1) { transition-delay: 0s; }
+		.articles-grid .article-item:nth-child(3n + 2) { transition-delay: 0.07s; }
+		.articles-grid .article-item:nth-child(3n + 3) { transition-delay: 0.14s; }
+	}
+
+	@media (min-width: 641px) and (max-width: 1024px) {
+		.articles-grid .article-item:nth-child(2n + 1) { transition-delay: 0s; }
+		.articles-grid .article-item:nth-child(2n + 2) { transition-delay: 0.08s; }
+	}
+
+	@media (max-width: 640px) {
+		.articles-grid .article-item { transition-delay: 0s; }
+	}
+
+	/* 3. ESG / SDGs カード：4列グリッドでの心地よい時間差（0.07s刻み） */
+	@media (min-width: 1025px) {
+		.esg-cards-grid .esg-card:nth-child(4n + 1) { transition-delay: 0s; }
+		.esg-cards-grid .esg-card:nth-child(4n + 2) { transition-delay: 0.07s; }
+		.esg-cards-grid .esg-card:nth-child(4n + 3) { transition-delay: 0.14s; }
+		.esg-cards-grid .esg-card:nth-child(4n + 4) { transition-delay: 0.21s; }
+	}
+
+	@media (min-width: 641px) and (max-width: 1024px) {
+		.esg-cards-grid .esg-card:nth-child(2n + 1) { transition-delay: 0s; }
+		.esg-cards-grid .esg-card:nth-child(2n + 2) { transition-delay: 0.08s; }
+	}
+
+	/* マウスホバー時は即応性を最優先（transition-delay をゼロにして快適に追従） */
+	.popular-card.is-revealed:hover,
+	.article-item.is-revealed:hover,
+	.esg-card.is-revealed:hover {
+		transition-delay: 0s !important;
 	}
 
 	.popular-card.is-revealed:hover {
-		transform: translateY(-4px);
+		transform: translateY(-4px) scale(1);
 	}
 
 	.article-item.is-revealed:hover {
-		transform: translateY(-5px);
+		transform: translateY(-5px) scale(1);
 	}
 
 	.esg-card.is-revealed:hover {
-		transform: translateY(-5px);
+		transform: translateY(-5px) scale(1);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.toc-card,
 		.popular-card,
 		.article-item,
 		.esg-card {
 			opacity: 1 !important;
 			transform: none !important;
 			transition: none !important;
+			transition-delay: 0s !important;
 		}
-	}
-
-	.toc-card {
-		background: #0a0d12;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 14px;
-		overflow: hidden;
-	}
-
-	.toc-card:hover {
-		border-color: rgba(255, 255, 255, 0.35);
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-	}
-
-	.toc-card__link {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.toc-card__media {
-		position: relative;
-		height: 320px;
-		overflow: hidden;
-		background: #000;
-	}
-
-	.toc-card__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.toc-card:hover .toc-card__img {
-		transform: scale(1.06);
-	}
-
-	.toc-card__overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(180deg, transparent 40%, rgba(10, 13, 18, 0.8) 100%);
-	}
-
-	.toc-card__brand {
-		position: absolute;
-		top: 14px;
-		left: 14px;
-		padding: 3px 10px;
-		background: rgba(7, 8, 10, 0.85);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
-		font-size: 10.5px;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		color: var(--magazine-text-color);
-		backdrop-filter: blur(8px);
-	}
-
-	.toc-card__body {
-		padding: 28px;
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-	}
-
-	.toc-card__meta {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 11px;
-		color: var(--mag-color-meta);
-		margin-bottom: 8px;
-	}
-
-	.toc-meta-views {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		opacity: 0.85;
-	}
-
-	.toc-views-icon {
-		width: 12px;
-		height: 12px;
-		stroke-width: 1.8;
-		opacity: 0.85;
-	}
-
-	.toc-meta-topic {
-		color: var(--mag-color-meta);
-		font-weight: 600;
-	}
-
-	.toc-card__title {
-		font-size: 20px;
-		font-weight: 600;
-		line-height: 1.4;
-		color: var(--mag-color-heading) !important;
-		margin: 0 0 12px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s ease;
-	}
-
-	.toc-card:hover .toc-card__title {
-		color: #ffffff !important;
-		text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
-	}
-
-	.toc-card__lead {
-		font-size: 14px;
-		color: var(--mag-color-lead);
-		line-height: 1.6;
-		margin: 0 0 20px 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		flex: none;
-		transition: color 0.3s ease;
-	}
-
-	.toc-card:hover .toc-card__lead {
-		color: var(--mag-color-heading);
-	}
-
-	.toc-card__arrow {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--mag-color-heading);
-		margin-top: auto;
-		transition: color 0.3s ease, transform 0.3s ease;
-	}
-
-	.toc-card:hover .toc-card__arrow {
-		color: #ffffff;
-	}
-
-	.toc-card__arrow svg {
-		width: 14px;
-		height: 14px;
-		transition: transform 0.3s ease;
-	}
-
-	.toc-card:hover .toc-card__arrow svg {
-		transform: translateX(4px);
 	}
 
 	/* ============================================================== */
@@ -1532,7 +2316,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.popular-card {
 		background: #ffffff;
 		border: 1px solid rgba(0, 0, 0, 0.08);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 	}
@@ -1584,20 +2368,20 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-family: var(--font-mono, monospace);
-		font-size: 11.5px;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 12px;
 		font-weight: 700;
-		background: #f0f0f3;
-		color: #44444c !important;
-		border: 1px solid rgba(0, 0, 0, 0.12);
+		background: #111114;
+		color: #ffffff !important;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		z-index: 2;
 	}
 
 	.popular-rank-badge.is-top {
-		background: #111114;
+		background: #b81424;
 		color: #ffffff !important;
-		border-color: #111114;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+		border-color: #b81424;
+		box-shadow: 0 2px 8px rgba(184, 20, 36, 0.35);
 	}
 
 	.popular-card__body {
@@ -1750,7 +2534,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		border: 1px solid var(--mag-color-border);
 		color: var(--mag-color-lead);
 		padding: 5px 13px;
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 11.5px;
 		font-weight: 600;
 		letter-spacing: 0.04em;
@@ -1792,7 +2576,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		box-sizing: border-box;
 		background: rgba(255, 255, 255, 0.06);
 		border: 1px solid var(--mag-color-border);
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		padding: 0 14px;
 		width: 210px;
 		flex-shrink: 0;
@@ -1880,7 +2664,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	.article-item {
 		background: #090b0e;
 		border: 1px solid var(--mag-color-border);
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -1934,7 +2718,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		padding: 3px 10px;
 		background: rgba(7, 8, 10, 0.85);
 		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 999px;
+		border-radius: var(--radius-meta, 0);
 		font-size: 10.5px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
@@ -2237,7 +3021,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		padding: 80px 20px;
 		background: #090b0e;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 16px;
+		border-radius: var(--radius-card, 4px);
 		margin-top: 20px;
 	}
 
@@ -2271,7 +3055,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		color: #040507;
 		border: none;
 		padding: 10px 24px;
-		border-radius: 6px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 13px;
 		font-weight: 700;
 		cursor: pointer;
@@ -2313,19 +3097,19 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			margin-bottom: 24px;
 		}
 
-		.apple-hero {
+		.magazine-hero {
 			min-height: 85vh;
 			padding-top: 60px;
 		}
 
-		.apple-hero__frame {
+		.magazine-hero__frame {
 			top: 15px;
 			left: 15px;
 			right: 15px;
 			bottom: 15px;
 		}
 
-		.apple-hero__header {
+		.magazine-hero__header {
 			flex-direction: column;
 			align-items: flex-start;
 			gap: 12px;
@@ -2370,7 +3154,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			align-items: stretch;
 		}
 
-		.apple-cta-btn {
+		.magazine-cta-btn {
 			justify-content: center;
 		}
 
@@ -2378,11 +3162,11 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 			display: none;
 		}
 
-		.apple-hero__footer {
+		.magazine-hero__footer {
 			display: none;
 		}
 
-		.apple-hero__scroll-cue {
+		.magazine-hero__scroll-cue {
 			display: none;
 		}
 
@@ -2563,7 +3347,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.esg-section__eyebrow {
 		display: block;
-		font-family: var(--font-mono, monospace);
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-size: 11px;
 		letter-spacing: 0.16em;
 		color: #777782 !important;
@@ -2649,7 +3433,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.esg-card {
-		border-radius: 10px;
+		border-radius: var(--radius-card, 4px);
 		background: #ffffff;
 		border: 1px solid rgba(0, 0, 0, 0.08);
 		overflow: hidden;
@@ -2736,11 +3520,16 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 	}
 
 	.esg-meta-views svg {
+		width: 12px;
+		height: 12px;
 		stroke: #777782;
+		stroke-width: 1.8;
+		opacity: 0.85;
+		flex-shrink: 0;
 	}
 
 	.esg-card__date {
-		font-family: var(--font-mono, monospace);
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-size: 11px;
 		color: #777782 !important;
 	}

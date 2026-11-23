@@ -13,24 +13,63 @@ export const GET: APIRoute = async ({ site, url }) => {
 		limit: 20,
 	});
 
-	const items = posts
-		.map((post) => {
-			if (!post.data.publishedAt) return null;
-			const pubDate = post.data.publishedAt.toUTCString();
+	let magazineEntries: any[] = [];
+	try {
+		const magRes = await getEmDashCollection("magazine" as any, {
+			orderBy: { published_at: "desc" },
+			limit: 30,
+		});
+		magazineEntries = magRes?.entries || [];
+	} catch (e) {}
 
-			const postUrl = new URL(`/posts/${post.id}`, siteUrl).href;
-			const title = escapeXml(post.data.title || "Untitled");
-			const description = escapeXml(post.data.excerpt || "");
+	type FeedEntry = {
+		title: string;
+		url: string;
+		pubDate: Date;
+		description: string;
+	};
 
+	const feedEntries: FeedEntry[] = [];
+
+	for (const post of posts) {
+		const rawDate = post.data.publishedAt || (post.data as any).published_at;
+		if (!rawDate) continue;
+		const pubDate = rawDate instanceof Date ? rawDate : new Date(rawDate);
+		if (Number.isNaN(pubDate.getTime())) continue;
+		feedEntries.push({
+			title: post.data.title || "Untitled",
+			url: new URL(`/news/${post.id}`, siteUrl).href,
+			pubDate,
+			description: post.data.excerpt || "",
+		});
+	}
+
+	for (const entry of magazineEntries) {
+		const rawDate = entry.data?.publishedAt || entry.data?.published_at;
+		if (!rawDate) continue;
+		const pubDate = rawDate instanceof Date ? rawDate : new Date(rawDate);
+		if (Number.isNaN(pubDate.getTime())) continue;
+		feedEntries.push({
+			title: entry.data?.title || "Untitled",
+			url: new URL(`/magazine/${entry.id}`, siteUrl).href,
+			pubDate,
+			description: entry.data?.excerpt || "",
+		});
+	}
+
+	feedEntries.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+
+	const items = feedEntries
+		.slice(0, 30)
+		.map((item) => {
 			return `    <item>
-      <title>${title}</title>
-      <link>${postUrl}</link>
-      <guid isPermaLink="true">${postUrl}</guid>
-      <pubDate>${pubDate}</pubDate>
-      <description>${description}</description>
+      <title>${escapeXml(item.title)}</title>
+      <link>${escapeXml(item.url)}</link>
+      <guid isPermaLink="true">${escapeXml(item.url)}</guid>
+      <pubDate>${item.pubDate.toUTCString()}</pubDate>
+      <description>${escapeXml(item.description)}</description>
     </item>`;
 		})
-		.filter(Boolean)
 		.join("\n");
 
 	const rss = `<?xml version="1.0" encoding="UTF-8"?>
@@ -38,9 +77,9 @@ export const GET: APIRoute = async ({ site, url }) => {
   <channel>
     <title>${escapeXml(siteTitle)}</title>
     <description>${escapeXml(siteTagline)}</description>
-	<link>${siteUrl.href}</link>
-	<atom:link href="${new URL("/rss.xml", siteUrl).href}" rel="self" type="application/rss+xml"/>
-    <language>${getSiteLocale() ?? "en-us"}</language>
+	<link>${escapeXml(siteUrl.href)}</link>
+	<atom:link href="${escapeXml(new URL("/rss.xml", siteUrl).href)}" rel="self" type="application/rss+xml"/>
+    <language>${getSiteLocale() ?? "ja"}</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${items}
   </channel>

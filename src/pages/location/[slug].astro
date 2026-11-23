@@ -1364,7 +1364,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		padding: 7px 14px;
 		background: rgba(255, 255, 255, 0.04);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 6px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 0.8125rem;
 		font-weight: 500;
 		color: #e5e7eb;
@@ -1487,7 +1487,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		padding: 18px 24px;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		margin-top: 16px;
 		margin-bottom: 0;
 	}
@@ -1548,7 +1548,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.25);
 		color: #ffffff;
-		border-radius: 6px;
+		border-radius: var(--radius-action, 9999px);
 		font-size: 0.875rem;
 		font-weight: 600;
 		text-decoration: none;
@@ -1624,7 +1624,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		aspect-ratio: 16 / 9;
 		max-height: 450px;
 		width: 100%;
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		background: #08090a;
 		margin-bottom: 12px;
@@ -1677,7 +1677,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		appearance: none;
 		background: transparent;
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 6px;
+		border-radius: var(--radius-card, 4px);
 		padding: 0;
 		overflow: hidden;
 		height: 68px;
@@ -1785,7 +1785,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		color: #64748b;
 		background: rgba(255, 255, 255, 0.06);
 		padding: 2px 6px;
-		border-radius: 3px;
+		border-radius: var(--radius-meta, 0);
 	}
 
 	.dealer-summary-fax .d-val {
@@ -1818,7 +1818,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.dept-acc-item {
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 8px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		scroll-margin-top: 110px;
 		transition: border-color 0.2s ease, background 0.2s ease;
@@ -2125,7 +2125,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		background: rgba(255, 255, 255, 0.08);
 		color: #ffffff;
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 6px;
+		border-radius: var(--radius-action, 9999px);
 		font-weight: 600;
 		font-size: 0.875rem;
 		text-decoration: none;
@@ -2141,7 +2141,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	/* マップコンテナボックス */
 	.map-container-box {
 		position: relative;
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		margin-bottom: 32px;
@@ -2162,7 +2162,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.access-acc-item {
 		background: #111317;
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 10px;
+		border-radius: var(--radius-card, 4px);
 		overflow: hidden;
 		transition: border-color 0.2s ease, background 0.2s ease;
 	}
@@ -2249,7 +2249,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		padding: 3px 10px;
-		border-radius: 3px;
+		border-radius: var(--radius-meta, 0);
 		margin-bottom: 8px;
 		letter-spacing: 0.03em;
 	}
@@ -2317,7 +2317,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.gmap-rating-hero {
 		background: #111317;
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 10px;
+		border-radius: var(--radius-card, 4px);
 		padding: 24px 28px;
 		margin-bottom: 24px;
 	}
@@ -2375,7 +2375,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		padding: 6px 14px;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 20px;
+		border-radius: var(--radius-meta, 0);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: #e5e7eb;
@@ -2391,7 +2391,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.review-card {
 		background: #0d0f12;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
+		border-radius: var(--radius-card, 4px);
 		padding: 22px 20px;
 		display: flex;
 		flex-direction: column;
@@ -2474,7 +2474,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 	.sidebar-card {
 		background: #111317;
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
+		border-radius: var(--radius-card, 4px);
 		padding: 28px;
 		margin-bottom: 24px;
 		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -2612,7 +2612,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		padding: 12px 14px;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px dashed rgba(255, 255, 255, 0.12);
-		border-radius: 6px;
+		border-radius: var(--radius-card, 4px);
 	}
 	.sidebar-office-notice__badge {
 		display: block;
@@ -2640,7 +2640,7 @@ const locationJsonLd = [locationSchema, breadcrumbSchema];
 		padding: 14px;
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px dashed rgba(255, 255, 255, 0.15);
-		border-radius: 6px;
+		border-radius: var(--radius-card, 4px);
 	}
 
 	.sidebar-related-hub__header {

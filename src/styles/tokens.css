@@ -50,7 +50,9 @@
 		--emdash-search-highlight: var(--color-text);
 
 		/* Typography */
+		--font-body: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		--font-heading: var(--font-body);
+		--font-mono: var(--font-body);
 		--font-weight-heading: 600; /* h2-h6, card and list titles */
 		--font-weight-display: 600; /* h1 and large page titles */
 
@@ -114,18 +116,30 @@
 		--nav-height: 64px; /* sticky header height */
 		--search-input-width: 200px; /* header search box width */
 
-		/* Radius: card = inset media + card padding, so corners stay concentric */
-		--radius-sm: 6px; /* small controls */
-		--radius: 8px; /* inputs, code */
-		--radius-lg: 12px; /* media inside cards */
-		--radius-xl: 18px; /* cards, panels */
-		--radius-full: 999px; /* pills: buttons, chips */
+		/* Radius: 機能・役割に応じた角丸設計
+		   - アクション要素（押せるもの）：丸型（Pill / 9999px）
+		   - 静的メタ情報（押せないもの/カテゴリ・ブランド・タグ）：角丸なし（0px / スクエア）
+		   - コンテンツ・記事・カード（読むもの）：極小マイクロ角丸（4px / シャープ）
+		*/
+		--radius-none: 0; /* 角丸なし（完全スクエア） */
+		--radius-meta: 0; /* カテゴリ、ブランド、タグ、ステータスバッジ（押せないもの） */
+		--radius-xs: 2px; /* 極小パーツ */
+		--radius-sm: 4px; /* 内部要素・フォーム・インプット */
+		--radius: 4px; /* 基本（4pxマイクロ角丸） */
+		--radius-card: 4px; /* 記事カード・ブロックカード・パネル外枠 */
+		--radius-lg: 4px; /* カード内メディア・大きめのブロック */
+		--radius-xl: 4px; /* 大パネル（旧18pxから4pxへ統一） */
+		--radius-action: 9999px; /* CTAボタン・主要アクション（押せるもの） */
+		--radius-full: 9999px; /* pills: ボタン等 */
 		--card-padding: 6px; /* inset between card edge and its media */
 
-		/* Motion */
-		--ease-out: cubic-bezier(0.2, 0, 0, 1);
-		--transition-fast: 150ms var(--ease-out);
-		--transition-base: 250ms var(--ease-out);
+		/* Motion (Nicole Editorial Motion Curves) */
+		--ease-editorial: cubic-bezier(0.42, 0, 0, 1); /* Master Curve: 高速初速＋シルキーな超長減速 */
+		--ease-out: cubic-bezier(0.42, 0, 0, 1);
+		--transition-fast: 200ms var(--ease-editorial);
+		--transition-base: 400ms var(--ease-editorial);
+		--transition-slow: 800ms var(--ease-editorial);
+		--transition-reveal: 900ms var(--ease-editorial);
 
 		/* Avatars */
 		--avatar-size-xs: 20px; /* card and row bylines */

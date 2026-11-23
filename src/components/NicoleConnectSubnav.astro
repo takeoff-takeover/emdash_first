@@ -1,6 +1,6 @@
 ---
 // src/components/NicoleConnectSubnav.astro
-// Apple MacBook Proスタイルのスクロール連動サブナビゲーションバー（Nicole Connect専用）
+// Nicole Connect専用 スクロール連動サブナビゲーションバー
 interface Props {
 	currentSlug?: string;
 }
@@ -53,7 +53,7 @@ const isDetailPage = Boolean(currentSlug);
 
 <style>
 	/* ============================================================== */
-	/* Apple MacBook Pro Local Navigation Style */
+	/* Nicole Connect Local Navigation Style */
 	/* ファーストビューをしっかり読み進めた後にスッと出現 */
 	/* ============================================================== */
 	.nicole-connect-subnav {
@@ -77,7 +77,7 @@ const isDetailPage = Boolean(currentSlug);
 		transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.4s ease;
 	}
 
-	/* スクロールして表示された時（Appleスタイルでスッと下りてくる） */
+	/* スクロールして表示された時（ヘッダー下へスッと下りてくる） */
 	.nicole-connect-subnav.is-visible {
 		transform: translateY(0);
 		opacity: 1;
@@ -173,7 +173,7 @@ const isDetailPage = Boolean(currentSlug);
 		display: inline-flex;
 		align-items: center;
 		padding: 6px 16px;
-		border-radius: 999px;
+		border-radius: var(--radius-action, 9999px);
 		background: rgba(255, 255, 255, 0.12);
 		color: #ffffff;
 		font-size: 11.5px;
@@ -232,7 +232,7 @@ const isDetailPage = Boolean(currentSlug);
 		const subnav = document.getElementById('connectSubnav');
 		if (!subnav) return;
 
-		// Apple流：ファーストビューをしっかり読み進めてから出現させる閾値（px）
+		// ファーストビューをしっかり読み進めてから出現させる閾値（px）
 		const SCROLL_THRESHOLD = 520;
 
 		let ticking = false;

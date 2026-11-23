@@ -44,19 +44,28 @@ export const GET: APIRoute = async ({ site }) => {
 		return src.startsWith("http") ? src : `${siteUrl}${src.startsWith("/") ? "" : "/"}${src}`;
 	};
 
+	const escapeXml = (str: string): string =>
+		str.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c] || c));
+
+	const resolveLastmod = (data: any): string => {
+		const raw = data?.updatedAt || data?.updated_at || data?.publishedAt || data?.published_at;
+		if (!raw) return now;
+		const d = raw instanceof Date ? raw : new Date(raw);
+		return Number.isNaN(d.getTime()) ? now : d.toISOString();
+	};
+
 	// 1. マガジン記事
 	try {
-		const magResult = await getEmDashCollection("magazine" as any, { limit: 100 });
+		const magResult = await getEmDashCollection("magazine" as any, { limit: 500 });
 		if (magResult?.entries) {
 			for (const entry of magResult.entries) {
 				const slug = entry.id;
-				const lastmod = entry.data?.updated_at || entry.data?.published_at;
 				const imgUrl = formatImageUrl(entry.data?.featured_image);
 				dynamicUrls.push({
 					url: `${siteUrl}/magazine/${slug}`,
 					priority: "0.8",
 					changefreq: "weekly",
-					lastmod: lastmod ? new Date(lastmod).toISOString() : now,
+					lastmod: resolveLastmod(entry.data),
 					image: imgUrl ? { loc: imgUrl, title: entry.data?.title } : undefined,
 				});
 			}
@@ -65,17 +74,16 @@ export const GET: APIRoute = async ({ site }) => {
 
 	// 2. お知らせ記事 (posts コレクション -> /news/[slug])
 	try {
-		const newsResult = await getEmDashCollection("posts", { limit: 100 });
+		const newsResult = await getEmDashCollection("posts", { limit: 500 });
 		if (newsResult?.entries) {
 			for (const entry of newsResult.entries) {
 				const slug = entry.id;
-				const lastmod = entry.data?.updatedAt || entry.data?.publishedAt;
 				const imgUrl = formatImageUrl(entry.data?.featured_image);
 				dynamicUrls.push({
 					url: `${siteUrl}/news/${slug}`,
 					priority: "0.8",
 					changefreq: "weekly",
-					lastmod: lastmod ? new Date(lastmod).toISOString() : now,
+					lastmod: resolveLastmod(entry.data),
 					image: imgUrl ? { loc: imgUrl, title: entry.data?.title } : undefined,
 				});
 			}
@@ -84,17 +92,16 @@ export const GET: APIRoute = async ({ site }) => {
 
 	// 3. キャンペーン詳細 (campaigns コレクション -> /campaigns/[slug])
 	try {
-		const cmpResult = await getEmDashCollection("campaigns" as any, { limit: 50 });
+		const cmpResult = await getEmDashCollection("campaigns" as any, { limit: 200 });
 		if (cmpResult?.entries) {
 			for (const entry of cmpResult.entries) {
 				const slug = entry.id;
-				const lastmod = entry.data?.updated_at || entry.data?.published_at;
 				const imgUrl = formatImageUrl(entry.data?.featured_image || entry.data?.image);
 				dynamicUrls.push({
 					url: `${siteUrl}/campaigns/${slug}`,
 					priority: "0.7",
 					changefreq: "weekly",
-					lastmod: lastmod ? new Date(lastmod).toISOString() : now,
+					lastmod: resolveLastmod(entry.data),
 					image: imgUrl ? { loc: imgUrl, title: entry.data?.title } : undefined,
 				});
 			}
@@ -103,17 +110,16 @@ export const GET: APIRoute = async ({ site }) => {
 
 	// 4. 拠点個別ページ (locations コレクション -> /location/[slug])
 	try {
-		const locResult = await getEmDashCollection("locations" as any, { limit: 50 });
+		const locResult = await getEmDashCollection("locations" as any, { limit: 200 });
 		if (locResult?.entries) {
 			for (const entry of locResult.entries) {
 				const slug = entry.id;
-				const lastmod = entry.data?.updated_at || entry.data?.published_at;
 				const imgUrl = formatImageUrl(entry.data?.featured_image || entry.data?.image);
 				dynamicUrls.push({
 					url: `${siteUrl}/location/${slug}`,
 					priority: "0.7",
 					changefreq: "monthly",
-					lastmod: lastmod ? new Date(lastmod).toISOString() : now,
+					lastmod: resolveLastmod(entry.data),
 					image: imgUrl ? { loc: imgUrl, title: entry.data?.title } : undefined,
 				});
 			}
@@ -127,13 +133,13 @@ export const GET: APIRoute = async ({ site }) => {
 ${allUrls
 	.map(
 		(p) => `  <url>
-    <loc>${p.url}</loc>
+    <loc>${escapeXml(p.url)}</loc>
     <lastmod>${p.lastmod || now}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>${p.image ? `
     <image:image>
-      <image:loc>${p.image.loc}</image:loc>${p.image.title ? `
-      <image:title>${p.image.title.replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '\'': '&apos;', '"': '&quot;' }[c] || c))}</image:title>` : ""}
+      <image:loc>${escapeXml(p.image.loc)}</image:loc>${p.image.title ? `
+      <image:title>${escapeXml(p.image.title)}</image:title>` : ""}
     </image:image>` : ""}
   </url>`
 	)

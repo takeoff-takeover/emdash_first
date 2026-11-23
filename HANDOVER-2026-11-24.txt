@@ -1,0 +1,39 @@
+================================================================================
+引き継ぎサマリー: 2026-11-24
+================================================================================
+
+1. 今回のセッションで完了したこと
+   - サイト全体監査（セキュリティ・リンク切れ・デザイン原則・SEO/AIO・コード衛生）と全優先度（最優先〜低優先）の一括修正
+     * [最優先] 未認証の旧スライダーAPI3件を削除（save-slider-to-post.ts / upload-slider-image.ts / get-post-slider.ts）
+     * [最優先] コード内リンク切れ画像11件を実在する正規画像へ差し替え（リンク切れ0件を確認）
+     * [最優先] public/llms.txt 内の404記事リンク3件を実在する主要公開記事へ更新
+     * [高優先] NicoleLayout.astro に theme.css を追加読み込み、tokens.css へ --font-body / --font-mono を定義し、全16ファイルから monospace 指定を完全排除
+     * [高優先] 不要な外部Webフォント（Google Fonts Roboto / Inter）を NicoleLayout.astro・astro.config.mjs・Base.astro から削除し、Helvetica Neue / システムフォント構成に一本化
+     * [高優先] magazine/[slug].astro の blockquote 左ボーダー＆背景ボックスを削除、design-system.astro の赤グロー影を削除
+     * [高優先] 企業情報ページ（corporate.astro / corporate/nicole-cars.astro）の認定中古車センター拠点表記を「BMW・MINI併設の認定中古車センター2箇所（BMW 2拠点・MINI 2拠点）」へ統一
+     * [中優先] 検証用ページ（gallery-preview.astro / magazine/motion-sample.astro）へ noindex={true} を付与し、robots.txt.ts の本番許可時にも Disallow を追加
+     * [中優先] rss.xml.ts のURLを /posts/ → /news/ へ正規化、magazine 記事も統合配信、言語フォールバックを ja へ修正
+     * [中優先] NicoleLayout.astro の OGP preload を相対パスへ修正
+     * [中優先] sitemap.xml.ts の lastmod フィールド名両対応、XMLエスケープ徹底、取得上限引き上げ
+     * [低優先] /api/views の slug / collection バリデーション強化、AdobeStock_ ファイル名のコード内排除、未使用ファイル（AccordionPatternsPreview.astro / seed/seed.json.bak）削除
+   - マガジン関連記事ロジック改修 ＆ フェラーリ受賞記事のカテゴリ変更
+     * magazine/[slug].astro の関連記事を「1. 同ブランド＆同カテゴリ → 2. 同ブランド → 3. 同カテゴリ → 4. その他最新」の優先順へ変更（CMSタクソノミーを最優先参照）
+     * 202611_ferrari_world-award-2025 のカテゴリを People → Announcement（announcement）へ更新（ローカルD1・backup.sqlite 同期済み）
+   - 全記事テンプレートの見出しサイズ階層＆スマホ改行ルール統一
+     * スマホ表示での H1/H2 サイズ逆転を解消（H1 23px〜 ＞ H2 20px ＞ H3 17.5px ＞ H4 16px）
+     * 左揃え記事見出しの text-wrap: balance 強制を解除し、スマホ幅（768px以下）の本文見出し（H2〜H4）は word-break: normal; line-break: strict; text-wrap: wrap; で自然なフル幅折り返しに統一（magazine / news / campaigns / pages / theme.css）
+   - 全189件のCTAブロック監査・1行完結＆シンプル化とルールブック完全同期
+     * CTABlock.astro のレガシープロパティ（buttonText / buttonUrl / text）対応補強
+     * 202611_ferrari_world-award-2025 を含む全記事のCTAボタンを15文字以内・誘導文をPC1行（24文字以内目安）かつ矛盾のない表現へ一括修正（ローカルD1・backup.sqlite 同期済み）
+     * AGENTS.md / CLAUDE.md / .agents/rules/design-rules.md / .agents/rules/article-block-rules.md へ見出しルール・CTAシンプル1行ルールを反映・完全同期
+
+2. 現在のステータス & 積み残しタスク
+   - ローカル環境・DBバックアップ（seed/backup.sqlite）・ルールブック（AGENTS.md / CLAUDE.md）すべて最新で同期済み。
+   - 任意の今後の検討事項：
+     * iOS向け apple-touch-icon（180×180 PNG版ロゴ）を用意した場合、NicoleLayout.astro の SVG 指定を PNG へ差し替え。
+     * Cloudflare 本番デプロイは明示指示があるまで未実施（ローカル確認のみ）。
+
+3. 次回環境（自宅／会社PC）での再開手順
+   - プロジェクトフォルダに移動: cd ~/dev/my-emdash-site
+   - 「開発準備して」と指示して dev-setup スキルを実行
+================================================================================
