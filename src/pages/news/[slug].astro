@@ -83,13 +83,11 @@ function formatNoticeDate(raw: any, fallbackStr: string = "2026.10.20"): string 
 
 const formattedDate = formatNoticeDate(rawDate);
 
-// カテゴリー自動判定
+// カテゴリー自動判定（一覧ページ・トップページと同じ 重要なお知らせ / 営業日案内 / お知らせ の3構成）
 function getCategory(slugStr: string, titleStr: string): string {
 	const combined = `${slugStr} ${titleStr}`.toLowerCase();
-	if (/休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "休業案内";
-	if (/定休日|営業時間|営業日/.test(combined)) return "営業案内";
 	if (/重要|注意|法改正|閉鎖|停止/.test(combined)) return "重要なお知らせ";
-	if (/協定|加入|リリース|寄贈|csr|esg|パートナー/.test(combined)) return "プレスリリース";
+	if (/定休日|営業時間|営業日|休業|夏季休業|年末年始|gw|ゴールデンウィーク/.test(combined)) return "営業日案内";
 	return "お知らせ";
 }
 
