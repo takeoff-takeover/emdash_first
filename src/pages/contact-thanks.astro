@@ -1,7 +1,7 @@
 ---
 // src/pages/contact-thanks.astro
 // ニコル・グループ お問い合わせ完了
-// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
+// 会社案内（corporate.astro）準拠：黒ベース（#000000）＆チャコールグレー帯（#08090b）・1440pxワイド1カラム構成
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "お問い合わせ完了 | Nicole Group 公式";
@@ -21,7 +21,7 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 			body:has(.thanks-dark-main) #primary,
 			body:has(.thanks-dark-main) .content-area,
 			body:has(.thanks-dark-main) .ast-container {
-				background-color: #040507 !important;
+				background-color: #000000 !important;
 				background-image: none !important;
 				padding: 0 !important;
 				margin: 0 !important;
@@ -110,7 +110,7 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 		--spacing-12: 3rem;
 		--spacing-20: 5rem;
 
-		--color-bg: #040507;
+		--color-bg: #000000;
 		--color-border: rgba(255, 255, 255, 0.1);
 		--color-text: #ffffff;
 
@@ -183,10 +183,10 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 		inset: 0;
 		background: linear-gradient(
 			180deg,
-			rgba(4, 5, 7, 0.86) 0%,
-			rgba(4, 5, 7, 0.42) 40%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
+			rgba(0, 0, 0, 0.86) 0%,
+			rgba(0, 0, 0, 0.42) 40%,
+			rgba(0, 0, 0, 0.85) 80%,
+			#000000 100%
 		);
 	}
 
@@ -195,9 +195,9 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 		inset: 0;
 		background: linear-gradient(
 			90deg,
-			rgba(4, 5, 7, 0.82) 0%,
-			rgba(4, 5, 7, 0.28) 55%,
-			rgba(4, 5, 7, 0.62) 100%
+			rgba(0, 0, 0, 0.82) 0%,
+			rgba(0, 0, 0, 0.28) 55%,
+			rgba(0, 0, 0, 0.62) 100%
 		);
 	}
 
@@ -253,14 +253,12 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 	.corp-section {
 		padding: var(--spacing-20) 0;
 		position: relative;
-		background-color: #040507;
+		background-color: #000000;
 	}
 
 	.corp-section--alt {
-		background-color: #0e1118;
-		background-image:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
-			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		background-color: #08090b;
+		background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
@@ -370,7 +368,7 @@ const referenceId = /^NC-\d{8}-[A-Z0-9]{4}$/.test(rawRef) ? rawRef : "";
 	.thanks-btn--primary {
 		background-color: #ffffff;
 		border: 1px solid #ffffff;
-		color: #040507;
+		color: #000000;
 	}
 
 	.thanks-btn--primary:hover {

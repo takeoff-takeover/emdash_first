@@ -75,6 +75,7 @@ const websiteSchema = {
 import NicoleHeader from "../components/NicoleHeader.astro";
 import NicoleFooter from "../components/NicoleFooter.astro";
 import NicoleConnectSubnav from "../components/NicoleConnectSubnav.astro";
+import NicoleFloatingDock from "../components/NicoleFloatingDock.astro";
 import "../styles/tokens.css";
 import "../styles/theme.css";
 import "../styles/entrance-motion.css";
@@ -215,6 +216,7 @@ import "../styles/entrance-motion.css";
 		<NicoleFooter />
 	</div>
 
+	<NicoleFloatingDock />
 	<DevMobilePreview />
 	<script is:inline src="/scripts/lenis.min.js"></script>
 	<script is:inline src="/scripts/entrance-motion-init.js"></script>

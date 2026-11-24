@@ -1,7 +1,7 @@
 ---
 // src/pages/contact.astro
 // ニコル・グループ お問い合わせフォーム
-// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
+// 会社案内（corporate.astro）準拠：黒ベース（#000000）＆チャコールグレー帯（#08090b）・1440pxワイド1カラム構成
 // formrun API連携対応ネイティブHTMLフォーム
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
@@ -54,7 +54,7 @@ const jsonLd = {
 			body:has(.contact-dark-main) #primary,
 			body:has(.contact-dark-main) .content-area,
 			body:has(.contact-dark-main) .ast-container {
-				background-color: #040507 !important;
+				background-color: #000000 !important;
 				background-image: none !important;
 				padding: 0 !important;
 				margin: 0 !important;
@@ -96,7 +96,7 @@ const jsonLd = {
 			</div>
 		</header>
 
-		<!-- 2. ご案内・注意事項セクション（#040507 ベース） -->
+		<!-- 2. ご案内・注意事項セクション（#000000 ベース） -->
 		<section class="corp-section corp-section--compact">
 			<div class="corp-container">
 				<div class="contact-notes">
@@ -385,7 +385,7 @@ const jsonLd = {
 		--spacing-16: 4rem;
 		--spacing-20: 5rem;
 
-		--color-bg: #040507;
+		--color-bg: #000000;
 		--color-border: rgba(255, 255, 255, 0.1);
 		--color-text: #ffffff;
 		--color-text-secondary: rgba(255, 255, 255, 0.74);
@@ -460,10 +460,10 @@ const jsonLd = {
 		inset: 0;
 		background: linear-gradient(
 			180deg,
-			rgba(4, 5, 7, 0.86) 0%,
-			rgba(4, 5, 7, 0.42) 40%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
+			rgba(0, 0, 0, 0.86) 0%,
+			rgba(0, 0, 0, 0.42) 40%,
+			rgba(0, 0, 0, 0.85) 80%,
+			#000000 100%
 		);
 	}
 
@@ -472,9 +472,9 @@ const jsonLd = {
 		inset: 0;
 		background: linear-gradient(
 			90deg,
-			rgba(4, 5, 7, 0.82) 0%,
-			rgba(4, 5, 7, 0.28) 55%,
-			rgba(4, 5, 7, 0.62) 100%
+			rgba(0, 0, 0, 0.82) 0%,
+			rgba(0, 0, 0, 0.28) 55%,
+			rgba(0, 0, 0, 0.62) 100%
 		);
 	}
 
@@ -550,7 +550,7 @@ const jsonLd = {
 	.corp-section {
 		padding: var(--spacing-20) 0;
 		position: relative;
-		background-color: #040507;
+		background-color: #000000;
 	}
 
 	.corp-section--compact {
@@ -558,10 +558,8 @@ const jsonLd = {
 	}
 
 	.corp-section--alt {
-		background-color: #0e1118;
-		background-image:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
-			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		background-color: #08090b;
+		background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow:
@@ -736,7 +734,7 @@ const jsonLd = {
 		min-height: 52px !important;
 		padding: 0 16px !important;
 		margin: 0 !important;
-		background-color: rgba(4, 5, 7, 0.72) !important;
+		background-color: rgba(0, 0, 0, 0.72) !important;
 		border: 1px solid rgba(255, 255, 255, 0.18) !important;
 		border-radius: var(--radius-card, 4px) !important;
 		color: #ffffff !important;
@@ -759,7 +757,7 @@ const jsonLd = {
 	.form-control:focus {
 		outline: none !important;
 		border-color: #ffffff !important;
-		background-color: rgba(4, 5, 7, 0.92) !important;
+		background-color: rgba(0, 0, 0, 0.92) !important;
 	}
 
 	.form-control.is-invalid {
@@ -794,14 +792,24 @@ const jsonLd = {
 	}
 
 	.form-select {
+		display: inline-block !important;
+		vertical-align: middle;
 		-webkit-appearance: none !important;
+		-moz-appearance: none !important;
 		appearance: none !important;
+		background-image: none !important;
 		padding: 0 44px 0 16px !important;
+		line-height: 50px !important;
+		white-space: nowrap;
 		cursor: pointer;
 	}
 
+	.form-select::picker-icon {
+		display: none !important;
+	}
+
 	.form-select option {
-		background-color: #0e1118;
+		background-color: #08090b;
 		color: #ffffff;
 	}
 
@@ -819,7 +827,7 @@ const jsonLd = {
 		gap: 10px;
 		min-height: 48px;
 		padding: 12px 22px;
-		background-color: rgba(4, 5, 7, 0.6);
+		background-color: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		border-radius: var(--radius-card, 4px);
 		color: rgba(255, 255, 255, 0.86);

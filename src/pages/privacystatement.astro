@@ -1,7 +1,7 @@
 ---
 // src/pages/privacystatement.astro
 // ニコル・グループ プライバシー・ポリシー
-// 会社案内（corporate.astro）準拠：黒ベース（#040507）＆チャコールグレー帯（#0e1118）・1440pxワイド1カラム構成
+// 会社案内（corporate.astro）準拠：黒ベース（#000000）＆チャコールグレー帯（#08090b）・1440pxワイド1カラム構成
 import NicoleLayout from "../layouts/NicoleLayout.astro";
 
 const pageTitle = "プライバシー・ポリシー | Nicole Group 公式";
@@ -53,7 +53,7 @@ const jsonLd = {
 			body:has(.legal-dark-main) #primary,
 			body:has(.legal-dark-main) .content-area,
 			body:has(.legal-dark-main) .ast-container {
-				background-color: #040507 !important;
+				background-color: #000000 !important;
 				background-image: none !important;
 				padding: 0 !important;
 				margin: 0 !important;
@@ -105,7 +105,7 @@ const jsonLd = {
 			</div>
 		</header>
 
-		<!-- 2. 第1部：プライバシー・ステートメント（#040507 ベース） -->
+		<!-- 2. 第1部：プライバシー・ステートメント（#000000 ベース） -->
 		<section id="privacy-statement" class="corp-section">
 			<div class="corp-container">
 				<header class="corp-section-header">
@@ -442,7 +442,7 @@ const jsonLd = {
 			</div>
 		</section>
 
-		<!-- 4. 対象グループ会社（#040507 ベース） -->
+		<!-- 4. 対象グループ会社（#000000 ベース） -->
 		<section id="legal-companies" class="corp-section">
 			<div class="corp-container">
 				<footer class="legal-companies">
@@ -473,7 +473,7 @@ const jsonLd = {
 		--spacing-16: 4rem;
 		--spacing-20: 5rem;
 
-		--color-bg: #040507;
+		--color-bg: #000000;
 		--color-border: rgba(255, 255, 255, 0.09);
 		--color-text: #ffffff;
 		--color-text-secondary: rgba(255, 255, 255, 0.78);
@@ -548,10 +548,10 @@ const jsonLd = {
 		inset: 0;
 		background: linear-gradient(
 			180deg,
-			rgba(4, 5, 7, 0.86) 0%,
-			rgba(4, 5, 7, 0.42) 40%,
-			rgba(4, 5, 7, 0.85) 80%,
-			#040507 100%
+			rgba(0, 0, 0, 0.86) 0%,
+			rgba(0, 0, 0, 0.42) 40%,
+			rgba(0, 0, 0, 0.85) 80%,
+			#000000 100%
 		);
 	}
 
@@ -560,9 +560,9 @@ const jsonLd = {
 		inset: 0;
 		background: linear-gradient(
 			90deg,
-			rgba(4, 5, 7, 0.82) 0%,
-			rgba(4, 5, 7, 0.28) 55%,
-			rgba(4, 5, 7, 0.62) 100%
+			rgba(0, 0, 0, 0.82) 0%,
+			rgba(0, 0, 0, 0.28) 55%,
+			rgba(0, 0, 0, 0.62) 100%
 		);
 	}
 
@@ -672,15 +672,13 @@ const jsonLd = {
 	.corp-section {
 		padding: var(--spacing-20) 0;
 		position: relative;
-		background-color: #040507;
+		background-color: #000000;
 		scroll-margin-top: 88px;
 	}
 
 	.corp-section--alt {
-		background-color: #0e1118;
-		background-image:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%),
-			radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+		background-color: #08090b;
+		background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow:
@@ -817,7 +815,7 @@ const jsonLd = {
 		align-items: center;
 		gap: 10px;
 		background-color: #ffffff;
-		color: #040507 !important;
+		color: #000000 !important;
 		padding: 12px 26px;
 		border-radius: var(--radius-action, 9999px);
 		font-size: 13.5px;

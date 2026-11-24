@@ -1,0 +1,394 @@
+---
+// src/components/NicoleFloatingDock.astro
+// ニコル・グループ公式 下段フローティングナビゲーション（ダークガラス・ピル型ドック）
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+const isHome = pathname === "/";
+const isMagazine = pathname === "/magazine" || pathname.startsWith("/magazine/");
+const isLocations = pathname === "/locations" || pathname.startsWith("/location");
+const isContact = pathname === "/contact" || pathname.startsWith("/contact");
+---
+
+<nav class="nicole-floating-dock" id="nicole-floating-dock" aria-label="クイックナビゲーション">
+	<div class="nicole-floating-dock__pill">
+		<a
+			href="/"
+			class:list={["nicole-floating-dock__item", { "is-active": isHome }]}
+			aria-current={isHome ? "page" : undefined}
+		>
+			<span class="nicole-floating-dock__icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M3 10.5 12 3l9 7.5"></path>
+					<path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"></path>
+				</svg>
+			</span>
+			<span class="nicole-floating-dock__label">HOME</span>
+		</a>
+
+		<a
+			href="/magazine"
+			class:list={["nicole-floating-dock__item", { "is-active": isMagazine }]}
+			aria-current={isMagazine ? "page" : undefined}
+		>
+			<span class="nicole-floating-dock__icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"></path>
+					<path d="M8 7h8M8 11h8M8 15h5"></path>
+				</svg>
+			</span>
+			<span class="nicole-floating-dock__label">MAGAZINE</span>
+		</a>
+
+		<button
+			type="button"
+			class="nicole-floating-dock__item nicole-floating-dock__item--top"
+			id="nicole-dock-top-btn"
+			aria-label="ページ最上部へ戻る"
+			title="TOP"
+		>
+			<span class="nicole-floating-dock__icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 19V5"></path>
+					<path d="m6 11 6-6 6 6"></path>
+				</svg>
+			</span>
+		</button>
+
+		<a
+			href="/locations"
+			class:list={["nicole-floating-dock__item", { "is-active": isLocations }]}
+			aria-current={isLocations ? "page" : undefined}
+		>
+			<span class="nicole-floating-dock__icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 21s-6-5.6-6-10.5a6 6 0 1 1 12 0C18 15.4 12 21 12 21Z"></path>
+					<circle cx="12" cy="10.5" r="2.2"></circle>
+				</svg>
+			</span>
+			<span class="nicole-floating-dock__label">LOCATIONS</span>
+		</a>
+
+		<a
+			href="/contact"
+			class="nicole-floating-dock__item js-contact-link"
+			aria-current={isContact ? "page" : undefined}
+		>
+			<span class="nicole-floating-dock__icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="5" width="18" height="14" rx="2"></rect>
+					<path d="m3 7 9 6 9-6"></path>
+				</svg>
+			</span>
+			<span class="nicole-floating-dock__label">CONTACT</span>
+		</a>
+	</div>
+</nav>
+
+<style>
+	.nicole-floating-dock {
+		position: fixed;
+		left: 50%;
+		bottom: max(18px, env(safe-area-inset-bottom, 0px));
+		transform: translate3d(-50%, 18px, 0);
+		z-index: 950;
+		pointer-events: none;
+		width: auto;
+		max-width: calc(100vw - 24px);
+		opacity: 0;
+		visibility: hidden;
+		transition:
+			opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+			visibility 0.35s;
+		will-change: opacity, transform;
+	}
+
+	.nicole-floating-dock.is-visible {
+		opacity: 1;
+		transform: translate3d(-50%, 0, 0);
+		visibility: visible;
+	}
+
+	.nicole-floating-dock__pill {
+		pointer-events: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		padding: 5px 7px;
+		background: rgba(14, 14, 14, 0.84);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 9999px;
+		box-shadow: 0 14px 36px rgba(0, 0, 0, 0.72);
+	}
+
+	.nicole-floating-dock.is-visible .nicole-floating-dock__pill {
+		pointer-events: auto;
+	}
+
+	.nicole-floating-dock__item {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 92px;
+		height: 46px;
+		padding: 0 10px;
+		border: none;
+		background: transparent;
+		border-radius: 9999px;
+		color: rgba(255, 255, 255, 0.74);
+		font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		font-size: 10px;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		line-height: 1;
+		text-decoration: none;
+		white-space: nowrap;
+		cursor: pointer;
+		gap: 4px;
+		transition:
+			background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+			color 0.2s ease,
+			box-shadow 0.2s ease,
+			border-color 0.2s ease,
+			transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.nicole-floating-dock__item:hover,
+	.nicole-floating-dock__item:focus-visible {
+		background: rgba(255, 255, 255, 0.09);
+		color: #ffffff;
+		text-decoration: none;
+		outline: none;
+	}
+
+	.nicole-floating-dock__item:focus-visible {
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+	}
+
+	.nicole-floating-dock__item--top {
+		min-width: 44px;
+		width: 44px;
+		height: 42px;
+		padding: 0;
+		margin: 0 14px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		color: #ffffff;
+	}
+
+	.nicole-floating-dock__item--top:hover,
+	.nicole-floating-dock__item--top:focus-visible {
+		background: #ffffff;
+		border-color: #ffffff;
+		box-shadow: none;
+		color: #000000;
+		transform: translateY(-1px);
+	}
+
+	.nicole-floating-dock__icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	.nicole-floating-dock__icon svg {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.nicole-floating-dock__label {
+		display: block;
+	}
+
+	@media (max-width: 640px) {
+		.nicole-floating-dock {
+			width: calc(100vw - 20px);
+			max-width: 420px;
+			bottom: max(12px, env(safe-area-inset-bottom, 0px));
+		}
+
+		.nicole-floating-dock__pill {
+			width: 100%;
+			justify-content: space-between;
+			padding: 4px 5px;
+			gap: 2px;
+		}
+
+		.nicole-floating-dock__item {
+			width: auto;
+			min-width: 0;
+			flex: 1 1 0%;
+			height: 44px;
+			padding: 0 2px;
+			font-size: 9px;
+			letter-spacing: 0.03em;
+			gap: 3px;
+		}
+
+		.nicole-floating-dock__item--top {
+			flex: 0 0 40px;
+			width: 40px;
+			height: 40px;
+			margin: 0 8px;
+		}
+
+		.nicole-floating-dock__icon {
+			width: 15px;
+			height: 15px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.nicole-floating-dock,
+		.nicole-floating-dock__item {
+			transition: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		var dock = document.getElementById("nicole-floating-dock");
+		var topBtn = document.getElementById("nicole-dock-top-btn");
+		var footer = document.getElementById("nicole-footer") || document.querySelector("footer");
+		if (!dock) return;
+
+		if (topBtn) {
+			topBtn.addEventListener("click", function () {
+				if (window.lenis && typeof window.lenis.scrollTo === "function") {
+					window.lenis.scrollTo(0, { immediate: false });
+				} else {
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				}
+			});
+		}
+
+		var isFooterVisible = false;
+		var isShown = false;
+		var isHovered = false;
+		var isPeeking = false;
+		var peekShowTimer = null;
+		var peekHideTimer = null;
+		var lastY = window.scrollY;
+		var upAccum = 0;
+		var downAccum = 0;
+		var topHideThreshold = 120;
+		var showDelta = 10;
+		var hideDelta = 14;
+
+		function applyVisibility(visible) {
+			isShown = visible;
+			dock.classList.toggle("is-visible", visible);
+		}
+
+		function cancelPeek() {
+			isPeeking = false;
+			if (peekShowTimer) {
+				clearTimeout(peekShowTimer);
+				peekShowTimer = null;
+			}
+			if (peekHideTimer) {
+				clearTimeout(peekHideTimer);
+				peekHideTimer = null;
+			}
+		}
+
+		function schedulePeekHide(delayMs) {
+			if (peekHideTimer) clearTimeout(peekHideTimer);
+			peekHideTimer = setTimeout(function () {
+				if (!isPeeking) return;
+				if (isHovered) return;
+				isPeeking = false;
+				if (window.scrollY <= topHideThreshold || isFooterVisible) {
+					applyVisibility(false);
+				}
+			}, delayMs);
+		}
+
+		dock.addEventListener("mouseenter", function () {
+			isHovered = true;
+			if (peekHideTimer) {
+				clearTimeout(peekHideTimer);
+				peekHideTimer = null;
+			}
+		});
+
+		dock.addEventListener("mouseleave", function () {
+			isHovered = false;
+			if (isPeeking) {
+				schedulePeekHide(500);
+			}
+		});
+
+		function onScroll() {
+			var currentY = Math.max(0, window.scrollY);
+			var diff = currentY - lastY;
+			lastY = currentY;
+
+			if (Math.abs(diff) > 2 && isPeeking) {
+				cancelPeek();
+			}
+
+			// 最上部またはフッター表示中は常に非表示
+			if (currentY <= topHideThreshold || isFooterVisible) {
+				upAccum = 0;
+				downAccum = 0;
+				if (isShown && !isPeeking) applyVisibility(false);
+				return;
+			}
+
+			if (diff < 0) {
+				// 上方向スクロール：少し戻ろうとしたらふわっと表示
+				upAccum += -diff;
+				downAccum = 0;
+				if (!isShown && upAccum >= showDelta) {
+					applyVisibility(true);
+				}
+			} else if (diff > 0) {
+				// 下方向スクロール：読み進めるときはスッと隠す
+				downAccum += diff;
+				upAccum = 0;
+				if (isShown && downAccum >= hideDelta) {
+					applyVisibility(false);
+				}
+			}
+		}
+
+		if (footer && "IntersectionObserver" in window) {
+			var observer = new IntersectionObserver(
+				function (entries) {
+					isFooterVisible = entries.some(function (entry) {
+						return entry.isIntersecting;
+					});
+					if (isFooterVisible && isShown) {
+						cancelPeek();
+						applyVisibility(false);
+					}
+				},
+				{ threshold: 0.05 }
+			);
+			observer.observe(footer);
+		}
+
+		window.addEventListener("scroll", onScroll, { passive: true });
+		applyVisibility(false);
+
+		// 初回ピーク演出：最上部でページを開いた直後に一瞬だけふわっと見せて存在を伝え、自動で引っ込む
+		if (window.scrollY <= topHideThreshold) {
+			peekShowTimer = setTimeout(function () {
+				if (window.scrollY > topHideThreshold || isFooterVisible) return;
+				isPeeking = true;
+				applyVisibility(true);
+				schedulePeekHide(2200);
+			}, 600);
+		}
+	})();
+</script>

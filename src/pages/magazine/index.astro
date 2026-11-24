@@ -1334,7 +1334,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		--mag-color-meta: #6b707d;        /* 3. 日付・タグ・閲覧数（補助的なシックグレー） */
 		--mag-color-border: rgba(255, 255, 255, 0.1); /* 4. 境界線・区切り */
 
-		background-color: #040507;
+		background-color: #000000;
 		color: var(--mag-color-lead);
 		font-family: "Helvetica Neue", Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 		min-height: 100vh;
@@ -1392,10 +1392,10 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		height: 100%;
 		background: linear-gradient(
 			180deg, 
-			rgba(4, 5, 7, 0.88) 0%, 
-			rgba(4, 5, 7, 0.25) 35%, 
-			rgba(4, 5, 7, 0.4) 65%, 
-			rgba(4, 5, 7, 0.98) 100%
+			rgba(0, 0, 0, 0.88) 0%, 
+			rgba(0, 0, 0, 0.25) 35%, 
+			rgba(0, 0, 0, 0.4) 65%, 
+			rgba(0, 0, 0, 0.98) 100%
 		);
 	}
 
@@ -1407,8 +1407,8 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		height: 100%;
 		background: linear-gradient(
 			90deg, 
-			rgba(4, 5, 7, 0.75) 0%, 
-			rgba(4, 5, 7, 0.35) 45%, 
+			rgba(0, 0, 0, 0.75) 0%, 
+			rgba(0, 0, 0, 0.35) 45%, 
 			transparent 100%
 		);
 	}
@@ -1532,7 +1532,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.magazine-cta-btn--primary {
 		background: #ffffff;
-		color: #040507;
+		color: #000000;
 		box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
 	}
 
@@ -2471,7 +2471,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 		position: sticky;
 		top: 60px;
 		z-index: 500;
-		background: rgba(4, 5, 7, 0.96);
+		background: rgba(0, 0, 0, 0.96);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		padding: 16px 0 20px 0;
@@ -3052,7 +3052,7 @@ const archiveArticles = Astro.url.searchParams.get("view") === "latest"
 
 	.btn-reset-filters {
 		background: #ffffff;
-		color: #040507;
+		color: #000000;
 		border: none;
 		padding: 10px 24px;
 		border-radius: var(--radius-action, 9999px);
